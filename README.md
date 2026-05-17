@@ -1,37 +1,85 @@
 # Climate Claim Verification RAG
 
-This project documents a multi-stage retrieval-augmented fact-checking system for climate science claims. The task is to retrieve relevant evidence from an evidence corpus and classify each claim into one of four labels: `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, or `DISPUTED`.
+A portfolio-safe climate fact-checking project that combines evidence retrieval, semantic reranking, and sequence classification for climate-related claims.
 
-The repository is prepared as a sanitized portfolio version. It focuses on task design, modeling strategy, and evaluation results without redistributing restricted course data.
+Given a claim, the system retrieves relevant evidence from a large evidence corpus and predicts one of four labels: `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, or `DISPUTED`. The project is presented as a sanitized public summary: restricted benchmark files, raw evidence corpora, notebooks, and submission artifacts are not redistributed.
 
-## Task
+## Project Highlights
 
-Given a climate science claim, the system needs to:
+- Built an end-to-end claim verification pipeline covering candidate retrieval, semantic reranking, sequence classification, prediction formatting, and official metric evaluation.
+- Implemented a two-stage retrieval system: BM25 candidate generation followed by BGE semantic reranking to select top-5 evidence passages.
+- Fine-tuned a Qwen3.5-4B sequence classifier with LoRA on claim-evidence inputs under Colab-style resource constraints.
+- Compared retrieval candidate sizes, reranking models, and classifier training strategies to diagnose the retrieval-classification bottleneck.
+- Separated development-set diagnostics from public evaluation results to avoid mixing experimental numbers.
 
-1. Retrieve relevant evidence candidates from the evidence knowledge base.
-2. Rerank candidates by claim-evidence relevance.
-3. Predict the final claim label.
-4. Evaluate both retrieval quality and classification accuracy.
+## Task Definition
 
-## Method
+For each claim `c`, the system outputs:
 
-The system follows a three-stage RAG architecture:
+- a ranked evidence set `E = {e1, e2, ..., ek}`;
+- a claim label from `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, `DISPUTED`.
 
-| Stage | Purpose | Implementation idea |
+The official score combines:
+
+| Metric | Meaning |
+|---|---|
+| Evidence Retrieval F-score | Whether predicted evidence IDs match the gold evidence IDs |
+| Claim Classification Accuracy | Whether the final label is correct |
+| Harmonic Mean | Balanced score between retrieval and classification |
+
+## System Architecture
+
+```text
+Claim
+  -> BM25 candidate retrieval, top-N evidence pool
+  -> BGE semantic reranking, top-5 final evidence
+  -> Qwen3.5-4B LoRA sequence classifier
+  -> Four-way claim label + evidence IDs
+```
+
+| Stage | Design | Reason |
 |---|---|---|
-| Bi-Encoder retrieval | Fast candidate recall | Encode claims and evidence into dense vectors and retrieve top-k candidates |
-| Cross-Encoder reranking | Fine-grained relevance scoring | Score claim-evidence pairs with joint encoding |
-| Transformer / open-source LLM verification | Final label prediction | Use retrieved evidence to predict claim labels |
+| Preprocessing | Lowercase and whitespace cleanup while preserving numbers, units, entities, and chemical symbols | Climate claims often depend on exact values, locations, and scientific terms |
+| BM25 Retrieval | Retrieve top-1000 evidence candidates from the full corpus | Efficient first-stage recall with manageable reranking cost |
+| BGE Reranking | Rank BM25 candidates by claim-evidence semantic similarity | Handles paraphrases such as `human emissions` vs `anthropogenic greenhouse gases` |
+| Sequence Classification | Fine-tune Qwen3.5-4B with LoRA on claim + retrieved evidence | Matches inference-time noisy evidence instead of only clean gold evidence |
 
-Additional retrieval optimization:
+## Retrieval Experiments
 
-- Used BGE-M3 as the semantic retrieval model.
-- Constructed hard negative samples to improve discrimination between relevant evidence and semantically similar but incorrect evidence.
-- Tuned the pipeline on the development split with official evaluation metrics.
+BM25 candidate size and reranker choice were evaluated on the development set using Recall@5.
 
-## Evaluation
+| Candidate Pool | Reranker | Recall@5 |
+|---|---|---:|
+| BM25 top-1000 | MiniLM | 0.204 |
+| BM25 top-5000 | MiniLM | 0.191 |
+| BM25 top-1000 | BGE | 0.223 |
+| BM25 top-5000 | BGE | 0.206 |
 
-Official evaluation metrics include evidence retrieval F-score, claim classification accuracy, and their harmonic mean.
+**Finding:** BM25 top-1000 with BGE reranking gave the best tested retrieval trade-off. Expanding the candidate pool to 5000 introduced more weakly related evidence and made reranking noisier.
+
+## Classifier Training Strategy
+
+The main classifier issue was the distribution gap between training-time gold evidence and inference-time retrieved evidence.
+
+| Training Strategy | Classification Accuracy |
+|---|---:|
+| Gold evidence training, tested on noisy retrieval | 0.45 |
+| Retrieved evidence with relabelled retrieval misses | 0.38 |
+| Retrieved evidence with original labels | 0.6169 |
+
+**Finding:** Training on retrieved evidence while keeping original labels produced the best classification performance. Relabelling retrieval misses as `NOT_ENOUGH_INFO` distorted the label distribution and made the model over-conservative.
+
+## End-to-End Results
+
+### Development / Reported System Diagnostics
+
+| System | Evidence F | Accuracy | Harmonic Mean |
+|---|---:|---:|---:|
+| BM25(1000) + BGE + Qwen3.5-4B LoRA | 0.19 | 0.61 | 0.29 |
+
+These numbers reflect the final report configuration and show a clear pattern: classification accuracy was stronger than retrieval F-score, so retrieval remained the main bottleneck.
+
+### Public Evaluation Snapshot
 
 | Metric | Value |
 |---|---:|
@@ -40,16 +88,41 @@ Official evaluation metrics include evidence retrieval F-score, claim classifica
 | Evidence Retrieval F-score | 0.26 |
 | Claim Classification Accuracy | 0.57 |
 
-## Key Takeaways
+The public snapshot is kept separate from the report diagnostics because it comes from a different evaluation setting/submission state.
 
-- Retrieval and classification need to be optimized together; improving one metric alone may not improve the harmonic mean.
-- Hard negative sampling is useful for claims whose surface wording is close to misleading evidence.
-- Cross-Encoder reranking improves evidence quality before final classification, especially for ambiguous or disputed claims.
+## Error Analysis
+
+The most common errors came from retrieval, not final label classification.
+
+| Error Type | Example Failure Mode | Impact |
+|---|---|---|
+| Lexical overlap without factual relevance | Evidence shares words such as `households`, `millions`, or `emissions` but does not verify the same claim | Reranker may promote topically related but invalid evidence |
+| Entity and scope mismatch | Claim refers to Australia, while retrieved evidence discusses the United Kingdom or a different population | Classifier receives misleading context |
+| Numerical mismatch | Evidence contains similar percentages or years but refers to a different quantity | Supports/refutes distinction becomes unstable |
+| BM25 recall ceiling | Gold evidence is absent from the top-1000 candidate pool | BGE reranker cannot recover missing evidence |
+
+## Resource Constraints
+
+A full dense retrieval attempt with BGE embeddings over roughly 1.2M evidence passages was explored but was not used in the final public configuration. Encoding took about 56 minutes on a Colab T4 GPU, and the FAISS IndexFlatIP setup ran into memory pressure. A lighter MiniLM dense retrieval attempt also created memory pressure when combined with the Qwen classifier.
+
+The final pipeline therefore uses BM25 for candidate recall, BGE for reranking, and explicit memory cleanup between retrieval and classification stages.
+
+## What This Project Demonstrates
+
+- Retrieval-augmented fact-checking system design.
+- Trade-off analysis between lexical retrieval, semantic reranking, and sequence classification.
+- LoRA fine-tuning of an open-source LLM-style classifier under constrained GPU resources.
+- Evidence-level error analysis for entity, scope, and numerical mismatch.
+- Metric-aware development using Evidence F-score, Accuracy, and Harmonic Mean.
 
 ## Tech Stack
 
-Python, BGE-M3, Bi-Encoder retrieval, Cross-Encoder reranking, Transformer models, RAG, hard negative sampling.
+Python, BM25, BGE reranking, MiniLM comparison, Qwen3.5-4B, LoRA, RAG, sequence classification, retrieval evaluation, Colab GPU workflow.
 
-## Notes
+## Resume-Ready Summary
 
-This is a portfolio-safe project summary. Dataset files and restricted course materials are not included.
+Built a two-stage climate claim verification system with BM25 top-1000 candidate retrieval, BGE semantic reranking, and Qwen3.5-4B LoRA sequence classification; compared MiniLM/BGE rerankers and classifier training strategies, achieving public evaluation rank 5 with H-mean 0.35, Evidence F-score 0.26, and Claim Accuracy 0.57.
+
+## Public Data Policy
+
+This repository is a portfolio-safe summary. Restricted benchmark files, raw evidence corpora, prediction files, notebooks, and private submission materials are intentionally excluded.
