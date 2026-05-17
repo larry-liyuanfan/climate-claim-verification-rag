@@ -2,7 +2,7 @@
 
 A portfolio-safe climate fact-checking project that combines evidence retrieval, semantic reranking, and sequence classification for climate-related claims.
 
-Given a claim, the system retrieves relevant evidence from a large evidence corpus and predicts one of four labels: `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, or `DISPUTED`. The project is presented as a sanitized public summary: restricted benchmark files, raw evidence corpora, notebooks, and submission artifacts are not redistributed.
+Given a claim, the system retrieves relevant evidence from a large evidence corpus and predicts one of four labels: `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, or `DISPUTED`. The project is presented as a sanitized public summary: restricted benchmark files, raw evidence corpora, notebooks, and private evaluation artifacts are not redistributed.
 
 ## Project Highlights
 
@@ -88,7 +88,7 @@ These numbers reflect the final report configuration and show a clear pattern: c
 | Evidence Retrieval F-score | 0.26 |
 | Claim Classification Accuracy | 0.57 |
 
-The public snapshot is kept separate from the report diagnostics because it comes from a different evaluation setting/submission state.
+The public snapshot is kept separate from the report diagnostics because it comes from a different evaluation setting.
 
 ## Error Analysis
 
@@ -125,4 +125,4 @@ Built a two-stage climate claim verification system with BM25 top-1000 candidate
 
 ## Public Data Policy
 
-This repository is a portfolio-safe summary. Restricted benchmark files, raw evidence corpora, prediction files, notebooks, and private submission materials are intentionally excluded.
+This repository is a portfolio-safe summary. Restricted benchmark files, raw evidence corpora, prediction files, notebooks, and private evaluation artifacts are intentionally excluded.
