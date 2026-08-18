@@ -15,7 +15,6 @@ set -euo pipefail
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${NATIVE_ENV}/bin/activate"
-unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 climate-rag index \
