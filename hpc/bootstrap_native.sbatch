@@ -14,23 +14,19 @@ set -euo pipefail
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
-python -m venv "${NATIVE_ENV}"
+python -m venv --system-site-packages "${NATIVE_ENV}"
 source "${NATIVE_ENV}/bin/activate"
-unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 python -m pip install --upgrade pip
-python -m pip install --no-cache-dir "numpy>=1.26,<2"
 python -m pip install --no-cache-dir \
-  --index-url https://download.pytorch.org/whl/cu124 \
-  "torch==2.5.1"
-python -m pip install --no-cache-dir \
+  "numpy>=1.22,<1.23" \
   "transformers>=4.51,<5" \
   "sentence-transformers>=4,<6" \
-  "faiss-cpu>=1.8" \
+  "faiss-cpu==1.7.4" \
   "lightgbm>=4.3" \
   "pydantic>=2.7" \
   "PyYAML>=6.0" \
   "fastapi>=0.111" \
   "uvicorn>=0.30"
 python -m pip install --no-deps -e "${REPO_DIR}"
-python -c "import numpy, torch, faiss, lightgbm, sentence_transformers; print(numpy.__version__, torch.__version__, torch.version.cuda)"
+python -c "import numpy, torch, faiss, lightgbm, sentence_transformers; print(numpy.__version__, torch.__version__, torch.version.cuda, faiss.__version__)"
