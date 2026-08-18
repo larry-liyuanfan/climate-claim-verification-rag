@@ -11,6 +11,7 @@ import numpy as np
 from .io import write_json
 from .models import EvidenceDocument, RankedDocument
 from .tokenize import climate_tokenize
+from .torch_compat import ensure_torch_pytree_compat
 
 
 def l2_normalize(matrix: np.ndarray) -> np.ndarray:
@@ -75,6 +76,7 @@ class SentenceTransformerEncoder:
         device: str | None = None,
     ) -> None:
         try:
+            ensure_torch_pytree_compat()
             from sentence_transformers import SentenceTransformer
         except ImportError as exc:
             raise RuntimeError(
