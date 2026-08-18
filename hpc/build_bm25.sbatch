@@ -13,7 +13,7 @@ DATA_DIR="${DATA_DIR:-/data/gpfs/projects/punim2936/nlp/COMP90042_2026-main/data
 ARTIFACT_DIR="${ARTIFACT_DIR:-/data/gpfs/projects/punim2936/climate-rag-artifacts}"
 : "${CONTAINER_IMAGE:?set CONTAINER_IMAGE}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
-module load apptainer
+module load Apptainer/1.4.5
 
 apptainer exec \
   --bind "${REPO_DIR}:/workspace:ro,${DATA_DIR}:/data:ro,${ARTIFACT_DIR}:/artifacts" \
@@ -22,4 +22,3 @@ apptainer exec \
     --evidence /data/evidence.json \
     --backend bm25 \
     --output-dir /artifacts/bm25
-

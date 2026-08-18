@@ -11,7 +11,7 @@ It contains the 167 MB evidence JSON and train/dev/test claim files. The scripts
 ## Build once
 
 ```bash
-module load apptainer
+module load Apptainer/1.4.5
 apptainer build climate-rag.sif hpc/Apptainer.def
 
 export REPO_DIR="$PWD"
