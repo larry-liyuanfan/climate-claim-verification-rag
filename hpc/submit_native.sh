@@ -5,7 +5,7 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 PORTFOLIO_ROOT="$(dirname "${REPO_DIR}")"
 DATA_DIR="${DATA_DIR:-/data/gpfs/projects/punim2936/nlp/COMP90042_2026-main/data}"
 ARTIFACT_DIR="${ARTIFACT_DIR:-${PORTFOLIO_ROOT}/climate-artifacts}"
-NATIVE_ENV="${NATIVE_ENV:-${ARTIFACT_DIR}/native-venv}"
+NATIVE_ENV="${NATIVE_ENV:-${ARTIFACT_DIR}/native-venv-standalone}"
 PIP_CACHE_DIR="${ARTIFACT_DIR}/pip-cache"
 mkdir -p "${ARTIFACT_DIR}" "${PIP_CACHE_DIR}"
 
