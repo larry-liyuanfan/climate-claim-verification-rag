@@ -9,6 +9,7 @@ from typing import Protocol
 
 from .fusion import build_candidate_features
 from .models import RankedDocument
+from .torch_compat import ensure_torch_pytree_compat
 
 
 class Reranker(Protocol):
@@ -64,6 +65,7 @@ class Qwen3CausalLMReranker:
     ) -> None:
         try:
             import torch
+            ensure_torch_pytree_compat()
             from transformers import AutoModelForCausalLM, AutoTokenizer
         except ImportError as exc:
             raise RuntimeError("torch and transformers>=4.51 are required for Qwen3 reranking") from exc

@@ -29,4 +29,4 @@ python -m pip install --no-cache-dir \
   "fastapi>=0.111" \
   "uvicorn>=0.30"
 python -m pip install --no-deps -e "${REPO_DIR}"
-python -c "import numpy, torch, faiss, lightgbm, sentence_transformers; print(numpy.__version__, torch.__version__, torch.version.cuda, faiss.__version__)"
+python -c "from climate_rag.torch_compat import ensure_torch_pytree_compat; ensure_torch_pytree_compat(); import numpy, torch, faiss, lightgbm, sentence_transformers; print(numpy.__version__, torch.__version__, torch.version.cuda, faiss.__version__)"
