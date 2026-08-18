@@ -1,0 +1,18 @@
+{
+  "c1": {
+    "bm25": [
+      {"evidence_id": "e1", "score": 4.0, "rank": 1},
+      {"evidence_id": "e6", "score": 3.0, "rank": 2},
+      {"evidence_id": "e8", "score": 2.0, "rank": 3}
+    ],
+    "dense": [
+      {"evidence_id": "e6", "score": 0.8, "rank": 1},
+      {"evidence_id": "e1", "score": 0.7, "rank": 2}
+    ]
+  },
+  "c2": {
+    "bm25": ["e2", "e7", "e4"],
+    "dense": ["e7", "e2"]
+  }
+}
+

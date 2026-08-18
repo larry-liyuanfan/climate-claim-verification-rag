@@ -1,0 +1,13 @@
+bm25_index: /artifacts/bm25/bm25.pkl.gz
+dense_index: /artifacts/dense-hnsw/dense
+ltr_model: /artifacts/ltr/ltr_model.txt
+device: cuda
+recall_k: 1000
+fusion_k: 100
+rrf_k: 60
+rerank_k: 50
+final_k: 5
+reranker:
+  kind: local
+  model: Qwen/Qwen3-Reranker-0.6B
+  device: cuda

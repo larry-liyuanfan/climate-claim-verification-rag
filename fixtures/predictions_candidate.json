@@ -1,0 +1,7 @@
+{
+  "c1": {"claim_label": "SUPPORTS", "evidences": ["e1"]},
+  "c2": {"claim_label": "REFUTES", "evidences": ["e2"]},
+  "c3": {"claim_label": "SUPPORTS", "evidences": ["e3"]},
+  "c4": {"claim_label": "DISPUTED", "evidences": ["e5"]}
+}
+

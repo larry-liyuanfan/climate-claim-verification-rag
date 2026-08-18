@@ -1,128 +1,152 @@
 # Climate Claim Verification RAG
 
-A portfolio-safe climate fact-checking project that combines evidence retrieval, semantic reranking, and sequence classification for climate-related claims.
-
-Given a claim, the system retrieves relevant evidence from a large evidence corpus and predicts one of four labels: `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, or `DISPUTED`. The project is presented as a sanitized public summary: restricted benchmark files, raw evidence corpora, notebooks, and private evaluation artifacts are not redistributed.
-
-## Project Highlights
-
-- Built an end-to-end claim verification pipeline covering candidate retrieval, semantic reranking, sequence classification, prediction formatting, and official metric evaluation.
-- Implemented a two-stage retrieval system: BM25 candidate generation followed by BGE semantic reranking to select top-5 evidence passages.
-- Fine-tuned a Qwen3.5-4B sequence classifier with LoRA on claim-evidence inputs under Colab-style resource constraints.
-- Compared retrieval candidate sizes, reranking models, and classifier training strategies to diagnose the retrieval-classification bottleneck.
-- Separated development-set diagnostics from public evaluation results to avoid mixing experimental numbers.
-
-## Task Definition
-
-For each claim `c`, the system outputs:
-
-- a ranked evidence set `E = {e1, e2, ..., ek}`;
-- a claim label from `SUPPORTS`, `REFUTES`, `NOT_ENOUGH_INFO`, `DISPUTED`.
-
-The official score combines:
-
-| Metric | Meaning |
-|---|---|
-| Evidence Retrieval F-score | Whether predicted evidence IDs match the gold evidence IDs |
-| Claim Classification Accuracy | Whether the final label is correct |
-| Harmonic Mean | Balanced score between retrieval and classification |
-
-## System Architecture
+A reproducible search-and-ranking extension of the **2026 COMP90042 Group 045 team project**. The course system used BM25 candidate retrieval, BGE bi-encoder reranking, and a LoRA-tuned claim classifier. This repository turns its retrieval work into a testable package and explicit five-stage experiment:
 
 ```text
 Claim
-  -> BM25 candidate retrieval, top-N evidence pool
-  -> BGE semantic reranking, top-5 final evidence
-  -> Qwen3.5-4B LoRA sequence classifier
-  -> Four-way claim label + evidence IDs
+  ├─ BM25 lexical recall
+  └─ learned dense recall (optional Qwen3-Embedding)
+        ↓
+      RRF fusion
+        ↓
+      LambdaMART or declared linear pairwise fallback
+        ↓
+      cross-encoder/API reranker
+        ↓
+      evidence set → external trained classifier
 ```
 
-| Stage | Design | Reason |
+The repository does **not** claim an official leaderboard rank. Restricted course data, raw predictions, and private checkpoints are not redistributed.
+
+## What is implemented
+
+| Layer | Implementation | Truth boundary |
 |---|---|---|
-| Preprocessing | Lowercase and whitespace cleanup while preserving numbers, units, entities, and chemical symbols | Climate claims often depend on exact values, locations, and scientific terms |
-| BM25 Retrieval | Retrieve top-1000 evidence candidates from the full corpus | Efficient first-stage recall with manageable reranking cost |
-| BGE Reranking | Rank BM25 candidates by claim-evidence semantic similarity | Handles paraphrases such as `human emissions` vs `anthropogenic greenhouse gases` |
-| Sequence Classification | Fine-tune Qwen3.5-4B with LoRA on claim + retrieved evidence | Matches inference-time noisy evidence instead of only clean gold evidence |
+| Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Tested on public synthetic fixtures |
+| Dense retrieval | Deterministic hash smoke encoder; optional Sentence Transformers adapter | Hash mode is not a semantic model |
+| ANN | NumPy exact IP plus optional FAISS FlatIP, HNSW, and IVF-PQ adapters | Full 1.2M-corpus benchmark not yet run by this package |
+| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Artifact names the actual algorithm |
+| Reranking | Optional local model, Alibaba Model Studio adapter, deterministic feature fallback | Fallback is never presented as Qwen3 |
+| Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, claim accuracy, H-mean, paired bootstrap | Macro-averaged over claims |
+| Confidence | Temperature scaling and coverage-risk/selective-abstention utilities | Requires real classifier logits |
+| Serving | FastAPI evidence retrieval endpoint | Returns `classification.status=not_configured`; never fabricates a label |
+| Provenance | Input hashes, Git SHA, environment, metrics, predictions, error cases, report | Generated for every CLI run |
 
-## Retrieval Experiments
+## Quick start
 
-BM25 candidate size and reranker choice were evaluated on the development set using Recall@5.
+```bash
+python -m pip install -e ".[test]"
+pytest
 
-| Candidate Pool | Reranker | Recall@5 |
-|---|---|---:|
-| BM25 top-1000 | MiniLM | 0.204 |
-| BM25 top-5000 | MiniLM | 0.191 |
-| BM25 top-1000 | BGE | 0.223 |
-| BM25 top-5000 | BGE | 0.206 |
+climate-rag index \
+  --evidence fixtures/evidence.json \
+  --backend both \
+  --output-dir artifacts/smoke-index
 
-**Finding:** BM25 top-1000 with BGE reranking gave the best tested retrieval trade-off. Expanding the candidate pool to 5000 introduced more weakly related evidence and made reranking noisier.
+climate-rag evaluate \
+  --claims fixtures/claims.json \
+  --predictions fixtures/predictions_candidate.json \
+  --baseline-predictions fixtures/predictions_baseline.json \
+  --output-dir runs/smoke-eval
+```
 
-## Classifier Training Strategy
+The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`.
 
-The main classifier issue was the distribution gap between training-time gold evidence and inference-time retrieved evidence.
+## Main commands
 
-| Training Strategy | Classification Accuracy |
-|---|---:|
-| Gold evidence training, tested on noisy retrieval | 0.45 |
-| Retrieved evidence with relabelled retrieval misses | 0.38 |
-| Retrieved evidence with original labels | 0.6169 |
+Build BM25:
 
-**Finding:** Training on retrieved evidence while keeping original labels produced the best classification performance. Relabelling retrieval misses as `NOT_ENOUGH_INFO` distorted the label distribution and made the model over-conservative.
+```bash
+climate-rag index --evidence /data/evidence.json --backend bm25 --output-dir /artifacts/bm25
+```
 
-## End-to-End Results
+Build Qwen3 embeddings and FAISS FlatIP, retaining a validated reusable vector cache:
 
-### Development / Reported System Diagnostics
+```bash
+climate-rag index \
+  --evidence /data/evidence.json \
+  --backend dense \
+  --encoder sentence-transformer \
+  --model Qwen/Qwen3-Embedding-0.6B \
+  --ann flat \
+  --embeddings /artifacts/qwen3-0.6b.npy \
+  --output-dir /artifacts/dense-flat
+```
 
-| System | Evidence F | Accuracy | Harmonic Mean |
-|---|---:|---:|---:|
-| BM25(1000) + BGE + Qwen3.5-4B LoRA | 0.19 | 0.61 | 0.29 |
+The cache sidecar stores encoder, dimension, document count, and ordered document-ID hash. A mismatch fails closed. HNSW and IVF-PQ reuse the same embeddings through the example configs.
 
-These numbers reflect the final report configuration and show a clear pattern: classification accuracy was stronger than retrieval F-score, so retrieval remained the main bottleneck.
+Mine hard negatives and train fusion:
 
-### Public Evaluation Snapshot
+```bash
+climate-rag mine-negatives \
+  --claims /data/train-claims.json \
+  --rankings /artifacts/train_rankings.jsonl \
+  --limit 20 \
+  --output-dir /artifacts/hard-negatives
 
-| Metric | Value |
-|---|---:|
-| Public evaluation rank | 5 |
-| Harmonic Mean | 0.35 |
-| Evidence Retrieval F-score | 0.26 |
-| Claim Classification Accuracy | 0.57 |
+climate-rag train-fusion \
+  --features /artifacts/ltr_features.jsonl \
+  --algorithm auto \
+  --output-dir /artifacts/ltr
+```
 
-The public snapshot is kept separate from the report diagnostics because it comes from a different evaluation setting.
+`auto` uses LightGBM LambdaMART when present. Otherwise it persists `linear_pairwise_ranknet_fallback`; it is never renamed LambdaMART. Candidate rows must be split by claim before held-out evaluation.
 
-## Error Analysis
+Run the fixed five-stage comparison:
 
-The most common errors came from retrieval, not final label classification.
+```bash
+climate-rag evaluate \
+  --claims /data/dev-claims.json \
+  --experiment-config configs/five_stage.example.yaml \
+  --output-dir /artifacts/five-stage
+```
 
-| Error Type | Example Failure Mode | Impact |
-|---|---|---|
-| Lexical overlap without factual relevance | Evidence shares words such as `households`, `millions`, or `emissions` but does not verify the same claim | Reranker may promote topically related but invalid evidence |
-| Entity and scope mismatch | Claim refers to Australia, while retrieved evidence discusses the United Kingdom or a different population | Classifier receives misleading context |
-| Numerical mismatch | Evidence contains similar percentages or years but refers to a different quantity | Supports/refutes distinction becomes unstable |
-| BM25 recall ceiling | Gold evidence is absent from the top-1000 candidate pool | BGE reranker cannot recover missing evidence |
+It evaluates `bm25`, `dense`, `rrf`, `ltr`, and `ltr_reranker` with one claim split and one `final_k`, then bootstraps each stage against BM25. The configured reranker name is recorded. Deterministic fallback results cannot be described as Qwen3 results.
 
-## Resource Constraints
+Serve retrieval:
 
-A full dense retrieval attempt with BGE embeddings over roughly 1.2M evidence passages was explored but was not used in the final public configuration. Encoding took about 56 minutes on a Colab T4 GPU, and the FAISS IndexFlatIP setup ran into memory pressure. A lighter MiniLM dense retrieval attempt also created memory pressure when combined with the Qwen classifier.
+```bash
+climate-rag serve --bm25-index /artifacts/bm25/bm25.pkl.gz --host 0.0.0.0 --port 8000
+```
 
-The final pipeline therefore uses BM25 for candidate recall, BGE for reranking, and explicit memory cleanup between retrieval and classification stages.
+`POST /retrieve` accepts `{"claim_text": "...", "top_k": 5}` and returns evidence plus an explicit unconfigured-classifier state.
 
-## What This Project Demonstrates
+## Data and artifacts
 
-- Retrieval-augmented fact-checking system design.
-- Trade-off analysis between lexical retrieval, semantic reranking, and sequence classification.
-- LoRA fine-tuning of an open-source LLM-style classifier under constrained GPU resources.
-- Evidence-level error analysis for entity, scope, and numerical mismatch.
-- Metric-aware development using Evidence F-score, Accuracy, and Harmonic Mean.
+Claims use the course-compatible keyed JSON schema with `claim_text`, optional `claim_label`, and `evidences`. Evidence may be a keyed JSON object, list records, or JSONL. Installing `ijson` streams a keyed object; otherwise JSON is loaded into memory.
 
-## Tech Stack
+Every command writes `run_manifest.json`, `metrics.json`, `predictions.jsonl`, `error_cases.jsonl`, and `report.md`. Non-secret arguments, Git SHA, input hashes, environment, and Slurm job ID are recorded.
 
-Python, BM25, BGE reranking, MiniLM comparison, Qwen3.5-4B, LoRA, RAG, sequence classification, retrieval evaluation, Colab GPU workflow.
+The restricted full corpus has been located on Spartan at:
 
-## Resume-Ready Summary
+```text
+/data/gpfs/projects/punim2936/nlp/COMP90042_2026-main/data
+```
 
-Built a two-stage climate claim verification system with BM25 top-1000 candidate retrieval, BGE semantic reranking, and Qwen3.5-4B LoRA sequence classification; compared MiniLM/BGE rerankers and classifier training strategies, achieving public evaluation rank 5 with H-mean 0.35, Evidence F-score 0.26, and Claim Accuracy 0.57.
+It contains the 167 MB `evidence.json` and train/dev/test claim files. It is referenced only by Slurm/Apptainer configuration and must not be copied into GitHub. See [`hpc/README.md`](hpc/README.md).
 
-## Public Data Policy
+## Historical result boundary
 
-This repository is a portfolio-safe summary. Restricted benchmark files, raw evidence corpora, prediction files, notebooks, and private evaluation artifacts are intentionally excluded.
+Local Group 045 records contain non-equivalent evaluations:
+
+- final notebook development output: Evidence F `0.1763`, Accuracy `0.6234`, H-mean `0.2749`;
+- separate BGE/BM25-top-1000 experiment record: Recall@5 `0.223`;
+- rounded training document: approximately Evidence F `0.19`, Accuracy `0.61`, H-mean `0.29`.
+
+These are **historical project records**, not reproduced package results, and must not be mixed. An earlier README claimed a public rank and snapshot metrics without a stable official artifact; those claims have been removed.
+
+## Attribution and publication boundary
+
+- The 2026 COMP90042 submission was a **Group 045 team project**. Do not present the course pipeline, data, or team output as one person's independent work.
+- This repository is a post-course portfolio engineering extension. Git history and the evidence ledger identify later additions.
+- Course data, teammate identifiers, raw private predictions, checkpoints, and credentials are excluded.
+- No open-source license is granted at present. Public visibility does not itself grant reuse rights.
+
+## Technical references
+
+- [Qwen3 Embedding technical report](https://arxiv.org/abs/2506.05176) and [official implementation](https://github.com/QwenLM/Qwen3-Embedding)
+- [FAISS index families](https://github.com/facebookresearch/faiss/wiki/Faiss-indexes)
+- [LightGBM learning-to-rank parameters](https://lightgbm.readthedocs.io/en/stable/Parameters.html#learning-to-rank-parameters)
+- [Spartan job submission](https://dashboard.hpc.unimelb.edu.au/job_submission/) and [container guidance](https://dashboard.hpc.unimelb.edu.au/software/containers/)
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/DECISIONS.md`](docs/DECISIONS.md), and [`docs/EVIDENCE.md`](docs/EVIDENCE.md).

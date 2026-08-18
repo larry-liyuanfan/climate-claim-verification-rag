@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climate-claim-verification-rag"
+version = "0.1.0"
+description = "Reproducible retrieval and ranking toolkit for climate claim verification"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "No license granted; see README"}
+authors = [
+  {name = "COMP90042 Group 045 and portfolio extension contributors"},
+]
+dependencies = [
+  "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dense = [
+  "faiss-cpu>=1.8; python_version < '3.13'",
+  "sentence-transformers>=3.0",
+]
+ltr = ["lightgbm>=4.3"]
+serve = ["fastapi>=0.110", "uvicorn>=0.29"]
+yaml = ["PyYAML>=6.0"]
+test = ["pytest>=8.0", "httpx>=0.27"]
+
+[project.scripts]
+climate-rag = "climate_rag.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+

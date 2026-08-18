@@ -1,0 +1,15 @@
+index:
+  evidence: /data/evidence.json
+  output_dir: /artifacts/dense-ivfpq
+  backend: dense
+  encoder: sentence-transformer
+  model: Qwen/Qwen3-Embedding-0.6B
+  device: cuda
+  ann: ivfpq
+  nlist: 4096
+  pq_m: 32
+  nbits: 8
+  nprobe: 32
+  batch_size: 64
+  embeddings: /artifacts/qwen3-0.6b.npy
+

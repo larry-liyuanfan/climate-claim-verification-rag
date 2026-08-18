@@ -1,0 +1,23 @@
+{
+  "c1": {
+    "claim_text": "Human carbon dioxide emissions warm the climate system.",
+    "claim_label": "SUPPORTS",
+    "evidences": ["e1"]
+  },
+  "c2": {
+    "claim_text": "Arctic sea ice increased between 1979 and 2020.",
+    "claim_label": "REFUTES",
+    "evidences": ["e2"]
+  },
+  "c3": {
+    "claim_text": "Australia reports greenhouse gas emissions by sector and year.",
+    "claim_label": "SUPPORTS",
+    "evidences": ["e3"]
+  },
+  "c4": {
+    "claim_text": "Studies agree on a statistically significant regional rainfall increase.",
+    "claim_label": "DISPUTED",
+    "evidences": ["e5"]
+  }
+}
+
