@@ -17,7 +17,7 @@ ARTIFACT_DIR="${ARTIFACT_DIR:-/data/gpfs/projects/punim2936/climate-rag-artifact
 test -f "${ARTIFACT_DIR}/qwen3-0.6b.npy"
 test -f "${ARTIFACT_DIR}/qwen3-0.6b.npy.json"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
-module load apptainer
+module load Apptainer/1.4.5
 
 KINDS=(hnsw ivfpq)
 KIND="${KINDS[$SLURM_ARRAY_TASK_ID]}"
@@ -41,4 +41,3 @@ apptainer exec --nv \
     --embeddings /artifacts/qwen3-0.6b.npy \
     --output-dir "/artifacts/dense-${KIND}" \
     "${EXTRA[@]}"
-
