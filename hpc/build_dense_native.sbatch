@@ -17,6 +17,7 @@ module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
+export PYTHONPATH="${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 climate-rag index \
   --evidence "${DATA_DIR}/evidence.json" \
