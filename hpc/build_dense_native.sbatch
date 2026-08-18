@@ -19,6 +19,10 @@ source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 export PYTHONPATH="${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
+export HF_HOME="${ARTIFACT_DIR}/.cache/huggingface"
+export HF_HUB_CACHE="${HF_HOME}/hub"
+export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
+mkdir -p "${HF_HUB_CACHE}" "${TRANSFORMERS_CACHE}"
 climate-rag index \
   --evidence "${DATA_DIR}/evidence.json" \
   --backend dense \

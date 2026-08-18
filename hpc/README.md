@@ -34,6 +34,10 @@ bash hpc/submit_native.sh
 The wrapper submits one environment job and makes BM25/Qwen dense jobs depend
 on it. This is a recorded fallback, not a silent change of runtime.
 
+All Hugging Face model downloads are redirected to
+`${ARTIFACT_DIR}/.cache/huggingface` in project storage. The dense jobs must not
+fall back to `$HOME/.cache`; the home quota is too small for Qwen3 model files.
+
 Confirm the current GPU partition with `sinfo`/project access, then submit:
 
 ```bash
