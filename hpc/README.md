@@ -23,6 +23,17 @@ sbatch --account=punim2936 hpc/build_image.sbatch
 Apptainer cache and temporary build directory into project storage. This avoids
 the small home-directory quota being consumed by image layers.
 
+If an unprivileged image build still exceeds the user's build-layer quota,
+Spartan's reviewed PyTorch/CUDA module can provide the heavy runtime while a
+project-storage virtual environment holds only the search dependencies:
+
+```bash
+bash hpc/submit_native.sh
+```
+
+The wrapper submits one environment job and makes BM25/Qwen dense jobs depend
+on it. This is a recorded fallback, not a silent change of runtime.
+
 Confirm the current GPU partition with `sinfo`/project access, then submit:
 
 ```bash
