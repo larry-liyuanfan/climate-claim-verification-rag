@@ -1,0 +1,44 @@
+#!/bin/bash
+#SBATCH --job-name=climate-ann
+#SBATCH --array=0-1
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --gres=gpu:1
+#SBATCH --mem=96G
+#SBATCH --time=12:00:00
+#SBATCH --output=slurm-%x-%A_%a.out
+
+set -euo pipefail
+: "${REPO_DIR:?set REPO_DIR}"
+DATA_DIR="${DATA_DIR:-/data/gpfs/projects/punim2936/nlp/COMP90042_2026-main/data}"
+ARTIFACT_DIR="${ARTIFACT_DIR:-/data/gpfs/projects/punim2936/climate-rag-artifacts}"
+: "${CONTAINER_IMAGE:?set CONTAINER_IMAGE}"
+test -f "${ARTIFACT_DIR}/qwen3-0.6b.npy"
+test -f "${ARTIFACT_DIR}/qwen3-0.6b.npy.json"
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
+module load apptainer
+
+KINDS=(hnsw ivfpq)
+KIND="${KINDS[$SLURM_ARRAY_TASK_ID]}"
+EXTRA=()
+if [[ "${KIND}" == "hnsw" ]]; then
+  EXTRA=(--hnsw-m 32)
+else
+  EXTRA=(--nlist 4096 --pq-m 32 --nbits 8 --nprobe 32)
+fi
+
+apptainer exec --nv \
+  --bind "${REPO_DIR}:/workspace:ro,${DATA_DIR}:/data:ro,${ARTIFACT_DIR}:/artifacts" \
+  "${CONTAINER_IMAGE}" \
+  climate-rag index \
+    --evidence /data/evidence.json \
+    --backend dense \
+    --encoder sentence-transformer \
+    --model Qwen/Qwen3-Embedding-0.6B \
+    --device cuda \
+    --ann "${KIND}" \
+    --embeddings /artifacts/qwen3-0.6b.npy \
+    --output-dir "/artifacts/dense-${KIND}" \
+    "${EXTRA[@]}"
+

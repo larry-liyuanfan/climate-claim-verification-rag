@@ -1,0 +1,12 @@
+index:
+  evidence: /data/evidence.json
+  output_dir: /artifacts/dense-hnsw
+  backend: dense
+  encoder: sentence-transformer
+  model: Qwen/Qwen3-Embedding-0.6B
+  device: cuda
+  ann: hnsw
+  hnsw_m: 32
+  batch_size: 64
+  embeddings: /artifacts/qwen3-0.6b.npy
+

@@ -1,0 +1,7 @@
+{"query_id":"q1","evidence_id":"e1","relevance":2,"features":{"bm25_score":4.0,"bm25_reciprocal_rank":1.0,"dense_score":0.8,"dense_reciprocal_rank":0.5,"token_overlap":0.9,"number_overlap":0.0,"year_overlap":0.0,"query_length":6,"document_length":9}}
+{"query_id":"q1","evidence_id":"e6","relevance":0,"features":{"bm25_score":2.0,"bm25_reciprocal_rank":0.5,"dense_score":0.9,"dense_reciprocal_rank":1.0,"token_overlap":0.25,"number_overlap":0.0,"year_overlap":0.0,"query_length":6,"document_length":7}}
+{"query_id":"q2","evidence_id":"e2","relevance":2,"features":{"bm25_score":5.0,"bm25_reciprocal_rank":1.0,"dense_score":0.9,"dense_reciprocal_rank":1.0,"token_overlap":0.8,"number_overlap":1.0,"year_overlap":1.0,"query_length":8,"document_length":12}}
+{"query_id":"q2","evidence_id":"e7","relevance":0,"features":{"bm25_score":2.5,"bm25_reciprocal_rank":0.5,"dense_score":0.7,"dense_reciprocal_rank":0.5,"token_overlap":0.3,"number_overlap":0.0,"year_overlap":0.0,"query_length":8,"document_length":6}}
+{"query_id":"q3","evidence_id":"e3","relevance":2,"features":{"bm25_score":6.0,"bm25_reciprocal_rank":1.0,"dense_score":0.75,"dense_reciprocal_rank":0.5,"token_overlap":0.85,"number_overlap":0.0,"year_overlap":0.0,"query_length":7,"document_length":9}}
+{"query_id":"q3","evidence_id":"e4","relevance":0,"features":{"bm25_score":3.0,"bm25_reciprocal_rank":0.5,"dense_score":0.8,"dense_reciprocal_rank":1.0,"token_overlap":0.45,"number_overlap":0.0,"year_overlap":0.0,"query_length":7,"document_length":10}}
+
