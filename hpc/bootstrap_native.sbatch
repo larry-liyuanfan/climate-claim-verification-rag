@@ -18,9 +18,11 @@ python -m venv --system-site-packages "${NATIVE_ENV}"
 source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 python -m pip install --upgrade pip
+# Qwen3-compatible, while avoiding newer NumPy typing used after this tag;
+# Spartan's supported PyTorch module exposes NumPy 1.22.3.
 python -m pip install --no-cache-dir \
   "numpy>=1.22,<1.23" \
-  "transformers>=4.51,<5" \
+  "transformers==4.51.3" \
   "sentence-transformers>=4,<6" \
   "faiss-cpu==1.7.4" \
   "lightgbm>=4.3" \
