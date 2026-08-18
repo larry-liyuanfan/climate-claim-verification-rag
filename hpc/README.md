@@ -11,15 +11,17 @@ It contains the 167 MB evidence JSON and train/dev/test claim files. The scripts
 ## Build once
 
 ```bash
-module load GCCcore/13.3.0 Apptainer/1.4.5
-apptainer build climate-rag.sif hpc/Apptainer.def
-
 export REPO_DIR="$PWD"
 export DATA_DIR=/data/gpfs/projects/punim2936/nlp/COMP90042_2026-main/data
 export ARTIFACT_DIR=/data/gpfs/projects/punim2936/climate-rag-artifacts
 export CONTAINER_IMAGE=/data/gpfs/projects/punim2936/climate-rag-artifacts/climate-rag.sif
 mkdir -p "$ARTIFACT_DIR"
+sbatch --account=punim2936 hpc/build_image.sbatch
 ```
+
+`build_image.sbatch` pins the Spartan module prerequisites and moves both the
+Apptainer cache and temporary build directory into project storage. This avoids
+the small home-directory quota being consumed by image layers.
 
 Confirm the current GPU partition with `sinfo`/project access, then submit:
 
