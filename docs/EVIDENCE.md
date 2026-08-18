@@ -13,7 +13,7 @@
 | Five-stage orchestration | `verified-smoke` | synthetic fixture with deterministic reranker |
 | FastAPI retrieval | `verified-smoke` | API test confirms explicit no-classifier state |
 | Full 1,208,827-document BM25 index | `verified` | Spartan job `29360715`; commit `a7b110e`; 40.333 s total, 126,334,728-byte artifact, Slurm MaxRSS 2,630,496 K |
-| Full Qwen3/FAISS/LTR/reranker results | `future` | dense job is queued; no effectiveness or ANN-performance claim yet |
+| Full Qwen3/FAISS/LTR/reranker results | `future` | dense job `29360716` failed on home-cache quota before model loading; cache fix `2cd75e3` passed 21 tests; replacement `29382416` is queued; no effectiveness or ANN-performance claim yet |
 
 ## Historical Group 045 records
 

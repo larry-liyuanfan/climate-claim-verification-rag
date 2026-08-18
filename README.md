@@ -141,7 +141,7 @@ The native-module run on 2026-08-18 produced a full-corpus lexical index. These 
 | Serialized index | `126,334,728 bytes` |
 | Slurm MaxRSS | `2,630,496 K` |
 
-The restricted artifact remains under project storage at `climate-artifacts/bm25`; only its non-sensitive metrics and provenance are published. Qwen3 embeddings, FAISS ANN comparisons, fusion, and reranking remain unverified until their own artifacts complete.
+The restricted artifact remains under project storage at `climate-artifacts/bm25`; only its non-sensitive metrics and provenance are published. The first Qwen3 dense job (`29360716`) failed before model loading because Hugging Face defaulted to the small home cache; commit `2cd75e3` redirects all model caches to project storage, and replacement job `29382416` is queued. Qwen3 embeddings, FAISS ANN comparisons, fusion, and reranking remain unverified until their own artifacts complete.
 
 ## Historical result boundary
 
