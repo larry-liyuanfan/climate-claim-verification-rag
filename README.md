@@ -22,7 +22,7 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 
 | Layer | Implementation | Truth boundary |
 |---|---|---|
-| Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Tested on public synthetic fixtures |
+| Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Full 1,208,827-document Spartan build verified; retrieval quality evaluation remains separate |
 | Dense retrieval | Deterministic hash smoke encoder; optional Sentence Transformers adapter | Hash mode is not a semantic model |
 | ANN | NumPy exact IP plus optional FAISS FlatIP, HNSW, and IVF-PQ adapters | Full 1.2M-corpus benchmark not yet run by this package |
 | Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Artifact names the actual algorithm |
@@ -124,6 +124,24 @@ The restricted full corpus has been located on Spartan at:
 ```
 
 It contains the 167 MB `evidence.json` and train/dev/test claim files. It is referenced only by Slurm/Apptainer configuration and must not be copied into GitHub. See [`hpc/README.md`](hpc/README.md).
+
+### Verified Spartan BM25 build
+
+The native-module run on 2026-08-18 produced a full-corpus lexical index. These are engineering measurements, not retrieval-quality scores:
+
+| Field | Verified value |
+|---|---:|
+| Slurm job | `29360715` (`COMPLETED`, exit `0:0`) |
+| Git commit | `a7b110e8d647e9e6f51272d02c2436d4a346a27c` |
+| Evidence documents | `1,208,827` |
+| Vocabulary | `531,996` |
+| BM25 build time | `36.886 s` |
+| Total command time | `40.333 s` |
+| Slurm elapsed time | `51 s` |
+| Serialized index | `126,334,728 bytes` |
+| Slurm MaxRSS | `2,630,496 K` |
+
+The restricted artifact remains under project storage at `climate-artifacts/bm25`; only its non-sensitive metrics and provenance are published. Qwen3 embeddings, FAISS ANN comparisons, fusion, and reranking remain unverified until their own artifacts complete.
 
 ## Historical result boundary
 

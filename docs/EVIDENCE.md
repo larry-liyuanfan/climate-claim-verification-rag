@@ -12,13 +12,15 @@
 | Bootstrap and calibration utilities | `verified` | seeded unit tests |
 | Five-stage orchestration | `verified-smoke` | synthetic fixture with deterministic reranker |
 | FastAPI retrieval | `verified-smoke` | API test confirms explicit no-classifier state |
-| Full 1.2M-corpus result | `future` | data is on Spartan; job not yet run from this commit |
+| Full 1,208,827-document BM25 index | `verified` | Spartan job `29360715`; commit `a7b110e`; 40.333 s total, 126,334,728-byte artifact, Slurm MaxRSS 2,630,496 K |
+| Full Qwen3/FAISS/LTR/reranker results | `future` | dense job is queued; no effectiveness or ANN-performance claim yet |
 
 ## Historical Group 045 records
 
 | Record | Status | Boundary |
 |---|---|---|
-| 1,208,827 evidence passages and 1,228 train claims | `project-record-only` | final notebook output; data not redistributed |
+| 1,208,827 evidence passages | `verified` | counted by full BM25 index artifact; data not redistributed |
+| 1,228 train claims | `project-record-only` | final notebook output; not re-counted by the BM25 build |
 | BGE/BM25-top-1000 Recall@5 0.223 | `project-record-only` | separate experiment, not reproduced here |
 | Notebook dev F 0.1763 / Accuracy 0.6234 / H-mean 0.2749 | `project-record-only` | exact local notebook output |
 | Rounded F 0.19 / Accuracy 0.61 / H-mean about 0.29 | `project-record-only` | training document; different/rounded run |
