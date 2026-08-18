@@ -5,7 +5,7 @@ import os
 import platform
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -37,7 +37,7 @@ def build_manifest(
     started_at: str | None = None,
     repository: str | Path | None = None,
 ) -> dict[str, Any]:
-    finished = datetime.now(UTC).isoformat()
+    finished = datetime.now(timezone.utc).isoformat()
     files: list[dict[str, Any]] = []
     for raw_path in inputs:
         path = Path(raw_path)

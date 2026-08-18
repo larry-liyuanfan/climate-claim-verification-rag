@@ -29,6 +29,8 @@ def test_cli_index_evaluate_negatives_and_ltr(tmp_path: Path) -> None:
     assert (index_dir / "bm25.pkl.gz").exists()
     assert (index_dir / "dense" / "dense_index.json").exists()
     assert (index_dir / "run_manifest.json").exists()
+    manifest = json.loads((index_dir / "run_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["finished_at_utc"].endswith("+00:00")
 
     evaluation_dir = tmp_path / "evaluation"
     assert main(
