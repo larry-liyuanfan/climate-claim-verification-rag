@@ -28,3 +28,7 @@ The historical LoRA classifier/checkpoint is not distributed. Evaluation accepts
 
 Improvements are compared per claim on the same split. Paired bootstrap reports difference and interval. Target gains remain aspirations until a restricted-data run creates manifests and outputs.
 
+## D8 — Deploy the measured winner, not the most complex stage
+
+The fixed-dev run selects BM25+dense RRF: it improved Recall@5 and Evidence F1 over BM25 with paired intervals excluding zero. The trained LambdaMART and deterministic reranker regressed sharply, so they remain documented negative experiments and are blocked from the default retrieval path. IVF-PQ is likewise rejected despite its speed and compression because its Recall@5 versus Flat was only 0.3688; HNSW is the retained ANN default.
+

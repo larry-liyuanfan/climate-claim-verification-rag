@@ -24,9 +24,9 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 |---|---|---|
 | Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Full 1,208,827-document Spartan build verified; retrieval quality evaluation remains separate |
 | Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; hash mode is not a semantic model |
-| ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus FlatIP reference build verified; HNSW/IVF-PQ quality-speed comparisons remain future work |
-| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Artifact names the actual algorithm |
-| Reranking | Optional local model, Alibaba Model Studio adapter, deterministic feature fallback | Fallback is never presented as Qwen3 |
+| ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
+| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
+| Reranking | Optional local model, Alibaba Model Studio adapter, deterministic feature fallback | Fixed-dev run used the deterministic fallback, not Qwen3; that stage also failed the quality gate |
 | Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, claim accuracy, H-mean, paired bootstrap | Macro-averaged over claims |
 | Confidence | Temperature scaling and coverage-risk/selective-abstention utilities | Requires real classifier logits |
 | Serving | FastAPI evidence retrieval endpoint | Returns `classification.status=not_configured`; never fabricates a label |
@@ -165,7 +165,33 @@ The replacement job completed on 2026-08-19 after commit `2cd75e3` moved Hugging
 
 The cache sidecar records the model, dimension, document count, and ordered document-ID hash. The run manifest records job `29382416`, Git SHA, environment, and the restricted input hash. Its start/finish timestamps were identical because the original writer generated both at artifact-write time; the follow-up code fixes that provenance defect, so the verified duration above comes from `metrics.json` and Slurm accounting. The 4.95 GB embeddings, 4.95 GB index, and restricted corpus remain on Spartan.
 
-No Recall@K, MRR, nDCG, QPS, HNSW/IVF-PQ comparison, fusion, or reranker result was produced by this build. Those remain unverified until separately evaluated against the fixed claim split.
+The dense/FlatIP build itself produced no effectiveness result. The separately completed CPU-only ANN benchmark and fixed-dev run below provide the quality-speed and retrieval comparisons.
+
+### Verified Spartan ANN quality-speed comparison
+
+Jobs `29418470` and `29418595` reused the same 1,208,827-row, 1,024-dimensional Qwen3 embedding cache. The benchmark used 154 fixed dev queries, 32 FAISS CPU threads, three batch-search repeats, and FlatIP as the ANN ground truth.
+
+| Index | Recall@5 vs Flat | Batch QPS | Single-query P50 / P95 | FAISS index bytes | Decision |
+|---|---:|---:|---:|---:|---|
+| FlatIP | `1.0000` | `5.15` | `411.84 / 432.68 ms` | `4,951,355,437` | exact reference |
+| HNSW (`M=32`, `efSearch=64`) | `0.9961` | `3,060.64` | `12.88 / 15.41 ms` | `5,280,336,294` | retained quality-speed default |
+| IVF-PQ (`nlist=4096`, `nprobe=32`, `m=32`) | `0.3688` | `8,436.04` | `1.52 / 1.69 ms` | `66,211,820` | rejected: excessive recall loss |
+
+The QPS values are batched, in-memory measurements on this fixed 154-query/32-thread run; they are not an online-service SLA. HNSW build time was `374.750 s` with batch MaxRSS `19,080 M`; IVF-PQ build time was `385.315 s` with batch MaxRSS `17,073,512 K`. Restricted indexes remain on Spartan.
+
+### Verified fixed-dev retrieval comparison
+
+Job `29435589` evaluated 154 restricted dev claims at `final_k=5` using commit `636e915`, the same BM25/HNSW candidate stores, and 5,000 paired bootstrap samples. The run was CPU-only (`32 CPU`, `32 GB` request), completed in `1 min 42 s`, and reached batch MaxRSS `11,596,892 K`.
+
+| Stage | Recall@5 | MRR@10 | nDCG@10 | Evidence F1 |
+|---|---:|---:|---:|---:|
+| BM25 | `0.1721` | `0.2513` | `0.1644` | `0.1168` |
+| Qwen3 dense/HNSW | `0.2696` | `0.3308` | `0.2487` | `0.1768` |
+| BM25+dense RRF | **`0.2709`** | **`0.3446`** | **`0.2495`** | **`0.1785`** |
+| LambdaMART | `0.0029` | `0.0065` | `0.0030` | `0.0027` |
+| LambdaMART + deterministic reranker | `0.0127` | `0.0359` | `0.0149` | `0.0111` |
+
+Against BM25, RRF improved Recall@5 by `0.0988` (paired-bootstrap 95% interval `0.0543–0.1452`) and Evidence F1 by `0.0616` (`0.0360–0.0893`). The quality gate therefore selects RRF and blocks the learned-fusion and deterministic-reranker stages. Because `final_k=5`, the recorded Recall@10/50 equals Recall@5 and is not presented as a wider-cutoff result. Claim classification was not configured, so zero claim accuracy/H-mean values are not classifier findings. The reranker in this run was explicitly `deterministic-feature-fallback`, not Qwen3.
 
 ## Historical result boundary
 
