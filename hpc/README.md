@@ -62,5 +62,10 @@ replace gold-evidence retrieval metrics.
 
 `prepare_ltr.sbatch` runs BM25+dense retrieval on the training claims, removes gold evidence from the negative pool, and emits `ltr_features.jsonl`. Training consumes that file; no manually assembled feature table is required.
 
+The `*_native.sbatch` LTR chain uses the already verified native environment and
+is CPU-only: HNSW hard-negative mining on train claims, LightGBM LambdaMART, then
+a fixed dev comparison with paired bootstrap. Its final stage is explicitly the
+deterministic feature reranker; it must not be described as Qwen3 reranking.
+
 
 Before reporting a result, retain Slurm logs, `run_manifest.json`, `metrics.json`, per-claim predictions, `sacct` elapsed/MaxRSS, allocated hardware, and storage/API cost. Do not claim an improvement if it was not run on the same split/final K with a paired comparison.

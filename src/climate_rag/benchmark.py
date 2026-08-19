@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -116,6 +117,9 @@ def run_five_stage_benchmark(
         config = yaml.safe_load(config_source.read_text(encoding="utf-8"))
     else:
         config = json.loads(config_source.read_text(encoding="utf-8"))
+    for key in ("bm25_index", "dense_index", "ltr_model"):
+        if key in config:
+            config[key] = os.path.expandvars(str(config[key]))
     claims = load_claims(claims_path)
     bm25 = BM25Index.load(config["bm25_index"])
     dense = DenseRetriever.load(config["dense_index"], device=config.get("device"))

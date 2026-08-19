@@ -90,7 +90,7 @@ def test_cli_index_evaluate_negatives_and_ltr(tmp_path: Path) -> None:
     assert (ltr_dir / "ltr_model.json").exists()
 
 
-def test_five_stage_benchmark_entrypoint(tmp_path: Path) -> None:
+def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
     index_dir = tmp_path / "index"
     main(
         [
@@ -116,12 +116,13 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path) -> None:
         ]
     )
     config = tmp_path / "benchmark.json"
+    monkeypatch.setenv("CLIMATE_TEST_ARTIFACT_DIR", str(tmp_path))
     config.write_text(
         json.dumps(
             {
-                "bm25_index": str(index_dir / "bm25.pkl.gz"),
-                "dense_index": str(index_dir / "dense"),
-                "ltr_model": str(ltr_dir / "ltr_model.json"),
+                "bm25_index": "${CLIMATE_TEST_ARTIFACT_DIR}/index/bm25.pkl.gz",
+                "dense_index": "${CLIMATE_TEST_ARTIFACT_DIR}/index/dense",
+                "ltr_model": "${CLIMATE_TEST_ARTIFACT_DIR}/ltr/ltr_model.json",
                 "recall_k": 8,
                 "fusion_k": 8,
                 "rerank_k": 8,
