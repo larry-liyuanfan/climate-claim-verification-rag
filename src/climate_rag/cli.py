@@ -13,6 +13,7 @@ from typing import Any
 import numpy as np
 
 from .artifacts import write_run_artifacts
+from .ann_benchmark import benchmark_faiss_indices
 from .benchmark import run_five_stage_benchmark
 from .bm25 import BM25Index
 from .dense import (
@@ -134,6 +135,7 @@ def command_index(args: argparse.Namespace) -> int:
                 encoder.dimension,
                 kind=args.ann,
                 hnsw_m=args.hnsw_m,
+                hnsw_ef_construction=args.hnsw_ef_construction,
                 nlist=args.nlist,
                 pq_m=args.pq_m,
                 nbits=args.nbits,
@@ -177,7 +179,21 @@ def command_index(args: argparse.Namespace) -> int:
                         "dimension": encoder.dimension,
                     },
                 )
-        dense.fit_vectors(documents, vectors)
+        training_vectors = None
+        if isinstance(ann, FaissANNIndex) and ann.kind == "ivfpq":
+            if args.ivf_train_size < 1:
+                raise ValueError("ivf_train_size must be positive")
+            training_count = min(len(vectors), args.ivf_train_size)
+            generator = np.random.default_rng(args.seed)
+            training_rows = np.sort(
+                generator.choice(len(vectors), size=training_count, replace=False)
+            )
+            training_vectors = np.asarray(vectors[training_rows], dtype=np.float32)
+            metrics["ivf_training_vector_count"] = training_count
+            notes.append(
+                "IVF-PQ training uses a deterministic sample; the seed and sample size are recorded."
+            )
+        dense.fit_vectors(documents, vectors, training_vectors=training_vectors)
         dense_dir = output_dir / "dense"
         dense.save(dense_dir)
         metrics.update(
@@ -200,6 +216,76 @@ def command_index(args: argparse.Namespace) -> int:
         started_at=started_at,
         inputs=[args.evidence],
         notes=notes,
+        repository=_repository(),
+    )
+    print(json.dumps(metrics, indent=2, sort_keys=True))
+    return 0
+
+
+def _named_paths(values: list[str] | None, argument: str) -> dict[str, Path]:
+    result: dict[str, Path] = {}
+    for value in values or []:
+        if "=" not in value:
+            raise ValueError(f"{argument} entries must use name=path")
+        name, raw_path = value.split("=", 1)
+        if not name or name in result:
+            raise ValueError(f"duplicate or empty {argument} name: {name!r}")
+        result[name] = Path(raw_path)
+    return result
+
+
+def command_benchmark_ann(args: argparse.Namespace) -> int:
+    _required(args, "claims", "output_dir")
+    started_at = _started_at_utc()
+    indexes = _named_paths(args.index, "--index")
+    if "flat" not in indexes:
+        raise ValueError("--index must include flat=/path/to/index.faiss")
+    claims = load_claims(args.claims)
+    claim_ids = sorted(claims)
+    encoder = SentenceTransformerEncoder(
+        args.model,
+        query_prefix=args.query_prefix,
+        query_prompt_name=args.query_prompt_name,
+        device=args.device,
+    )
+    encode_started = time.perf_counter()
+    query_vectors = encoder.encode_queries(
+        [claims[claim_id].text for claim_id in claim_ids], batch_size=args.batch_size
+    )
+    encode_seconds = time.perf_counter() - encode_started
+    metrics, per_query = benchmark_faiss_indices(
+        query_vectors,
+        indexes,
+        top_ks=tuple(int(value) for value in args.ks.split(",") if value),
+        repeats=args.repeats,
+        latency_sample_size=args.latency_sample_size,
+        faiss_threads=args.faiss_threads,
+        hnsw_ef_search=args.hnsw_ef_search,
+        ivf_nprobe=args.ivf_nprobe,
+    )
+    metrics.update(
+        {
+            "encoder": encoder.name,
+            "query_embedding_seconds": encode_seconds,
+            "query_embedding_qps": len(claim_ids) / max(encode_seconds, 1e-12),
+        }
+    )
+    for claim_id, row in zip(claim_ids, per_query, strict=True):
+        row["claim_id"] = claim_id
+    manifests = _named_paths(args.index_manifest, "--index-manifest")
+    write_run_artifacts(
+        args.output_dir,
+        command="benchmark-ann",
+        arguments=_recorded_arguments(args),
+        metrics=metrics,
+        started_at=started_at,
+        inputs=[args.claims, *manifests.values()],
+        predictions=per_query,
+        notes=[
+            "FlatIP row positions are the exact ANN ground truth on the same embedding mapping.",
+            "Batch QPS and single-query P50/P95 are measured separately.",
+            "Storage and resource measurements are engineering evidence, not retrieval relevance gains.",
+        ],
         repository=_repository(),
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
@@ -528,11 +614,39 @@ def build_parser() -> argparse.ArgumentParser:
     )
     index.add_argument("--ann", choices=("numpy", "flat", "hnsw", "ivfpq"), default="numpy")
     index.add_argument("--hnsw-m", type=int, default=32)
+    index.add_argument("--hnsw-ef-construction", type=int, default=200)
     index.add_argument("--nlist", type=int, default=256)
     index.add_argument("--pq-m", type=int, default=32)
     index.add_argument("--nbits", type=int, default=8)
     index.add_argument("--nprobe", type=int, default=16)
+    index.add_argument("--ivf-train-size", type=int, default=200000)
+    index.add_argument("--seed", type=int, default=17)
     index.set_defaults(handler=command_index)
+
+    ann_benchmark = subparsers.add_parser(
+        "benchmark-ann", help="compare FAISS ANN recall/throughput against FlatIP"
+    )
+    ann_benchmark.add_argument("--config")
+    ann_benchmark.add_argument("--claims")
+    ann_benchmark.add_argument(
+        "--index", action="append", help="repeat name=/path/index.faiss; flat is required"
+    )
+    ann_benchmark.add_argument(
+        "--index-manifest", action="append", help="repeat name=/path/run_manifest.json"
+    )
+    ann_benchmark.add_argument("--model", default="Qwen/Qwen3-Embedding-0.6B")
+    ann_benchmark.add_argument("--query-prefix", default="")
+    ann_benchmark.add_argument("--query-prompt-name")
+    ann_benchmark.add_argument("--device")
+    ann_benchmark.add_argument("--batch-size", type=int, default=32)
+    ann_benchmark.add_argument("--ks", default="5,10,50")
+    ann_benchmark.add_argument("--repeats", type=int, default=3)
+    ann_benchmark.add_argument("--latency-sample-size", type=int, default=32)
+    ann_benchmark.add_argument("--faiss-threads", type=int)
+    ann_benchmark.add_argument("--hnsw-ef-search", type=int, default=64)
+    ann_benchmark.add_argument("--ivf-nprobe", type=int, default=32)
+    ann_benchmark.add_argument("--output-dir")
+    ann_benchmark.set_defaults(handler=command_benchmark_ann)
 
     negatives = subparsers.add_parser("mine-negatives", help="mine high-ranked non-gold evidence")
     negatives.add_argument("--config")

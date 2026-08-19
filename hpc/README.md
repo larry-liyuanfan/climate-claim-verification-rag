@@ -52,6 +52,14 @@ sbatch --account=punim2936 --partition="$SPARTAN_GPU_PARTITION" hpc/evaluate_fiv
 
 `build_ann_array.sbatch` requires the embedding cache and sidecar produced by `build_dense_flat.sbatch`. HNSW and IVF-PQ then reuse exactly the same rows.
 
+For the already verified native Spartan environment, `build_ann_native.sbatch`
+builds HNSW and IVF-PQ on CPU nodes without consuming a GPU. IVF-PQ uses a
+deterministic 200,000-vector training sample. After both array tasks succeed,
+`benchmark_ann_native.sbatch` encodes the fixed dev claims once and records
+FlatIP-referenced Recall@5/10/50, batched QPS, single-query P50/P95, load time,
+index bytes and bytes/document. These are ANN engineering metrics; they do not
+replace gold-evidence retrieval metrics.
+
 `prepare_ltr.sbatch` runs BM25+dense retrieval on the training claims, removes gold evidence from the negative pool, and emits `ltr_features.jsonl`. Training consumes that file; no manually assembled feature table is required.
 
 

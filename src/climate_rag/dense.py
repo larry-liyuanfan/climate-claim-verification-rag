@@ -165,6 +165,7 @@ class FaissANNIndex:
         *,
         kind: str = "flat",
         hnsw_m: int = 32,
+        hnsw_ef_construction: int = 200,
         nlist: int = 256,
         pq_m: int = 32,
         nbits: int = 8,
@@ -182,6 +183,7 @@ class FaissANNIndex:
         self.kind = kind
         self.parameters = {
             "hnsw_m": int(hnsw_m),
+            "hnsw_ef_construction": int(hnsw_ef_construction),
             "nlist": int(nlist),
             "pq_m": int(pq_m),
             "nbits": int(nbits),
@@ -191,6 +193,7 @@ class FaissANNIndex:
             self.index = faiss.IndexFlatIP(dimension)
         elif kind == "hnsw":
             self.index = faiss.IndexHNSWFlat(dimension, hnsw_m, faiss.METRIC_INNER_PRODUCT)
+            self.index.hnsw.efConstruction = hnsw_ef_construction
         else:
             quantizer = faiss.IndexFlatIP(dimension)
             self.index = faiss.IndexIVFPQ(
@@ -248,7 +251,11 @@ class DenseRetriever:
         return self.fit_vectors(documents, vectors)
 
     def fit_vectors(
-        self, documents: Sequence[EvidenceDocument], vectors: np.ndarray
+        self,
+        documents: Sequence[EvidenceDocument],
+        vectors: np.ndarray,
+        *,
+        training_vectors: np.ndarray | None = None,
     ) -> "DenseRetriever":
         self.doc_ids = [document.evidence_id for document in documents]
         if len(set(self.doc_ids)) != len(self.doc_ids):
@@ -256,7 +263,10 @@ class DenseRetriever:
         self.texts = [document.text for document in documents]
         if len(vectors) != len(documents):
             raise ValueError("embedding row count does not match document count")
-        self.backend.build(vectors)
+        if isinstance(self.backend, FaissANNIndex):
+            self.backend.build(vectors, training_vectors=training_vectors)
+        else:
+            self.backend.build(vectors)
         return self
 
     def search(self, query: str, top_k: int = 10) -> list[RankedDocument]:
