@@ -3,9 +3,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
-#SBATCH --gres=gpu:1
 #SBATCH --mem=128G
-#SBATCH --time=06:00:00
+#SBATCH --time=12:00:00
 #SBATCH --output=slurm-%x-%j.out
 
 set -euo pipefail
@@ -32,8 +31,8 @@ climate-rag benchmark-ann \
   --index-manifest "hnsw=${ARTIFACT_DIR}/dense-hnsw/run_manifest.json" \
   --index-manifest "ivfpq=${ARTIFACT_DIR}/dense-ivfpq/run_manifest.json" \
   --model Qwen/Qwen3-Embedding-0.6B \
-  --device cuda \
-  --batch-size 64 \
+  --device cpu \
+  --batch-size 32 \
   --faiss-threads "${SLURM_CPUS_PER_TASK}" \
   --hnsw-ef-search 64 \
   --ivf-nprobe 32 \
