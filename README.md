@@ -23,8 +23,8 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Layer | Implementation | Truth boundary |
 |---|---|---|
 | Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Full 1,208,827-document Spartan build verified; retrieval quality evaluation remains separate |
-| Dense retrieval | Deterministic hash smoke encoder; optional Sentence Transformers adapter | Hash mode is not a semantic model |
-| ANN | NumPy exact IP plus optional FAISS FlatIP, HNSW, and IVF-PQ adapters | Full 1.2M-corpus benchmark not yet run by this package |
+| Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; hash mode is not a semantic model |
+| ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus FlatIP reference build verified; HNSW/IVF-PQ quality-speed comparisons remain future work |
 | Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Artifact names the actual algorithm |
 | Reranking | Optional local model, Alibaba Model Studio adapter, deterministic feature fallback | Fallback is never presented as Qwen3 |
 | Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, claim accuracy, H-mean, paired bootstrap | Macro-averaged over claims |
@@ -141,7 +141,31 @@ The native-module run on 2026-08-18 produced a full-corpus lexical index. These 
 | Serialized index | `126,334,728 bytes` |
 | Slurm MaxRSS | `2,630,496 K` |
 
-The restricted artifact remains under project storage at `climate-artifacts/bm25`; only its non-sensitive metrics and provenance are published. The first Qwen3 dense job (`29360716`) failed before model loading because Hugging Face defaulted to the small home cache; commit `2cd75e3` redirects all model caches to project storage, and replacement job `29382416` is queued. Qwen3 embeddings, FAISS ANN comparisons, fusion, and reranking remain unverified until their own artifacts complete.
+The restricted artifact remains under project storage at `climate-artifacts/bm25`; only its non-sensitive metrics and provenance are published.
+
+### Verified Spartan Qwen3 dense and FlatIP build
+
+The replacement job completed on 2026-08-19 after commit `2cd75e3` moved Hugging Face caches from the quota-limited home directory to project storage. These are full-corpus **index-build measurements**, not retrieval-effectiveness scores:
+
+| Field | Verified value |
+|---|---:|
+| Slurm job | `29382416` (`COMPLETED`, exit `0:0`) |
+| Git commit | `2cd75e3b2cc2af059a9880e9482d8e814c94cdc5` |
+| Encoder | `Qwen/Qwen3-Embedding-0.6B` |
+| Evidence vectors | `1,208,827` |
+| Vector dimension | `1,024` |
+| Dense/FlatIP build time | `1,694.743 s` |
+| Total command time | `1,696.767 s` |
+| Slurm elapsed time | `28 min 25 s` |
+| Embedding cache | `4,951,355,520 bytes` |
+| FAISS FlatIP index | `4,951,355,437 bytes` |
+| Dense artifact total | `5,133,839,551 bytes` |
+| Slurm MaxRSS | `22,583,288 K` (`21.54 GB` via `seff`) |
+| Allocation | `1× H100`, `8 CPU`, `96 GB`; `0.474 H100-hours` wall allocation |
+
+The cache sidecar records the model, dimension, document count, and ordered document-ID hash. The run manifest records job `29382416`, Git SHA, environment, and the restricted input hash. Its start/finish timestamps were identical because the original writer generated both at artifact-write time; the follow-up code fixes that provenance defect, so the verified duration above comes from `metrics.json` and Slurm accounting. The 4.95 GB embeddings, 4.95 GB index, and restricted corpus remain on Spartan.
+
+No Recall@K, MRR, nDCG, QPS, HNSW/IVF-PQ comparison, fusion, or reranker result was produced by this build. Those remain unverified until separately evaluated against the fixed claim split.
 
 ## Historical result boundary
 

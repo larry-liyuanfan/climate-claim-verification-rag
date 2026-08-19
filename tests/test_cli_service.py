@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -31,6 +32,9 @@ def test_cli_index_evaluate_negatives_and_ltr(tmp_path: Path) -> None:
     assert (index_dir / "run_manifest.json").exists()
     manifest = json.loads((index_dir / "run_manifest.json").read_text(encoding="utf-8"))
     assert manifest["finished_at_utc"].endswith("+00:00")
+    assert datetime.fromisoformat(manifest["started_at_utc"]) < datetime.fromisoformat(
+        manifest["finished_at_utc"]
+    )
 
     evaluation_dir = tmp_path / "evaluation"
     assert main(

@@ -6,6 +6,7 @@ import json
 import sys
 import time
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -89,8 +90,13 @@ def _recorded_arguments(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def _started_at_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
 def command_index(args: argparse.Namespace) -> int:
     _required(args, "evidence", "output_dir")
+    started_at = _started_at_utc()
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
@@ -191,6 +197,7 @@ def command_index(args: argparse.Namespace) -> int:
         command="index",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[args.evidence],
         notes=notes,
         repository=_repository(),
@@ -247,6 +254,7 @@ def _load_rankings(path: str | Path) -> dict[str, dict[str, list[RankedDocument]
 
 def command_mine_negatives(args: argparse.Namespace) -> int:
     _required(args, "claims", "output_dir")
+    started_at = _started_at_utc()
     claims = load_claims(args.claims)
     live_indexes = bool(args.bm25_index or args.dense_index)
     if live_indexes:
@@ -330,6 +338,7 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         command="mine-negatives",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[
             args.claims,
             *([args.rankings] if args.rankings else []),
@@ -357,6 +366,7 @@ def _pairwise_accuracy(scores: np.ndarray, labels: np.ndarray, groups: list[str]
 
 def command_train_fusion(args: argparse.Namespace) -> int:
     _required(args, "features", "output_dir")
+    started_at = _started_at_utc()
     rows = list(read_jsonl(args.features))
     if not rows:
         raise ValueError("feature file is empty")
@@ -399,6 +409,7 @@ def command_train_fusion(args: argparse.Namespace) -> int:
         command="train-fusion",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[args.features],
         notes=[
             "Training pairwise accuracy is a diagnostic, not held-out ranking quality.",
@@ -412,6 +423,7 @@ def command_train_fusion(args: argparse.Namespace) -> int:
 
 def command_evaluate(args: argparse.Namespace) -> int:
     _required(args, "claims", "output_dir")
+    started_at = _started_at_utc()
     if args.experiment_config:
         metrics, rows = run_five_stage_benchmark(
             claims_path=args.claims,
@@ -425,6 +437,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
             command="evaluate-five-stage",
             arguments=_recorded_arguments(args),
             metrics=metrics,
+            started_at=started_at,
             inputs=[args.claims, args.experiment_config],
             predictions=rows,
             notes=[
@@ -458,6 +471,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
         command="evaluate",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[
             args.claims,
             args.predictions,

@@ -8,9 +8,12 @@ baseline into a reproducible multistage search lab: BM25 and dense recall share
 one evidence schema; FlatIP, HNSW and IVF-PQ expose ANN trade-offs; RRF provides
 a training-free baseline; LambdaMART-compatible features support learned fusion;
 and a cross-encoder reranker, calibration, abstention and paired bootstrap close
-the evaluation loop. Every command writes manifests and artifacts. The full
-1.2-million-evidence Spartan run is reported separately from fixture smoke tests,
-and no public rank is claimed without an official source.
+the evaluation loop. On Spartan I built BM25 and Qwen3-Embedding-0.6B/FlatIP
+artifacts for all 1,208,827 evidence passages; the dense build produced 1,024-d
+vectors in 28 minutes 17 seconds of command time with a 21.54 GB peak resident
+set. Those are engineering measurements, not Recall@K gains. HNSW/IVF-PQ and
+end-to-end quality remain separate experiments, and no public rank is claimed
+without an official source.
 
 ## Deep-dive questions
 
