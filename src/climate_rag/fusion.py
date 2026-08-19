@@ -235,7 +235,10 @@ class LightGBMLambdaMART:
         self.model.fit(sorted_features, sorted_labels, group=counts, feature_name=list(self.feature_names))
 
     def predict(self, features: np.ndarray) -> np.ndarray:
-        return np.asarray(self.model.predict(features), dtype=np.float64)
+        matrix = np.asarray(features)
+        if matrix.ndim != 2 or matrix.shape[1] != len(self.feature_names):
+            raise ValueError("feature matrix shape does not match feature_names")
+        return np.asarray(self.model.booster_.predict(matrix), dtype=np.float64)
 
     def save(self, path: str | Path) -> None:
         target = Path(path)
@@ -257,7 +260,11 @@ class LightGBMLambdaMART:
         if metadata.get("algorithm") != "lightgbm_lambdamart":
             raise ValueError("not a LightGBM LambdaMART model")
         instance = cls(metadata["feature_names"], seed=int(metadata["seed"]))
-        instance.model._Booster = instance._lgb.Booster(model_file=str(target))
+        booster = instance._lgb.Booster(model_file=str(target))
+        if booster.num_feature() != len(instance.feature_names):
+            raise ValueError("LightGBM model feature count does not match persisted feature_names")
+        instance.model._Booster = booster
+        instance.model._n_features = booster.num_feature()
         instance.model.fitted_ = True
         return instance
 

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from climate_rag.dense import DenseRetriever, FaissANNIndex, HashDenseEncoder, NumpyFlatIndex
-from climate_rag.fusion import LinearPairwiseLTR, reciprocal_rank_fusion
+from climate_rag.fusion import LightGBMLambdaMART, LinearPairwiseLTR, reciprocal_rank_fusion
 from climate_rag.io import iter_evidence
 from climate_rag.models import RankedDocument
 from climate_rag.negatives import mine_hard_negatives
@@ -65,6 +65,23 @@ def test_ltr_rejects_groups_without_preference_pairs() -> None:
     model = LinearPairwiseLTR(("x",))
     with pytest.raises(ValueError, match="unequal-label"):
         model.fit(np.asarray([[1.0], [2.0]]), np.asarray([0, 0]), ["q", "q"])
+
+
+def test_lightgbm_ltr_round_trip_preserves_feature_count(tmp_path: Path) -> None:
+    pytest.importorskip("lightgbm")
+    features = np.asarray([[3.0, 1.0], [0.0, 0.0], [2.0, 1.0], [-1.0, 0.0]])
+    labels = np.asarray([2, 0, 2, 0])
+    groups = ["q1", "q1", "q2", "q2"]
+    model = LightGBMLambdaMART(("quality", "overlap"), seed=17)
+    model.fit(features, labels, groups)
+    expected = model.predict(features)
+    path = tmp_path / "ltr_model.txt"
+    model.save(path)
+
+    restored = LightGBMLambdaMART.load(path)
+    np.testing.assert_allclose(restored.predict(features), expected)
+    with pytest.raises(ValueError, match="feature matrix shape"):
+        restored.predict(np.ones((1, 3)))
 
 
 def test_hard_negative_mining_excludes_gold_and_tracks_sources() -> None:
