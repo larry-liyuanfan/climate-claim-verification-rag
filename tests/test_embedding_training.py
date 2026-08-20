@@ -12,6 +12,9 @@ def test_embedding_pilot_pins_the_known_qwen3_transformers_runtime() -> None:
     assert '"ms-swift==3.9.3"' in script
     assert "--retries 5" in script
     assert 'PIP_DEFAULT_TIMEOUT="${PIP_DEFAULT_TIMEOUT:-120}"' in script
+    assert "unset PYTHONPATH" in script
+    assert "from typing_extensions import TypeVar" in script
+    assert '"runtime_preflight"' in script
 
 
 def test_build_swift_infonce_dataset_is_claim_grouped_and_filters_false_negatives() -> None:

@@ -19,6 +19,10 @@ set -euo pipefail
 cd "${REPO_DIR}"
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
+# EasyBuild exports an older typing_extensions through PYTHONPATH.  Keep the
+# module-provided CUDA/PyTorch system site-packages, but let the node-local venv
+# win for Python dependencies installed below.
+unset PYTHONPATH
 NODE_LOCAL_ROOT="${SLURM_TMPDIR:-${TMPDIR:-/tmp}}"
 RUNTIME_ENV="${SWIFT_ENV:-${NODE_LOCAL_ROOT}/climate-swift-venv-3.9.3}"
 if [[ ! -x "${RUNTIME_ENV}/bin/swift" ]]; then
@@ -44,6 +48,19 @@ export INFONCE_USE_BATCH=true
 export INFONCE_HARD_NEGATIVES="${INFONCE_HARD_NEGATIVES:-4}"
 export INFONCE_MASK_FAKE_NEGATIVE=true
 mkdir -p "${HF_HOME}" "${OUTPUT_DIR}"
+
+python - <<'PY'
+from typing_extensions import TypeVar
+import torch
+import transformers
+import swift
+
+print(
+    "runtime_preflight",
+    {"torch": torch.__version__, "transformers": transformers.__version__, "swift": swift.__version__},
+    flush=True,
+)
+PY
 
 # This is a bounded resource/contract pilot, not a resume-quality effectiveness run.
 # The official Qwen3-Embedding/ms-swift recipe uses task_type=embedding,
