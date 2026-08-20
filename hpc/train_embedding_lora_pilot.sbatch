@@ -20,8 +20,10 @@ cd "${REPO_DIR}"
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 # EasyBuild exports an older typing_extensions through PYTHONPATH.  Keep the
-# module-provided CUDA/PyTorch system site-packages, but let the node-local venv
-# win for Python dependencies installed below.
+# module-provided CUDA/PyTorch path, but put the node-local venv first so its
+# current typing_extensions wins.  Dropping PYTHONPATH entirely makes pip
+# install a CUDA 13 torch wheel that the Spartan driver cannot load.
+MODULE_PYTHONPATH="${PYTHONPATH:-}"
 unset PYTHONPATH
 NODE_LOCAL_ROOT="${SLURM_TMPDIR:-${TMPDIR:-/tmp}}"
 RUNTIME_ENV="${SWIFT_ENV:-${NODE_LOCAL_ROOT}/climate-swift-venv-3.9.3}"
@@ -29,6 +31,9 @@ if [[ ! -x "${RUNTIME_ENV}/bin/swift" ]]; then
   python -m venv --system-site-packages "${RUNTIME_ENV}"
   export PIP_CACHE_DIR="${NODE_LOCAL_ROOT}/climate-swift-pip-cache"
   export PIP_DEFAULT_TIMEOUT="${PIP_DEFAULT_TIMEOUT:-120}"
+  VENV_SITE=$("${RUNTIME_ENV}/bin/python" -c 'import site; print(site.getsitepackages()[0])')
+  export PYTHONPATH="${VENV_SITE}${MODULE_PYTHONPATH:+:${MODULE_PYTHONPATH}}"
+  "${RUNTIME_ENV}/bin/python" -m pip install --no-input --retries 5 "typing_extensions>=4.12"
   "${RUNTIME_ENV}/bin/python" -m pip install \
     --no-input \
     --retries 5 \
@@ -36,6 +41,8 @@ if [[ ! -x "${RUNTIME_ENV}/bin/swift" ]]; then
     "ms-swift==3.9.3"
 fi
 source "${RUNTIME_ENV}/bin/activate"
+VENV_SITE=$(python -c 'import site; print(site.getsitepackages()[0])')
+export PYTHONPATH="${VENV_SITE}${MODULE_PYTHONPATH:+:${MODULE_PYTHONPATH}}"
 export PYTHONNOUSERSITE=1
 export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
@@ -43,11 +50,13 @@ export HF_HOME="${ARTIFACT_ROOT}/.cache/huggingface"
 export HF_HUB_CACHE="${HF_HOME}/hub"
 export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
 export HF_HUB_DISABLE_TELEMETRY=1
+export MODELSCOPE_CACHE="${ARTIFACT_ROOT}/.cache/modelscope"
+export MODELSCOPE_HOME="${ARTIFACT_ROOT}/.cache/modelscope"
 export INFONCE_TEMPERATURE="${INFONCE_TEMPERATURE:-0.05}"
 export INFONCE_USE_BATCH=true
 export INFONCE_HARD_NEGATIVES="${INFONCE_HARD_NEGATIVES:-4}"
 export INFONCE_MASK_FAKE_NEGATIVE=true
-mkdir -p "${HF_HOME}" "${OUTPUT_DIR}"
+mkdir -p "${HF_HOME}" "${MODELSCOPE_CACHE}" "${OUTPUT_DIR}"
 
 python - <<'PY'
 from typing_extensions import TypeVar
@@ -60,6 +69,9 @@ print(
     {"torch": torch.__version__, "transformers": transformers.__version__, "swift": swift.__version__},
     flush=True,
 )
+assert torch.__version__.startswith("2.1.2"), torch.__version__
+assert torch.version.cuda == "12.2", torch.version.cuda
+assert torch.cuda.is_available(), "Spartan GPU is not visible to the pinned CUDA runtime"
 PY
 
 # This is a bounded resource/contract pilot, not a resume-quality effectiveness run.
@@ -69,7 +81,7 @@ PY
   --model Qwen/Qwen3-Embedding-0.6B \
   --model_type qwen3_emb \
   --task_type embedding \
-  --tuner_type lora \
+  --train_type lora \
   --lora_rank 8 \
   --lora_alpha 32 \
   --target_modules all-linear \

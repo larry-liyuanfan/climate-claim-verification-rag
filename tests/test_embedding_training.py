@@ -13,8 +13,17 @@ def test_embedding_pilot_pins_the_known_qwen3_transformers_runtime() -> None:
     assert "--retries 5" in script
     assert 'PIP_DEFAULT_TIMEOUT="${PIP_DEFAULT_TIMEOUT:-120}"' in script
     assert "unset PYTHONPATH" in script
+    assert 'MODULE_PYTHONPATH="${PYTHONPATH:-}"' in script
+    assert 'export PYTHONPATH="${VENV_SITE}${MODULE_PYTHONPATH:+:${MODULE_PYTHONPATH}}"' in script
+    assert '"typing_extensions>=4.12"' in script
     assert "from typing_extensions import TypeVar" in script
     assert '"runtime_preflight"' in script
+    assert 'torch.__version__.startswith("2.1.2")' in script
+    assert 'torch.version.cuda == "12.2"' in script
+    assert "torch.cuda.is_available()" in script
+    assert 'MODELSCOPE_CACHE="${ARTIFACT_ROOT}/.cache/modelscope"' in script
+    assert "--train_type lora" in script
+    assert "--tuner_type" not in script
 
 
 def test_build_swift_infonce_dataset_is_claim_grouped_and_filters_false_negatives() -> None:
