@@ -14,6 +14,7 @@ setup_climate_adapter_runtime() {
     --retries 5 \
     --target "${dependency_dir}" \
     --no-deps \
+    "accelerate==1.14.0" \
     "peft==0.17.1"
   export PYTHONPATH="${dependency_dir}:${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 
