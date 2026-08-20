@@ -22,6 +22,7 @@
 | RRF + Qwen3-0.6B weighted-rank fusion | `verified` | job `29452723`, commit `18faf6a`: selected 4:1 RRF/Qwen rank profile; Recall@5 `0.2890` vs `0.2709` (delta interval `0.0005–0.0389`); MRR/nDCG intervals positive; F1 delta interval crosses zero; P50/P95 `5.57/6.52 s` |
 | Qwen3-Reranker-4B pure replacement | `verified-inconclusive` | job `29453918`, commit `c04e39c`: 154 claims/7,700 pairs; Recall@5/F1 `0.3054/0.1997`, but paired intervals versus RRF cross zero; P50/P95 `4.20/4.82 s` |
 | RRF + Qwen3-4B balanced weighted-rank fusion | `verified-dev-selection` | jobs `29453918`/`29455049`: Recall@5/MRR/nDCG/F1 `0.3153/0.3961/0.2849/0.2131`; all four 5,000-sample paired intervals versus RRF above zero; 4B/weights selected on the same dev split, not an independent test |
+| Qwen3-Reranker-8B pilot Pareto gate | `verified-negative-pareto-gate` | job `29456898`, commit `53a3782`: same 8 claims/400 pairs as 4B pilot; tied F1/Recall@5 `0.3016/0.4688`, MRR `0.5042` vs 4B `0.5104`, P95 `8.25 s` vs `5.13 s`; full 8B intentionally not run |
 | LightGBM LambdaMART fixed-dev result | `verified-negative` | Recall@5 `0.0029`; severe regression, not selected for deployment |
 | Deterministic reranker fixed-dev result | `verified-negative` | Recall@5 `0.0127`; explicitly not Qwen3 and not selected |
 
@@ -49,4 +50,6 @@ The local Qwen3 reranker run manifest records job `29448904`, commit `01a571fbee
 The corrected fusion run manifest records job `29452723`, commit `18faf6aa59b593ae7e362c6decdc031d6ef96575`, 154 queries and 7,700 pairs. Comparison job `29453474` bootstrapped every Qwen/fusion prediction file against the same RRF predictions. The selected `base4` profile is a rank-level fusion, not a learned score calibration: its 4:1 weights were evaluated alongside balanced and 2:1 profiles on the fixed dev split, so they are not an independent test-set hyperparameter claim.
 
 The 4B run manifest records job `29453918`, commit `c04e39c9fb4983f010623ba14d0c8cf9ac371edd`, dev-claim hash `ea9976e8...`, config hash `64aa8c1d...`, BF16 inference, 154 queries and 7,700 pairs. Comparison job `29455049` evaluated pure, balanced, 2:1 and 4:1 outputs against the same RRF predictions with 5,000 paired samples. Balanced fusion was best on this dev split and therefore carries a `verified-dev-selection` boundary rather than an independent test label. Restricted predictions and the 4B model cache remain on Spartan.
+
+The 8B resource gate is recorded in `docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json`. Job `29456898` used node-local model caching after a storage-only failed attempt, finished with exit `0:0`, and did not beat the 4B pilot on quality/latency. No full-dev 8B result exists or is claimed.
 

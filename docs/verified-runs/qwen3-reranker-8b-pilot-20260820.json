@@ -1,0 +1,42 @@
+{
+  "status": "verified-negative-pareto-gate",
+  "scope": "same fixed eight-claim, 400-pair pilot used by the 4B gate; not a full-dev result",
+  "spartan": {
+    "job_id": "29456898",
+    "git_sha": "53a37824d805c0d62e91e797a5dfbf1caef3c044",
+    "partition": "gpu-a100-mig",
+    "allocated_gpu": "A100 1g.20gb MIG slice",
+    "elapsed_seconds": 139,
+    "cpu_count": 8,
+    "requested_memory_gb": 32,
+    "batch_max_rss_kb": 29380852,
+    "exit_code": "0:0"
+  },
+  "qwen3_reranker_8b": {
+    "best_fusion": "rrf_reranker_fusion_base2",
+    "evidence_f1": 0.3015873015873016,
+    "recall_at_5": 0.46875,
+    "mrr_at_10": 0.5041666666666667,
+    "p50_seconds_per_query": 7.928801153320819,
+    "p95_seconds_per_query": 8.251878491928801,
+    "model_load_seconds": 32.29527197871357,
+    "metrics_sha256": "e1090e480acd3ae58f0b3ceb1b5268d56a9bc63334ec335488bfab88b674e972",
+    "run_manifest_sha256": "ca718e3e0356f09e84b27c2492b79f680767ba106d9317ec7d794d61a156f48c"
+  },
+  "qwen3_reranker_4b_comparator": {
+    "best_fusion": "rrf_reranker_fusion_balanced",
+    "evidence_f1": 0.3015873015873016,
+    "recall_at_5": 0.46875,
+    "mrr_at_10": 0.5104166666666666,
+    "p50_seconds_per_query": 4.388569451868534,
+    "p95_seconds_per_query": 5.131936387112364,
+    "metrics_sha256": "506dda866dd29d0947e75d25f308bd604386c4f8f50b4a52b3a132ea40ba671c",
+    "run_manifest_sha256": "7919bfe52e93a177e8092d3d44ec4d730f1906bf34e88a2e058859e96689d5ee"
+  },
+  "decision": "Do not submit a full 8B run: the pilot tied 4B on Evidence F1 and Recall@5, had slightly lower MRR@10, and raised P95 latency by 60.79%.",
+  "boundaries": [
+    "This gate chooses whether to spend resources; eight claims are not an independent quality benchmark.",
+    "No full-dev 8B metric is claimed.",
+    "Restricted predictions and model weights remain on Spartan."
+  ]
+}
