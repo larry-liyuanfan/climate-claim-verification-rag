@@ -18,7 +18,7 @@ from climate_rag.encoder_gate import (
     required_evidence_ids,
     screening_decision,
 )
-from climate_rag.io import iter_evidence, load_claims
+from climate_rag.io import iter_evidence, load_claims, write_json
 from climate_rag.metrics import evaluate_predictions
 from climate_rag.models import Prediction
 
@@ -152,6 +152,21 @@ def main() -> int:
         sample_size=args.sample_size,
         seed=args.seed,
     )
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    print(
+        json.dumps(
+            {
+                "event": "sample_ready",
+                "source_document_count": sample.source_document_count,
+                "sample_document_count": len(sample.documents),
+                "required_evidence_count": len(sample.required_ids),
+                "claim_count": len(claims),
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
     models = [value.strip() for value in args.models.split(",") if value.strip()]
     if len(models) != 2:
         raise ValueError("exactly two comma-separated models are required")
@@ -159,6 +174,7 @@ def main() -> int:
     metric_rows: dict[str, list[dict[str, Any]]] = {}
     output_rows: list[dict[str, Any]] = []
     for model in models:
+        print(json.dumps({"event": "model_started", "model": model}), flush=True)
         metrics, rows, predictions = _evaluate_model(
             model,
             claims=claims,
@@ -171,6 +187,27 @@ def main() -> int:
         model_metrics[model] = metrics
         metric_rows[model] = rows
         output_rows.extend(predictions)
+        write_json(
+            output_dir / "checkpoint.json",
+            {
+                "status": "in_progress",
+                "completed_models": list(model_metrics),
+                "models": model_metrics,
+            },
+        )
+        print(
+            json.dumps(
+                {
+                    "event": "model_completed",
+                    "model": model,
+                    "recall@5": metrics["recall@5"],
+                    "document_encode_seconds": metrics["document_encode_seconds"],
+                    "peak_torch_gpu_bytes": metrics["peak_torch_gpu_bytes"],
+                },
+                sort_keys=True,
+            ),
+            flush=True,
+        )
     comparisons = compare_metric_rows(
         metric_rows[models[0]],
         metric_rows[models[1]],
@@ -202,6 +239,14 @@ def main() -> int:
             "This screen cannot replace a full-corpus fixed-dev evaluation.",
         ],
         repository=Path(__file__).resolve().parents[1],
+    )
+    write_json(
+        output_dir / "checkpoint.json",
+        {
+            "status": "completed",
+            "completed_models": models,
+            "screening_decision": metrics["screening_decision"],
+        },
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
     return 0
