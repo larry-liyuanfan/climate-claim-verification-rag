@@ -24,7 +24,7 @@ source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 export PYTHONPATH="${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
-export HF_HOME="${ARTIFACT_DIR}/.cache/huggingface"
+export HF_HOME="${MODEL_CACHE_ROOT:-${ARTIFACT_DIR}/.cache/huggingface}"
 export HF_HUB_CACHE="${HF_HOME}/hub"
 export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
 export HF_HUB_DISABLE_TELEMETRY=1
