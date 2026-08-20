@@ -34,6 +34,7 @@ def _evaluate_model(
     top_k: int,
     adapter_path: str | None = None,
     run_label: str | None = None,
+    save_index_path: str | Path | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     try:
         import faiss
@@ -76,6 +77,12 @@ def _evaluate_model(
         np.ascontiguousarray(query_vectors, dtype=np.float32), min(top_k, len(documents))
     )
     search_seconds = time.perf_counter() - search_started
+    saved_index_bytes = 0
+    if save_index_path is not None:
+        index_path = Path(save_index_path)
+        index_path.parent.mkdir(parents=True, exist_ok=True)
+        faiss.write_index(index, str(index_path))
+        saved_index_bytes = index_path.stat().st_size
     predictions: dict[str, Prediction] = {}
     prediction_rows: list[dict[str, Any]] = []
     for claim_id, row_scores, row_positions in zip(
@@ -116,6 +123,7 @@ def _evaluate_model(
         "flat_search_seconds": search_seconds,
         "flat_search_qps": len(claims) / max(search_seconds, 1e-12),
         "peak_torch_gpu_bytes": peak_gpu_bytes,
+        "saved_index_bytes": saved_index_bytes,
     }
     del index, query_vectors, document_vectors, encoder
     gc.collect()

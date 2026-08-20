@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 from climate_rag import dense
 from climate_rag.embedding_adapter_gate import (
+    full_corpus_promotion_decision,
     heldout_query_texts,
     select_heldout_claims,
 )
@@ -81,3 +82,17 @@ def test_sentence_transformer_encoder_loads_adapter(monkeypatch) -> None:
     assert encoder.adapter_parameter_count == 7
     assert len(calls) == 1
     assert calls[0][1:] == ("adapter", {r"^model\.": ""})
+
+
+def test_full_corpus_promotion_requires_recall_ci_and_secondary_non_regression() -> None:
+    comparisons = {
+        metric: {"mean_difference": 0.01, "ci_lower": 0.001}
+        for metric in ("recall@5", "mrr@10", "ndcg@10", "evidence_f1")
+    }
+    assert full_corpus_promotion_decision(comparisons)[
+        "candidate_passes_full_corpus_gate"
+    ]
+    comparisons["evidence_f1"]["mean_difference"] = -0.0001
+    decision = full_corpus_promotion_decision(comparisons)
+    assert not decision["candidate_passes_full_corpus_gate"]
+    assert not decision["secondary_mean_non_regression"]

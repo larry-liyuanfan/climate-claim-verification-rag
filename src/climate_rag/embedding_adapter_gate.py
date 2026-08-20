@@ -36,3 +36,30 @@ def select_heldout_claims(
     if missing:
         raise ValueError(f"{len(missing)} eval query texts do not resolve to source claims")
     return selected
+
+
+def full_corpus_promotion_decision(
+    comparisons: Mapping[str, Mapping[str, float | int]],
+) -> dict[str, object]:
+    """Promote only on significant Recall@5 lift and mean non-regression elsewhere."""
+
+    recall = comparisons["recall@5"]
+    secondary = ("mrr@10", "ndcg@10", "evidence_f1")
+    primary_pass = (
+        float(recall["mean_difference"]) > 0
+        and float(recall["ci_lower"]) > 0
+    )
+    non_regression = all(
+        float(comparisons[metric]["mean_difference"]) >= 0 for metric in secondary
+    )
+    passed = primary_pass and non_regression
+    return {
+        "candidate_passes_full_corpus_gate": passed,
+        "primary_recall_ci_positive": primary_pass,
+        "secondary_mean_non_regression": non_regression,
+        "decision": "promote_adapter" if passed else "retain_base_encoder",
+        "boundary": (
+            "The gate uses the untouched official dev claims and full evidence corpus; "
+            "it is still an offline project evaluation, not an online production A/B test."
+        ),
+    }
