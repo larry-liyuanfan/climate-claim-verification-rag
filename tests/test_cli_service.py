@@ -10,7 +10,6 @@ from climate_rag.io import iter_evidence
 from climate_rag.pipeline import HybridRetriever
 from climate_rag.service import create_app
 
-
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
@@ -129,6 +128,17 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
                 "rerank_k": 8,
                 "final_k": 5,
                 "rerank_source": "rrf",
+                "rerank_fusion": {
+                    "enabled": True,
+                    "k": 60,
+                    "profiles": [
+                        {
+                            "name": "balanced",
+                            "base_weight": 1.0,
+                            "reranker_weight": 1.0,
+                        }
+                    ],
+                },
                 "reranker": {"kind": "deterministic"},
             }
         ),
@@ -149,11 +159,20 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
         ]
     ) == 0
     metrics = json.loads((output_dir / "metrics.json").read_text(encoding="utf-8"))
-    assert set(metrics["systems"]) == {"bm25", "dense", "rrf", "ltr", "rrf_reranker"}
+    assert set(metrics["systems"]) == {
+        "bm25",
+        "dense",
+        "rrf",
+        "ltr",
+        "rrf_reranker",
+        "rrf_reranker_fusion_balanced",
+    }
     assert metrics["reranker"] == "deterministic-feature-fallback"
     assert metrics["reranker_base"] == "rrf"
     assert metrics["reranker_timing"]["query_count"] == metrics["claim_count"] == 2
     assert metrics["reranker_timing"]["candidate_pair_count"] > 0
+    assert metrics["rerank_fusion"]["enabled"] is True
+    assert (output_dir / "reranker_candidates.jsonl").exists()
 
 
 def test_fastapi_service_returns_evidence_without_fake_label() -> None:

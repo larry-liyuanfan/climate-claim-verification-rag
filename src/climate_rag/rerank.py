@@ -20,6 +20,62 @@ class Reranker(Protocol):
     ) -> list[RankedDocument]: ...
 
 
+def weighted_rank_fuse(
+    base: Sequence[RankedDocument],
+    reranked: Sequence[RankedDocument],
+    top_k: int,
+    *,
+    k: int = 60,
+    base_weight: float = 1.0,
+    reranker_weight: float = 1.0,
+) -> list[RankedDocument]:
+    """Fuse first-stage and cross-encoder ranks without mixing score scales."""
+
+    if top_k <= 0:
+        return []
+    if k < 0:
+        raise ValueError("rank-fusion k must be non-negative")
+    if base_weight < 0 or reranker_weight < 0:
+        raise ValueError("rank-fusion weights must be non-negative")
+    if base_weight == 0 and reranker_weight == 0:
+        raise ValueError("at least one rank-fusion weight must be positive")
+
+    base_by_id = {row.evidence_id: row for row in base}
+    reranked_by_id = {row.evidence_id: row for row in reranked}
+    evidence_ids = sorted(base_by_id.keys() | reranked_by_id.keys())
+    rows: list[tuple[float, RankedDocument]] = []
+    for evidence_id in evidence_ids:
+        base_row = base_by_id.get(evidence_id)
+        reranked_row = reranked_by_id.get(evidence_id)
+        score = 0.0
+        if base_row is not None:
+            score += base_weight / (k + base_row.rank)
+        if reranked_row is not None:
+            score += reranker_weight / (k + reranked_row.rank)
+        source_row = reranked_row or base_row
+        assert source_row is not None
+        rows.append((score, source_row))
+    rows.sort(key=lambda item: (-item[0], item[1].evidence_id))
+    return [
+        RankedDocument(
+            evidence_id=row.evidence_id,
+            text=row.text,
+            score=float(score),
+            rank=rank,
+            source="weighted-rank-fusion",
+            features={
+                "base_rank": float(base_by_id[row.evidence_id].rank)
+                if row.evidence_id in base_by_id
+                else 0.0,
+                "reranker_rank": float(reranked_by_id[row.evidence_id].rank)
+                if row.evidence_id in reranked_by_id
+                else 0.0,
+            },
+        )
+        for rank, (score, row) in enumerate(rows[:top_k], start=1)
+    ]
+
+
 class DeterministicFeatureReranker:
     """Local fallback based on auditable lexical/numeric overlap features."""
 

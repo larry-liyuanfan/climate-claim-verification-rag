@@ -3,12 +3,21 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from climate_rag.dense import DenseRetriever, FaissANNIndex, HashDenseEncoder, NumpyFlatIndex
-from climate_rag.fusion import LightGBMLambdaMART, LinearPairwiseLTR, reciprocal_rank_fusion
+from climate_rag.dense import (
+    DenseRetriever,
+    FaissANNIndex,
+    HashDenseEncoder,
+    NumpyFlatIndex,
+)
+from climate_rag.fusion import (
+    LightGBMLambdaMART,
+    LinearPairwiseLTR,
+    reciprocal_rank_fusion,
+)
 from climate_rag.io import iter_evidence
 from climate_rag.models import RankedDocument
 from climate_rag.negatives import mine_hard_negatives
-
+from climate_rag.rerank import weighted_rank_fuse
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -44,6 +53,20 @@ def test_rrf_is_deterministic_and_deduplicates() -> None:
     rows = reciprocal_rank_fusion(rankings, k=60)
     assert [row.evidence_id for row in rows] == ["a", "b"]
     assert len({row.evidence_id for row in rows}) == 2
+
+
+def test_weighted_rank_fuse_preserves_both_rank_signals() -> None:
+    base = [RankedDocument("a", 0.9, 1), RankedDocument("b", 0.8, 2)]
+    reranked = [RankedDocument("b", 0.7, 1), RankedDocument("a", 0.6, 2)]
+    rows = weighted_rank_fuse(base, reranked, 2, k=0, base_weight=2.0, reranker_weight=1.0)
+    assert [row.evidence_id for row in rows] == ["a", "b"]
+    assert rows[0].features == {"base_rank": 1.0, "reranker_rank": 2.0}
+
+
+def test_weighted_rank_fuse_rejects_invalid_weights() -> None:
+    rows = [RankedDocument("a", 1.0, 1)]
+    with pytest.raises(ValueError, match="at least one"):
+        weighted_rank_fuse(rows, rows, 1, base_weight=0.0, reranker_weight=0.0)
 
 
 def test_linear_pairwise_ltr_learns_order_and_persists(tmp_path: Path) -> None:

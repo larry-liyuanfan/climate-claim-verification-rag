@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -11,7 +12,7 @@ import numpy as np
 from .bm25 import BM25Index
 from .dense import DenseRetriever
 from .fusion import build_candidate_features, load_ranker, reciprocal_rank_fusion
-from .io import load_claims, write_json
+from .io import load_claims, write_json, write_jsonl
 from .metrics import evaluate_predictions, paired_bootstrap
 from .models import Prediction, RankedDocument
 from .rerank import (
@@ -19,6 +20,7 @@ from .rerank import (
     ModelStudioReranker,
     Qwen3CausalLMReranker,
     Reranker,
+    weighted_rank_fuse,
 )
 
 
@@ -52,6 +54,45 @@ def _make_reranker(config: dict[str, Any]) -> Reranker:
             timeout_seconds=float(config.get("timeout_seconds", 30.0)),
         )
     raise ValueError(f"unsupported reranker kind: {kind}")
+
+
+def _rerank_fusion_profiles(config: dict[str, Any]) -> list[dict[str, Any]]:
+    if not bool(config.get("enabled", False)):
+        return []
+    kind = str(config.get("kind", "weighted-rank-fusion"))
+    if kind != "weighted-rank-fusion":
+        raise ValueError("rerank_fusion.kind must be 'weighted-rank-fusion'")
+    raw_profiles = config.get("profiles")
+    if raw_profiles is None:
+        raw_profiles = [
+            {
+                "name": "balanced",
+                "base_weight": config.get("base_weight", 1.0),
+                "reranker_weight": config.get("reranker_weight", 1.0),
+            }
+        ]
+    if not isinstance(raw_profiles, list) or not raw_profiles:
+        raise ValueError("rerank_fusion.profiles must be a non-empty list")
+    profiles: list[dict[str, Any]] = []
+    names: set[str] = set()
+    for raw in raw_profiles:
+        if not isinstance(raw, dict):
+            raise TypeError("each rerank fusion profile must be a mapping")
+        name = str(raw.get("name", "")).strip()
+        if not re.fullmatch(r"[a-z0-9_]+", name):
+            raise ValueError("rerank fusion profile names must match [a-z0-9_]+")
+        if name in names:
+            raise ValueError(f"duplicate rerank fusion profile: {name}")
+        names.add(name)
+        profiles.append(
+            {
+                "name": name,
+                "k": int(raw.get("k", config.get("k", 60))),
+                "base_weight": float(raw.get("base_weight", 1.0)),
+                "reranker_weight": float(raw.get("reranker_weight", 1.0)),
+            }
+        )
+    return profiles
 
 
 def _rank_with_ltr(
@@ -142,6 +183,12 @@ def run_five_stage_benchmark(
     if rerank_source not in {"rrf", "ltr"}:
         raise ValueError("rerank_source must be 'rrf' or 'ltr'")
     reranked_stage = f"{rerank_source}_reranker"
+    fusion_config = config.get("rerank_fusion", {}) or {}
+    fusion_profiles = _rerank_fusion_profiles(fusion_config)
+    fused_stages = {
+        profile["name"]: f"{reranked_stage}_fusion_{profile['name']}"
+        for profile in fusion_profiles
+    }
     predictions: dict[str, dict[str, Prediction]] = {
         "bm25": {},
         "dense": {},
@@ -149,8 +196,11 @@ def run_five_stage_benchmark(
         "ltr": {},
         reranked_stage: {},
     }
+    for fused_stage in fused_stages.values():
+        predictions[fused_stage] = {}
     rerank_durations: list[float] = []
     reranked_pair_count = 0
+    candidate_trace: list[dict[str, Any]] = []
     for claim_id in sorted(claims):
         query = claims[claim_id].text
         bm25_rows = bm25.search(query, recall_k)
@@ -162,9 +212,36 @@ def run_five_stage_benchmark(
         rerank_candidates = rrf_rows if rerank_source == "rrf" else ltr_rows
         rerank_candidates = rerank_candidates[:rerank_k]
         rerank_started = time.perf_counter()
-        reranked = reranker.rerank(query, rerank_candidates, final_k)
+        reranked_all = reranker.rerank(query, rerank_candidates, len(rerank_candidates))
         rerank_durations.append(time.perf_counter() - rerank_started)
         reranked_pair_count += len(rerank_candidates)
+        reranked = reranked_all[:final_k]
+        fused_by_profile = {
+            profile["name"]: weighted_rank_fuse(
+                rerank_candidates,
+                reranked_all,
+                final_k,
+                k=profile["k"],
+                base_weight=profile["base_weight"],
+                reranker_weight=profile["reranker_weight"],
+            )
+            for profile in fusion_profiles
+        }
+        base_by_id = {row.evidence_id: row for row in rerank_candidates}
+        reranked_by_id = {row.evidence_id: row for row in reranked_all}
+        for evidence_id in sorted(base_by_id.keys() | reranked_by_id.keys()):
+            base_row = base_by_id.get(evidence_id)
+            reranked_row = reranked_by_id.get(evidence_id)
+            candidate_trace.append(
+                {
+                    "claim_id": claim_id,
+                    "evidence_id": evidence_id,
+                    "base_rank": base_row.rank if base_row is not None else None,
+                    "base_score": base_row.score if base_row is not None else None,
+                    "reranker_rank": reranked_row.rank if reranked_row is not None else None,
+                    "reranker_score": reranked_row.score if reranked_row is not None else None,
+                }
+            )
         stage_rows = {
             "bm25": bm25_rows,
             "dense": dense_rows,
@@ -172,6 +249,8 @@ def run_five_stage_benchmark(
             "ltr": ltr_rows,
             reranked_stage: reranked,
         }
+        for profile_name, fused in fused_by_profile.items():
+            stage_rows[fused_stages[profile_name]] = fused
         for stage, rows in stage_rows.items():
             predictions[stage][claim_id] = Prediction(
                 claim_id=claim_id,
@@ -179,6 +258,7 @@ def run_five_stage_benchmark(
             )
     target = Path(output_dir)
     target.mkdir(parents=True, exist_ok=True)
+    write_jsonl(target / "reranker_candidates.jsonl", candidate_trace)
     system_metrics: dict[str, Any] = {}
     per_system_rows: dict[str, list[dict[str, Any]]] = {}
     long_rows: list[dict[str, Any]] = []
@@ -196,7 +276,9 @@ def run_five_stage_benchmark(
         long_rows.extend({"system": stage, **row} for row in rows)
     baseline = {row["claim_id"]: row for row in per_system_rows["bm25"]}
     comparisons: dict[str, Any] = {}
-    for stage in ("dense", "rrf", "ltr", reranked_stage):
+    for stage in predictions:
+        if stage == "bm25":
+            continue
         candidate = {row["claim_id"]: row for row in per_system_rows[stage]}
         comparisons[stage] = {}
         for metric in ("recall@5", "evidence_f1", "mrr@10", "ndcg@10"):
@@ -213,6 +295,14 @@ def run_five_stage_benchmark(
         "paired_bootstrap_vs_bm25": comparisons,
         "reranker": reranker.name,
         "reranker_base": rerank_source,
+        "rerank_fusion": {
+            "enabled": bool(fusion_profiles),
+            "kind": "weighted-rank-fusion" if fusion_profiles else None,
+            "profiles": [
+                {**profile, "stage": fused_stages[profile["name"]]}
+                for profile in fusion_profiles
+            ],
+        },
         "reranker_timing": {
             "model_load_seconds": reranker_load_seconds,
             "query_count": len(rerank_durations),
