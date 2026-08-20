@@ -28,3 +28,11 @@ def test_embedding_lora_pilot_is_project_cached_and_bounded() -> None:
     assert "--loss_type infonce" in script
     assert '--max_steps "${MAX_STEPS:-20}"' in script
     assert "/home/" not in script
+
+
+def test_embedding_swift_bootstrap_is_pinned_to_project_storage() -> None:
+    script = (ROOT / "hpc" / "bootstrap_embedding_swift.sbatch").read_text()
+    assert '${SWIFT_ENV:?set project-storage SWIFT_ENV}' in script
+    assert '${PIP_CACHE_DIR:?set project-storage PIP_CACHE_DIR}' in script
+    assert '"ms-swift==3.9.3"' in script
+    assert "/home/" not in script

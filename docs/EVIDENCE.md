@@ -6,7 +6,7 @@
 |---|---|---|
 | Package and five required CLI commands | `verified` | editable install and CLI integration tests |
 | BM25, hash dense exact search, RRF, hard negatives | `verified` | deterministic unit tests |
-| Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA training gate | `implemented-unrun` | current ms-swift dataset contract, gold/duplicate false-negative filtering, detached-SHA Spartan pilot script; 33 local tests; no effectiveness claim until held-out retrieval evaluation |
+| Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA training gate | `implemented-unrun` | current ms-swift dataset contract, gold/duplicate false-negative filtering, detached-SHA Spartan pilot script; pinned project-storage ms-swift environment; 34 local tests; no effectiveness claim until held-out retrieval evaluation |
 | Pairwise LTR fallback and LightGBM persistence | `verified` | 24-test clean environment; commit `636e915` fixes persisted LightGBM feature metadata |
 | Qwen3 encoder and FAISS FlatIP adapter | `verified-build` | full 1,208,827-vector Spartan build plus fixed-dev effectiveness run completed |
 | FAISS HNSW/IVF-PQ | `verified` | jobs `29418470`/`29418595`; fixed 154-query FlatIP-grounded quality-speed comparison |

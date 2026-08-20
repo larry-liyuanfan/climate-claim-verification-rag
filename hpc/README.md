@@ -65,7 +65,9 @@ replace gold-evidence retrieval metrics.
 `prepare_embedding_training.sbatch` reuses those mined negatives to build
 claim-grouped ms-swift InfoNCE JSONL. `train_embedding_lora_pilot.sbatch` is a
 20-step, one-GPU resource/contract pilot for Qwen3-Embedding-0.6B LoRA. Submit
-the data job first, inspect its manifest and row counts, then use
+`bootstrap_embedding_swift.sbatch` on CPU to create the pinned project-storage
+`ms-swift==3.9.3` environment. Submit the data job first, inspect its manifest
+and row counts, then use
 `sbatch --test-only` before the pilot. Do not promote the adapter until a
 separate held-out claim split beats the frozen 0.6B baseline on retrieval while
 meeting the latency/memory gate.
