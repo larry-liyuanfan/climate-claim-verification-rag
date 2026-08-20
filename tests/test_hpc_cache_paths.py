@@ -23,6 +23,9 @@ def test_embedding_lora_pilot_is_project_cached_and_bounded() -> None:
     script = (ROOT / "hpc" / "train_embedding_lora_pilot.sbatch").read_text()
     assert 'HF_HOME="${ARTIFACT_ROOT}/.cache/huggingface"' in script
     assert '${REPO_DIR:?set detached, exact-SHA REPO_DIR}' in script
+    assert 'RUNTIME_ENV="${SWIFT_ENV:-${NODE_LOCAL_ROOT}/climate-swift-venv-3.9.3}"' in script
+    assert 'PIP_CACHE_DIR="${NODE_LOCAL_ROOT}/climate-swift-pip-cache"' in script
+    assert '"ms-swift==3.9.3"' in script
     assert "--model Qwen/Qwen3-Embedding-0.6B" in script
     assert "--task_type embedding" in script
     assert "--loss_type infonce" in script
@@ -30,9 +33,9 @@ def test_embedding_lora_pilot_is_project_cached_and_bounded() -> None:
     assert "/home/" not in script
 
 
-def test_embedding_swift_bootstrap_is_pinned_to_project_storage() -> None:
-    script = (ROOT / "hpc" / "bootstrap_embedding_swift.sbatch").read_text()
-    assert '${SWIFT_ENV:?set project-storage SWIFT_ENV}' in script
-    assert '${PIP_CACHE_DIR:?set project-storage PIP_CACHE_DIR}' in script
-    assert '"ms-swift==3.9.3"' in script
+def test_embedding_data_prep_requires_exact_sha_inputs() -> None:
+    script = (ROOT / "hpc" / "prepare_embedding_training.sbatch").read_text()
+    assert '${REPO_DIR:?set detached, exact-SHA REPO_DIR}' in script
+    assert '${HARD_NEGATIVES:?set HARD_NEGATIVES}' in script
+    assert '--split-seed "${SPLIT_SEED:-45}"' in script
     assert "/home/" not in script

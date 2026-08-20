@@ -65,12 +65,19 @@ replace gold-evidence retrieval metrics.
 `prepare_embedding_training.sbatch` reuses those mined negatives to build
 claim-grouped ms-swift InfoNCE JSONL. `train_embedding_lora_pilot.sbatch` is a
 20-step, one-GPU resource/contract pilot for Qwen3-Embedding-0.6B LoRA. Submit
-`bootstrap_embedding_swift.sbatch` on CPU to create the pinned project-storage
-`ms-swift==3.9.3` environment. Submit the data job first, inspect its manifest
-and row counts, then use
+the pilot creates a pinned `ms-swift==3.9.3` environment under node-local
+`${SLURM_TMPDIR}` because the shared project quota cannot hold another full
+environment. Submit the data job first, inspect its manifest and row counts,
+then use
 `sbatch --test-only` before the pilot. Do not promote the adapter until a
 separate held-out claim split beats the frozen 0.6B baseline on retrieval while
 meeting the latency/memory gate.
+
+Bootstrap job `29460211` demonstrated that a persistent project-storage
+ms-swift environment would exceed quota; its dependent data job was cancelled
+automatically. The failed partial environment was removed without touching
+corpus, indexes or model caches. This failure is provenance for the node-local
+runtime decision, not a training result.
 
 The `*_native.sbatch` LTR chain uses the already verified native environment and
 is CPU-only: HNSW hard-negative mining on train claims, LightGBM LambdaMART, then

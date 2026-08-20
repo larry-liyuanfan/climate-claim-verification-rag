@@ -10,7 +10,6 @@
 #SBATCH --error=slurm-%x-%j.err
 
 set -euo pipefail
-: "${SWIFT_ENV:?set SWIFT_ENV with a pinned ms-swift installation}"
 : "${REPO_DIR:?set detached, exact-SHA REPO_DIR}"
 : "${DATASET_DIR:?set DATASET_DIR from prepare_embedding_training.sbatch}"
 : "${OUTPUT_DIR:?set a new OUTPUT_DIR}"
@@ -19,7 +18,14 @@ set -euo pipefail
 cd "${REPO_DIR}"
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
-source "${SWIFT_ENV}/bin/activate"
+NODE_LOCAL_ROOT="${SLURM_TMPDIR:-${TMPDIR:-/tmp}}"
+RUNTIME_ENV="${SWIFT_ENV:-${NODE_LOCAL_ROOT}/climate-swift-venv-3.9.3}"
+if [[ ! -x "${RUNTIME_ENV}/bin/swift" ]]; then
+  python -m venv --system-site-packages "${RUNTIME_ENV}"
+  export PIP_CACHE_DIR="${NODE_LOCAL_ROOT}/climate-swift-pip-cache"
+  "${RUNTIME_ENV}/bin/python" -m pip install --no-input "ms-swift==3.9.3"
+fi
+source "${RUNTIME_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
