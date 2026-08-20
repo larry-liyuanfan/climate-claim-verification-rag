@@ -7,6 +7,7 @@ fusion_k: 100
 rrf_k: 60
 rerank_k: 50
 final_k: 5
+rerank_source: rrf
 reranker:
   kind: local
   model: Qwen/Qwen3-Reranker-0.6B

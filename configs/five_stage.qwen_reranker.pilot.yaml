@@ -1,0 +1,18 @@
+bm25_index: ${ARTIFACT_DIR}/bm25/bm25.pkl.gz
+dense_index: ${ARTIFACT_DIR}/dense-hnsw/dense
+ltr_model: ${ARTIFACT_DIR}/ltr/ltr_model.txt
+device: cpu
+claim_limit: 8
+recall_k: 1000
+fusion_k: 100
+rrf_k: 60
+rerank_k: 50
+final_k: 5
+rerank_source: rrf
+reranker:
+  kind: local
+  model: Qwen/Qwen3-Reranker-0.6B
+  device: cuda
+  max_length: 2048
+  batch_size: 16
+  instruction: Given a climate claim, retrieve evidence that helps verify the claim

@@ -123,10 +123,12 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
                 "bm25_index": "${CLIMATE_TEST_ARTIFACT_DIR}/index/bm25.pkl.gz",
                 "dense_index": "${CLIMATE_TEST_ARTIFACT_DIR}/index/dense",
                 "ltr_model": "${CLIMATE_TEST_ARTIFACT_DIR}/ltr/ltr_model.json",
+                "claim_limit": 2,
                 "recall_k": 8,
                 "fusion_k": 8,
                 "rerank_k": 8,
                 "final_k": 5,
+                "rerank_source": "rrf",
                 "reranker": {"kind": "deterministic"},
             }
         ),
@@ -147,8 +149,11 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
         ]
     ) == 0
     metrics = json.loads((output_dir / "metrics.json").read_text(encoding="utf-8"))
-    assert set(metrics["systems"]) == {"bm25", "dense", "rrf", "ltr", "ltr_reranker"}
+    assert set(metrics["systems"]) == {"bm25", "dense", "rrf", "ltr", "rrf_reranker"}
     assert metrics["reranker"] == "deterministic-feature-fallback"
+    assert metrics["reranker_base"] == "rrf"
+    assert metrics["reranker_timing"]["query_count"] == metrics["claim_count"] == 2
+    assert metrics["reranker_timing"]["candidate_pair_count"] > 0
 
 
 def test_fastapi_service_returns_evidence_without_fake_label() -> None:

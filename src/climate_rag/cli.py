@@ -527,7 +527,8 @@ def command_evaluate(args: argparse.Namespace) -> int:
             inputs=[args.claims, args.experiment_config],
             predictions=rows,
             notes=[
-                "All five systems use the same claims and final_k.",
+                "All configured systems use the same claims and final_k.",
+                "The reranker base stage is recorded; RRF and LTR candidates are not interchangeable.",
                 "The configured reranker name is recorded; deterministic fallback results must not be described as Qwen3.",
             ],
             repository=_repository(),

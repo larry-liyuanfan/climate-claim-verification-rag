@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
 from typing import Any
 
@@ -121,21 +122,35 @@ def run_five_stage_benchmark(
         if key in config:
             config[key] = os.path.expandvars(str(config[key]))
     claims = load_claims(claims_path)
+    claim_limit = config.get("claim_limit")
+    if claim_limit is not None:
+        limit = int(claim_limit)
+        if limit <= 0:
+            raise ValueError("claim_limit must be positive when configured")
+        claims = {claim_id: claims[claim_id] for claim_id in sorted(claims)[:limit]}
     bm25 = BM25Index.load(config["bm25_index"])
     dense = DenseRetriever.load(config["dense_index"], device=config.get("device"))
     ranker = load_ranker(config["ltr_model"])
+    reranker_load_started = time.perf_counter()
     reranker = _make_reranker(config.get("reranker", {}))
+    reranker_load_seconds = time.perf_counter() - reranker_load_started
     recall_k = int(config.get("recall_k", 1000))
     fusion_k = int(config.get("fusion_k", 100))
     rerank_k = int(config.get("rerank_k", 50))
     final_k = int(config.get("final_k", 5))
+    rerank_source = str(config.get("rerank_source", "ltr"))
+    if rerank_source not in {"rrf", "ltr"}:
+        raise ValueError("rerank_source must be 'rrf' or 'ltr'")
+    reranked_stage = f"{rerank_source}_reranker"
     predictions: dict[str, dict[str, Prediction]] = {
         "bm25": {},
         "dense": {},
         "rrf": {},
         "ltr": {},
-        "ltr_reranker": {},
+        reranked_stage: {},
     }
+    rerank_durations: list[float] = []
+    reranked_pair_count = 0
     for claim_id in sorted(claims):
         query = claims[claim_id].text
         bm25_rows = bm25.search(query, recall_k)
@@ -144,13 +159,18 @@ def run_five_stage_benchmark(
             {"bm25": bm25_rows, "dense": dense_rows}, k=int(config.get("rrf_k", 60)), top_k=fusion_k
         )
         ltr_rows = _rank_with_ltr(query, bm25_rows, dense_rows, rrf_rows, ranker)
-        reranked = reranker.rerank(query, ltr_rows[:rerank_k], final_k)
+        rerank_candidates = rrf_rows if rerank_source == "rrf" else ltr_rows
+        rerank_candidates = rerank_candidates[:rerank_k]
+        rerank_started = time.perf_counter()
+        reranked = reranker.rerank(query, rerank_candidates, final_k)
+        rerank_durations.append(time.perf_counter() - rerank_started)
+        reranked_pair_count += len(rerank_candidates)
         stage_rows = {
             "bm25": bm25_rows,
             "dense": dense_rows,
             "rrf": rrf_rows,
             "ltr": ltr_rows,
-            "ltr_reranker": reranked,
+            reranked_stage: reranked,
         }
         for stage, rows in stage_rows.items():
             predictions[stage][claim_id] = Prediction(
@@ -176,7 +196,7 @@ def run_five_stage_benchmark(
         long_rows.extend({"system": stage, **row} for row in rows)
     baseline = {row["claim_id"]: row for row in per_system_rows["bm25"]}
     comparisons: dict[str, Any] = {}
-    for stage in ("dense", "rrf", "ltr", "ltr_reranker"):
+    for stage in ("dense", "rrf", "ltr", reranked_stage):
         candidate = {row["claim_id"]: row for row in per_system_rows[stage]}
         comparisons[stage] = {}
         for metric in ("recall@5", "evidence_f1", "mrr@10", "ndcg@10"):
@@ -187,10 +207,21 @@ def run_five_stage_benchmark(
                 samples=bootstrap_samples,
                 seed=seed,
             )
+    rerank_array = np.asarray(rerank_durations, dtype=np.float64)
     return {
         "systems": system_metrics,
         "paired_bootstrap_vs_bm25": comparisons,
         "reranker": reranker.name,
+        "reranker_base": rerank_source,
+        "reranker_timing": {
+            "model_load_seconds": reranker_load_seconds,
+            "query_count": len(rerank_durations),
+            "candidate_pair_count": reranked_pair_count,
+            "total_seconds": float(np.sum(rerank_array)),
+            "mean_seconds_per_query": float(np.mean(rerank_array)),
+            "p50_seconds_per_query": float(np.percentile(rerank_array, 50)),
+            "p95_seconds_per_query": float(np.percentile(rerank_array, 95)),
+        },
         "claim_count": len(claims),
         "final_k": final_k,
     }, long_rows
