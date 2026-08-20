@@ -49,7 +49,7 @@ PY
 # This sampled held-out comparison is a promotion gate, not final full-corpus
 # evidence. A pass only authorises a fixed-dev full-corpus evaluation.
 /usr/bin/time -v python scripts/evaluate_embedding_adapter_gate.py \
-  --claims "${DATA_DIR}/dev-claims.json" \
+  --claims "${DATA_DIR}/${CLAIMS_FILE:-train-claims.json}" \
   --evidence "${DATA_DIR}/evidence.json" \
   --eval-dataset "${EVAL_DATASET}" \
   --adapter "${ADAPTER_DIR}" \
