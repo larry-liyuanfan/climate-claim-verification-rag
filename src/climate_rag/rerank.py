@@ -12,6 +12,17 @@ from .models import RankedDocument
 from .torch_compat import ensure_torch_pytree_compat
 
 
+def _resolve_torch_dtype(torch_module: object, value: str) -> object:
+    normalised = value.strip().lower()
+    if normalised == "auto":
+        return "auto"
+    aliases = {"bf16": "bfloat16", "fp16": "float16", "fp32": "float32"}
+    attribute = aliases.get(normalised, normalised)
+    if attribute not in {"bfloat16", "float16", "float32"}:
+        raise ValueError("dtype must be auto, bfloat16/bf16, float16/fp16, or float32/fp32")
+    return getattr(torch_module, attribute)
+
+
 class Reranker(Protocol):
     name: str
 
@@ -117,6 +128,7 @@ class Qwen3CausalLMReranker:
         *,
         max_length: int = 8192,
         batch_size: int = 8,
+        dtype: str = "auto",
         instruction: str = "Given a climate claim, retrieve evidence that helps verify the claim",
     ) -> None:
         try:
@@ -129,9 +141,13 @@ class Qwen3CausalLMReranker:
         self._torch = torch
         self.max_length = max_length
         self.batch_size = batch_size
+        self.dtype = dtype
         self.instruction = instruction
         self._tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
-        self._model = AutoModelForCausalLM.from_pretrained(model_name).eval()
+        self._model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=_resolve_torch_dtype(torch, dtype),
+        ).eval()
         if device:
             self._model.to(device)
         self._false_token_id = self._tokenizer.convert_tokens_to_ids("no")
@@ -165,9 +181,7 @@ class Qwen3CausalLMReranker:
             encoded["input_ids"] = [
                 self._prefix_tokens + row + self._suffix_tokens for row in encoded["input_ids"]
             ]
-            batch = self._tokenizer.pad(
-                encoded, padding=True, return_tensors="pt", max_length=self.max_length
-            )
+            batch = self._tokenizer.pad(encoded, padding=True, return_tensors="pt")
             batch = {key: tensor.to(self._model.device) for key, tensor in batch.items()}
             with self._torch.inference_mode():
                 logits = self._model(**batch).logits[:, -1, :]

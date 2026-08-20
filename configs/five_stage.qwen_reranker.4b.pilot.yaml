@@ -2,6 +2,7 @@ bm25_index: ${ARTIFACT_DIR}/bm25/bm25.pkl.gz
 dense_index: ${ARTIFACT_DIR}/dense-hnsw/dense
 ltr_model: ${ARTIFACT_DIR}/ltr/ltr_model.txt
 device: cpu
+claim_limit: 8
 recall_k: 1000
 fusion_k: 100
 rrf_k: 60
@@ -24,9 +25,9 @@ rerank_fusion:
       reranker_weight: 1.0
 reranker:
   kind: local
-  model: Qwen/Qwen3-Reranker-0.6B
+  model: Qwen/Qwen3-Reranker-4B
   device: cuda
   max_length: 2048
-  batch_size: 16
+  batch_size: 2
   dtype: bfloat16
   instruction: Given a climate claim, rank passages that directly support, refute, or provide enough evidence to assess the claim; prefer exact quantitative, causal, temporal, and geographic matches over passages that only share the topic

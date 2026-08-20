@@ -23,11 +23,21 @@ export PYTHONNOUSERSITE=1
 export PYTHONPATH="${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
 
-climate-rag evaluate \
-  --claims "${DATA_DIR}/dev-claims.json" \
-  --predictions "${RERANK_RUN_DIR}/predictions_rrf_reranker.json" \
-  --baseline-predictions "${RERANK_RUN_DIR}/predictions_rrf.json" \
-  --ks 5 \
-  --bootstrap-samples 5000 \
-  --output-dir "${OUTPUT_DIR}"
+shopt -s nullglob
+candidates=("${RERANK_RUN_DIR}"/predictions_rrf_reranker*.json)
+if (( ${#candidates[@]} == 0 )); then
+  echo "No RRF reranker prediction files found in ${RERANK_RUN_DIR}" >&2
+  exit 2
+fi
+for candidate in "${candidates[@]}"; do
+  stage="$(basename "${candidate}" .json)"
+  stage="${stage#predictions_}"
+  climate-rag evaluate \
+    --claims "${DATA_DIR}/dev-claims.json" \
+    --predictions "${candidate}" \
+    --baseline-predictions "${RERANK_RUN_DIR}/predictions_rrf.json" \
+    --ks 5 \
+    --bootstrap-samples 5000 \
+    --output-dir "${OUTPUT_DIR}/${stage}"
+done
 sync

@@ -29,4 +29,5 @@ reranker:
   device: cuda
   max_length: 2048
   batch_size: 16
+  dtype: bfloat16
   instruction: Given a climate claim, rank passages that directly support, refute, or provide enough evidence to assess the claim; prefer exact quantitative, causal, temporal, and geographic matches over passages that only share the topic
