@@ -75,5 +75,11 @@ set. `compare_qwen_reranker_native.sbatch` performs the paired RRF-vs-reranker
 comparison without repeating model inference. Model cache, predictions and
 restricted evidence stay in project storage.
 
+The 8B configs are an optional size/Pareto gate, not a promised improvement.
+They force BF16 and batch size 1. Run the eight-claim pilot first on a measured
+GPU shape; only submit the full config if the pilot fits memory, produces finite
+scores and offers a defensible quality/latency trade-off. The full Slurm script
+accepts `EXPERIMENT_CONFIG` so 0.6B, 4B and 8B runs remain explicit and hashed.
+
 
 Before reporting a result, retain Slurm logs, `run_manifest.json`, `metrics.json`, per-claim predictions, `sacct` elapsed/MaxRSS, allocated hardware, and storage/API cost. Do not claim an improvement if it was not run on the same split/final K with a paired comparison.

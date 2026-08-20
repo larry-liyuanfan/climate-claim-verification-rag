@@ -15,6 +15,7 @@ set -euo pipefail
 : "${NATIVE_ENV:?set NATIVE_ENV}"
 : "${REPO_DIR:?set REPO_DIR}"
 : "${OUTPUT_DIR:?set a new full-run output directory}"
+EXPERIMENT_CONFIG="${EXPERIMENT_CONFIG:-${REPO_DIR}/configs/five_stage.qwen_reranker.native.yaml}"
 
 cd "${REPO_DIR}"
 module purge
@@ -34,7 +35,7 @@ export CLIMATE_GIT_COMMIT="$(git rev-parse HEAD)"
 
 climate-rag evaluate \
   --claims "${DATA_DIR}/dev-claims.json" \
-  --experiment-config "${REPO_DIR}/configs/five_stage.qwen_reranker.native.yaml" \
+  --experiment-config "${EXPERIMENT_CONFIG}" \
   --bootstrap-samples 5000 \
   --output-dir "${OUTPUT_DIR}"
 sync
