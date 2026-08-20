@@ -16,6 +16,7 @@ set -euo pipefail
 : "${REPO_DIR:?set REPO_DIR}"
 : "${OUTPUT_DIR:?set a new pilot output directory}"
 EXPERIMENT_CONFIG="${EXPERIMENT_CONFIG:-${REPO_DIR}/configs/five_stage.qwen_reranker.pilot.yaml}"
+BOOTSTRAP_SAMPLES="${BOOTSTRAP_SAMPLES:-500}"
 
 cd "${REPO_DIR}"
 module purge
@@ -34,6 +35,6 @@ export CLIMATE_GIT_COMMIT="$(git rev-parse HEAD)"
 climate-rag evaluate \
   --claims "${DATA_DIR}/dev-claims.json" \
   --experiment-config "${EXPERIMENT_CONFIG}" \
-  --bootstrap-samples 500 \
+  --bootstrap-samples "${BOOTSTRAP_SAMPLES}" \
   --output-dir "${OUTPUT_DIR}"
 sync
