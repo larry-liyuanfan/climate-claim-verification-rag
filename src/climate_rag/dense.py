@@ -75,6 +75,7 @@ class SentenceTransformerEncoder:
         query_prompt_name: str | None = None,
         device: str | None = None,
         truncate_dim: int | None = None,
+        adapter_path: str | None = None,
     ) -> None:
         try:
             ensure_torch_pytree_compat()
@@ -96,6 +97,9 @@ class SentenceTransformerEncoder:
             device=device,
             truncate_dim=truncate_dim,
         )
+        self.adapter_path = adapter_path
+        if adapter_path:
+            self._model.load_adapter(adapter_path)
         self.dimension = int(self._model.get_sentence_embedding_dimension())
 
     def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray:
@@ -310,6 +314,7 @@ class DenseRetriever:
         if isinstance(self.encoder, SentenceTransformerEncoder):
             encoder_spec["query_prefix"] = self.encoder.query_prefix
             encoder_spec["query_prompt_name"] = self.encoder.query_prompt_name
+            encoder_spec["adapter_path"] = self.encoder.adapter_path
         backend_spec: dict[str, object] = {"type": backend_type}
         if isinstance(self.backend, FaissANNIndex):
             backend_spec.update(
@@ -344,6 +349,7 @@ class DenseRetriever:
                 query_prefix=str(encoder_spec.get("query_prefix", "")),
                 query_prompt_name=encoder_spec.get("query_prompt_name"),
                 device=device,
+                adapter_path=encoder_spec.get("adapter_path"),
             )
         backend_spec = spec["backend"]
         index_path = target / spec["index_file"]

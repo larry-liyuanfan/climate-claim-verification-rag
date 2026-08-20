@@ -32,6 +32,8 @@ def _evaluate_model(
     truncate_dim: int | None,
     batch_size: int,
     top_k: int,
+    adapter_path: str | None = None,
+    run_label: str | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     try:
         import faiss
@@ -50,7 +52,9 @@ def _evaluate_model(
         model_name,
         device=device,
         truncate_dim=truncate_dim,
+        adapter_path=adapter_path,
     )
+    label = run_label or model_name
     load_seconds = time.perf_counter() - load_started
     encode_started = time.perf_counter()
     document_vectors = encoder.encode_documents(
@@ -82,7 +86,7 @@ def _evaluate_model(
         prediction_rows.append(
             {
                 "claim_id": claim_id,
-                "model": model_name,
+                "model": label,
                 "evidence_ids": list(ranked_ids),
                 "scores": [float(score) for score in row_scores],
             }
@@ -97,7 +101,9 @@ def _evaluate_model(
     )
     metrics = {
         **aggregate,
-        "model": model_name,
+        "model": label,
+        "base_model": model_name,
+        "adapter_path": adapter_path,
         "dimension": encoder.dimension,
         "document_count": len(documents),
         "document_vector_bytes": int(document_vectors.nbytes),
