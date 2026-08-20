@@ -19,12 +19,16 @@ retained 0.6B. I then improved the retained model through claim-grouped hard
 negatives and a 20-step LoRA/InfoNCE run instead of another scale guess. A
 126-claim evidence-preserving sampled gate raised Recall@5 from 0.6090 to
 0.6303 with a positive paired interval; MRR and nDCG intervals were also
-positive, but Evidence F1 crossed zero. I therefore treat it as a sampled
-screen and require a full-corpus official-dev gate before promotion. The first
-full run completed encoding/search but failed while writing a rebuildable
-4.95 GB index under the project quota; I removed only the incomplete file and
-changed the gate to persist that index only when explicit. On the fixed
-154-claim dev split, RRF improved Recall@5 from
+positive, but Evidence F1 crossed zero, so I did not promote from the sample.
+The first full run completed encoding/search but failed while writing a
+rebuildable 4.95 GB index under project quota; I removed only the incomplete
+file and made index persistence explicit. Replacement job 29465819 then
+completed all 154 official-dev claims against 1,208,827 documents. The adapter
+raised Recall@5 from 0.2793 to 0.2970, MRR from 0.3633 to 0.3869, nDCG from
+0.2994 to 0.3203 and Evidence F1 from 0.07253 to 0.07544; every 5,000-sample
+paired interval was above zero. It passes my offline dev promotion gate, but I
+still do not call it independent test generalisation or an online A/B result.
+On the fixed 154-claim dev split, RRF improved Recall@5 from
 0.1721 to 0.2709. A first pure-0.6B rerank
 regressed because it erased the strong first-stage order. I corrected the
 architecture by fusing cross-encoder rank back with RRF, then gated a BF16 4B
@@ -63,8 +67,9 @@ generalisation. No public rank is claimed without an official source.
 23. Why does the production dense encoder remain 0.6B while the offline reranker is 4B?
 24. Why adapt the retained 0.6B encoder with LoRA instead of rebuilding a larger encoder?
 25. How does claim-grouped splitting and duplicate-text filtering prevent leakage and false negatives?
-26. Why is the sampled adapter result insufficient even though Recall, MRR and nDCG intervals are positive?
-27. How did the late project-quota failure change the artifact design without weakening the evaluation?
+26. Why was the sampled adapter result insufficient even though Recall, MRR and nDCG intervals were positive?
+27. Which exact conditions let the full-corpus adapter pass, and why is it still only a dev-selection result?
+28. How did the late project-quota failure change the artifact design without weakening the evaluation?
 
 ## Code evidence map
 

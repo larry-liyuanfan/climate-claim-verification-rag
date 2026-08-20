@@ -23,7 +23,7 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Layer | Implementation | Truth boundary |
 |---|---|---|
 | Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Full 1,208,827-document Spartan build verified; retrieval quality evaluation remains separate |
-| Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; hash mode is not a semantic model |
+| Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; a 20-step hard-negative LoRA adapter passed the full-corpus offline official-dev promotion gate; hash mode is not a semantic model |
 | ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
 | Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
 | Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved all four fixed-dev ranking metrics; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
@@ -102,10 +102,20 @@ The claim-grouped sampled gate (`29463846`) retained all 368 labelled positives
 for 126 held-out claims in a 5,000/1,208,827-document corpus. Recall@5 changed
 from `0.6090` to `0.6303` (paired 95% interval `0.0048–0.0429`), while MRR and
 nDCG intervals were also positive. Evidence F1 changed from `0.1087` to `0.1095`
-with an interval crossing zero (`-0.0003–0.0026`), so this is only a sampled
-promotion screen. The compact record is in
-[`docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json`](docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json).
-A full-corpus official-dev gate must pass before the production encoder changes.
+with an interval crossing zero (`-0.0003–0.0026`), so that run remained only a
+sampled screen.
+
+The complete official-dev replacement gate (`29465819`) then evaluated all 154
+claims and all 1,208,827 evidence passages. Recall@5 changed from `0.2793` to
+`0.2970` (paired 95% interval `0.0014–0.0350`), MRR@10 from `0.3633` to
+`0.3869`, nDCG@10 from `0.2994` to `0.3203`, and Evidence F1 from `0.07253` to
+`0.07544`; all four 5,000-sample paired intervals were above zero. The adapter
+therefore passes the pre-registered offline promotion gate. It is an
+official-dev result, not independent test generalisation or an online A/B test.
+Compact sampled and full-corpus records are published in
+[`docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json`](docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json)
+and
+[`docs/verified-runs/qwen3-embedding-lora-full-gate-20260821.json`](docs/verified-runs/qwen3-embedding-lora-full-gate-20260821.json).
 
 `auto` uses LightGBM LambdaMART when present. Otherwise it persists `linear_pairwise_ranknet_fallback`; it is never renamed LambdaMART. Candidate rows must be split by claim before held-out evaluation.
 
@@ -187,6 +197,30 @@ The dense/FlatIP build itself produced no effectiveness result. The separately c
 ### Verified dense encoder size gate
 
 Job `29458425` compared `Qwen3-Embedding-0.6B` with `Qwen3-Embedding-4B` at the same 1,024-dimensional output on an evidence-preserving 5,000-document sample. All 27 gold-evidence rows for the same eight claims were forced into the sample; this is a resource screen, not full-corpus retrieval evidence. The 4B candidate did not pass: Recall@5 changed from `0.950` to `0.925` (paired 95% interval `-0.075–0.000`), while MRR@10 and Evidence F1 tied. Document encoding fell from `50.95` to `7.21 docs/s`, and peak Torch GPU allocation rose from `3.17 GB` to `17.42 GB`. The production 0.6B index is therefore retained, and a full 4B rebuild was deliberately not submitted. The compact record is in [`docs/verified-runs/qwen3-embedding-4b-pilot-20260820.json`](docs/verified-runs/qwen3-embedding-4b-pilot-20260820.json).
+
+### Verified full-corpus embedding-adapter promotion gate
+
+The retained 0.6B encoder was adapted instead of replaced. Job `29465819`
+evaluated the 20-step hard-negative InfoNCE/LoRA checkpoint on all 154 untouched
+official-dev claims, all 463 required evidence rows and the complete 1,208,827-
+document corpus at 1,024 dimensions. It used commit `c815070`, one L40S, eight
+CPUs and a 64 GB request, completed in `49 min 37 s` with exit `0:0`, reached
+Slurm MaxRSS `22,890,736 K`, and consumed `0.827 L40S-hours` of wall allocation.
+
+| Metric | Base 0.6B | Adapted 0.6B | Mean delta | Paired 95% interval |
+|---|---:|---:|---:|---:|
+| Recall@5 | `0.2793` | **`0.2970`** | `+0.0176` | `0.0014–0.0350` |
+| MRR@10 | `0.3633` | **`0.3869`** | `+0.0236` | `0.0060–0.0432` |
+| nDCG@10 | `0.2994` | **`0.3203`** | `+0.0210` | `0.0090–0.0341` |
+| Evidence F1 | `0.07253` | **`0.07544`** | `+0.00291` | `0.00120–0.00482` |
+
+The adapted corpus encoded in `2,888.48 s` (`418.50 docs/s`), built the in-memory
+FlatIP reference in `1.86 s`, and recorded peak Torch GPU allocation
+`25,243,138,560 bytes`. The first attempt had completed encoding/search but then
+failed while persisting a rebuildable 4.95 GB adapted index under project quota.
+The replacement saved `0` index bytes and retained only the small manifest,
+metrics, report and restricted prediction artifact on Spartan. This operational
+fix did not change the evaluation or its pre-registered gate.
 
 ### Verified Spartan ANN quality-speed comparison
 
