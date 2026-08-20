@@ -167,6 +167,10 @@ The cache sidecar records the model, dimension, document count, and ordered docu
 
 The dense/FlatIP build itself produced no effectiveness result. The separately completed CPU-only ANN benchmark and fixed-dev run below provide the quality-speed and retrieval comparisons.
 
+### Verified dense encoder size gate
+
+Job `29458425` compared `Qwen3-Embedding-0.6B` with `Qwen3-Embedding-4B` at the same 1,024-dimensional output on an evidence-preserving 5,000-document sample. All 27 gold-evidence rows for the same eight claims were forced into the sample; this is a resource screen, not full-corpus retrieval evidence. The 4B candidate did not pass: Recall@5 changed from `0.950` to `0.925` (paired 95% interval `-0.075–0.000`), while MRR@10 and Evidence F1 tied. Document encoding fell from `50.95` to `7.21 docs/s`, and peak Torch GPU allocation rose from `3.17 GB` to `17.42 GB`. The production 0.6B index is therefore retained, and a full 4B rebuild was deliberately not submitted. The compact record is in [`docs/verified-runs/qwen3-embedding-4b-pilot-20260820.json`](docs/verified-runs/qwen3-embedding-4b-pilot-20260820.json).
+
 ### Verified Spartan ANN quality-speed comparison
 
 Jobs `29418470` and `29418595` reused the same 1,208,827-row, 1,024-dimensional Qwen3 embedding cache. The benchmark used 154 fixed dev queries, 32 FAISS CPU threads, three batch-search repeats, and FlatIP as the ANN ground truth.

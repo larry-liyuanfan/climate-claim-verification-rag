@@ -10,8 +10,13 @@ a training-free baseline; LambdaMART-compatible features support learned fusion;
 and a cross-encoder reranker plus paired bootstrap close the evaluation loop.
 On Spartan I built BM25 and Qwen3-Embedding-0.6B artifacts for all 1,208,827
 evidence passages. HNSW retained 0.9961 Recall@5 versus Flat while reaching
-3,060.64 batch QPS in the fixed 154-query benchmark. On the fixed 154-claim dev
-split, RRF improved Recall@5 from 0.1721 to 0.2709. A first pure-0.6B rerank
+3,060.64 batch QPS in the fixed 154-query benchmark. In a separate
+evidence-preserving 5,000-document/eight-claim resource screen, I compared a 4B
+dense encoder at the same 1,024 dimensions. It
+reduced sampled Recall@5, tied F1/MRR, encoded about 7.1 times slower and used
+about 5.5 times the peak Torch GPU memory, so I stopped the full rebuild and
+retained 0.6B. On the fixed 154-claim dev split, RRF improved Recall@5 from
+0.1721 to 0.2709. A first pure-0.6B rerank
 regressed because it erased the strong first-stage order. I corrected the
 architecture by fusing cross-encoder rank back with RRF, then gated a BF16 4B
 model on the identical 154-claim/7,700-pair split. Balanced RRF/4B fusion reached
@@ -46,6 +51,7 @@ generalisation. No public rank is claimed without an official source.
 20. What evidence is required before claiming the new pipeline beats Recall@5=0.223?
 21. Why did pure 4B aggregate metrics rise while its paired intervals still cross zero?
 22. Why is balanced 4B fusion a dev-selection result rather than an independent test claim?
+23. Why does the production dense encoder remain 0.6B while the offline reranker is 4B?
 
 ## Code evidence map
 
