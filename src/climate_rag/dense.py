@@ -74,6 +74,7 @@ class SentenceTransformerEncoder:
         query_prefix: str = "",
         query_prompt_name: str | None = None,
         device: str | None = None,
+        truncate_dim: int | None = None,
     ) -> None:
         try:
             ensure_torch_pytree_compat()
@@ -88,7 +89,13 @@ class SentenceTransformerEncoder:
         self.query_prompt_name = query_prompt_name or (
             "query" if "Qwen3-Embedding" in model_name and not query_prefix else None
         )
-        self._model = SentenceTransformer(model_name, device=device)
+        if truncate_dim is not None and truncate_dim <= 0:
+            raise ValueError("truncate_dim must be positive")
+        self._model = SentenceTransformer(
+            model_name,
+            device=device,
+            truncate_dim=truncate_dim,
+        )
         self.dimension = int(self._model.get_sentence_embedding_dimension())
 
     def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray:
@@ -148,7 +155,7 @@ class NumpyFlatIndex:
         np.save(path, self.vectors)
 
     @classmethod
-    def load(cls, path: str | Path) -> "NumpyFlatIndex":
+    def load(cls, path: str | Path) -> NumpyFlatIndex:
         index = cls()
         index.vectors = np.load(path, mmap_mode="r")
         return index
@@ -225,7 +232,7 @@ class FaissANNIndex:
         faiss.write_index(self.index, str(path))
 
     @classmethod
-    def load(cls, path: str | Path, metadata: dict[str, object]) -> "FaissANNIndex":
+    def load(cls, path: str | Path, metadata: dict[str, object]) -> FaissANNIndex:
         import faiss
 
         instance = cls.__new__(cls)
@@ -245,7 +252,7 @@ class DenseRetriever:
         self.doc_ids: list[str] = []
         self.texts: list[str] = []
 
-    def fit(self, documents: Sequence[EvidenceDocument], batch_size: int = 32) -> "DenseRetriever":
+    def fit(self, documents: Sequence[EvidenceDocument], batch_size: int = 32) -> DenseRetriever:
         texts = [document.text for document in documents]
         vectors = self.encoder.encode_documents(texts, batch_size=batch_size)
         return self.fit_vectors(documents, vectors)
@@ -256,7 +263,7 @@ class DenseRetriever:
         vectors: np.ndarray,
         *,
         training_vectors: np.ndarray | None = None,
-    ) -> "DenseRetriever":
+    ) -> DenseRetriever:
         self.doc_ids = [document.evidence_id for document in documents]
         if len(set(self.doc_ids)) != len(self.doc_ids):
             raise ValueError("duplicate evidence ids are not allowed")
@@ -325,7 +332,7 @@ class DenseRetriever:
         )
 
     @classmethod
-    def load(cls, directory: str | Path, *, device: str | None = None) -> "DenseRetriever":
+    def load(cls, directory: str | Path, *, device: str | None = None) -> DenseRetriever:
         target = Path(directory)
         spec = json.loads((target / "dense_index.json").read_text(encoding="utf-8"))
         encoder_spec = spec["encoder"]
