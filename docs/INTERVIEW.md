@@ -11,11 +11,14 @@ and a cross-encoder reranker plus paired bootstrap close the evaluation loop.
 On Spartan I built BM25 and Qwen3-Embedding-0.6B artifacts for all 1,208,827
 evidence passages. HNSW retained 0.9961 Recall@5 versus Flat while reaching
 3,060.64 batch QPS in the fixed 154-query benchmark. On the fixed 154-claim dev
-split, RRF improved Recall@5 from 0.1721 to 0.2709. I then scored all 7,700 RRF
-Top-50 pairs with Qwen3-Reranker-0.6B: Recall@5 fell to 0.2438 and P95 was 5.88
-seconds/query, so the quality-cost gate kept HNSW+RRF. This is a measured
-deployment decision, not a claim that the most complex stage must win; no
-public rank is claimed without an official source.
+split, RRF improved Recall@5 from 0.1721 to 0.2709. A first pure-Qwen rerank
+regressed because it erased the strong first-stage order. I corrected the
+architecture by fusing Qwen rank back with RRF rank: the 4:1 profile reached
+Recall@5 0.2890, MRR@10 0.3801 and nDCG@10 0.2739, with paired intervals above
+zero versus RRF for all three. Evidence F1 improved to 0.1905 but its delta
+interval crossed zero. P95 was 6.52 seconds/query, so I expose the fusion as an
+offline quality profile and keep HNSW+RRF as the latency default. No public rank
+is claimed without an official source.
 
 ## Deep-dive questions
 

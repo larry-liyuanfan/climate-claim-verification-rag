@@ -26,7 +26,7 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; hash mode is not a semantic model |
 | ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
 | Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
-| Reranking | Optional local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | Full fixed-dev Qwen3 run verified from RRF Top-50; it added about 4.88 s/query P50 without improving over RRF, so it is not selected |
+| Reranking | Optional local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | Pure Qwen replacement regressed; a base-heavy weighted-rank fusion preserved RRF and improved three ranking metrics, so it is retained only as a measured offline quality profile |
 | Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, claim accuracy, H-mean, paired bootstrap | Macro-averaged over claims |
 | Confidence | Temperature scaling and coverage-risk/selective-abstention utilities | Requires real classifier logits |
 | Serving | FastAPI evidence retrieval endpoint | Returns `classification.status=not_configured`; never fabricates a label |
@@ -187,12 +187,13 @@ Job `29435589` evaluated 154 restricted dev claims at `final_k=5` using commit `
 |---|---:|---:|---:|---:|
 | BM25 | `0.1721` | `0.2513` | `0.1644` | `0.1168` |
 | Qwen3 dense/HNSW | `0.2696` | `0.3308` | `0.2487` | `0.1768` |
-| BM25+dense RRF | **`0.2709`** | **`0.3446`** | **`0.2495`** | **`0.1785`** |
-| RRF + Qwen3-Reranker-0.6B | `0.2438` | `0.3053` | `0.2180` | `0.1573` |
+| BM25+dense RRF | `0.2709` | `0.3446` | `0.2495` | `0.1785` |
+| Pure Qwen3-Reranker-0.6B replacement (first run) | `0.2438` | `0.3053` | `0.2180` | `0.1573` |
+| RRF + Qwen3-0.6B weighted rank fusion (4:1) | **`0.2890`** | **`0.3801`** | **`0.2739`** | **`0.1905`** |
 | LambdaMART | `0.0029` | `0.0065` | `0.0030` | `0.0027` |
 | LambdaMART + deterministic reranker | `0.0127` | `0.0359` | `0.0149` | `0.0111` |
 
-Against BM25, RRF improved Recall@5 by `0.0988` (paired-bootstrap 95% interval `0.0543–0.1452`) and Evidence F1 by `0.0616` (`0.0360–0.0893`). Job `29448904` then scored all `7,700` RRF Top-50 claim-document pairs with `Qwen/Qwen3-Reranker-0.6B` on one A100 `1g.20gb` MIG slice. It completed in `14 min 09 s`, reached batch MaxRSS `12,724,892 K`, and recorded reranker P50/P95 of `4.88/5.88 s` per query. Relative to RRF, its mean Recall@5 and Evidence F1 changes were `-0.0271` and `-0.0212`; both 5,000-sample paired intervals crossed zero. The quality gate therefore selects HNSW+RRF: Qwen3 was a real, reproducible experiment, but it added material latency without a defensible effectiveness gain. The learned-fusion and deterministic-reranker stages also remain blocked. Because `final_k=5`, the recorded Recall@10/50 equals Recall@5 and is not presented as a wider-cutoff result. Claim classification was not configured, so zero claim accuracy/H-mean values are not classifier findings.
+Against BM25, RRF improved Recall@5 by `0.0988` (paired-bootstrap 95% interval `0.0543–0.1452`) and Evidence F1 by `0.0616` (`0.0360–0.0893`). The first pure Qwen replacement run (`29448904`) regressed, which exposed an architectural error: it discarded a strong first-stage ordering. Job `29452723` therefore rescored the same `7,700` RRF Top-50 claim-document pairs with a climate-specific instruction and fused Qwen rank back with RRF rank. The selected 4:1 base-heavy profile improved Recall@5 by `0.0181` versus RRF (95% interval `0.0005–0.0389`, two-sided bootstrap `p=0.044`), MRR@10 by `0.0355` (`0.0069–0.0648`), and nDCG@10 by `0.0244` (`0.0085–0.0414`). Evidence F1 rose by `0.0120`, but its interval `-0.0004–0.0248` crosses zero and is not claimed as stable. The job completed in `15 min 50 s`, used batch MaxRSS `12,709,584 K`, and recorded reranker P50/P95 `5.57/6.52 s` per query. HNSW+RRF remains the latency-oriented default; the 4:1 fusion is an offline quality profile. LambdaMART and the deterministic reranker remain rejected. Because `final_k=5`, recorded Recall@10/50 equals Recall@5 and is not presented as a wider-cutoff result. Claim classification was not configured, so zero claim accuracy/H-mean values are not classifier findings.
 
 ## Historical result boundary
 
