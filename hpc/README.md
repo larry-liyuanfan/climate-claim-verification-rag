@@ -67,5 +67,13 @@ is CPU-only: HNSW hard-negative mining on train claims, LightGBM LambdaMART, the
 a fixed dev comparison with paired bootstrap. Its final stage is explicitly the
 deterministic feature reranker; it must not be described as Qwen3 reranking.
 
+Local Qwen3 reranking uses a measured pilot before the full run. The pilot config
+limits evaluation to eight claims and `evaluate_qwen_reranker_pilot.sbatch`
+records model-load and per-query timing. Only after that gate should
+`evaluate_qwen_reranker_native.sbatch` score the complete RRF Top-50 candidate
+set. `compare_qwen_reranker_native.sbatch` performs the paired RRF-vs-reranker
+comparison without repeating model inference. Model cache, predictions and
+restricted evidence stay in project storage.
+
 
 Before reporting a result, retain Slurm logs, `run_manifest.json`, `metrics.json`, per-claim predictions, `sacct` elapsed/MaxRSS, allocated hardware, and storage/API cost. Do not claim an improvement if it was not run on the same split/final K with a paired comparison.

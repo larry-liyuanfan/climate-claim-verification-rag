@@ -7,13 +7,15 @@ claim classifier under Colab constraints. My portfolio extension turns that
 baseline into a reproducible multistage search lab: BM25 and dense recall share
 one evidence schema; FlatIP, HNSW and IVF-PQ expose ANN trade-offs; RRF provides
 a training-free baseline; LambdaMART-compatible features support learned fusion;
-and a cross-encoder reranker, calibration, abstention and paired bootstrap close
-the evaluation loop. On Spartan I built BM25 and Qwen3-Embedding-0.6B/FlatIP
-artifacts for all 1,208,827 evidence passages; the dense build produced 1,024-d
-vectors in 28 minutes 17 seconds of command time with a 21.54 GB peak resident
-set. Those are engineering measurements, not Recall@K gains. HNSW/IVF-PQ and
-end-to-end quality remain separate experiments, and no public rank is claimed
-without an official source.
+and a cross-encoder reranker plus paired bootstrap close the evaluation loop.
+On Spartan I built BM25 and Qwen3-Embedding-0.6B artifacts for all 1,208,827
+evidence passages. HNSW retained 0.9961 Recall@5 versus Flat while reaching
+3,060.64 batch QPS in the fixed 154-query benchmark. On the fixed 154-claim dev
+split, RRF improved Recall@5 from 0.1721 to 0.2709. I then scored all 7,700 RRF
+Top-50 pairs with Qwen3-Reranker-0.6B: Recall@5 fell to 0.2438 and P95 was 5.88
+seconds/query, so the quality-cost gate kept HNSW+RRF. This is a measured
+deployment decision, not a claim that the most complex stage must win; no
+public rank is claimed without an official source.
 
 ## Deep-dive questions
 

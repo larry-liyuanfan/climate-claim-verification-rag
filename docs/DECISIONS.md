@@ -30,5 +30,5 @@ Improvements are compared per claim on the same split. Paired bootstrap reports 
 
 ## D8 — Deploy the measured winner, not the most complex stage
 
-The fixed-dev run selects BM25+dense RRF: it improved Recall@5 and Evidence F1 over BM25 with paired intervals excluding zero. The trained LambdaMART and deterministic reranker regressed sharply, so they remain documented negative experiments and are blocked from the default retrieval path. IVF-PQ is likewise rejected despite its speed and compression because its Recall@5 versus Flat was only 0.3688; HNSW is the retained ANN default.
+The fixed-dev run selects BM25+dense RRF: it improved Recall@5 and Evidence F1 over BM25 with paired intervals excluding zero. Qwen3-Reranker-0.6B was then evaluated on all 7,700 RRF Top-50 pairs; its mean Recall@5/F1 was lower than RRF and the paired intervals crossed zero, while per-query P50/P95 was 4.88/5.88 s. It therefore adds cost without a defensible gain and is not enabled by default. The trained LambdaMART and deterministic reranker regressed sharply, so they also remain documented negative experiments. IVF-PQ is rejected despite its speed and compression because its Recall@5 versus Flat was only 0.3688; HNSW is the retained ANN default.
 
