@@ -90,14 +90,22 @@ climate-rag train-fusion \
   --output-dir /artifacts/ltr
 ```
 
-The retained 0.6B dense encoder can be improved without blindly increasing its
-parameter count. `scripts/prepare_embedding_training.py` converts the mined
+The retained 0.6B dense encoder is improved through task adaptation rather than
+blind parameter scaling. `scripts/prepare_embedding_training.py` converts mined
 training negatives into the current ms-swift Qwen3-Embedding InfoNCE format,
 keeps every claim wholly in train or validation, removes gold/duplicate-text
-false negatives, and emits hashed run artifacts. The bounded Spartan LoRA
-contract pilot is `hpc/train_embedding_lora_pilot.sbatch`; it follows the
-official Qwen3-Embedding recipe (`task_type=embedding`, InfoNCE, LoRA) and must
-pass a later held-out retrieval/latency gate before any effectiveness claim.
+false negatives, and emits hashed run artifacts. Spartan job `29462754`
+completed a bounded 20-step LoRA/InfoNCE run, and preflight `29463845` verified
+that 5,046,272 adapter parameters were injected into the serving encoder.
+
+The claim-grouped sampled gate (`29463846`) retained all 368 labelled positives
+for 126 held-out claims in a 5,000/1,208,827-document corpus. Recall@5 changed
+from `0.6090` to `0.6303` (paired 95% interval `0.0048–0.0429`), while MRR and
+nDCG intervals were also positive. Evidence F1 changed from `0.1087` to `0.1095`
+with an interval crossing zero (`-0.0003–0.0026`), so this is only a sampled
+promotion screen. The compact record is in
+[`docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json`](docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json).
+A full-corpus official-dev gate must pass before the production encoder changes.
 
 `auto` uses LightGBM LambdaMART when present. Otherwise it persists `linear_pairwise_ranknet_fallback`; it is never renamed LambdaMART. Candidate rows must be split by claim before held-out evaluation.
 

@@ -6,7 +6,7 @@
 |---|---|---|
 | Package and five required CLI commands | `verified` | editable install and CLI integration tests |
 | BM25, hash dense exact search, RRF, hard negatives | `verified` | deterministic unit tests |
-| Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA training gate | `implemented-unrun` | current ms-swift dataset contract, gold/duplicate false-negative filtering, detached-SHA Spartan pilot script; pinned node-local ms-swift environment after project-quota failure; 34 local tests; no effectiveness claim until held-out retrieval evaluation |
+| Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA training and sampled gate | `verified-sampled-screen` | data job `29460405`, 20-step training `29462754`, injection preflight `29463845`, sampled retrieval `29463846`; 1,228 claims/4,122 rows, 5,046,272 injected LoRA parameters, 126 held-out claims/5,000 documents; Recall@5 `0.6090→0.6303` with positive paired interval, but F1 interval crosses zero; full-corpus gate still required |
 | Pairwise LTR fallback and LightGBM persistence | `verified` | 24-test clean environment; commit `636e915` fixes persisted LightGBM feature metadata |
 | Qwen3 encoder and FAISS FlatIP adapter | `verified-build` | full 1,208,827-vector Spartan build plus fixed-dev effectiveness run completed |
 | FAISS HNSW/IVF-PQ | `verified` | jobs `29418470`/`29418595`; fixed 154-query FlatIP-grounded quality-speed comparison |
@@ -46,6 +46,8 @@ Before reporting an improvement, retain the data/split hash, metric definition, 
 The `29382416` artifact manifest correctly records the job, Git SHA, environment, and restricted input hash, but its start and finish timestamps are identical because the old writer created both at artifact-write time. Runtime claims therefore use `metrics.json` and Slurm accounting. The follow-up code records command start time explicitly.
 
 The dense encoder size gate is recorded in `docs/verified-runs/qwen3-embedding-4b-pilot-20260820.json`. Job `29458425` completed in `14 min 16 s` with exit `0:0` and Slurm MaxRSS `27,017,012 K`. It retains all gold evidence in the sampled corpus but evaluates only eight claims, so it supports the decision not to spend resources on a full 4B rebuild; it does not prove full-corpus 4B effectiveness.
+
+The retained-0.6B adaptation chain is recorded in `docs/verified-runs/qwen3-embedding-lora-sampled-gate-20260821.json`. Data job `29460405` resolved 13,354/13,354 evidence IDs and produced a claim-grouped split; training job `29462754` completed 20 LoRA/InfoNCE steps; preflight `29463845` verified 5,046,272 injected adapter parameters. Sampled gate `29463846` used 126 held-out claims, 5,000 of 1,208,827 documents, all 368 labelled positives and 2,000 paired-bootstrap samples. Recall@5, MRR and nDCG intervals were positive, while Evidence F1 crossed zero. The first full-corpus job `29464119` finished encoding/search but failed while persisting a rebuildable 4.95 GB adapted FlatIP index, so it produced no usable metrics. Commit `c815070` disables that persistence by default; replacement `29465819` remains a running external gate and is not yet an effectiveness result.
 
 The fixed-dev run manifest records job `29435589`, commit `636e9159a14a59248ce8c4e93c396370c4af508e`, dev-claim hash `ea9976e8...`, config hash `8ae39fb2...`, `final_k=5`, 5,000 bootstrap samples, and `deterministic-feature-fallback`. It is a retrieval-only experiment: the classifier is unconfigured, and Recall@10/50 are not separately interpretable because only five final documents were emitted.
 

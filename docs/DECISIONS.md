@@ -34,7 +34,11 @@ The fixed-dev run first selected BM25+dense RRF over BM25. A separate dense-enco
 
 The next dense-encoder gate is task adaptation, not another parameter-scale
 guess. Mined train-claim negatives are converted to Qwen3-Embedding InfoNCE
-rows with a claim-grouped validation split and false-negative controls. A LoRA
-pilot first validates the ms-swift contract and resource shape; only a later
-held-out retrieval comparison may justify rebuilding the production index.
+rows with a claim-grouped validation split and false-negative controls. A
+20-step LoRA run and runtime injection preflight completed, and the 126-claim
+evidence-preserving sampled screen improved Recall@5, MRR and nDCG with positive
+paired intervals. Evidence F1 did not have a positive interval, so the adapter
+is not promoted from the sampled result. Promotion requires the full-corpus
+official-dev Recall@5 interval lower bound to exceed zero and non-negative mean
+changes in MRR, nDCG and Evidence F1.
 
