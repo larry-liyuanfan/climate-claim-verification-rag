@@ -38,6 +38,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--bootstrap-samples", type=int, default=5_000)
     parser.add_argument("--seed", type=int, default=17)
+    parser.add_argument(
+        "--save-index",
+        action="store_true",
+        help=(
+            "persist the rebuildable adapted FlatIP index; disabled by default so the "
+            "evaluation can finish under a constrained project artifact quota"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -163,7 +171,7 @@ def main() -> int:
         top_k=args.top_k,
         adapter_path=args.adapter,
         run_label="adapted_full_corpus",
-        save_index_path=output_dir / "adapted-flat.faiss",
+        save_index_path=output_dir / "adapted-flat.faiss" if args.save_index else None,
     )
     comparisons = compare_metric_rows(
         base_rows,
@@ -202,6 +210,7 @@ def main() -> int:
         notes=[
             "The base FlatIP index is reused only after exact document-order/count/hash validation.",
             "The adapter is evaluated on untouched official dev claims and the complete evidence corpus.",
+            "The adapted FlatIP index is rebuildable and is persisted only when --save-index is explicit.",
             "The primary gate is paired Recall@5; MRR, nDCG and Evidence F1 must not regress in mean.",
             "Passing remains offline project evidence, not an online production A/B test.",
         ],

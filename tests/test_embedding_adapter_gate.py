@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 from climate_rag import dense
@@ -96,3 +97,12 @@ def test_full_corpus_promotion_requires_recall_ci_and_secondary_non_regression()
     decision = full_corpus_promotion_decision(comparisons)
     assert not decision["candidate_passes_full_corpus_gate"]
     assert not decision["secondary_mean_non_regression"]
+
+
+def test_full_corpus_gate_does_not_persist_rebuildable_index_by_default() -> None:
+    source = (
+        Path(__file__).parents[1] / "scripts" / "evaluate_embedding_adapter_full_gate.py"
+    ).read_text(encoding="utf-8")
+    assert '"--save-index"' in source
+    assert 'if args.save_index else None' in source
+    assert "disabled by default" in source
