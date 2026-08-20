@@ -1,5 +1,17 @@
+from pathlib import Path
+
 from climate_rag.embedding_training import build_swift_infonce_dataset
 from climate_rag.models import Claim, EvidenceDocument
+
+
+def test_embedding_pilot_pins_the_known_qwen3_transformers_runtime() -> None:
+    script = (Path(__file__).parents[1] / "hpc" / "train_embedding_lora_pilot.sbatch").read_text(
+        encoding="utf-8"
+    )
+    assert '"transformers==4.51.3"' in script
+    assert '"ms-swift==3.9.3"' in script
+    assert "--retries 5" in script
+    assert 'PIP_DEFAULT_TIMEOUT="${PIP_DEFAULT_TIMEOUT:-120}"' in script
 
 
 def test_build_swift_infonce_dataset_is_claim_grouped_and_filters_false_negatives() -> None:

@@ -24,7 +24,12 @@ RUNTIME_ENV="${SWIFT_ENV:-${NODE_LOCAL_ROOT}/climate-swift-venv-3.9.3}"
 if [[ ! -x "${RUNTIME_ENV}/bin/swift" ]]; then
   python -m venv --system-site-packages "${RUNTIME_ENV}"
   export PIP_CACHE_DIR="${NODE_LOCAL_ROOT}/climate-swift-pip-cache"
-  "${RUNTIME_ENV}/bin/python" -m pip install --no-input "ms-swift==3.9.3"
+  export PIP_DEFAULT_TIMEOUT="${PIP_DEFAULT_TIMEOUT:-120}"
+  "${RUNTIME_ENV}/bin/python" -m pip install \
+    --no-input \
+    --retries 5 \
+    "transformers==4.51.3" \
+    "ms-swift==3.9.3"
 fi
 source "${RUNTIME_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
