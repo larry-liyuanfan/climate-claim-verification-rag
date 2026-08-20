@@ -82,7 +82,10 @@ runtime decision, not a training result.
 The first data-preparation retry (`29460344`) exited before reading data because
 the existing native venv's EasyBuild Python lacked its module-provided shared
 library. The script now loads the same verified GCC/OpenMPI/PyTorch module stack
-as the earlier native jobs before activating the venv.
+as the earlier native jobs before activating the venv. Retry `29460372` then
+showed that the venv's editable install still pointed at an older checkout; the
+script now prepends the detached job worktree's `src` to `PYTHONPATH` so runtime
+code and recorded SHA cannot diverge.
 
 The `*_native.sbatch` LTR chain uses the already verified native environment and
 is CPU-only: HNSW hard-negative mining on train claims, LightGBM LambdaMART, then

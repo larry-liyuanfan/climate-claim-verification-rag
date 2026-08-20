@@ -21,6 +21,7 @@ module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 export PYTHONUNBUFFERED=1
+export PYTHONPATH="${REPO_DIR}/src:${PYTHONPATH:-}"
 
 python scripts/prepare_embedding_training.py \
   --claims "${DATA_DIR}/train-claims.json" \
