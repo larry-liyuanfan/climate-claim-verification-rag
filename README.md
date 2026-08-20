@@ -90,6 +90,15 @@ climate-rag train-fusion \
   --output-dir /artifacts/ltr
 ```
 
+The retained 0.6B dense encoder can be improved without blindly increasing its
+parameter count. `scripts/prepare_embedding_training.py` converts the mined
+training negatives into the current ms-swift Qwen3-Embedding InfoNCE format,
+keeps every claim wholly in train or validation, removes gold/duplicate-text
+false negatives, and emits hashed run artifacts. The bounded Spartan LoRA
+contract pilot is `hpc/train_embedding_lora_pilot.sbatch`; it follows the
+official Qwen3-Embedding recipe (`task_type=embedding`, InfoNCE, LoRA) and must
+pass a later held-out retrieval/latency gate before any effectiveness claim.
+
 `auto` uses LightGBM LambdaMART when present. Otherwise it persists `linear_pairwise_ranknet_fallback`; it is never renamed LambdaMART. Candidate rows must be split by claim before held-out evaluation.
 
 Run the fixed five-stage comparison:
