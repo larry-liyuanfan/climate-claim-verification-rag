@@ -79,6 +79,11 @@ automatically. The failed partial environment was removed without touching
 corpus, indexes or model caches. This failure is provenance for the node-local
 runtime decision, not a training result.
 
+The first data-preparation retry (`29460344`) exited before reading data because
+the existing native venv's EasyBuild Python lacked its module-provided shared
+library. The script now loads the same verified GCC/OpenMPI/PyTorch module stack
+as the earlier native jobs before activating the venv.
+
 The `*_native.sbatch` LTR chain uses the already verified native environment and
 is CPU-only: HNSW hard-negative mining on train claims, LightGBM LambdaMART, then
 a fixed dev comparison with paired bootstrap. Its final stage is explicitly the

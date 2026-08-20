@@ -16,6 +16,8 @@ set -euo pipefail
 : "${OUTPUT_DIR:?set a new OUTPUT_DIR}"
 
 cd "${REPO_DIR}"
+module purge
+module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 export PYTHONUNBUFFERED=1

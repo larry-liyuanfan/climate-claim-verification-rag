@@ -37,5 +37,6 @@ def test_embedding_data_prep_requires_exact_sha_inputs() -> None:
     script = (ROOT / "hpc" / "prepare_embedding_training.sbatch").read_text()
     assert '${REPO_DIR:?set detached, exact-SHA REPO_DIR}' in script
     assert '${HARD_NEGATIVES:?set HARD_NEGATIVES}' in script
+    assert "module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0" in script
     assert '--split-seed "${SPLIT_SEED:-45}"' in script
     assert "/home/" not in script
