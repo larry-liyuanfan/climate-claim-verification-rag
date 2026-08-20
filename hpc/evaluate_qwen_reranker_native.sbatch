@@ -24,11 +24,21 @@ source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
 export PYTHONPATH="${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
-export HF_HOME="${ARTIFACT_DIR}/.cache/huggingface"
+if [[ "${MODEL_CACHE_MODE:-project}" == "node-local" ]]; then
+  NODE_LOCAL_ROOT="${SLURM_TMPDIR:-${TMPDIR:-/tmp}}"
+  export HF_HOME="${NODE_LOCAL_ROOT}/climate-hf-${SLURM_JOB_ID}"
+else
+  export HF_HOME="${MODEL_CACHE_ROOT:-${ARTIFACT_DIR}/.cache/huggingface}"
+fi
+mkdir -p "${HF_HOME}"
 export HF_HUB_CACHE="${HF_HOME}/hub"
 export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
-export HF_HUB_OFFLINE=1
-export TRANSFORMERS_OFFLINE=1
+if [[ "${MODEL_CACHE_MODE:-project}" == "project" ]]; then
+  export HF_HUB_OFFLINE=1
+  export TRANSFORMERS_OFFLINE=1
+else
+  unset HF_HUB_OFFLINE TRANSFORMERS_OFFLINE || true
+fi
 export HF_HUB_DISABLE_TELEMETRY=1
 export PYTHONUNBUFFERED=1
 export CLIMATE_GIT_COMMIT="$(git rev-parse HEAD)"

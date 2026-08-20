@@ -80,6 +80,12 @@ They force BF16 and batch size 1. Run the eight-claim pilot first on a measured
 GPU shape; only submit the full config if the pilot fits memory, produces finite
 scores and offers a defensible quality/latency trade-off. The full Slurm script
 accepts `EXPERIMENT_CONFIG` so 0.6B, 4B and 8B runs remain explicit and hashed.
+If the shared project filesystem lacks room for the 8B weight shards, set
+`MODEL_CACHE_MODE=node-local`. Both reranker scripts then place the Hugging Face
+cache under the Slurm node's ephemeral `${SLURM_TMPDIR}`/`${TMPDIR}` (falling
+back to `/tmp`) and the full script permits the one-off download. This avoids
+writing weights to `$HOME` or uploading them as artifacts; it intentionally
+trades a repeated download for a bounded pilot/full gate.
 
 
 Before reporting a result, retain Slurm logs, `run_manifest.json`, `metrics.json`, per-claim predictions, `sacct` elapsed/MaxRSS, allocated hardware, and storage/API cost. Do not claim an improvement if it was not run on the same split/final K with a paired comparison.
