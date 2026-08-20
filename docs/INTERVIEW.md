@@ -15,7 +15,16 @@ evidence-preserving 5,000-document/eight-claim resource screen, I compared a 4B
 dense encoder at the same 1,024 dimensions. It
 reduced sampled Recall@5, tied F1/MRR, encoded about 7.1 times slower and used
 about 5.5 times the peak Torch GPU memory, so I stopped the full rebuild and
-retained 0.6B. On the fixed 154-claim dev split, RRF improved Recall@5 from
+retained 0.6B. I then improved the retained model through claim-grouped hard
+negatives and a 20-step LoRA/InfoNCE run instead of another scale guess. A
+126-claim evidence-preserving sampled gate raised Recall@5 from 0.6090 to
+0.6303 with a positive paired interval; MRR and nDCG intervals were also
+positive, but Evidence F1 crossed zero. I therefore treat it as a sampled
+screen and require a full-corpus official-dev gate before promotion. The first
+full run completed encoding/search but failed while writing a rebuildable
+4.95 GB index under the project quota; I removed only the incomplete file and
+changed the gate to persist that index only when explicit. On the fixed
+154-claim dev split, RRF improved Recall@5 from
 0.1721 to 0.2709. A first pure-0.6B rerank
 regressed because it erased the strong first-stage order. I corrected the
 architecture by fusing cross-encoder rank back with RRF, then gated a BF16 4B
@@ -52,6 +61,10 @@ generalisation. No public rank is claimed without an official source.
 21. Why did pure 4B aggregate metrics rise while its paired intervals still cross zero?
 22. Why is balanced 4B fusion a dev-selection result rather than an independent test claim?
 23. Why does the production dense encoder remain 0.6B while the offline reranker is 4B?
+24. Why adapt the retained 0.6B encoder with LoRA instead of rebuilding a larger encoder?
+25. How does claim-grouped splitting and duplicate-text filtering prevent leakage and false negatives?
+26. Why is the sampled adapter result insufficient even though Recall, MRR and nDCG intervals are positive?
+27. How did the late project-quota failure change the artifact design without weakening the evaluation?
 
 ## Code evidence map
 
@@ -62,6 +75,8 @@ generalisation. No public rank is claimed without an official source.
 | Dense encoding and FlatIP/HNSW/IVF-PQ adapters | `src/climate_rag/dense.py` |
 | RRF and learned-fusion feature path | `src/climate_rag/fusion.py` |
 | Hard-negative mining | `src/climate_rag/negatives.py` |
+| Claim-grouped InfoNCE data and LoRA runtime | `scripts/prepare_embedding_training.py`, `hpc/train_embedding_lora_pilot.sbatch`, `hpc/adapter_runtime.sh` |
+| Sampled/full adapter promotion gates | `scripts/evaluate_embedding_adapter_gate.py`, `scripts/evaluate_embedding_adapter_full_gate.py`, `src/climate_rag/embedding_adapter_gate.py` |
 | Cross-encoder/Model Studio rerank adapters | `src/climate_rag/rerank.py` |
 | Calibration and abstention | `src/climate_rag/calibration.py` |
 | Recall/MRR/nDCG/F1/H-mean/bootstrap | `src/climate_rag/metrics.py` |
