@@ -2,7 +2,8 @@
 #SBATCH --job-name=climate-embed-lora
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gpus=1
+#SBATCH --partition=gpu-a100-mig
+#SBATCH --gres=gpu:1g.20gb:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00

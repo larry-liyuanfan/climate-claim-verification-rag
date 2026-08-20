@@ -73,6 +73,10 @@ then use
 separate held-out claim split beats the frozen 0.6B baseline on retrieval while
 meeting the latency/memory gate.
 
+The contract pilot pins one A100 `1g.20gb` MIG slice, matching the earlier
+measured 0.6B reranker resource class. Its Slurm header uses only the typed GRES
+form; mixing `--gpus=1` with a typed command-line GRES is deliberately blocked.
+
 Bootstrap job `29460211` demonstrated that a persistent project-storage
 ms-swift environment would exceed quota; its dependent data job was cancelled
 automatically. The failed partial environment was removed without touching

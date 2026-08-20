@@ -21,6 +21,9 @@ def test_container_dense_jobs_bind_cache_under_artifacts() -> None:
 
 def test_embedding_lora_pilot_is_project_cached_and_bounded() -> None:
     script = (ROOT / "hpc" / "train_embedding_lora_pilot.sbatch").read_text()
+    assert "#SBATCH --partition=gpu-a100-mig" in script
+    assert "#SBATCH --gres=gpu:1g.20gb:1" in script
+    assert "#SBATCH --gpus=" not in script
     assert 'HF_HOME="${ARTIFACT_ROOT}/.cache/huggingface"' in script
     assert '${REPO_DIR:?set detached, exact-SHA REPO_DIR}' in script
     assert 'RUNTIME_ENV="${SWIFT_ENV:-${NODE_LOCAL_ROOT}/climate-swift-venv-3.9.3}"' in script
