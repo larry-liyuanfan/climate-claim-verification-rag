@@ -24,7 +24,6 @@ module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${NATIVE_ENV}/bin/activate"
 export PYTHONNOUSERSITE=1
-export PYTHONPATH="${NATIVE_ENV}/lib/python3.10/site-packages:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 export HF_HOME="${ARTIFACT_ROOT}/.cache/huggingface"
@@ -32,6 +31,8 @@ export HF_HUB_CACHE="${HF_HOME}/hub"
 export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
 export HF_HUB_DISABLE_TELEMETRY=1
 mkdir -p "${HF_HOME}" "${OUTPUT_DIR}"
+source hpc/adapter_runtime.sh
+setup_climate_adapter_runtime
 
 python - <<'PY'
 import torch
