@@ -98,8 +98,36 @@ class SentenceTransformerEncoder:
             truncate_dim=truncate_dim,
         )
         self.adapter_path = adapter_path
+        self.adapter_parameter_count = 0
         if adapter_path:
-            self._model.load_adapter(adapter_path)
+            try:
+                from peft import PeftModel
+            except ImportError as exc:
+                raise RuntimeError("peft is required to load a dense encoder adapter") from exc
+            transformer_module = self._model[0]
+            auto_model = getattr(transformer_module, "auto_model", None)
+            if auto_model is None:
+                raise RuntimeError(
+                    "the first SentenceTransformer module does not expose auto_model"
+                )
+            # ms-swift trains Qwen3-Embedding through Qwen3ForCausalLM, whose
+            # adapter keys contain an extra `model.` level. SentenceTransformers
+            # serves the bare Qwen3Model. PEFT applies this mapping after
+            # stripping its own base_model.model prefix, so both structures
+            # resolve to the same `layers.*` modules without rewriting the
+            # source checkpoint.
+            transformer_module.auto_model = PeftModel.from_pretrained(
+                auto_model,
+                adapter_path,
+                key_mapping={r"^model\.": ""},
+            )
+            self.adapter_parameter_count = sum(
+                parameter.numel()
+                for name, parameter in transformer_module.auto_model.named_parameters()
+                if "lora_" in name
+            )
+            if self.adapter_parameter_count <= 0:
+                raise RuntimeError("adapter loaded without any LoRA parameters")
         self.dimension = int(self._model.get_sentence_embedding_dimension())
 
     def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray:

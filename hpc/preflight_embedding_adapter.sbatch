@@ -30,26 +30,43 @@ source hpc/adapter_runtime.sh
 setup_climate_adapter_runtime
 
 python - <<'PY'
+import gc
 import json
 import os
 from pathlib import Path
 
+import numpy as np
+
 from climate_rag.dense import SentenceTransformerEncoder
 
 adapter = Path(os.environ["ADAPTER_DIR"])
+probe = ["held-out climate retrieval adapter preflight"]
+base = SentenceTransformerEncoder(
+    "Qwen/Qwen3-Embedding-0.6B",
+    device="cpu",
+    truncate_dim=1024,
+)
+base_vector = base.encode_queries(probe, batch_size=1)
+del base
+gc.collect()
 encoder = SentenceTransformerEncoder(
     "Qwen/Qwen3-Embedding-0.6B",
     device="cpu",
     truncate_dim=1024,
     adapter_path=str(adapter),
 )
-vector = encoder.encode_queries(["held-out climate retrieval adapter preflight"], batch_size=1)
+vector = encoder.encode_queries(probe, batch_size=1)
 assert vector.shape == (1, 1024), vector.shape
+delta_l2 = float(np.linalg.norm(vector - base_vector))
+assert encoder.adapter_parameter_count > 0, encoder.adapter_parameter_count
+assert delta_l2 > 1e-7, delta_l2
 print(
     json.dumps(
         {
             "event": "adapter_cpu_preflight_completed",
             "adapter": str(adapter),
+            "adapter_parameter_count": encoder.adapter_parameter_count,
+            "base_vs_adapter_delta_l2": delta_l2,
             "dimension": encoder.dimension,
             "vector_shape": list(vector.shape),
         },

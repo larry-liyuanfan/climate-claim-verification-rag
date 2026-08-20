@@ -34,14 +34,37 @@ def test_heldout_query_texts_and_claim_resolution() -> None:
 
 
 def test_sentence_transformer_encoder_loads_adapter(monkeypatch) -> None:
-    calls: list[str] = []
+    calls: list[tuple[object, str, dict[str, str]]] = []
+
+    class FakeParameter:
+        def numel(self) -> int:
+            return 7
+
+    class FakeAutoModel:
+        pass
+
+    class FakePeftModel:
+        def named_parameters(self):
+            return [("layers.0.q_proj.lora_A.default.weight", FakeParameter())]
+
+    class FakePeftFactory:
+        @classmethod
+        def from_pretrained(cls, model, path: str, *, key_mapping):
+            calls.append((model, path, key_mapping))
+            return FakePeftModel()
+
+    class FakeTransformerModule:
+        def __init__(self) -> None:
+            self.auto_model = FakeAutoModel()
 
     class FakeSentenceTransformer:
         def __init__(self, *args, **kwargs) -> None:
             del args, kwargs
+            self.module = FakeTransformerModule()
 
-        def load_adapter(self, path: str) -> None:
-            calls.append(path)
+        def __getitem__(self, index: int):
+            assert index == 0
+            return self.module
 
         def get_sentence_embedding_dimension(self) -> int:
             return 1024
@@ -52,6 +75,9 @@ def test_sentence_transformer_encoder_loads_adapter(monkeypatch) -> None:
         "sentence_transformers",
         SimpleNamespace(SentenceTransformer=FakeSentenceTransformer),
     )
+    monkeypatch.setitem(sys.modules, "peft", SimpleNamespace(PeftModel=FakePeftFactory))
     encoder = dense.SentenceTransformerEncoder("base", adapter_path="adapter")
     assert encoder.adapter_path == "adapter"
-    assert calls == ["adapter"]
+    assert encoder.adapter_parameter_count == 7
+    assert len(calls) == 1
+    assert calls[0][1:] == ("adapter", {r"^model\.": ""})
