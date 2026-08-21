@@ -62,6 +62,8 @@ replace gold-evidence retrieval metrics.
 
 `prepare_ltr.sbatch` runs BM25+dense retrieval on the training claims, removes gold evidence from the negative pool, and emits `ltr_features.jsonl`. Only positives present in the live candidate pool are retained; a query with no retrievable positive is counted and excluded instead of receiving an artificial all-zero retrieval feature row. Training consumes that file; no manually assembled feature table is required.
 
+`rebuild_candidate_supported_ltr.sbatch` is the exact-SHA replacement gate. It derives its 30-minute/24-GB shape from the earlier 10:11, 12.1-GB feature job, rebuilds candidate-supported rows, trains LambdaMART and evaluates the same 154-claim dev split in one serial allocation. Its deterministic reranker stage remains a fallback diagnostic and must not be described as Qwen3.
+
 `prepare_embedding_training.sbatch` reuses those mined negatives to build
 claim-grouped ms-swift InfoNCE JSONL. `train_embedding_lora_pilot.sbatch` is a
 20-step, one-GPU resource/contract pilot for Qwen3-Embedding-0.6B LoRA. Submit

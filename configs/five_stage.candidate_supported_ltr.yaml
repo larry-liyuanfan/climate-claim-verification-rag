@@ -1,0 +1,11 @@
+bm25_index: ${ARTIFACT_DIR}/bm25/bm25.pkl.gz
+dense_index: ${ARTIFACT_DIR}/dense-hnsw/dense
+ltr_model: ${LTR_MODEL}
+device: cpu
+recall_k: 1000
+fusion_k: 100
+rrf_k: 60
+rerank_k: 50
+final_k: 5
+reranker:
+  kind: deterministic
