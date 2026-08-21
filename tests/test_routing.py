@@ -8,6 +8,7 @@ from climate_rag.routing import (
     agreement_features,
     cross_fit_route,
     fit_ridge_gain_model,
+    hashed_text_features,
     select_quality_preserving_threshold,
     stable_fold,
 )
@@ -37,6 +38,15 @@ def test_agreement_features_are_bounded_and_inference_safe() -> None:
     assert features.shape == (len(ROUTER_FEATURE_NAMES),)
     assert np.all(features >= 0.0)
     assert np.all(features <= 1.0)
+
+
+def test_hashed_text_features_are_stable_and_sensitive() -> None:
+    first = hashed_text_features("South Australia has no cheap electricity.", dimensions=16)
+    repeat = hashed_text_features("South Australia has no cheap electricity.", dimensions=16)
+    changed = hashed_text_features("Victoria has cheap electricity.", dimensions=16)
+    assert first.shape == (21,)
+    assert np.array_equal(first, repeat)
+    assert not np.array_equal(first, changed)
 
 
 def test_ridge_gain_model_fits_simple_signal() -> None:

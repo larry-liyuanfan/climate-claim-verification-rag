@@ -15,6 +15,7 @@ from climate_rag.routing import (
     agreement_features,
     cross_fit_route,
     group_prediction_rows,
+    hashed_text_features,
 )
 
 
@@ -25,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Cross-fit a cost-aware weak/strong rerank router")
     parser.add_argument("--predictions", type=Path, required=True)
     parser.add_argument("--source-metrics", type=Path, required=True)
+    parser.add_argument("--claims", type=Path, help="optional claim text for inference-safe difficulty features")
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--weak-system", default="rrf")
     parser.add_argument("--strong-system", default="rrf_reranker_fusion_balanced")
@@ -52,7 +54,7 @@ def main() -> None:
     if missing:
         raise ValueError(f"missing required system rows: {missing}")
 
-    features = np.vstack(
+    agreement_matrix = np.vstack(
         [
             agreement_features(
                 grouped[claim_id]["bm25"]["predicted_evidence_ids"],
@@ -62,6 +64,28 @@ def main() -> None:
             for claim_id in claim_ids
         ]
     )
+    feature_names = list(ROUTER_FEATURE_NAMES)
+    if args.claims:
+        claims = json.loads(args.claims.read_text(encoding="utf-8"))
+        missing_claims = sorted(set(claim_ids) - set(claims))
+        if missing_claims:
+            raise ValueError(f"claim text is missing for: {missing_claims}")
+        text_matrix = np.vstack(
+            [hashed_text_features(str(claims[claim_id]["claim_text"])) for claim_id in claim_ids]
+        )
+        features = np.column_stack((agreement_matrix, text_matrix))
+        feature_names.extend(
+            [
+                "text_log_token_count",
+                "text_digit_token_fraction",
+                "text_negation_fraction",
+                "text_bracket_count",
+                "text_question_mark_count",
+                *(f"text_hash_{index}" for index in range(text_matrix.shape[1] - 5)),
+            ]
+        )
+    else:
+        features = agreement_matrix
     weak_f1 = np.asarray(
         [grouped[claim_id][args.weak_system]["evidence_f1"] for claim_id in claim_ids],
         dtype=np.float64,
@@ -96,7 +120,7 @@ def main() -> None:
         "weak_path_seconds_per_query": args.weak_seconds,
         "strong_increment_mean_seconds_per_query": float(reranker_timing["mean_seconds_per_query"]),
         "strong_increment_p95_seconds_per_query": float(reranker_timing["p95_seconds_per_query"]),
-        "feature_names": list(ROUTER_FEATURE_NAMES),
+        "feature_names": feature_names,
         "folds": fold_reports,
     }
     output_rows: list[dict[str, Any]] = []
@@ -141,7 +165,11 @@ def main() -> None:
         },
         metrics=metrics,
         started_at=started,
-        inputs=(args.predictions, args.source_metrics),
+        inputs=tuple(
+            path
+            for path in (args.predictions, args.source_metrics, args.claims)
+            if path is not None
+        ),
         predictions=output_rows,
         notes=(
             "This is a dev-selection experiment, not an independent held-out generalisation claim.",

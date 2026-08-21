@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -23,6 +24,17 @@ ROUTER_FEATURE_NAMES = (
     "rrf_supported_by_both",
     "rrf_supported_by_exactly_one",
 )
+
+TEXT_SCALAR_FEATURE_NAMES = (
+    "text_log_token_count",
+    "text_digit_token_fraction",
+    "text_negation_fraction",
+    "text_bracket_count",
+    "text_question_mark_count",
+)
+
+_TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
+_NEGATIONS = {"no", "not", "never", "none", "without", "neither", "nor"}
 
 
 def _overlap(left: Sequence[str], right: Sequence[str], k: int) -> float:
@@ -60,6 +72,35 @@ def agreement_features(
         float(supported_by_one) / float(max(len(rrf), 1)),
     ]
     return np.asarray(values, dtype=np.float64)
+
+
+def hashed_text_features(text: str, *, dimensions: int = 128) -> np.ndarray:
+    """Return inference-safe scalar and signed-hash unigram/bigram features."""
+
+    if dimensions <= 0:
+        raise ValueError("dimensions must be positive")
+    tokens = _TOKEN_PATTERN.findall(text.lower())
+    token_count = max(len(tokens), 1)
+    scalar = np.asarray(
+        [
+            np.log1p(len(tokens)),
+            sum(token.isdigit() for token in tokens) / token_count,
+            sum(token in _NEGATIONS for token in tokens) / token_count,
+            float(text.count("[") + text.count("]")),
+            float(text.count("?")),
+        ],
+        dtype=np.float64,
+    )
+    hashed = np.zeros(dimensions, dtype=np.float64)
+    terms = [*tokens, *(f"{left}_{right}" for left, right in zip(tokens, tokens[1:]))]
+    for term in terms:
+        digest = hashlib.blake2b(term.encode("utf-8"), digest_size=8).digest()
+        value = int.from_bytes(digest, "big")
+        hashed[value % dimensions] += 1.0 if value & 1 else -1.0
+    norm = float(np.linalg.norm(hashed))
+    if norm:
+        hashed /= norm
+    return np.concatenate((scalar, hashed))
 
 
 @dataclass(frozen=True)
