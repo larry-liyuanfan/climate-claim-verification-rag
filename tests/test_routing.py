@@ -13,6 +13,21 @@ from climate_rag.routing import (
 )
 
 
+def test_router_cli_arguments_can_be_json_serialised() -> None:
+    import json
+    from pathlib import Path
+
+    arguments = {"path": Path("artifact.jsonl"), "folds": 5}
+    serialisable = {
+        key: str(value) if isinstance(value, Path) else value
+        for key, value in arguments.items()
+    }
+    assert json.loads(json.dumps(serialisable)) == {
+        "path": "artifact.jsonl",
+        "folds": 5,
+    }
+
+
 def test_agreement_features_are_bounded_and_inference_safe() -> None:
     features = agreement_features(
         ["a", "b", "c", "d", "e"],

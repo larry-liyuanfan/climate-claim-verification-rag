@@ -135,7 +135,10 @@ def main() -> None:
     write_run_artifacts(
         args.output_dir,
         command="evaluate-rerank-router",
-        arguments=vars(args),
+        arguments={
+            key: str(value) if isinstance(value, Path) else value
+            for key, value in vars(args).items()
+        },
         metrics=metrics,
         started_at=started,
         inputs=(args.predictions, args.source_metrics),
