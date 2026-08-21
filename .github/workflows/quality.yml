@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install test and LTR dependencies
-        run: python -m pip install -e ".[test,ltr]"
+      - name: Install test, serving and LTR dependencies
+        run: python -m pip install -e ".[test,serve,ltr]"
       - name: Run full test suite
         run: python -m pytest -q
