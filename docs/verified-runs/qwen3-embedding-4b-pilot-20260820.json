@@ -38,7 +38,7 @@
     "ci_upper": 0.0,
     "bootstrap_samples": 500
   },
-  "decision": "Retain the 0.6B production encoder; the sampled gate does not justify a full 4B rebuild.",
+  "decision": "Retain the 0.6B full-corpus latency-profile encoder; the sampled gate does not justify a full 4B rebuild.",
   "boundaries": [
     "The sampler retains every gold-evidence row for the evaluated claims but is not the full 1,208,827-document corpus.",
     "Only eight claims are evaluated, so this is a resource-selection screen rather than an independent quality claim.",
