@@ -44,3 +44,11 @@ def test_embedding_data_prep_requires_exact_sha_inputs() -> None:
     assert 'PYTHONPATH="${REPO_DIR}/src:${PYTHONPATH:-}"' in script
     assert '--split-seed "${SPLIT_SEED:-45}"' in script
     assert "/home/" not in script
+
+
+def test_candidate_supported_ltr_copies_git_objects_to_node_local_storage() -> None:
+    script = (ROOT / "hpc" / "rebuild_candidate_supported_ltr.sbatch").read_text()
+    assert "git clone --no-local --no-checkout" in script
+    assert "git clone --shared" not in script
+    assert "trap 'rm -rf" in script
+    assert '${CLIMATE_GIT_COMMIT:?Set an exact pushed Git commit}' in script

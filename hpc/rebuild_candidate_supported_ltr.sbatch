@@ -19,10 +19,13 @@ set -euo pipefail
 
 git -C "${REPO_DIR}" cat-file -e "${CLIMATE_GIT_COMMIT}^{commit}"
 CODE_ROOT="${SLURM_TMPDIR:-${TMPDIR:-/tmp}}/climate-ltr-supported-${SLURM_JOB_ID:?}"
-git clone --shared --no-checkout "${REPO_DIR}" "${CODE_ROOT}"
+trap 'rm -rf -- "${CODE_ROOT}"' EXIT
+# Copy the object database into node-local storage. A shared clone leaves an
+# alternates pointer back to GPFS and previously failed during checkout with an
+# intermittently unreadable tree even though the source repository passed fsck.
+git clone --no-local --no-checkout "${REPO_DIR}" "${CODE_ROOT}"
 git -C "${CODE_ROOT}" checkout --detach "${CLIMATE_GIT_COMMIT}"
 cd "${CODE_ROOT}"
-trap 'rm -rf -- "${CODE_ROOT}"' EXIT
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
