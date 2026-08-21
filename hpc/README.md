@@ -60,7 +60,7 @@ FlatIP-referenced Recall@5/10/50, batched QPS, single-query P50/P95, load time,
 index bytes and bytes/document. These are ANN engineering metrics; they do not
 replace gold-evidence retrieval metrics.
 
-`prepare_ltr.sbatch` runs BM25+dense retrieval on the training claims, removes gold evidence from the negative pool, and emits `ltr_features.jsonl`. Training consumes that file; no manually assembled feature table is required.
+`prepare_ltr.sbatch` runs BM25+dense retrieval on the training claims, removes gold evidence from the negative pool, and emits `ltr_features.jsonl`. Only positives present in the live candidate pool are retained; a query with no retrievable positive is counted and excluded instead of receiving an artificial all-zero retrieval feature row. Training consumes that file; no manually assembled feature table is required.
 
 `prepare_embedding_training.sbatch` reuses those mined negatives to build
 claim-grouped ms-swift InfoNCE JSONL. `train_embedding_lora_pilot.sbatch` is a

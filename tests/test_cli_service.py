@@ -73,6 +73,20 @@ def test_cli_index_evaluate_negatives_and_ltr(tmp_path: Path) -> None:
     ) == 0
     assert (negatives_dir / "hard_negatives.jsonl").read_text(encoding="utf-8").strip()
     assert (negatives_dir / "ltr_features.jsonl").read_text(encoding="utf-8").strip()
+    ltr_rows = [
+        json.loads(line)
+        for line in (negatives_dir / "ltr_features.jsonl").read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    assert all(
+        row["relevance"] == 0
+        or row["features"]["bm25_reciprocal_rank"] > 0
+        or row["features"]["dense_reciprocal_rank"] > 0
+        for row in ltr_rows
+    )
+    negative_metrics = json.loads((negatives_dir / "metrics.json").read_text(encoding="utf-8"))
+    assert negative_metrics["ltr_query_group_count"] > 0
+    assert negative_metrics["ltr_skipped_query_count"] == 0
 
     ltr_dir = tmp_path / "ltr"
     assert main(

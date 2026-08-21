@@ -12,8 +12,8 @@ from typing import Any
 
 import numpy as np
 
-from .artifacts import write_run_artifacts
 from .ann_benchmark import benchmark_faiss_indices
+from .artifacts import write_run_artifacts
 from .benchmark import run_five_stage_benchmark
 from .bm25 import BM25Index
 from .dense import (
@@ -363,6 +363,9 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
     feature_rows: list[dict[str, Any]] = []
     ranking_rows: list[dict[str, Any]] = []
     missing_rankings = 0
+    ltr_supported_positive_count = 0
+    ltr_unsupported_positive_count = 0
+    ltr_skipped_query_count = 0
     for claim_id in sorted(claims):
         if claim_id not in rankings:
             missing_rankings += 1
@@ -385,7 +388,23 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             assert bm25_index is not None
             bm25_by_id = {row.evidence_id: row for row in rankings[claim_id]["bm25"]}
             dense_by_id = {row.evidence_id: row for row in rankings[claim_id]["dense"]}
-            candidate_ids = [*claims[claim_id].evidence_ids, *(str(row["evidence_id"]) for row in negatives)]
+            retrieved_ids = bm25_by_id.keys() | dense_by_id.keys()
+            supported_gold = [
+                evidence_id
+                for evidence_id in claims[claim_id].evidence_ids
+                if evidence_id in retrieved_ids
+            ]
+            ltr_supported_positive_count += len(supported_gold)
+            ltr_unsupported_positive_count += len(claims[claim_id].evidence_ids) - len(
+                supported_gold
+            )
+            if not supported_gold:
+                ltr_skipped_query_count += 1
+                continue
+            candidate_ids = [
+                *supported_gold,
+                *(str(row["evidence_id"]) for row in negatives),
+            ]
             for evidence_id in dict.fromkeys(candidate_ids):
                 text = text_by_id.get(evidence_id)
                 if text is None:
@@ -418,6 +437,10 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         "missing_rankings_count": missing_rankings,
         "hard_negative_count": len(rows),
         "ltr_feature_count": len(feature_rows),
+        "ltr_query_group_count": len({str(row["query_id"]) for row in feature_rows}),
+        "ltr_supported_positive_count": ltr_supported_positive_count,
+        "ltr_unsupported_positive_count": ltr_unsupported_positive_count,
+        "ltr_skipped_query_count": ltr_skipped_query_count,
     }
     write_run_artifacts(
         output_dir,
@@ -432,6 +455,10 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             *([Path(args.dense_index) / "dense_index.json"] if args.dense_index else []),
         ],
         predictions=rows,
+        notes=[
+            "LTR positives are restricted to the live BM25/dense candidate pool; unretrieved gold rows are never injected with zero retrieval features.",
+            "Queries with no candidate-supported positive are excluded from LTR training and counted in metrics.",
+        ],
         repository=_repository(),
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
