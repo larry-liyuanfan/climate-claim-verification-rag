@@ -1,0 +1,38 @@
+{
+  "status": "verified-partial-and-negative-dev-routing-gates",
+  "scope": "154-claim fixed official dev split; deterministic five-fold hash cross-fitting; not independent test generalisation",
+  "source_strong_system": "RRF + Qwen3-Reranker-4B balanced rank fusion",
+  "source_weak_system": "BM25+dense RRF",
+  "agreement_router": {
+    "slurm_job_id": "29479185",
+    "git_sha": "95f72a5a9e1a7681b39e9ccefd1949461f67deb6",
+    "strong_call_rate": 0.43506493506493504,
+    "calls_avoided_rate": 0.564935064935065,
+    "estimated_mean_seconds_per_query": 1.8650689291704405,
+    "recall_at_5": 0.28777056277056273,
+    "evidence_f1": 0.19093485879200167,
+    "recall_gain_preserved_fraction": 0.38048780487804795,
+    "f1_gain_preserved_fraction": 0.36000000000000015,
+    "f1_delta_vs_weak_95_interval": [0.0007931354359925826, 0.02477337146980004],
+    "f1_delta_vs_strong_95_interval": [-0.03658575551432695, -0.008096268810554525],
+    "metrics_sha256": "d53b8f27a0287047f16bebb6c422b391ec848b0c9439072523110cea95f48baf",
+    "manifest_sha256": "f33d3580994009df4a8207ecc6f821df622021e59b0621fd7888a3231b38b008"
+  },
+  "text_aware_router": {
+    "slurm_job_id": "29479261",
+    "git_sha": "2ff8cf4fbffb9dd33d668158c8969e3e78a99734",
+    "strong_call_rate": 0.14285714285714285,
+    "calls_avoided_rate": 0.8571428571428572,
+    "estimated_mean_seconds_per_query": 0.6210614394290999,
+    "recall_at_5": 0.2717532467532467,
+    "evidence_f1": 0.17878272521129665,
+    "recall_gain_preserved_fraction": 0.01951219512194957,
+    "f1_gain_preserved_fraction": 0.00936802973977656,
+    "f1_delta_vs_weak_95_interval": [-0.005844155844155842, 0.006493506493506492],
+    "metrics_sha256": "daec7b7f1369eccf5e36bde04144b23c3f517b203919e9a6293ee42774b9be07",
+    "manifest_sha256": "a5cdcd79f56332d5a08c641388b02dd331f5afccdc60b6374dfa1b5117e7c4c4"
+  },
+  "decision": "Reject both routers as a replacement for the always-4B offline quality profile. The agreement router is a statistically positive intermediate cost-quality point versus RRF but preserves only 36% of the 4B Evidence-F1 gain, below the predeclared 80% target. Adding hashed claim-text features worsened generalisation and is a verified negative result.",
+  "latency_boundary": "Estimated means combine the measured HNSW weak-path time with the measured 4B reranker mean multiplied by cross-fit call rate. They are analytical estimates, not new end-to-end load-test P95 values.",
+  "data_boundary": "Restricted claims, evidence, predictions and large model artifacts remain on Spartan. This compact record contains aggregate metrics and hashes only."
+}

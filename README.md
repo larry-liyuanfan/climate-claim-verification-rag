@@ -256,6 +256,18 @@ The model-size gate then ran Qwen3-Reranker-4B in BF16 on the identical 154-clai
 
 The optional 8B gate was also executed rather than left as a configuration claim. The first attempt (`29456746`) failed before inference because the shared project filesystem lacked room for the weight shards; four incomplete files totalling about 3.2 GB were removed, and commit `53a3782` moved the one-off cache to node-local ephemeral storage. Replacement pilot `29456898` completed in `2 min 19 s` on the same A100 `1g.20gb` MIG shape (batch MaxRSS `29,380,852 K`). On the same eight claims/400 pairs, the best 8B fusion tied 4B on Evidence F1 (`0.3016`) and Recall@5 (`0.4688`), was slightly lower on MRR@10 (`0.5042` vs `0.5104`), and raised P95 latency from `5.13 s` to `8.25 s` (`+60.8%`). The full 8B run was therefore deliberately not submitted. This is a resource-selection gate, not a full-dev 8B quality result; the derived record is in [`docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json`](docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json).
 
+Two RouteLLM-inspired cost-aware gates then tested whether the 4B path could be
+called selectively. Both used deterministic five-fold hash cross-fitting, so a
+claim's labels never trained its own route. The candidate-list-agreement router
+called 4B on `43.51%` of queries and reduced the analytical mean latency estimate
+to `1.865 s/query`; Recall@5/F1 were `0.2878/0.1909`, significantly above RRF,
+but this preserved only `38.05%/36.00%` of the always-4B gain and was
+significantly below the strong path. Adding inference-safe hashed claim-text
+features avoided `85.71%` of calls but collapsed to RRF-level quality. Both fail
+the predeclared 80% gain-preservation target and are not selected. The compact
+record is in
+[`docs/verified-runs/rerank-router-gates-20260821.json`](docs/verified-runs/rerank-router-gates-20260821.json).
+
 HNSW+RRF remains the latency-oriented default; balanced 4B fusion is the measured offline quality profile. LambdaMART, deterministic reranking and IVF-PQ remain rejected. Because `final_k=5`, recorded Recall@10/50 equals Recall@5 and is not presented as a wider-cutoff result. Claim classification was not configured, so zero claim accuracy/H-mean values are not classifier findings.
 
 ## Historical result boundary

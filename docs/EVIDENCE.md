@@ -25,6 +25,8 @@
 | Qwen3-Reranker-4B pure replacement | `verified-inconclusive` | job `29453918`, commit `c04e39c`: 154 claims/7,700 pairs; Recall@5/F1 `0.3054/0.1997`, but paired intervals versus RRF cross zero; P50/P95 `4.20/4.82 s` |
 | RRF + Qwen3-4B balanced weighted-rank fusion | `verified-dev-selection` | jobs `29453918`/`29455049`: Recall@5/MRR/nDCG/F1 `0.3153/0.3961/0.2849/0.2131`; all four 5,000-sample paired intervals versus RRF above zero; 4B/weights selected on the same dev split, not an independent test |
 | Qwen3-Reranker-8B pilot Pareto gate | `verified-negative-pareto-gate` | job `29456898`, commit `53a3782`: same 8 claims/400 pairs as 4B pilot; tied F1/Recall@5 `0.3016/0.4688`, MRR `0.5042` vs 4B `0.5104`, P95 `8.25 s` vs `5.13 s`; full 8B intentionally not run |
+| Candidate-agreement cost-aware 4B router | `verified-partial-dev-gate/not-selected` | job `29479185`, commit `95f72a5`: five-fold cross-fit, 43.51% strong calls, estimated mean `1.865 s/query`, Recall@5/F1 `0.2878/0.1909`; paired improvements vs RRF but only 38.05%/36.00% of always-4B gain preserved, below the 80% gate |
+| Text-aware cost router | `verified-negative-dev-gate` | job `29479261`, commit `2ff8cf4`: five-fold cross-fit, 14.29% strong calls, Recall@5/F1 `0.2718/0.1788`; paired intervals vs RRF cross zero; rejected |
 | LightGBM LambdaMART fixed-dev result | `verified-negative` | Recall@5 `0.0029`; severe regression, not selected for deployment |
 | Deterministic reranker fixed-dev result | `verified-negative` | Recall@5 `0.0127`; explicitly not Qwen3 and not selected |
 
