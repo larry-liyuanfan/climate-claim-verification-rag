@@ -18,9 +18,10 @@ set -euo pipefail
 
 cd "$CLIMATE_REPO"
 module purge
-module load GCCcore/11.3.0 Python/3.10.4
+module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "$NATIVE_ENV/bin/activate"
-export PYTHONPATH="$CLIMATE_REPO/src${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONNOUSERSITE=1
+export PYTHONPATH="$CLIMATE_REPO/src:$NATIVE_ENV/lib/python3.10/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 python scripts/evaluate_rerank_router.py \
   --predictions "$SOURCE_RUN/predictions.jsonl" \
   --source-metrics "$SOURCE_RUN/metrics.json" \
