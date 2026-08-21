@@ -7,7 +7,7 @@
 | Package and five required CLI commands | `verified` | editable install and CLI integration tests |
 | BM25, hash dense exact search, RRF, hard negatives | `verified` | deterministic unit tests |
 | Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA adaptation | `verified-offline-dev-promotion` | data job `29460405`, 20-step training `29462754`, injection preflight `29463845`, sampled screen `29463846`, full-corpus gate `29465819`; all 154 official-dev claims/1,208,827 documents; Recall@5 `0.2793→0.2970`, MRR `0.3633→0.3869`, nDCG `0.2994→0.3203`, F1 `0.07253→0.07544`; all 5,000-sample paired intervals positive; offline dev, not independent test/online A/B |
-| Pairwise LTR fallback and LightGBM persistence | `verified-code` | 46-test clean environment; commit `636e915` fixes persisted LightGBM feature metadata; effectiveness requires a valid candidate-supported run |
+| Pairwise LTR fallback and LightGBM persistence | `verified-code` | 47-test project environment; commit `636e915` fixes persisted LightGBM feature metadata; effectiveness requires a valid candidate-supported run |
 | Qwen3 encoder and FAISS FlatIP adapter | `verified-build` | full 1,208,827-vector Spartan build plus fixed-dev effectiveness run completed |
 | FAISS HNSW/IVF-PQ | `verified` | jobs `29418470`/`29418595`; fixed 154-query FlatIP-grounded quality-speed comparison |
 | Retrieval/end-to-end metrics | `verified` | synthetic fixtures with exact expected values |
@@ -29,7 +29,7 @@
 | Text-aware cost router | `verified-negative-dev-gate` | job `29479261`, commit `2ff8cf4`: five-fold cross-fit, 14.29% strong calls, Recall@5/F1 `0.2718/0.1788`; paired intervals vs RRF cross zero; rejected |
 | Legacy LightGBM LambdaMART fixed-dev result | `invalidated-training-set` | Recall@5 `0.0029`, but the training builder injected unretrieved gold evidence with zero retrieval features; retain only as failure forensics, not a model-quality result |
 | Legacy LTR + deterministic reranker result | `invalidated-upstream` | Recall@5 `0.0127`; downstream of the invalid legacy LTR candidates and explicitly not Qwen3 |
-| Candidate-supported LambdaMART correction | `running/no-result` | commit `78f95c0`, Spartan job `29479905`; trains only on retrieved candidates, skips claim groups without candidate-supported positives and applies an exact quality gate; do not claim improvement until the terminal artifact is verified |
+| Candidate-supported LambdaMART correction | `queued/no-result` | Original job `29479905` failed before evaluation because a GPFS shared clone could not read one Git tree. Commit `023ed9b` replaces the shared checkout with a copied node-local object store and passes 47 local tests; sole replacement job `29484697` remains pending and has no result. Do not attribute the infrastructure failure to model quality or claim any corrected LTR effect before the terminal artifact is verified |
 
 ## Historical Group 045 records
 

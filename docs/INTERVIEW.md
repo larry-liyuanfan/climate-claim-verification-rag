@@ -64,7 +64,7 @@ generalisation. No public rank is claimed without an official source.
 20. What evidence is required before claiming the new pipeline beats Recall@5=0.223?
 21. Why did pure 4B aggregate metrics rise while its paired intervals still cross zero?
 22. Why is balanced 4B fusion a dev-selection result rather than an independent test claim?
-23. Why does the production dense encoder remain 0.6B while the offline reranker is 4B?
+23. Why does the retained full-corpus/latency-profile dense encoder remain 0.6B while the offline reranker is 4B?
 24. Why adapt the retained 0.6B encoder with LoRA instead of rebuilding a larger encoder?
 25. How does claim-grouped splitting and duplicate-text filtering prevent leakage and false negatives?
 26. Why was the sampled adapter result insufficient even though Recall, MRR and nDCG intervals were positive?

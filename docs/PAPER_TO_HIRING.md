@@ -68,9 +68,14 @@ features, teaching an inverse retrieval signal. That run is invalidated rather
 than reported as “LambdaMART failed”.
 
 - Code correction: `src/climate_rag/training.py` and commit `78f95c0` retain
-  only candidate-supported positives and skip unsupported claim groups.
-- Evaluation: Spartan job `29479905` is the sole exact-SHA corrected gate. It is
-  pending and has no result at the time of this document.
+  only candidate-supported positives and skip unsupported claim groups. The
+  first evaluation job `29479905` failed before model evaluation when a GPFS
+  shared clone could not read one Git tree; that is an infrastructure failure,
+  not a LambdaMART result.
+- Evaluation: commit `023ed9b` copies Git objects into the node-local checkout
+  and passes 47 local tests. Replacement job `29484697` is the sole active
+  exact-SHA corrected gate; it remains queued and has no result at the time of
+  this document.
 - Hiring signal: training-serving consistency, label reachability audits and
   failure forensics in a learning-to-rank pipeline.
 
