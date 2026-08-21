@@ -247,12 +247,12 @@ Job `29435589` evaluated 154 restricted dev claims at `final_k=5` using commit `
 | RRF + Qwen3-0.6B weighted rank fusion (4:1) | **`0.2890`** | **`0.3801`** | **`0.2739`** | **`0.1905`** |
 | Pure Qwen3-Reranker-4B | `0.3054` | `0.3763` | `0.2738` | `0.1997` |
 | RRF + Qwen3-4B weighted rank fusion (1:1) | **`0.3153`** | **`0.3961`** | **`0.2849`** | **`0.2131`** |
-| LambdaMART | `0.0029` | `0.0065` | `0.0030` | `0.0027` |
-| LambdaMART + deterministic reranker | `0.0127` | `0.0359` | `0.0149` | `0.0111` |
+| Legacy LambdaMART (invalidated training set) | `0.0029` | `0.0065` | `0.0030` | `0.0027` |
+| Legacy LambdaMART + deterministic reranker (invalidated upstream) | `0.0127` | `0.0359` | `0.0149` | `0.0111` |
 
 Against BM25, RRF improved Recall@5 by `0.0988` (paired-bootstrap 95% interval `0.0543–0.1452`) and Evidence F1 by `0.0616` (`0.0360–0.0893`). The first pure Qwen replacement run (`29448904`) regressed, exposing an architectural error: it discarded a strong first-stage order. Job `29452723` preserved that order with 0.6B weighted-rank fusion; its selected 4:1 profile improved Recall@5, MRR and nDCG, but not Evidence F1 with a stable interval.
 
-The aggregate five-stage metrics, exact input/artifact hashes and negative LTR decision are published in [`docs/verified-runs/five-stage-fixed-dev-20260819.json`](docs/verified-runs/five-stage-fixed-dev-20260819.json). Restricted predictions and candidate lists remain on Spartan.
+The aggregate five-stage metrics and exact input/artifact hashes are published in [`docs/verified-runs/five-stage-fixed-dev-20260819.json`](docs/verified-runs/five-stage-fixed-dev-20260819.json). A later audit found that the legacy LTR training builder injected unretrieved gold evidence with zero retrieval features, so the two LTR rows above are retained as failure-forensics evidence, not model-quality evidence. The candidate-supported correction is under exact-SHA Spartan evaluation and has no published quality result yet. Restricted predictions and candidate lists remain on Spartan.
 
 The model-size gate then ran Qwen3-Reranker-4B in BF16 on the identical 154-claim/7,700-pair split. Full job `29453918` completed in `12 min 48 s` on one A100 `1g.20gb` MIG slice (`8 CPU`, `32 GB` request; batch MaxRSS `20,372,008 K`). It recorded P50/P95 `4.20/4.82 s` per query. Pure 4B aggregate metrics rose but paired intervals versus RRF crossed zero. The selected 1:1 RRF/4B rank fusion reached Recall@5 `0.3153`, MRR@10 `0.3961`, nDCG@10 `0.2849`, and Evidence F1 `0.2131`. Comparison job `29455049` measured deltas versus RRF of `+0.0444` Recall@5 (95% interval `0.0163–0.0733`, `p=0.0024`), `+0.0515` MRR (`0.0149–0.0883`), `+0.0354` nDCG (`0.0123–0.0576`), and `+0.0347` Evidence F1 (`0.0165–0.0535`). All values come from 5,000 paired bootstrap samples. Because the fusion weights and model size were selected on this same fixed dev split, these are dev-set model-selection results, not an independent test claim.
 
@@ -270,7 +270,11 @@ the predeclared 80% gain-preservation target and are not selected. The compact
 record is in
 [`docs/verified-runs/rerank-router-gates-20260821.json`](docs/verified-runs/rerank-router-gates-20260821.json).
 
-HNSW+RRF remains the latency-oriented default; balanced 4B fusion is the measured offline quality profile. LambdaMART, deterministic reranking and IVF-PQ remain rejected. Because `final_k=5`, recorded Recall@10/50 equals Recall@5 and is not presented as a wider-cutoff result. Claim classification was not configured, so zero claim accuracy/H-mean values are not classifier findings.
+HNSW+RRF remains the latency-oriented default; balanced 4B fusion is the measured offline quality profile. IVF-PQ and both cost routers remain rejected. The legacy LTR rows are invalidated rather than treated as negative quality results; the corrected candidate-supported LambdaMART gate is pending. Because `final_k=5`, recorded Recall@10/50 equals Recall@5 and is not presented as a wider-cutoff result. Claim classification was not configured, so zero claim accuracy/H-mean values are not classifier findings.
+
+The [paper-to-hiring map](docs/PAPER_TO_HIRING.md) connects Qwen3 model sizing
+and adaptation, rank-preserving reranking, cost-aware routing and candidate-
+supported learning-to-rank to exact code, jobs, evidence and stop conditions.
 
 ## Historical result boundary
 

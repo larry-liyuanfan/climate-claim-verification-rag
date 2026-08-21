@@ -14,7 +14,6 @@ from .io import write_json
 from .models import RankedDocument
 from .tokenize import climate_tokenize
 
-
 DEFAULT_FEATURES = (
     "bm25_score",
     "bm25_reciprocal_rank",
@@ -182,7 +181,7 @@ class LinearPairwiseLTR:
         )
 
     @classmethod
-    def load(cls, path: str | Path) -> "LinearPairwiseLTR":
+    def load(cls, path: str | Path) -> LinearPairwiseLTR:
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("algorithm") != "linear_pairwise_ranknet_fallback":
             raise ValueError("not a LinearPairwiseLTR model")
@@ -242,7 +241,7 @@ class LightGBMLambdaMART:
 
     def save(self, path: str | Path) -> None:
         target = Path(path)
-        self.model.booster_.save_model(str(target))
+        target.write_text(self.model.booster_.model_to_string(), encoding="utf-8")
         write_json(
             target.with_suffix(target.suffix + ".json"),
             {
@@ -254,13 +253,13 @@ class LightGBMLambdaMART:
         )
 
     @classmethod
-    def load(cls, path: str | Path) -> "LightGBMLambdaMART":
+    def load(cls, path: str | Path) -> LightGBMLambdaMART:
         target = Path(path)
         metadata = json.loads(target.with_suffix(target.suffix + ".json").read_text(encoding="utf-8"))
         if metadata.get("algorithm") != "lightgbm_lambdamart":
             raise ValueError("not a LightGBM LambdaMART model")
         instance = cls(metadata["feature_names"], seed=int(metadata["seed"]))
-        booster = instance._lgb.Booster(model_file=str(target))
+        booster = instance._lgb.Booster(model_str=target.read_text(encoding="utf-8"))
         if booster.num_feature() != len(instance.feature_names):
             raise ValueError("LightGBM model feature count does not match persisted feature_names")
         instance.model._Booster = booster
