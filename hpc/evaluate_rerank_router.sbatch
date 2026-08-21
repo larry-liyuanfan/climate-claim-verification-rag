@@ -16,6 +16,8 @@ set -euo pipefail
 : "${OUTPUT_DIR:?Set OUTPUT_DIR outside the Git checkout}"
 
 cd "$CLIMATE_REPO"
+module purge
+module load GCCcore/11.3.0 Python/3.11.3
 export PYTHONPATH="$CLIMATE_REPO/src${PYTHONPATH:+:$PYTHONPATH}"
 python scripts/evaluate_rerank_router.py \
   --predictions "$SOURCE_RUN/predictions.jsonl" \
