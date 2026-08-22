@@ -3,12 +3,22 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from climate_rag.dense import DenseRetriever, FaissANNIndex, HashDenseEncoder, NumpyFlatIndex
-from climate_rag.fusion import LinearPairwiseLTR, reciprocal_rank_fusion
+from climate_rag.dense import (
+    DenseRetriever,
+    FaissANNIndex,
+    HashDenseEncoder,
+    NumpyFlatIndex,
+)
+from climate_rag.fusion import (
+    LightGBMLambdaMART,
+    LinearPairwiseLTR,
+    build_candidate_features,
+    reciprocal_rank_fusion,
+)
 from climate_rag.io import iter_evidence
 from climate_rag.models import RankedDocument
 from climate_rag.negatives import mine_hard_negatives
-
+from climate_rag.rerank import weighted_rank_fuse
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -46,6 +56,33 @@ def test_rrf_is_deterministic_and_deduplicates() -> None:
     assert len({row.evidence_id for row in rows}) == 2
 
 
+def test_candidate_features_include_serving_rrf_prior() -> None:
+    features = build_candidate_features(
+        "warming since 1990",
+        "warming accelerated after 1990",
+        bm25_rank=2,
+        dense_rank=4,
+        rrf_score=0.031,
+        rrf_rank=3,
+    )
+    assert features["rrf_score"] == pytest.approx(0.031)
+    assert features["rrf_reciprocal_rank"] == pytest.approx(1 / 3)
+
+
+def test_weighted_rank_fuse_preserves_both_rank_signals() -> None:
+    base = [RankedDocument("a", 0.9, 1), RankedDocument("b", 0.8, 2)]
+    reranked = [RankedDocument("b", 0.7, 1), RankedDocument("a", 0.6, 2)]
+    rows = weighted_rank_fuse(base, reranked, 2, k=0, base_weight=2.0, reranker_weight=1.0)
+    assert [row.evidence_id for row in rows] == ["a", "b"]
+    assert rows[0].features == {"base_rank": 1.0, "reranker_rank": 2.0}
+
+
+def test_weighted_rank_fuse_rejects_invalid_weights() -> None:
+    rows = [RankedDocument("a", 1.0, 1)]
+    with pytest.raises(ValueError, match="at least one"):
+        weighted_rank_fuse(rows, rows, 1, base_weight=0.0, reranker_weight=0.0)
+
+
 def test_linear_pairwise_ltr_learns_order_and_persists(tmp_path: Path) -> None:
     features = np.asarray([[3.0, 1.0], [0.0, 0.0], [2.0, 1.0], [-1.0, 0.0]])
     labels = np.asarray([2, 0, 2, 0])
@@ -65,6 +102,23 @@ def test_ltr_rejects_groups_without_preference_pairs() -> None:
     model = LinearPairwiseLTR(("x",))
     with pytest.raises(ValueError, match="unequal-label"):
         model.fit(np.asarray([[1.0], [2.0]]), np.asarray([0, 0]), ["q", "q"])
+
+
+def test_lightgbm_ltr_round_trip_preserves_feature_count(tmp_path: Path) -> None:
+    pytest.importorskip("lightgbm")
+    features = np.asarray([[3.0, 1.0], [0.0, 0.0], [2.0, 1.0], [-1.0, 0.0]])
+    labels = np.asarray([2, 0, 2, 0])
+    groups = ["q1", "q1", "q2", "q2"]
+    model = LightGBMLambdaMART(("quality", "overlap"), seed=17)
+    model.fit(features, labels, groups)
+    expected = model.predict(features)
+    path = tmp_path / "ltr_model.txt"
+    model.save(path)
+
+    restored = LightGBMLambdaMART.load(path)
+    np.testing.assert_allclose(restored.predict(features), expected)
+    with pytest.raises(ValueError, match="feature matrix shape"):
+        restored.predict(np.ones((1, 3)))
 
 
 def test_hard_negative_mining_excludes_gold_and_tracks_sources() -> None:

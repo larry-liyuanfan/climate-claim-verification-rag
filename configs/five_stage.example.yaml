@@ -7,6 +7,18 @@ fusion_k: 100
 rrf_k: 60
 rerank_k: 50
 final_k: 5
+rerank_source: rrf
+rerank_fusion:
+  enabled: true
+  kind: weighted-rank-fusion
+  k: 60
+  profiles:
+    - name: balanced
+      base_weight: 1.0
+      reranker_weight: 1.0
+    - name: base2
+      base_weight: 2.0
+      reranker_weight: 1.0
 reranker:
   kind: local
   model: Qwen/Qwen3-Reranker-0.6B

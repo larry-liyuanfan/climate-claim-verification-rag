@@ -1,0 +1,67 @@
+{
+  "scope": "claim-grouped held-out, evidence-preserving sampled-corpus adapter gate",
+  "evidence_status": "verified-sampled-screen",
+  "job_id": "29463846",
+  "git_sha": "49d141163fca3b41f33ab4d94cb062395db2443b",
+  "base_model": "Qwen/Qwen3-Embedding-0.6B",
+  "dimension": 1024,
+  "source_document_count": 1208827,
+  "sample_document_count": 5000,
+  "heldout_claim_count": 126,
+  "required_evidence_count": 368,
+  "bootstrap_samples": 2000,
+  "metrics": {
+    "recall@5": {
+      "base": 0.608994708994709,
+      "adapted": 0.6302910052910053,
+      "mean_delta": 0.0212962962962963,
+      "ci_lower": 0.004761904761904762,
+      "ci_upper": 0.04286044973544972,
+      "two_sided_p": 0.005
+    },
+    "mrr@10": {
+      "base": 0.7077790375409424,
+      "adapted": 0.727960443436634,
+      "mean_delta": 0.020181405895691607,
+      "ci_lower": 0.0029147770219198916,
+      "ci_upper": 0.04015526581002771,
+      "two_sided_p": 0.02
+    },
+    "ndcg@10": {
+      "base": 0.6419921675406751,
+      "adapted": 0.6611455472317534,
+      "mean_delta": 0.019153379691078276,
+      "ci_lower": 0.007105269765070308,
+      "ci_upper": 0.032430054034187736,
+      "two_sided_p": 0.001
+    },
+    "evidence_f1": {
+      "base": 0.10866592015932255,
+      "adapted": 0.10953726715226283,
+      "mean_delta": 0.0008713469929402844,
+      "ci_lower": -0.00030463363796697104,
+      "ci_upper": 0.0025974025974025974,
+      "two_sided_p": 0.253
+    }
+  },
+  "engineering": {
+    "base_document_encode_qps": 49.161712722561575,
+    "adapted_document_encode_qps": 45.58787822700704,
+    "base_peak_torch_gpu_bytes": 3070829568,
+    "adapted_peak_torch_gpu_bytes": 3105502208
+  },
+  "decision": "Pass the sampled screen only; require a full-corpus official-dev gate before promotion.",
+  "provenance": {
+    "metrics_sha256": "ee261f4f3c2ab64b7c2d106e54fc25d3e93201c6af2540678907599e88271b65",
+    "run_manifest_sha256": "de7443225fa7215e8a1741660f70a197af9a281c77478bac6423aa6d4ac5af7d",
+    "claims_sha256": "dabdcd3364fcda2b7963aa616e6a025df5779bfa7f7accc89f8ba49361f93604",
+    "evidence_sha256": "73cd238e235ce0c89547b5587ca0e31e0d723c74afba6af611a8f9e5b944781f",
+    "eval_dataset_sha256": "ae9c391233e89d72c119b4d99b7d2d62b75f27128de22205b4a3ac9d48c15abb"
+  },
+  "boundaries": [
+    "This is a 5,000-document sampled screen, not full-corpus retrieval evidence.",
+    "Evidence F1 has a paired interval crossing zero.",
+    "The classifier is unconfigured; zero classification metrics are not findings.",
+    "Restricted inputs, predictions, model checkpoints and indexes remain on Spartan."
+  ]
+}

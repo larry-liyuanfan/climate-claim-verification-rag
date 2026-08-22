@@ -6,11 +6,13 @@ import json
 import sys
 import time
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
+from .ann_benchmark import benchmark_faiss_indices
 from .artifacts import write_run_artifacts
 from .benchmark import run_five_stage_benchmark
 from .bm25 import BM25Index
@@ -26,6 +28,7 @@ from .fusion import (
     LightGBMLambdaMART,
     LinearPairwiseLTR,
     build_candidate_features,
+    reciprocal_rank_fusion,
     train_ranker,
 )
 from .io import (
@@ -89,8 +92,13 @@ def _recorded_arguments(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def _started_at_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
 def command_index(args: argparse.Namespace) -> int:
     _required(args, "evidence", "output_dir")
+    started_at = _started_at_utc()
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
@@ -128,6 +136,7 @@ def command_index(args: argparse.Namespace) -> int:
                 encoder.dimension,
                 kind=args.ann,
                 hnsw_m=args.hnsw_m,
+                hnsw_ef_construction=args.hnsw_ef_construction,
                 nlist=args.nlist,
                 pq_m=args.pq_m,
                 nbits=args.nbits,
@@ -171,7 +180,21 @@ def command_index(args: argparse.Namespace) -> int:
                         "dimension": encoder.dimension,
                     },
                 )
-        dense.fit_vectors(documents, vectors)
+        training_vectors = None
+        if isinstance(ann, FaissANNIndex) and ann.kind == "ivfpq":
+            if args.ivf_train_size < 1:
+                raise ValueError("ivf_train_size must be positive")
+            training_count = min(len(vectors), args.ivf_train_size)
+            generator = np.random.default_rng(args.seed)
+            training_rows = np.sort(
+                generator.choice(len(vectors), size=training_count, replace=False)
+            )
+            training_vectors = np.asarray(vectors[training_rows], dtype=np.float32)
+            metrics["ivf_training_vector_count"] = training_count
+            notes.append(
+                "IVF-PQ training uses a deterministic sample; the seed and sample size are recorded."
+            )
+        dense.fit_vectors(documents, vectors, training_vectors=training_vectors)
         dense_dir = output_dir / "dense"
         dense.save(dense_dir)
         metrics.update(
@@ -191,8 +214,79 @@ def command_index(args: argparse.Namespace) -> int:
         command="index",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[args.evidence],
         notes=notes,
+        repository=_repository(),
+    )
+    print(json.dumps(metrics, indent=2, sort_keys=True))
+    return 0
+
+
+def _named_paths(values: list[str] | None, argument: str) -> dict[str, Path]:
+    result: dict[str, Path] = {}
+    for value in values or []:
+        if "=" not in value:
+            raise ValueError(f"{argument} entries must use name=path")
+        name, raw_path = value.split("=", 1)
+        if not name or name in result:
+            raise ValueError(f"duplicate or empty {argument} name: {name!r}")
+        result[name] = Path(raw_path)
+    return result
+
+
+def command_benchmark_ann(args: argparse.Namespace) -> int:
+    _required(args, "claims", "output_dir")
+    started_at = _started_at_utc()
+    indexes = _named_paths(args.index, "--index")
+    if "flat" not in indexes:
+        raise ValueError("--index must include flat=/path/to/index.faiss")
+    claims = load_claims(args.claims)
+    claim_ids = sorted(claims)
+    encoder = SentenceTransformerEncoder(
+        args.model,
+        query_prefix=args.query_prefix,
+        query_prompt_name=args.query_prompt_name,
+        device=args.device,
+    )
+    encode_started = time.perf_counter()
+    query_vectors = encoder.encode_queries(
+        [claims[claim_id].text for claim_id in claim_ids], batch_size=args.batch_size
+    )
+    encode_seconds = time.perf_counter() - encode_started
+    metrics, per_query = benchmark_faiss_indices(
+        query_vectors,
+        indexes,
+        top_ks=tuple(int(value) for value in args.ks.split(",") if value),
+        repeats=args.repeats,
+        latency_sample_size=args.latency_sample_size,
+        faiss_threads=args.faiss_threads,
+        hnsw_ef_search=args.hnsw_ef_search,
+        ivf_nprobe=args.ivf_nprobe,
+    )
+    metrics.update(
+        {
+            "encoder": encoder.name,
+            "query_embedding_seconds": encode_seconds,
+            "query_embedding_qps": len(claim_ids) / max(encode_seconds, 1e-12),
+        }
+    )
+    for claim_id, row in zip(claim_ids, per_query, strict=True):
+        row["claim_id"] = claim_id
+    manifests = _named_paths(args.index_manifest, "--index-manifest")
+    write_run_artifacts(
+        args.output_dir,
+        command="benchmark-ann",
+        arguments=_recorded_arguments(args),
+        metrics=metrics,
+        started_at=started_at,
+        inputs=[args.claims, *manifests.values()],
+        predictions=per_query,
+        notes=[
+            "FlatIP row positions are the exact ANN ground truth on the same embedding mapping.",
+            "Batch QPS and single-query P50/P95 are measured separately.",
+            "Storage and resource measurements are engineering evidence, not retrieval relevance gains.",
+        ],
         repository=_repository(),
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
@@ -247,6 +341,7 @@ def _load_rankings(path: str | Path) -> dict[str, dict[str, list[RankedDocument]
 
 def command_mine_negatives(args: argparse.Namespace) -> int:
     _required(args, "claims", "output_dir")
+    started_at = _started_at_utc()
     claims = load_claims(args.claims)
     live_indexes = bool(args.bm25_index or args.dense_index)
     if live_indexes:
@@ -269,6 +364,9 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
     feature_rows: list[dict[str, Any]] = []
     ranking_rows: list[dict[str, Any]] = []
     missing_rankings = 0
+    ltr_supported_positive_count = 0
+    ltr_unsupported_positive_count = 0
+    ltr_skipped_query_count = 0
     for claim_id in sorted(claims):
         if claim_id not in rankings:
             missing_rankings += 1
@@ -291,13 +389,34 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             assert bm25_index is not None
             bm25_by_id = {row.evidence_id: row for row in rankings[claim_id]["bm25"]}
             dense_by_id = {row.evidence_id: row for row in rankings[claim_id]["dense"]}
-            candidate_ids = [*claims[claim_id].evidence_ids, *(str(row["evidence_id"]) for row in negatives)]
+            rrf_by_id = {
+                row.evidence_id: row
+                for row in reciprocal_rank_fusion(rankings[claim_id], k=args.rrf_k)
+            }
+            retrieved_ids = bm25_by_id.keys() | dense_by_id.keys()
+            supported_gold = [
+                evidence_id
+                for evidence_id in claims[claim_id].evidence_ids
+                if evidence_id in retrieved_ids
+            ]
+            ltr_supported_positive_count += len(supported_gold)
+            ltr_unsupported_positive_count += len(claims[claim_id].evidence_ids) - len(
+                supported_gold
+            )
+            if not supported_gold:
+                ltr_skipped_query_count += 1
+                continue
+            candidate_ids = [
+                *supported_gold,
+                *(str(row["evidence_id"]) for row in negatives),
+            ]
             for evidence_id in dict.fromkeys(candidate_ids):
                 text = text_by_id.get(evidence_id)
                 if text is None:
                     continue
                 bm25_row = bm25_by_id.get(evidence_id)
                 dense_row = dense_by_id.get(evidence_id)
+                rrf_row = rrf_by_id.get(evidence_id)
                 feature_rows.append(
                     {
                         "query_id": claim_id,
@@ -310,6 +429,8 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
                             bm25_rank=bm25_row.rank if bm25_row else None,
                             dense_score=dense_row.score if dense_row else 0.0,
                             dense_rank=dense_row.rank if dense_row else None,
+                            rrf_score=rrf_row.score if rrf_row else 0.0,
+                            rrf_rank=rrf_row.rank if rrf_row else None,
                         ),
                     }
                 )
@@ -324,12 +445,17 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         "missing_rankings_count": missing_rankings,
         "hard_negative_count": len(rows),
         "ltr_feature_count": len(feature_rows),
+        "ltr_query_group_count": len({str(row["query_id"]) for row in feature_rows}),
+        "ltr_supported_positive_count": ltr_supported_positive_count,
+        "ltr_unsupported_positive_count": ltr_unsupported_positive_count,
+        "ltr_skipped_query_count": ltr_skipped_query_count,
     }
     write_run_artifacts(
         output_dir,
         command="mine-negatives",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[
             args.claims,
             *([args.rankings] if args.rankings else []),
@@ -337,6 +463,11 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             *([Path(args.dense_index) / "dense_index.json"] if args.dense_index else []),
         ],
         predictions=rows,
+        notes=[
+            "LTR positives are restricted to the live BM25/dense candidate pool; unretrieved gold rows are never injected with zero retrieval features.",
+            "Queries with no candidate-supported positive are excluded from LTR training and counted in metrics.",
+            "Training rows record the same RRF score/rank prior used by five-stage inference.",
+        ],
         repository=_repository(),
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
@@ -357,6 +488,7 @@ def _pairwise_accuracy(scores: np.ndarray, labels: np.ndarray, groups: list[str]
 
 def command_train_fusion(args: argparse.Namespace) -> int:
     _required(args, "features", "output_dir")
+    started_at = _started_at_utc()
     rows = list(read_jsonl(args.features))
     if not rows:
         raise ValueError("feature file is empty")
@@ -399,6 +531,7 @@ def command_train_fusion(args: argparse.Namespace) -> int:
         command="train-fusion",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[args.features],
         notes=[
             "Training pairwise accuracy is a diagnostic, not held-out ranking quality.",
@@ -412,6 +545,7 @@ def command_train_fusion(args: argparse.Namespace) -> int:
 
 def command_evaluate(args: argparse.Namespace) -> int:
     _required(args, "claims", "output_dir")
+    started_at = _started_at_utc()
     if args.experiment_config:
         metrics, rows = run_five_stage_benchmark(
             claims_path=args.claims,
@@ -425,10 +559,12 @@ def command_evaluate(args: argparse.Namespace) -> int:
             command="evaluate-five-stage",
             arguments=_recorded_arguments(args),
             metrics=metrics,
+            started_at=started_at,
             inputs=[args.claims, args.experiment_config],
             predictions=rows,
             notes=[
-                "All five systems use the same claims and final_k.",
+                "All configured systems use the same claims and final_k.",
+                "The reranker base stage is recorded; RRF and LTR candidates are not interchangeable.",
                 "The configured reranker name is recorded; deterministic fallback results must not be described as Qwen3.",
             ],
             repository=_repository(),
@@ -458,6 +594,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
         command="evaluate",
         arguments=_recorded_arguments(args),
         metrics=metrics,
+        started_at=started_at,
         inputs=[
             args.claims,
             args.predictions,
@@ -514,11 +651,39 @@ def build_parser() -> argparse.ArgumentParser:
     )
     index.add_argument("--ann", choices=("numpy", "flat", "hnsw", "ivfpq"), default="numpy")
     index.add_argument("--hnsw-m", type=int, default=32)
+    index.add_argument("--hnsw-ef-construction", type=int, default=200)
     index.add_argument("--nlist", type=int, default=256)
     index.add_argument("--pq-m", type=int, default=32)
     index.add_argument("--nbits", type=int, default=8)
     index.add_argument("--nprobe", type=int, default=16)
+    index.add_argument("--ivf-train-size", type=int, default=200000)
+    index.add_argument("--seed", type=int, default=17)
     index.set_defaults(handler=command_index)
+
+    ann_benchmark = subparsers.add_parser(
+        "benchmark-ann", help="compare FAISS ANN recall/throughput against FlatIP"
+    )
+    ann_benchmark.add_argument("--config")
+    ann_benchmark.add_argument("--claims")
+    ann_benchmark.add_argument(
+        "--index", action="append", help="repeat name=/path/index.faiss; flat is required"
+    )
+    ann_benchmark.add_argument(
+        "--index-manifest", action="append", help="repeat name=/path/run_manifest.json"
+    )
+    ann_benchmark.add_argument("--model", default="Qwen/Qwen3-Embedding-0.6B")
+    ann_benchmark.add_argument("--query-prefix", default="")
+    ann_benchmark.add_argument("--query-prompt-name")
+    ann_benchmark.add_argument("--device")
+    ann_benchmark.add_argument("--batch-size", type=int, default=32)
+    ann_benchmark.add_argument("--ks", default="5,10,50")
+    ann_benchmark.add_argument("--repeats", type=int, default=3)
+    ann_benchmark.add_argument("--latency-sample-size", type=int, default=32)
+    ann_benchmark.add_argument("--faiss-threads", type=int)
+    ann_benchmark.add_argument("--hnsw-ef-search", type=int, default=64)
+    ann_benchmark.add_argument("--ivf-nprobe", type=int, default=32)
+    ann_benchmark.add_argument("--output-dir")
+    ann_benchmark.set_defaults(handler=command_benchmark_ann)
 
     negatives = subparsers.add_parser("mine-negatives", help="mine high-ranked non-gold evidence")
     negatives.add_argument("--config")
@@ -528,6 +693,7 @@ def build_parser() -> argparse.ArgumentParser:
     negatives.add_argument("--dense-index")
     negatives.add_argument("--device")
     negatives.add_argument("--recall-k", type=int, default=1000)
+    negatives.add_argument("--rrf-k", type=int, default=60)
     negatives.add_argument("--output-dir")
     negatives.add_argument("--limit", type=int, default=20)
     negatives.set_defaults(handler=command_mine_negatives)

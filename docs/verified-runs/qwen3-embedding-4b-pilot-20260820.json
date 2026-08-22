@@ -1,0 +1,47 @@
+{
+  "scope": "evidence-preserving 5000-document, eight-claim dense encoder resource screen; not full-corpus effectiveness evidence",
+  "job_id": "29458425",
+  "git_sha": "ced5e32098b6a2b5a524b6d9313c1eeb1ac8a9fd",
+  "slurm": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 856,
+    "max_rss_kib": 27017012,
+    "gpu_shape": "one A100 1g.20gb MIG slice"
+  },
+  "sample": {
+    "source_documents": 1208827,
+    "sample_documents": 5000,
+    "claims": 8,
+    "required_gold_evidence_rows": 27,
+    "output_dimension": 1024
+  },
+  "baseline_0_6b": {
+    "recall_at_5": 0.95,
+    "mrr_at_10": 1.0,
+    "ndcg_at_10": 0.9634018618984627,
+    "evidence_f1": 0.12498401011164607,
+    "document_encode_docs_per_second": 50.94805890912912,
+    "peak_torch_gpu_bytes": 3174171136
+  },
+  "candidate_4b": {
+    "recall_at_5": 0.925,
+    "mrr_at_10": 1.0,
+    "ndcg_at_10": 0.9665867711411182,
+    "evidence_f1": 0.12498401011164607,
+    "document_encode_docs_per_second": 7.205045175853835,
+    "peak_torch_gpu_bytes": 17415023104
+  },
+  "paired_recall_at_5_difference": {
+    "mean": -0.025,
+    "ci_lower": -0.075,
+    "ci_upper": 0.0,
+    "bootstrap_samples": 500
+  },
+  "decision": "Retain the 0.6B full-corpus latency-profile encoder; the sampled gate does not justify a full 4B rebuild.",
+  "boundaries": [
+    "The sampler retains every gold-evidence row for the evaluated claims but is not the full 1,208,827-document corpus.",
+    "Only eight claims are evaluated, so this is a resource-selection screen rather than an independent quality claim.",
+    "Restricted inputs, predictions, embeddings and model caches remain on Spartan."
+  ]
+}

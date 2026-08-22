@@ -74,6 +74,8 @@ class SentenceTransformerEncoder:
         query_prefix: str = "",
         query_prompt_name: str | None = None,
         device: str | None = None,
+        truncate_dim: int | None = None,
+        adapter_path: str | None = None,
     ) -> None:
         try:
             ensure_torch_pytree_compat()
@@ -88,7 +90,44 @@ class SentenceTransformerEncoder:
         self.query_prompt_name = query_prompt_name or (
             "query" if "Qwen3-Embedding" in model_name and not query_prefix else None
         )
-        self._model = SentenceTransformer(model_name, device=device)
+        if truncate_dim is not None and truncate_dim <= 0:
+            raise ValueError("truncate_dim must be positive")
+        self._model = SentenceTransformer(
+            model_name,
+            device=device,
+            truncate_dim=truncate_dim,
+        )
+        self.adapter_path = adapter_path
+        self.adapter_parameter_count = 0
+        if adapter_path:
+            try:
+                from peft import PeftModel
+            except ImportError as exc:
+                raise RuntimeError("peft is required to load a dense encoder adapter") from exc
+            transformer_module = self._model[0]
+            auto_model = getattr(transformer_module, "auto_model", None)
+            if auto_model is None:
+                raise RuntimeError(
+                    "the first SentenceTransformer module does not expose auto_model"
+                )
+            # ms-swift trains Qwen3-Embedding through Qwen3ForCausalLM, whose
+            # adapter keys contain an extra `model.` level. SentenceTransformers
+            # serves the bare Qwen3Model. PEFT applies this mapping after
+            # stripping its own base_model.model prefix, so both structures
+            # resolve to the same `layers.*` modules without rewriting the
+            # source checkpoint.
+            transformer_module.auto_model = PeftModel.from_pretrained(
+                auto_model,
+                adapter_path,
+                key_mapping={r"^model\.": ""},
+            )
+            self.adapter_parameter_count = sum(
+                parameter.numel()
+                for name, parameter in transformer_module.auto_model.named_parameters()
+                if "lora_" in name
+            )
+            if self.adapter_parameter_count <= 0:
+                raise RuntimeError("adapter loaded without any LoRA parameters")
         self.dimension = int(self._model.get_sentence_embedding_dimension())
 
     def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray:
@@ -148,7 +187,7 @@ class NumpyFlatIndex:
         np.save(path, self.vectors)
 
     @classmethod
-    def load(cls, path: str | Path) -> "NumpyFlatIndex":
+    def load(cls, path: str | Path) -> NumpyFlatIndex:
         index = cls()
         index.vectors = np.load(path, mmap_mode="r")
         return index
@@ -165,6 +204,7 @@ class FaissANNIndex:
         *,
         kind: str = "flat",
         hnsw_m: int = 32,
+        hnsw_ef_construction: int = 200,
         nlist: int = 256,
         pq_m: int = 32,
         nbits: int = 8,
@@ -182,6 +222,7 @@ class FaissANNIndex:
         self.kind = kind
         self.parameters = {
             "hnsw_m": int(hnsw_m),
+            "hnsw_ef_construction": int(hnsw_ef_construction),
             "nlist": int(nlist),
             "pq_m": int(pq_m),
             "nbits": int(nbits),
@@ -191,6 +232,7 @@ class FaissANNIndex:
             self.index = faiss.IndexFlatIP(dimension)
         elif kind == "hnsw":
             self.index = faiss.IndexHNSWFlat(dimension, hnsw_m, faiss.METRIC_INNER_PRODUCT)
+            self.index.hnsw.efConstruction = hnsw_ef_construction
         else:
             quantizer = faiss.IndexFlatIP(dimension)
             self.index = faiss.IndexIVFPQ(
@@ -222,7 +264,7 @@ class FaissANNIndex:
         faiss.write_index(self.index, str(path))
 
     @classmethod
-    def load(cls, path: str | Path, metadata: dict[str, object]) -> "FaissANNIndex":
+    def load(cls, path: str | Path, metadata: dict[str, object]) -> FaissANNIndex:
         import faiss
 
         instance = cls.__new__(cls)
@@ -242,21 +284,28 @@ class DenseRetriever:
         self.doc_ids: list[str] = []
         self.texts: list[str] = []
 
-    def fit(self, documents: Sequence[EvidenceDocument], batch_size: int = 32) -> "DenseRetriever":
+    def fit(self, documents: Sequence[EvidenceDocument], batch_size: int = 32) -> DenseRetriever:
         texts = [document.text for document in documents]
         vectors = self.encoder.encode_documents(texts, batch_size=batch_size)
         return self.fit_vectors(documents, vectors)
 
     def fit_vectors(
-        self, documents: Sequence[EvidenceDocument], vectors: np.ndarray
-    ) -> "DenseRetriever":
+        self,
+        documents: Sequence[EvidenceDocument],
+        vectors: np.ndarray,
+        *,
+        training_vectors: np.ndarray | None = None,
+    ) -> DenseRetriever:
         self.doc_ids = [document.evidence_id for document in documents]
         if len(set(self.doc_ids)) != len(self.doc_ids):
             raise ValueError("duplicate evidence ids are not allowed")
         self.texts = [document.text for document in documents]
         if len(vectors) != len(documents):
             raise ValueError("embedding row count does not match document count")
-        self.backend.build(vectors)
+        if isinstance(self.backend, FaissANNIndex):
+            self.backend.build(vectors, training_vectors=training_vectors)
+        else:
+            self.backend.build(vectors)
         return self
 
     def search(self, query: str, top_k: int = 10) -> list[RankedDocument]:
@@ -293,6 +342,7 @@ class DenseRetriever:
         if isinstance(self.encoder, SentenceTransformerEncoder):
             encoder_spec["query_prefix"] = self.encoder.query_prefix
             encoder_spec["query_prompt_name"] = self.encoder.query_prompt_name
+            encoder_spec["adapter_path"] = self.encoder.adapter_path
         backend_spec: dict[str, object] = {"type": backend_type}
         if isinstance(self.backend, FaissANNIndex):
             backend_spec.update(
@@ -315,7 +365,7 @@ class DenseRetriever:
         )
 
     @classmethod
-    def load(cls, directory: str | Path, *, device: str | None = None) -> "DenseRetriever":
+    def load(cls, directory: str | Path, *, device: str | None = None) -> DenseRetriever:
         target = Path(directory)
         spec = json.loads((target / "dense_index.json").read_text(encoding="utf-8"))
         encoder_spec = spec["encoder"]
@@ -327,6 +377,7 @@ class DenseRetriever:
                 query_prefix=str(encoder_spec.get("query_prefix", "")),
                 query_prompt_name=encoder_spec.get("query_prompt_name"),
                 device=device,
+                adapter_path=encoder_spec.get("adapter_path"),
             )
         backend_spec = spec["backend"]
         index_path = target / spec["index_file"]

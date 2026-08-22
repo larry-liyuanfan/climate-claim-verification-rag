@@ -12,12 +12,79 @@ from .models import RankedDocument
 from .torch_compat import ensure_torch_pytree_compat
 
 
+def _resolve_torch_dtype(torch_module: object, value: str) -> object:
+    normalised = value.strip().lower()
+    if normalised == "auto":
+        return "auto"
+    aliases = {"bf16": "bfloat16", "fp16": "float16", "fp32": "float32"}
+    attribute = aliases.get(normalised, normalised)
+    if attribute not in {"bfloat16", "float16", "float32"}:
+        raise ValueError("dtype must be auto, bfloat16/bf16, float16/fp16, or float32/fp32")
+    return getattr(torch_module, attribute)
+
+
 class Reranker(Protocol):
     name: str
 
     def rerank(
         self, query: str, candidates: Sequence[RankedDocument], top_k: int
     ) -> list[RankedDocument]: ...
+
+
+def weighted_rank_fuse(
+    base: Sequence[RankedDocument],
+    reranked: Sequence[RankedDocument],
+    top_k: int,
+    *,
+    k: int = 60,
+    base_weight: float = 1.0,
+    reranker_weight: float = 1.0,
+) -> list[RankedDocument]:
+    """Fuse first-stage and cross-encoder ranks without mixing score scales."""
+
+    if top_k <= 0:
+        return []
+    if k < 0:
+        raise ValueError("rank-fusion k must be non-negative")
+    if base_weight < 0 or reranker_weight < 0:
+        raise ValueError("rank-fusion weights must be non-negative")
+    if base_weight == 0 and reranker_weight == 0:
+        raise ValueError("at least one rank-fusion weight must be positive")
+
+    base_by_id = {row.evidence_id: row for row in base}
+    reranked_by_id = {row.evidence_id: row for row in reranked}
+    evidence_ids = sorted(base_by_id.keys() | reranked_by_id.keys())
+    rows: list[tuple[float, RankedDocument]] = []
+    for evidence_id in evidence_ids:
+        base_row = base_by_id.get(evidence_id)
+        reranked_row = reranked_by_id.get(evidence_id)
+        score = 0.0
+        if base_row is not None:
+            score += base_weight / (k + base_row.rank)
+        if reranked_row is not None:
+            score += reranker_weight / (k + reranked_row.rank)
+        source_row = reranked_row or base_row
+        assert source_row is not None
+        rows.append((score, source_row))
+    rows.sort(key=lambda item: (-item[0], item[1].evidence_id))
+    return [
+        RankedDocument(
+            evidence_id=row.evidence_id,
+            text=row.text,
+            score=float(score),
+            rank=rank,
+            source="weighted-rank-fusion",
+            features={
+                "base_rank": float(base_by_id[row.evidence_id].rank)
+                if row.evidence_id in base_by_id
+                else 0.0,
+                "reranker_rank": float(reranked_by_id[row.evidence_id].rank)
+                if row.evidence_id in reranked_by_id
+                else 0.0,
+            },
+        )
+        for rank, (score, row) in enumerate(rows[:top_k], start=1)
+    ]
 
 
 class DeterministicFeatureReranker:
@@ -61,6 +128,7 @@ class Qwen3CausalLMReranker:
         *,
         max_length: int = 8192,
         batch_size: int = 8,
+        dtype: str = "auto",
         instruction: str = "Given a climate claim, retrieve evidence that helps verify the claim",
     ) -> None:
         try:
@@ -73,9 +141,13 @@ class Qwen3CausalLMReranker:
         self._torch = torch
         self.max_length = max_length
         self.batch_size = batch_size
+        self.dtype = dtype
         self.instruction = instruction
         self._tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
-        self._model = AutoModelForCausalLM.from_pretrained(model_name).eval()
+        self._model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=_resolve_torch_dtype(torch, dtype),
+        ).eval()
         if device:
             self._model.to(device)
         self._false_token_id = self._tokenizer.convert_tokens_to_ids("no")
@@ -109,9 +181,7 @@ class Qwen3CausalLMReranker:
             encoded["input_ids"] = [
                 self._prefix_tokens + row + self._suffix_tokens for row in encoded["input_ids"]
             ]
-            batch = self._tokenizer.pad(
-                encoded, padding=True, return_tensors="pt", max_length=self.max_length
-            )
+            batch = self._tokenizer.pad(encoded, padding=True, return_tensors="pt")
             batch = {key: tensor.to(self._model.device) for key, tensor in batch.items()}
             with self._torch.inference_mode():
                 logits = self._model(**batch).logits[:, -1, :]

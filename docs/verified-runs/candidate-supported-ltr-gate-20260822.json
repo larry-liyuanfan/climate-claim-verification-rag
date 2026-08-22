@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "status": "verified-negative-dev-gate",
+  "job": {
+    "id": "29484697",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:12:42",
+    "total_cpu": "03:46:02",
+    "max_rss_kib": 12033264,
+    "allocated_cpus": 32
+  },
+  "git_sha": "023ed9b31f08ee4525e2c4638fb457819b98dfeb",
+  "split": {
+    "train_claims": 1228,
+    "training_query_groups": 1169,
+    "training_rows": 26626,
+    "supported_positive_rows": 3246,
+    "unsupported_positive_rows": 876,
+    "skipped_queries_without_supported_positive": 59,
+    "dev_claims": 154,
+    "dev_claims_sha256": "ea9976e861095c5856a13773d15cf149c9b961d4afaf36be2e8b22d2e1ec1fe4",
+    "final_k": 5,
+    "paired_bootstrap_samples": 5000
+  },
+  "model": {
+    "algorithm": "lightgbm_lambdamart",
+    "training_pairwise_accuracy": 0.9529112754158965,
+    "training_feature_limit_per_query": 20,
+    "serving_fusion_candidates_per_query": 100
+  },
+  "systems": {
+    "bm25": {
+      "recall_at_5": 0.17207792207792208,
+      "mrr_at_10": 0.2512987012987013,
+      "ndcg_at_10": 0.16438803950056435,
+      "evidence_f1": 0.11683158111729541
+    },
+    "rrf": {
+      "recall_at_5": 0.2708874458874459,
+      "mrr_at_10": 0.34458874458874456,
+      "ndcg_at_10": 0.2494881908130123,
+      "evidence_f1": 0.17845804988662134
+    },
+    "candidate_supported_lambdamart": {
+      "recall_at_5": 0.0074675324675324666,
+      "mrr_at_10": 0.011255411255411256,
+      "ndcg_at_10": 0.006025704528548651,
+      "evidence_f1": 0.005895691609977325,
+      "paired_recall_at_5_delta_vs_bm25_95_interval": [
+        -0.2087689393939394,
+        -0.12218614718614719
+      ],
+      "paired_evidence_f1_delta_vs_bm25_95_interval": [
+        -0.13871521335807052,
+        -0.08390512265512268
+      ]
+    },
+    "deterministic_feature_reranker_after_ltr": {
+      "recall_at_5": 0.014285714285714284,
+      "mrr_at_10": 0.027056277056277053,
+      "ndcg_at_10": 0.013058862153924223,
+      "evidence_f1": 0.012533498247783964,
+      "boundary": "This is deterministic-feature-fallback, not Qwen3."
+    }
+  },
+  "artifact_hashes": {
+    "ltr_data_manifest_sha256": "7ec56fc603f6d9291fc0b4e94f88451ccb5fd20f88a1affdc38fec8f20558e56",
+    "ltr_data_metrics_sha256": "76985f3346511abc98e68b1c3027ebad867bdb729970d0c8f280d04427059add",
+    "model_sha256": "2a3a31843615d5a513ee89e14cb9063d483837e21de071e727fd35c6797c64b8",
+    "model_metadata_sha256": "08c51c46085d670e06ebb9912fd7cfb8ec135e0221f04d017dd77f68835526bd",
+    "evaluation_manifest_sha256": "7669012011be9ebcc22466f70eb81aaef850f716844fde46704db3d3c062d71b",
+    "evaluation_metrics_sha256": "a72c088ae611f3a5fb790629eb1e77f6c534fd852fcdec4665f9719fedba7222"
+  },
+  "decision": {
+    "selected": false,
+    "reason": "Candidate-supported labels fixed the legacy reachability defect but did not generalise. High training pairwise accuracy and severe dev collapse reject this model.",
+    "next_gate": "Commit b47e437 adds the serving RRF prior, matches training negatives to the 100-candidate serving width and evaluates a predeclared 4:1 RRF/LambdaMART rank fusion in job 29504398. No result is claimed while that job is pending."
+  },
+  "privacy": "Restricted rows, predictions, model and large artifacts remain on Spartan."
+}

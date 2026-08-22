@@ -21,7 +21,7 @@ dense = [
   "faiss-cpu>=1.8; python_version < '3.13'",
   "sentence-transformers>=3.0",
 ]
-ltr = ["lightgbm>=4.3"]
+ltr = ["lightgbm>=4.3", "scikit-learn>=1.4"]
 serve = ["fastapi>=0.110", "uvicorn>=0.29"]
 yaml = ["PyYAML>=6.0"]
 test = ["pytest>=8.0", "httpx>=0.27"]

@@ -1,0 +1,94 @@
+{
+  "scope": "154 untouched official-dev claims over the complete 1,208,827-document restricted evidence corpus",
+  "evidence_status": "verified-offline-dev-promotion-gate",
+  "slurm_job_id": "29465819",
+  "git_sha": "c81507084f3b5355c29b0ed0351dc85672a0c619",
+  "encoder": "Qwen/Qwen3-Embedding-0.6B",
+  "adapter": {
+    "method": "claim-grouped hard-negative InfoNCE LoRA",
+    "training_steps": 20,
+    "injected_parameters": 5046272,
+    "adapter_model_sha256": "954bc2c8cd55e55473865ebc3b1d0dc8bfe976ba2d3d929e1cae6364e8d16256"
+  },
+  "evaluation": {
+    "claim_count": 154,
+    "required_evidence_count": 463,
+    "document_count": 1208827,
+    "dimension": 1024,
+    "top_k": 50,
+    "bootstrap_samples": 5000,
+    "base": {
+      "recall_at_5": 0.2793290043290043,
+      "mrr_at_10": 0.363334879406308,
+      "ndcg_at_10": 0.29935610681604946,
+      "evidence_f1": 0.07253380128468413
+    },
+    "adapted": {
+      "recall_at_5": 0.296969696969697,
+      "mrr_at_10": 0.386909915481344,
+      "ndcg_at_10": 0.32034088808620914,
+      "evidence_f1": 0.07544387080760807,
+      "document_encode_seconds": 2888.477196684107,
+      "document_encode_qps": 418.4997552993322,
+      "flat_build_seconds": 1.8646692214533687,
+      "flat_search_seconds": 14.403536768630147,
+      "saved_index_bytes": 0
+    },
+    "adapted_vs_base": {
+      "recall_at_5": {
+        "mean_difference": 0.01764069264069264,
+        "ci_95": [0.0014042207792207902, 0.03495670995670996],
+        "two_sided_p": 0.0328
+      },
+      "mrr_at_10": {
+        "mean_difference": 0.023575036075036075,
+        "ci_95": [0.00601022984951557, 0.043159206864563995],
+        "two_sided_p": 0.0056
+      },
+      "ndcg_at_10": {
+        "mean_difference": 0.02098478127015965,
+        "ci_95": [0.008967312825895165, 0.0340858398039069],
+        "two_sided_p": 0.0
+      },
+      "evidence_f1": {
+        "mean_difference": 0.002910069522923927,
+        "ci_95": [0.001199135752157647, 0.004821917218496775],
+        "two_sided_p": 0.0004
+      }
+    }
+  },
+  "promotion_decision": {
+    "candidate_passes_full_corpus_gate": true,
+    "primary_recall_ci_positive": true,
+    "secondary_mean_non_regression": true,
+    "decision": "promote_adapter_as_offline_retrieval_candidate"
+  },
+  "runtime": {
+    "slurm_state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:49:37",
+    "allocation": "1x L40S, 8 CPU, 64 GB",
+    "gpu_wall_hours": 0.826944444444444,
+    "slurm_max_rss_kib": 22890736,
+    "peak_torch_gpu_bytes": 25243138560,
+    "total_cpu": "54:05.762"
+  },
+  "input_hashes": {
+    "dev_claims_sha256": "ea9976e861095c5856a13773d15cf149c9b961d4afaf36be2e8b22d2e1ec1fe4",
+    "evidence_sha256": "73cd238e235ce0c89547b5587ca0e31e0d723c74afba6af611a8f9e5b944781f",
+    "base_flat_index_sha256": "22c788b1ebcd4e2bcbbe1063a61a60260511a9b714028cd652982fd4e5dc6a56"
+  },
+  "public_artifact_boundary": {
+    "metrics_bytes": 4063,
+    "predictions_bytes": 1084213,
+    "report_bytes": 4274,
+    "saved_adapted_index_bytes": 0,
+    "restricted_predictions_redistributed": false,
+    "restricted_corpus_redistributed": false
+  },
+  "boundaries": [
+    "This is an offline official-dev promotion gate, not an independent test-set result or online A/B test.",
+    "The first attempt failed only while persisting a rebuildable 4.95 GB adapted FlatIP index; commit c815070 made index persistence opt-in and the successful replacement saved zero index bytes.",
+    "Large artifacts, restricted corpus data, raw predictions and the private adapter checkpoint remain on Spartan."
+  ]
+}

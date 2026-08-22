@@ -1,0 +1,67 @@
+{
+  "status": "verified-fixed-dev-retrieval-gate",
+  "slurm_job_id": "29435589",
+  "git_sha": "636e9159a14a59248ce8c4e93c396370c4af508e",
+  "scope": "154 restricted official-dev claims; final_k=5; 5000 paired-bootstrap samples; retrieval only",
+  "reranker": "deterministic-feature-fallback",
+  "systems": {
+    "bm25": {
+      "recall_at_5": 0.17207792207792208,
+      "mrr_at_10": 0.2512987012987013,
+      "ndcg_at_10": 0.16438803950056435,
+      "evidence_f1": 0.11683158111729541
+    },
+    "dense": {
+      "recall_at_5": 0.2695887445887446,
+      "mrr_at_10": 0.3308441558441559,
+      "ndcg_at_10": 0.24871270761036415,
+      "evidence_f1": 0.17677283034425892
+    },
+    "rrf": {
+      "recall_at_5": 0.2708874458874459,
+      "mrr_at_10": 0.34458874458874456,
+      "ndcg_at_10": 0.2494881908130123,
+      "evidence_f1": 0.17845804988662134
+    },
+    "lambdamart": {
+      "recall_at_5": 0.002922077922077922,
+      "mrr_at_10": 0.006493506493506494,
+      "ndcg_at_10": 0.002988887360228945,
+      "evidence_f1": 0.002741702741702742
+    },
+    "lambdamart_plus_deterministic_fallback": {
+      "recall_at_5": 0.012662337662337661,
+      "mrr_at_10": 0.03593073593073593,
+      "ndcg_at_10": 0.014873903878044714,
+      "evidence_f1": 0.01109049680478252
+    }
+  },
+  "rrf_vs_bm25": {
+    "recall_at_5_delta": 0.0988095238095238,
+    "recall_at_5_95_interval": [0.0543235930735931, 0.14523809523809525],
+    "evidence_f1_delta": 0.06162646876932591,
+    "evidence_f1_95_interval": [0.03597673160173163, 0.08932694289837147]
+  },
+  "decision": "Retain dense plus RRF. Reject this LambdaMART checkpoint and deterministic fallback because both regress sharply on the same fixed dev claims.",
+  "slurm": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 102,
+    "allocated_cpus": 32,
+    "batch_max_rss_kib": 11596892
+  },
+  "input_hashes": {
+    "dev_claims_sha256": "ea9976e861095c5856a13773d15cf149c9b961d4afaf36be2e8b22d2e1ec1fe4",
+    "config_sha256": "8ae39fb23113d4766d0588e93f50c95eee95dbf59866ebec6dae114854bc247a"
+  },
+  "artifact_hashes": {
+    "metrics_sha256": "b6f5968a2f2dafca5a1fca2d629b6f9431278049572990a1bc0d4c6c4ba73eb8",
+    "manifest_sha256": "135ef6e63df71541cec0ec133277698c4822823e2ad608b2db43bb0c08ab66e7"
+  },
+  "boundaries": [
+    "The restricted claims, evidence, predictions and large artifacts remain on Spartan.",
+    "The deterministic fallback is not Qwen3 and must not be described as a neural reranker result.",
+    "Because final_k is 5, Recall@10 and Recall@50 are not presented as wider-cutoff results.",
+    "Claim classification was not configured; zero accuracy and harmonic-mean fields are not classifier findings."
+  ]
+}

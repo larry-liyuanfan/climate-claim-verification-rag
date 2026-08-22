@@ -73,6 +73,7 @@ def write_run_artifacts(
     command: str,
     arguments: Mapping[str, Any],
     metrics: Mapping[str, Any],
+    started_at: str | None = None,
     inputs: Sequence[str | Path] = (),
     predictions: Sequence[Mapping[str, Any]] = (),
     error_cases: Sequence[Mapping[str, Any]] = (),
@@ -85,6 +86,7 @@ def write_run_artifacts(
         command=command,
         arguments=arguments,
         inputs=inputs,
+        started_at=started_at,
         repository=repository,
     )
     write_json(target / "run_manifest.json", manifest)
