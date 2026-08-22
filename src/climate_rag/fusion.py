@@ -19,6 +19,8 @@ DEFAULT_FEATURES = (
     "bm25_reciprocal_rank",
     "dense_score",
     "dense_reciprocal_rank",
+    "rrf_score",
+    "rrf_reciprocal_rank",
     "token_overlap",
     "number_overlap",
     "year_overlap",
@@ -80,6 +82,8 @@ def build_candidate_features(
     bm25_rank: int | None = None,
     dense_score: float = 0.0,
     dense_rank: int | None = None,
+    rrf_score: float = 0.0,
+    rrf_rank: int | None = None,
 ) -> dict[str, float]:
     query_tokens = set(climate_tokenize(query))
     document_tokens = set(climate_tokenize(document))
@@ -88,6 +92,8 @@ def build_candidate_features(
         "bm25_reciprocal_rank": 0.0 if not bm25_rank else 1.0 / bm25_rank,
         "dense_score": float(dense_score),
         "dense_reciprocal_rank": 0.0 if not dense_rank else 1.0 / dense_rank,
+        "rrf_score": float(rrf_score),
+        "rrf_reciprocal_rank": 0.0 if not rrf_rank else 1.0 / rrf_rank,
         "token_overlap": overlap_ratio(query_tokens, document_tokens),
         "number_overlap": overlap_ratio(_numbers(query), _numbers(document)),
         "year_overlap": overlap_ratio(_years(query), _years(document)),

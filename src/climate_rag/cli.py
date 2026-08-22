@@ -28,6 +28,7 @@ from .fusion import (
     LightGBMLambdaMART,
     LinearPairwiseLTR,
     build_candidate_features,
+    reciprocal_rank_fusion,
     train_ranker,
 )
 from .io import (
@@ -388,6 +389,10 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             assert bm25_index is not None
             bm25_by_id = {row.evidence_id: row for row in rankings[claim_id]["bm25"]}
             dense_by_id = {row.evidence_id: row for row in rankings[claim_id]["dense"]}
+            rrf_by_id = {
+                row.evidence_id: row
+                for row in reciprocal_rank_fusion(rankings[claim_id], k=args.rrf_k)
+            }
             retrieved_ids = bm25_by_id.keys() | dense_by_id.keys()
             supported_gold = [
                 evidence_id
@@ -411,6 +416,7 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
                     continue
                 bm25_row = bm25_by_id.get(evidence_id)
                 dense_row = dense_by_id.get(evidence_id)
+                rrf_row = rrf_by_id.get(evidence_id)
                 feature_rows.append(
                     {
                         "query_id": claim_id,
@@ -423,6 +429,8 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
                             bm25_rank=bm25_row.rank if bm25_row else None,
                             dense_score=dense_row.score if dense_row else 0.0,
                             dense_rank=dense_row.rank if dense_row else None,
+                            rrf_score=rrf_row.score if rrf_row else 0.0,
+                            rrf_rank=rrf_row.rank if rrf_row else None,
                         ),
                     }
                 )
@@ -458,6 +466,7 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         notes=[
             "LTR positives are restricted to the live BM25/dense candidate pool; unretrieved gold rows are never injected with zero retrieval features.",
             "Queries with no candidate-supported positive are excluded from LTR training and counted in metrics.",
+            "Training rows record the same RRF score/rank prior used by five-stage inference.",
         ],
         repository=_repository(),
     )
@@ -684,6 +693,7 @@ def build_parser() -> argparse.ArgumentParser:
     negatives.add_argument("--dense-index")
     negatives.add_argument("--device")
     negatives.add_argument("--recall-k", type=int, default=1000)
+    negatives.add_argument("--rrf-k", type=int, default=60)
     negatives.add_argument("--output-dir")
     negatives.add_argument("--limit", type=int, default=20)
     negatives.set_defaults(handler=command_mine_negatives)

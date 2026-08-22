@@ -46,7 +46,8 @@ climate-rag mine-negatives \
   --dense-index "${ARTIFACT_DIR}/dense-hnsw/dense" \
   --device cpu \
   --recall-k 1000 \
-  --limit 20 \
+  --rrf-k 60 \
+  --limit 100 \
   --output-dir "${OUTPUT_ROOT}/ltr-data"
 
 climate-rag train-fusion \

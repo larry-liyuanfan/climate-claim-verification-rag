@@ -57,12 +57,14 @@ def _make_reranker(config: dict[str, Any]) -> Reranker:
     raise ValueError(f"unsupported reranker kind: {kind}")
 
 
-def _rerank_fusion_profiles(config: dict[str, Any]) -> list[dict[str, Any]]:
+def _weighted_rank_fusion_profiles(
+    config: dict[str, Any], *, label: str
+) -> list[dict[str, Any]]:
     if not bool(config.get("enabled", False)):
         return []
     kind = str(config.get("kind", "weighted-rank-fusion"))
     if kind != "weighted-rank-fusion":
-        raise ValueError("rerank_fusion.kind must be 'weighted-rank-fusion'")
+        raise ValueError(f"{label}.kind must be 'weighted-rank-fusion'")
     raw_profiles = config.get("profiles")
     if raw_profiles is None:
         raw_profiles = [
@@ -73,17 +75,17 @@ def _rerank_fusion_profiles(config: dict[str, Any]) -> list[dict[str, Any]]:
             }
         ]
     if not isinstance(raw_profiles, list) or not raw_profiles:
-        raise ValueError("rerank_fusion.profiles must be a non-empty list")
+        raise ValueError(f"{label}.profiles must be a non-empty list")
     profiles: list[dict[str, Any]] = []
     names: set[str] = set()
     for raw in raw_profiles:
         if not isinstance(raw, dict):
-            raise TypeError("each rerank fusion profile must be a mapping")
+            raise TypeError(f"each {label} profile must be a mapping")
         name = str(raw.get("name", "")).strip()
         if not re.fullmatch(r"[a-z0-9_]+", name):
-            raise ValueError("rerank fusion profile names must match [a-z0-9_]+")
+            raise ValueError(f"{label} profile names must match [a-z0-9_]+")
         if name in names:
-            raise ValueError(f"duplicate rerank fusion profile: {name}")
+            raise ValueError(f"duplicate {label} profile: {name}")
         names.add(name)
         profiles.append(
             {
@@ -120,6 +122,8 @@ def _rank_with_ltr(
                 bm25_rank=b_row.rank if b_row else None,
                 dense_score=d_row.score if d_row else 0.0,
                 dense_rank=d_row.rank if d_row else None,
+                rrf_score=candidate.score,
+                rrf_rank=candidate.rank,
             )
         )
     matrix = np.asarray(
@@ -185,10 +189,18 @@ def run_five_stage_benchmark(
         raise ValueError("rerank_source must be 'rrf' or 'ltr'")
     reranked_stage = f"{rerank_source}_reranker"
     fusion_config = config.get("rerank_fusion", {}) or {}
-    fusion_profiles = _rerank_fusion_profiles(fusion_config)
+    fusion_profiles = _weighted_rank_fusion_profiles(fusion_config, label="rerank_fusion")
     fused_stages = {
         profile["name"]: f"{reranked_stage}_fusion_{profile['name']}"
         for profile in fusion_profiles
+    }
+    ltr_fusion_config = config.get("ltr_fusion", {}) or {}
+    ltr_fusion_profiles = _weighted_rank_fusion_profiles(
+        ltr_fusion_config, label="ltr_fusion"
+    )
+    ltr_fused_stages = {
+        profile["name"]: f"rrf_ltr_fusion_{profile['name']}"
+        for profile in ltr_fusion_profiles
     }
     predictions: dict[str, dict[str, Prediction]] = {
         "bm25": {},
@@ -198,6 +210,8 @@ def run_five_stage_benchmark(
         reranked_stage: {},
     }
     for fused_stage in fused_stages.values():
+        predictions[fused_stage] = {}
+    for fused_stage in ltr_fused_stages.values():
         predictions[fused_stage] = {}
     rerank_durations: list[float] = []
     reranked_pair_count = 0
@@ -210,6 +224,17 @@ def run_five_stage_benchmark(
             {"bm25": bm25_rows, "dense": dense_rows}, k=int(config.get("rrf_k", 60)), top_k=fusion_k
         )
         ltr_rows = _rank_with_ltr(query, bm25_rows, dense_rows, rrf_rows, ranker)
+        ltr_fused_by_profile = {
+            profile["name"]: weighted_rank_fuse(
+                rrf_rows,
+                ltr_rows,
+                final_k,
+                k=profile["k"],
+                base_weight=profile["base_weight"],
+                reranker_weight=profile["reranker_weight"],
+            )
+            for profile in ltr_fusion_profiles
+        }
         rerank_candidates = rrf_rows if rerank_source == "rrf" else ltr_rows
         rerank_candidates = rerank_candidates[:rerank_k]
         rerank_started = time.perf_counter()
@@ -252,6 +277,8 @@ def run_five_stage_benchmark(
         }
         for profile_name, fused in fused_by_profile.items():
             stage_rows[fused_stages[profile_name]] = fused
+        for profile_name, fused in ltr_fused_by_profile.items():
+            stage_rows[ltr_fused_stages[profile_name]] = fused
         for stage, rows in stage_rows.items():
             predictions[stage][claim_id] = Prediction(
                 claim_id=claim_id,
@@ -302,6 +329,14 @@ def run_five_stage_benchmark(
             "profiles": [
                 {**profile, "stage": fused_stages[profile["name"]]}
                 for profile in fusion_profiles
+            ],
+        },
+        "ltr_fusion": {
+            "enabled": bool(ltr_fusion_profiles),
+            "kind": "weighted-rank-fusion" if ltr_fusion_profiles else None,
+            "profiles": [
+                {**profile, "stage": ltr_fused_stages[profile["name"]]}
+                for profile in ltr_fusion_profiles
             ],
         },
         "reranker_timing": {

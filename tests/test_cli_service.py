@@ -84,6 +84,7 @@ def test_cli_index_evaluate_negatives_and_ltr(tmp_path: Path) -> None:
         or row["features"]["dense_reciprocal_rank"] > 0
         for row in ltr_rows
     )
+    assert all(row["features"]["rrf_reciprocal_rank"] > 0 for row in ltr_rows)
     negative_metrics = json.loads((negatives_dir / "metrics.json").read_text(encoding="utf-8"))
     assert negative_metrics["ltr_query_group_count"] > 0
     assert negative_metrics["ltr_skipped_query_count"] == 0
@@ -153,6 +154,17 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
                         }
                     ],
                 },
+                "ltr_fusion": {
+                    "enabled": True,
+                    "k": 60,
+                    "profiles": [
+                        {
+                            "name": "base4",
+                            "base_weight": 4.0,
+                            "reranker_weight": 1.0,
+                        }
+                    ],
+                },
                 "reranker": {"kind": "deterministic"},
             }
         ),
@@ -180,12 +192,14 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
         "ltr",
         "rrf_reranker",
         "rrf_reranker_fusion_balanced",
+        "rrf_ltr_fusion_base4",
     }
     assert metrics["reranker"] == "deterministic-feature-fallback"
     assert metrics["reranker_base"] == "rrf"
     assert metrics["reranker_timing"]["query_count"] == metrics["claim_count"] == 2
     assert metrics["reranker_timing"]["candidate_pair_count"] > 0
     assert metrics["rerank_fusion"]["enabled"] is True
+    assert metrics["ltr_fusion"]["enabled"] is True
     assert (output_dir / "reranker_candidates.jsonl").exists()
 
 

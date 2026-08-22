@@ -12,6 +12,7 @@ from climate_rag.dense import (
 from climate_rag.fusion import (
     LightGBMLambdaMART,
     LinearPairwiseLTR,
+    build_candidate_features,
     reciprocal_rank_fusion,
 )
 from climate_rag.io import iter_evidence
@@ -53,6 +54,19 @@ def test_rrf_is_deterministic_and_deduplicates() -> None:
     rows = reciprocal_rank_fusion(rankings, k=60)
     assert [row.evidence_id for row in rows] == ["a", "b"]
     assert len({row.evidence_id for row in rows}) == 2
+
+
+def test_candidate_features_include_serving_rrf_prior() -> None:
+    features = build_candidate_features(
+        "warming since 1990",
+        "warming accelerated after 1990",
+        bm25_rank=2,
+        dense_rank=4,
+        rrf_score=0.031,
+        rrf_rank=3,
+    )
+    assert features["rrf_score"] == pytest.approx(0.031)
+    assert features["rrf_reciprocal_rank"] == pytest.approx(1 / 3)
 
 
 def test_weighted_rank_fuse_preserves_both_rank_signals() -> None:
