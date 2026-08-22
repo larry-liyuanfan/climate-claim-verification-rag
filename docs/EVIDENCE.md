@@ -7,7 +7,7 @@
 | Package and five required CLI commands | `verified` | editable install and CLI integration tests |
 | BM25, hash dense exact search, RRF, hard negatives | `verified` | deterministic unit tests |
 | Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA adaptation | `verified-offline-dev-promotion` | data job `29460405`, 20-step training `29462754`, injection preflight `29463845`, sampled screen `29463846`, full-corpus gate `29465819`; all 154 official-dev claims/1,208,827 documents; Recall@5 `0.2793→0.2970`, MRR `0.3633→0.3869`, nDCG `0.2994→0.3203`, F1 `0.07253→0.07544`; all 5,000-sample paired intervals positive; offline dev, not independent test/online A/B |
-| Pairwise LTR fallback and LightGBM persistence | `verified-code` | 47-test project environment; commit `636e915` fixes persisted LightGBM feature metadata; effectiveness requires a valid candidate-supported run |
+| Pairwise LTR fallback and LightGBM persistence | `verified-code` | 48-test project environment; commit `636e915` fixes persisted LightGBM feature metadata; effectiveness requires a valid candidate-supported run |
 | Qwen3 encoder and FAISS FlatIP adapter | `verified-build` | full 1,208,827-vector Spartan build plus fixed-dev effectiveness run completed |
 | FAISS HNSW/IVF-PQ | `verified` | jobs `29418470`/`29418595`; fixed 154-query FlatIP-grounded quality-speed comparison |
 | Retrieval/end-to-end metrics | `verified` | synthetic fixtures with exact expected values |
@@ -30,7 +30,7 @@
 | Legacy LightGBM LambdaMART fixed-dev result | `invalidated-training-set` | Recall@5 `0.0029`, but the training builder injected unretrieved gold evidence with zero retrieval features; retain only as failure forensics, not a model-quality result |
 | Legacy LTR + deterministic reranker result | `invalidated-upstream` | Recall@5 `0.0127`; downstream of the invalid legacy LTR candidates and explicitly not Qwen3 |
 | Candidate-supported LambdaMART correction | `verified-negative-dev-gate` | Job `29484697`, commit `023ed9b`: 1,169 train groups/26,626 rows and 3,246 reachable positives; training pairwise accuracy `0.9529`, but fixed-dev Recall@5/F1 collapsed to `0.0075/0.0059` versus RRF `0.2709/0.1785`; both paired intervals versus BM25 were below zero. This is a valid negative result, not the earlier invalidated training set |
-| RRF-prior, serving-width LTR correction | `queued/no-result` | Commit `b47e437` adds RRF score/rank to both training and inference, expands hard negatives from 20 to the serving width of 100, and predeclares a 4:1 RRF/LambdaMART rank-preserving fusion. Sole CPU job `29504398` is pending; no quality result is claimed |
+| RRF-prior, serving-width LTR correction | `verified-positive-ranking-only-dev-gate` | Job `29504398`, commit `b47e437`: 1,169 groups/120,146 rows; fixed 154-claim dev RRF→4:1 RRF/LambdaMART fusion MRR@10 `0.3446→0.3648` and nDCG@10 `0.2495→0.2605`, with 5,000-sample paired intervals `[+0.0032,+0.0390]` and `[+0.0012,+0.0228]`; Recall@5/F1 `0.2709/0.1785→0.2801/0.1824` but intervals cross zero; deterministic CPU feature scorer P95 `7.80 ms/query`; compact record `docs/verified-runs/rrf-prior-ltr-fusion-gate-20260822.json` | May describe a bounded recovery and low-latency rank-position profile. It does not beat the 4B reranker quality profile, is not Qwen3, and is not independent-test/online evidence |
 
 ## Historical Group 045 records
 

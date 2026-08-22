@@ -78,8 +78,12 @@ than reported as “LambdaMART failed”.
   pairwise accuracy (`0.9529`) therefore did not transfer.
 - Follow-up: commit `b47e437` records the serving RRF score/rank in training,
   expands hard negatives from 20 to the 100-candidate serving width and adds a
-  predeclared 4:1 rank-preserving RRF/LambdaMART fusion. Job `29504398` is the
-  only active CPU gate and has no result yet.
+  predeclared 4:1 rank-preserving RRF/LambdaMART fusion. CPU job `29504398`
+  completed 120,146 rows and recovered MRR@10/nDCG@10 from RRF
+  `0.3446/0.2495` to `0.3648/0.2605`, with paired intervals above zero. Its
+  Recall@5/F1 intervals crossed zero and absolute quality remained below the 4B
+  reranker fusion, so it is retained as a low-latency rank-position profile
+  rather than the main quality profile.
 - Hiring signal: training-serving consistency, label reachability audits and
   failure forensics in a learning-to-rank pipeline.
 

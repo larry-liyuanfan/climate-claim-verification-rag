@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "evidence_status": "verified-positive-ranking-only-dev-gate",
+  "job": {
+    "id": "29504398",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 1261,
+    "batch_max_rss_kib": 12143696,
+    "total_cpu": "02:58:06"
+  },
+  "code": {
+    "git_sha": "b47e43774eebd89afa13d45a6ba96b4a0e6b01b5",
+    "change": "record the serving RRF score/rank in training, expand candidate-supported negatives to the 100-document serving width, and evaluate a predeclared 4:1 RRF/LambdaMART rank fusion"
+  },
+  "data": {
+    "split": "official dev",
+    "claim_count": 154,
+    "claim_file_sha256": "ea9976e861095c5856a13773d15cf149c9b961d4afaf36be2e8b22d2e1ec1fe4",
+    "experiment_config_sha256": "a95d62054fc95525f813e7b319825b6e039712625053a31869619c8cf8d7d447",
+    "final_k": 5
+  },
+  "training": {
+    "algorithm": "lightgbm_lambdamart",
+    "query_group_count": 1169,
+    "training_row_count": 120146,
+    "positive_row_count": 3246,
+    "training_pairwise_accuracy": 0.9141466420209489,
+    "feature_file_sha256": "0e5ba19c6c42dcb27e6b7476c1a8103adbef5d4e70974649acde8c6d13582981"
+  },
+  "systems": {
+    "bm25": {"recall_at_5": 0.17207792207792208, "mrr_at_10": 0.2512987012987013, "ndcg_at_10": 0.16438803950056435, "evidence_f1": 0.11683158111729541},
+    "rrf": {"recall_at_5": 0.2708874458874459, "mrr_at_10": 0.34458874458874456, "ndcg_at_10": 0.2494881908130123, "evidence_f1": 0.17845804988662134},
+    "raw_ltr": {"recall_at_5": 0.10043290043290042, "mrr_at_10": 0.10216450216450215, "ndcg_at_10": 0.07785409892749393, "evidence_f1": 0.06693465264893837},
+    "rrf_ltr_fusion_base4": {"recall_at_5": 0.2800865800865801, "mrr_at_10": 0.36482683982683983, "ndcg_at_10": 0.2604513887807157, "evidence_f1": 0.1824263038548753}
+  },
+  "paired_bootstrap_fusion_vs_rrf": {
+    "samples": 5000,
+    "seed": 17,
+    "recall_at_5": {"mean_difference": 0.009199134199134198, "ci_95": [-0.0033549783549783555, 0.026839826839826837], "two_sided_p": 0.2132},
+    "mrr_at_10": {"mean_difference": 0.020238095238095236, "ci_95": [0.003246753246753247, 0.03896103896103896], "two_sided_p": 0.0152},
+    "ndcg_at_10": {"mean_difference": 0.010963197967703397, "ci_95": [0.001168884186397476, 0.022757785023117618], "two_sided_p": 0.028},
+    "evidence_f1": {"mean_difference": 0.003968253968253969, "ci_95": [-0.004040404040404041, 0.013059163059163059], "two_sided_p": 0.358}
+  },
+  "cpu_reranker_timing": {
+    "query_count": 154,
+    "candidate_pair_count": 7700,
+    "p50_seconds_per_query": 0.005344285164028406,
+    "p95_seconds_per_query": 0.007799952337518334,
+    "total_seconds": 0.8556146463379264
+  },
+  "artifact_sha256": {
+    "spartan_five_stage_metrics": "62d2cea1a66b2095b55cd624902705a43cd2b7ae9adf0205f9b6aca5b1da94df",
+    "spartan_five_stage_manifest": "702a9986c2f3fa992c84c6b5cfdd6d3e27a888d8da80b409c8383b44262385c6",
+    "spartan_ltr_metrics": "9e6cce88ba50a4fecb3b82458dedeab48b7807eea94265bc3ad0548dabbc98da",
+    "local_fusion_vs_rrf_metrics": "c982915205c0fb51ec1213f7a3471e01dd06efd0c50e7cfbad1ee0d33f049102"
+  },
+  "decision": {
+    "result": "retain as a low-latency rank-position profile, not the main quality profile",
+    "reason": "MRR@10 and nDCG@10 improve over RRF with intervals above zero, while Recall@5 and Evidence F1 intervals cross zero and absolute quality remains below the selected 4B reranker fusion"
+  },
+  "boundaries": [
+    "Fusion weights and the LambdaMART model were selected on the same official dev split; this is not independent-test generalisation.",
+    "The fallback reranker is deterministic feature scoring and must not be described as Qwen3.",
+    "Because final_k is five, Recall@10 and Recall@50 equal Recall@5 by construction and are not wider-cutoff results.",
+    "Claim classification was not configured; zero accuracy and harmonic mean are not classifier findings.",
+    "Restricted predictions, candidate lists and the 1.2-million-document corpus remain on Spartan."
+  ]
+}
