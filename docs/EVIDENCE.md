@@ -29,7 +29,8 @@
 | Text-aware cost router | `verified-negative-dev-gate` | job `29479261`, commit `2ff8cf4`: five-fold cross-fit, 14.29% strong calls, Recall@5/F1 `0.2718/0.1788`; paired intervals vs RRF cross zero; rejected |
 | Legacy LightGBM LambdaMART fixed-dev result | `invalidated-training-set` | Recall@5 `0.0029`, but the training builder injected unretrieved gold evidence with zero retrieval features; retain only as failure forensics, not a model-quality result |
 | Legacy LTR + deterministic reranker result | `invalidated-upstream` | Recall@5 `0.0127`; downstream of the invalid legacy LTR candidates and explicitly not Qwen3 |
-| Candidate-supported LambdaMART correction | `queued/no-result` | Original job `29479905` failed before evaluation because a GPFS shared clone could not read one Git tree. Commit `023ed9b` replaces the shared checkout with a copied node-local object store and passes 47 local tests; sole replacement job `29484697` remains pending and has no result. Do not attribute the infrastructure failure to model quality or claim any corrected LTR effect before the terminal artifact is verified |
+| Candidate-supported LambdaMART correction | `verified-negative-dev-gate` | Job `29484697`, commit `023ed9b`: 1,169 train groups/26,626 rows and 3,246 reachable positives; training pairwise accuracy `0.9529`, but fixed-dev Recall@5/F1 collapsed to `0.0075/0.0059` versus RRF `0.2709/0.1785`; both paired intervals versus BM25 were below zero. This is a valid negative result, not the earlier invalidated training set |
+| RRF-prior, serving-width LTR correction | `queued/no-result` | Commit `b47e437` adds RRF score/rank to both training and inference, expands hard negatives from 20 to the serving width of 100, and predeclares a 4:1 RRF/LambdaMART rank-preserving fusion. Sole CPU job `29504398` is pending; no quality result is claimed |
 
 ## Historical Group 045 records
 

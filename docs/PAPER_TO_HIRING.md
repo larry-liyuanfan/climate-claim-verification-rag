@@ -67,15 +67,19 @@ evidence that neither retriever returned and assigned it zero BM25/dense
 features, teaching an inverse retrieval signal. That run is invalidated rather
 than reported as “LambdaMART failed”.
 
-- Code correction: `src/climate_rag/training.py` and commit `78f95c0` retain
+- Code correction: `src/climate_rag/cli.py` and commit `78f95c0` retain
   only candidate-supported positives and skip unsupported claim groups. The
   first evaluation job `29479905` failed before model evaluation when a GPFS
   shared clone could not read one Git tree; that is an infrastructure failure,
   not a LambdaMART result.
-- Evaluation: commit `023ed9b` copies Git objects into the node-local checkout
-  and passes 47 local tests. Replacement job `29484697` is the sole active
-  exact-SHA corrected gate; it remains queued and has no result at the time of
-  this document.
+- Evaluation: commit `023ed9b` copies Git objects into the node-local checkout.
+  Job `29484697` completed over 1,169 train groups/26,626 rows, but fixed-dev
+  Recall@5/F1 were only `0.0075/0.0059` versus RRF `0.2709/0.1785`; high train
+  pairwise accuracy (`0.9529`) therefore did not transfer.
+- Follow-up: commit `b47e437` records the serving RRF score/rank in training,
+  expands hard negatives from 20 to the 100-candidate serving width and adds a
+  predeclared 4:1 rank-preserving RRF/LambdaMART fusion. Job `29504398` is the
+  only active CPU gate and has no result yet.
 - Hiring signal: training-serving consistency, label reachability audits and
   failure forensics in a learning-to-rank pipeline.
 
