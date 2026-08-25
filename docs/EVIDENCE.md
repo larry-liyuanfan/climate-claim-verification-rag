@@ -4,7 +4,7 @@
 
 | Evidence | Status | Verification |
 |---|---|---|
-| Package and five required CLI commands | `verified` | editable install and CLI integration tests |
+| Package and CLI workflows | `verified` | editable install, CLI integration tests and 53-test project environment |
 | BM25, hash dense exact search, RRF, hard negatives | `verified` | deterministic unit tests |
 | Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA adaptation | `verified-offline-dev-promotion` | data job `29460405`, 20-step training `29462754`, injection preflight `29463845`, sampled screen `29463846`, full-corpus gate `29465819`; all 154 official-dev claims/1,208,827 documents; Recall@5 `0.2793→0.2970`, MRR `0.3633→0.3869`, nDCG `0.2994→0.3203`, F1 `0.07253→0.07544`; all 5,000-sample paired intervals positive; offline dev, not independent test/online A/B |
 | Pairwise LTR fallback and LightGBM persistence | `verified-code` | 48-test project environment; commit `636e915` fixes persisted LightGBM feature metadata; effectiveness requires a valid candidate-supported run |
@@ -13,7 +13,9 @@
 | Retrieval/end-to-end metrics | `verified` | synthetic fixtures with exact expected values |
 | Bootstrap and calibration utilities | `verified` | seeded unit tests |
 | Five-stage orchestration | `verified-smoke` | synthetic fixture with deterministic reranker |
-| FastAPI retrieval | `verified-smoke` | API test confirms explicit no-classifier state |
+| Public CLIMATE-FEVER adapter and fixed split | `verified-public-data-contract` | upstream SHA `8a4b9032...e0b`; 1,535 claims/7,675 annotations/5,240 unique evidence; seed `20260825`; train/validation/test 1,075/230/230; zero shared-evidence and normalised-claim cross-split leakage |
+| Public frozen-test BM25 baseline | `verified-public-external-retrieval-baseline` | 129 test claims with decisive evidence: Recall@5/10/50 `0.4571/0.5490/0.7182`, MRR@10 `0.4567`, nDCG@10 `0.4221`; compact record `docs/verified-runs/climate-fever-public-bm25-test-20260825.json` | Retrieval only; no cross-encoder or verdict model, so do not report claim accuracy or end-to-end RAG quality |
+| Grounded FastAPI service | `verified-code-and-fixture` | `/api/search`, `/api/verify`, trace, metrics and health tests; invalid citation IDs/quotes, provider failure and missing verifier all abstain | Model Studio credentials are not configured in the local environment; live Qwen3.7-Plus external-test verdict metrics are not yet verified |
 | Full 1,208,827-document BM25 index | `verified` | Spartan job `29360715`; commit `a7b110e`; 40.333 s total, 126,334,728-byte artifact, Slurm MaxRSS 2,630,496 K |
 | Full Qwen3 embeddings + FAISS FlatIP reference index | `verified-build` | Spartan job `29382416`; commit `2cd75e3`; 1,208,827 × 1,024-d vectors; 1,696.767 s total; 5,133,839,551-byte dense artifact; MaxRSS 22,583,288 K |
 | Qwen3-Embedding-4B sampled size gate | `verified-negative-resource-gate` | job `29458425`, commit `ced5e32`: evidence-preserving 5,000-document/eight-claim screen at 1,024 dimensions; Recall@5 `0.925` vs 0.6B `0.950`, F1/MRR tied; `7.21` vs `50.95 docs/s`; peak Torch GPU bytes `17.42 GB` vs `3.17 GB`; no full rebuild |

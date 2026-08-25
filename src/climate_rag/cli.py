@@ -16,6 +16,11 @@ from .ann_benchmark import benchmark_faiss_indices
 from .artifacts import write_run_artifacts
 from .benchmark import run_five_stage_benchmark
 from .bm25 import BM25Index
+from .climate_fever import (
+    benchmark_public_bm25,
+    download_climate_fever,
+    prepare_public_benchmark,
+)
 from .dense import (
     DenseRetriever,
     FaissANNIndex,
@@ -44,6 +49,12 @@ from .metrics import evaluate_predictions, paired_bootstrap
 from .models import RankedDocument
 from .negatives import mine_hard_negatives
 from .pipeline import HybridRetriever
+from .rerank import (
+    DeterministicFeatureReranker,
+    ModelStudioReranker,
+    Qwen3CausalLMReranker,
+)
+from .verification import AbstainingVerifier, ModelStudioStructuredVerifier
 
 
 def _load_config(path: str | None, command: str) -> dict[str, Any]:
@@ -54,15 +65,17 @@ def _load_config(path: str | None, command: str) -> dict[str, Any]:
         try:
             import yaml
         except ImportError as exc:
-            raise RuntimeError("PyYAML is required for YAML configs; install the 'yaml' extra") from exc
+            raise RuntimeError(
+                "PyYAML is required for YAML configs; install the 'yaml' extra"
+            ) from exc
         payload = yaml.safe_load(source.read_text(encoding="utf-8")) or {}
     else:
         payload = json.loads(source.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
-        raise ValueError("config root must be a mapping")
+        raise TypeError("config root must be a mapping")
     section = payload.get(command, payload)
     if not isinstance(section, dict):
-        raise ValueError(f"config section '{command}' must be a mapping")
+        raise TypeError(f"config section '{command}' must be a mapping")
     return section
 
 
@@ -77,7 +90,9 @@ def _apply_config(args: argparse.Namespace, raw_argv: list[str]) -> None:
 def _required(args: argparse.Namespace, *names: str) -> None:
     missing = [name for name in names if not getattr(args, name, None)]
     if missing:
-        raise ValueError("missing required arguments/config keys: " + ", ".join(missing))
+        raise ValueError(
+            "missing required arguments/config keys: " + ", ".join(missing)
+        )
 
 
 def _repository() -> Path:
@@ -121,7 +136,9 @@ def command_index(args: argparse.Namespace) -> int:
         route_started = time.perf_counter()
         if args.encoder == "hash":
             encoder = HashDenseEncoder(args.dimension)
-            notes.append("Hash embeddings are a deterministic smoke baseline, not a semantic model.")
+            notes.append(
+                "Hash embeddings are a deterministic smoke baseline, not a semantic model."
+            )
         else:
             encoder = SentenceTransformerEncoder(
                 args.model,
@@ -157,8 +174,13 @@ def command_index(args: argparse.Namespace) -> int:
                 "encoder": encoder.name,
                 "dimension": encoder.dimension,
             }
-            if any(cache_metadata.get(key) != value for key, value in expected_metadata.items()):
-                raise ValueError("embedding cache does not match corpus mapping or encoder")
+            if any(
+                cache_metadata.get(key) != value
+                for key, value in expected_metadata.items()
+            ):
+                raise ValueError(
+                    "embedding cache does not match corpus mapping or encoder"
+                )
             vectors = np.load(args.embeddings, mmap_mode="r")
             metrics["dense_embeddings_reused"] = True
         else:
@@ -204,7 +226,9 @@ def command_index(args: argparse.Namespace) -> int:
                 "dense_dimension": encoder.dimension,
                 "ann_kind": args.ann,
                 "dense_artifact_bytes": sum(
-                    path.stat().st_size for path in dense_dir.rglob("*") if path.is_file()
+                    path.stat().st_size
+                    for path in dense_dir.rglob("*")
+                    if path.is_file()
                 ),
             }
         )
@@ -295,7 +319,9 @@ def command_benchmark_ann(args: argparse.Namespace) -> int:
 
 def _load_rankings(path: str | Path) -> dict[str, dict[str, list[RankedDocument]]]:
     source = Path(path)
-    result: dict[str, dict[str, list[RankedDocument]]] = defaultdict(lambda: defaultdict(list))
+    result: dict[str, dict[str, list[RankedDocument]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
     if source.suffix.lower() == ".jsonl":
         rows = list(read_jsonl(source))
         for row in rows:
@@ -304,14 +330,18 @@ def _load_rankings(path: str | Path) -> dict[str, dict[str, list[RankedDocument]
             if "evidence_ids" in row:
                 for rank, evidence_id in enumerate(row["evidence_ids"], start=1):
                     result[claim_id][source_name].append(
-                        RankedDocument(str(evidence_id), 1.0 / rank, rank, source=source_name)
+                        RankedDocument(
+                            str(evidence_id), 1.0 / rank, rank, source=source_name
+                        )
                     )
             else:
                 result[claim_id][source_name].append(
                     RankedDocument(
                         evidence_id=str(row["evidence_id"]),
                         score=float(row.get("score", 0.0)),
-                        rank=int(row.get("rank", len(result[claim_id][source_name]) + 1)),
+                        rank=int(
+                            row.get("rank", len(result[claim_id][source_name]) + 1)
+                        ),
                         text=str(row.get("text", "")),
                         source=source_name,
                     )
@@ -319,14 +349,16 @@ def _load_rankings(path: str | Path) -> dict[str, dict[str, list[RankedDocument]
         return result
     payload = read_json(source)
     if not isinstance(payload, dict):
-        raise ValueError("rankings JSON must be keyed by claim id")
+        raise TypeError("rankings JSON must be keyed by claim id")
     for claim_id, routes in payload.items():
         if not isinstance(routes, dict):
-            raise ValueError("each claim ranking must map sources to ranked rows")
+            raise TypeError("each claim ranking must map sources to ranked rows")
         for source_name, rows in routes.items():
             for fallback_rank, row in enumerate(rows, start=1):
                 if isinstance(row, str):
-                    item = RankedDocument(row, 1.0 / fallback_rank, fallback_rank, source=source_name)
+                    item = RankedDocument(
+                        row, 1.0 / fallback_rank, fallback_rank, source=source_name
+                    )
                 else:
                     item = RankedDocument(
                         evidence_id=str(row["evidence_id"]),
@@ -421,7 +453,9 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
                     {
                         "query_id": claim_id,
                         "evidence_id": evidence_id,
-                        "relevance": 2 if evidence_id in claims[claim_id].evidence_ids else 0,
+                        "relevance": 2
+                        if evidence_id in claims[claim_id].evidence_ids
+                        else 0,
                         "features": build_candidate_features(
                             claims[claim_id].text,
                             text,
@@ -460,7 +494,11 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             args.claims,
             *([args.rankings] if args.rankings else []),
             *([args.bm25_index] if args.bm25_index else []),
-            *([Path(args.dense_index) / "dense_index.json"] if args.dense_index else []),
+            *(
+                [Path(args.dense_index) / "dense_index.json"]
+                if args.dense_index
+                else []
+            ),
         ],
         predictions=rows,
         notes=[
@@ -474,7 +512,9 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
     return 0
 
 
-def _pairwise_accuracy(scores: np.ndarray, labels: np.ndarray, groups: list[str]) -> float:
+def _pairwise_accuracy(
+    scores: np.ndarray, labels: np.ndarray, groups: list[str]
+) -> float:
     correct = 0
     total = 0
     for left in range(len(labels)):
@@ -482,7 +522,9 @@ def _pairwise_accuracy(scores: np.ndarray, labels: np.ndarray, groups: list[str]
             if groups[left] != groups[right] or labels[left] == labels[right]:
                 continue
             total += 1
-            correct += int((scores[left] - scores[right]) * (labels[left] - labels[right]) > 0)
+            correct += int(
+                (scores[left] - scores[right]) * (labels[left] - labels[right]) > 0
+            )
     return correct / total if total else 0.0
 
 
@@ -492,9 +534,14 @@ def command_train_fusion(args: argparse.Namespace) -> int:
     rows = list(read_jsonl(args.features))
     if not rows:
         raise ValueError("feature file is empty")
-    feature_names = tuple(args.feature_names.split(",")) if args.feature_names else DEFAULT_FEATURES
+    feature_names = (
+        tuple(args.feature_names.split(",")) if args.feature_names else DEFAULT_FEATURES
+    )
     matrix = np.asarray(
-        [[float(row.get("features", {}).get(name, 0.0)) for name in feature_names] for row in rows],
+        [
+            [float(row.get("features", {}).get(name, 0.0)) for name in feature_names]
+            for row in rows
+        ],
         dtype=np.float64,
     )
     labels = np.asarray([float(row["relevance"]) for row in rows], dtype=np.float64)
@@ -581,7 +628,12 @@ def command_evaluate(args: argparse.Namespace) -> int:
         _, baseline_rows, _ = evaluate_predictions(claims, baseline, ks)
         baseline_by_id = {row["claim_id"]: row for row in baseline_rows}
         comparisons: dict[str, Any] = {}
-        compare_metrics = ["evidence_f1", "mrr@10", "ndcg@10", *(f"recall@{k}" for k in ks)]
+        compare_metrics = [
+            "evidence_f1",
+            "mrr@10",
+            "ndcg@10",
+            *(f"recall@{k}" for k in ks),
+        ]
         for metric in compare_metrics:
             left = [baseline_by_id[row["claim_id"]][metric] for row in rows]
             right = [row[metric] for row in rows]
@@ -621,9 +673,72 @@ def command_serve(args: argparse.Namespace) -> int:
     from .service import create_app
 
     bm25 = BM25Index.load(args.bm25_index)
-    dense = DenseRetriever.load(args.dense_index, device=args.device) if args.dense_index else None
-    retriever = HybridRetriever(bm25=bm25, dense=dense)
-    uvicorn.run(create_app(retriever, default_top_k=args.top_k), host=args.host, port=args.port)
+    dense = (
+        DenseRetriever.load(args.dense_index, device=args.device)
+        if args.dense_index
+        else None
+    )
+    if args.reranker == "none":
+        reranker = None
+    elif args.reranker == "deterministic":
+        reranker = DeterministicFeatureReranker()
+    elif args.reranker == "model-studio":
+        reranker = ModelStudioReranker(model=args.reranker_model)
+    else:
+        reranker = Qwen3CausalLMReranker(
+            model_name=args.reranker_model,
+            device=args.device,
+            batch_size=args.reranker_batch_size,
+            dtype=args.reranker_dtype,
+        )
+    retriever = HybridRetriever(bm25=bm25, dense=dense, reranker=reranker)
+    verifier = (
+        ModelStudioStructuredVerifier(model=args.verifier_model)
+        if args.verifier == "model-studio"
+        else AbstainingVerifier()
+    )
+    uvicorn.run(
+        create_app(
+            retriever,
+            verifier=verifier,
+            default_top_k=args.top_k,
+            max_queries=args.max_queries,
+        ),
+        host=args.host,
+        port=args.port,
+    )
+    return 0
+
+
+def command_prepare_public(args: argparse.Namespace) -> int:
+    _required(args, "output_dir")
+    source = (
+        Path(args.input)
+        if args.input
+        else Path(args.output_dir) / "source" / "climate-fever.jsonl"
+    )
+    provenance: dict[str, Any] = {}
+    if not source.exists():
+        provenance = download_climate_fever(source, url=args.url)
+    manifest = prepare_public_benchmark(
+        source, args.output_dir, seed=args.seed, source_url=args.url
+    )
+    if provenance:
+        manifest["download"] = provenance
+        write_json(Path(args.output_dir) / "split_manifest.json", manifest)
+    print(json.dumps(manifest, indent=2, sort_keys=True))
+    return 0
+
+
+def command_benchmark_public(args: argparse.Namespace) -> int:
+    _required(args, "prepared_dir", "output_dir")
+    metrics = benchmark_public_bm25(
+        args.prepared_dir,
+        args.output_dir,
+        split_name=args.split,
+        top_k=args.top_k,
+    )
+    print(json.dumps(metrics, indent=2, sort_keys=True))
     return 0
 
 
@@ -638,7 +753,9 @@ def build_parser() -> argparse.ArgumentParser:
     index.add_argument("--backend", choices=("bm25", "dense", "both"), default="bm25")
     index.add_argument("--k1", type=float, default=1.5)
     index.add_argument("--b", type=float, default=0.75)
-    index.add_argument("--encoder", choices=("hash", "sentence-transformer"), default="hash")
+    index.add_argument(
+        "--encoder", choices=("hash", "sentence-transformer"), default="hash"
+    )
     index.add_argument("--model", default="Qwen/Qwen3-Embedding-0.6B")
     index.add_argument("--query-prefix", default="")
     index.add_argument("--query-prompt-name")
@@ -649,7 +766,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--embeddings",
         help="optional .npy cache shared by Flat/HNSW/IVF-PQ builds; encoder and corpus must match",
     )
-    index.add_argument("--ann", choices=("numpy", "flat", "hnsw", "ivfpq"), default="numpy")
+    index.add_argument(
+        "--ann", choices=("numpy", "flat", "hnsw", "ivfpq"), default="numpy"
+    )
     index.add_argument("--hnsw-m", type=int, default=32)
     index.add_argument("--hnsw-ef-construction", type=int, default=200)
     index.add_argument("--nlist", type=int, default=256)
@@ -666,7 +785,9 @@ def build_parser() -> argparse.ArgumentParser:
     ann_benchmark.add_argument("--config")
     ann_benchmark.add_argument("--claims")
     ann_benchmark.add_argument(
-        "--index", action="append", help="repeat name=/path/index.faiss; flat is required"
+        "--index",
+        action="append",
+        help="repeat name=/path/index.faiss; flat is required",
     )
     ann_benchmark.add_argument(
         "--index-manifest", action="append", help="repeat name=/path/run_manifest.json"
@@ -685,7 +806,9 @@ def build_parser() -> argparse.ArgumentParser:
     ann_benchmark.add_argument("--output-dir")
     ann_benchmark.set_defaults(handler=command_benchmark_ann)
 
-    negatives = subparsers.add_parser("mine-negatives", help="mine high-ranked non-gold evidence")
+    negatives = subparsers.add_parser(
+        "mine-negatives", help="mine high-ranked non-gold evidence"
+    )
     negatives.add_argument("--config")
     negatives.add_argument("--claims")
     negatives.add_argument("--rankings")
@@ -698,16 +821,22 @@ def build_parser() -> argparse.ArgumentParser:
     negatives.add_argument("--limit", type=int, default=20)
     negatives.set_defaults(handler=command_mine_negatives)
 
-    fusion = subparsers.add_parser("train-fusion", help="train LambdaMART or pairwise fallback LTR")
+    fusion = subparsers.add_parser(
+        "train-fusion", help="train LambdaMART or pairwise fallback LTR"
+    )
     fusion.add_argument("--config")
     fusion.add_argument("--features")
     fusion.add_argument("--output-dir")
-    fusion.add_argument("--algorithm", choices=("auto", "lambdamart", "linear"), default="auto")
+    fusion.add_argument(
+        "--algorithm", choices=("auto", "lambdamart", "linear"), default="auto"
+    )
     fusion.add_argument("--feature-names")
     fusion.add_argument("--seed", type=int, default=17)
     fusion.set_defaults(handler=command_train_fusion)
 
-    evaluate = subparsers.add_parser("evaluate", help="score official-format predictions")
+    evaluate = subparsers.add_parser(
+        "evaluate", help="score official-format predictions"
+    )
     evaluate.add_argument("--config")
     evaluate.add_argument("--claims")
     evaluate.add_argument("--predictions")
@@ -719,11 +848,53 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--seed", type=int, default=17)
     evaluate.set_defaults(handler=command_evaluate)
 
-    serve = subparsers.add_parser("serve", help="serve retrieval over FastAPI")
+    prepare_public = subparsers.add_parser(
+        "prepare-public",
+        help="download/adapt CLIMATE-FEVER and create a leakage-safe split",
+    )
+    prepare_public.add_argument("--config")
+    prepare_public.add_argument("--input")
+    prepare_public.add_argument(
+        "--url",
+        default=(
+            "https://raw.githubusercontent.com/tdiggelm/climate-fever-dataset/"
+            "main/dataset/climate-fever.jsonl"
+        ),
+    )
+    prepare_public.add_argument("--output-dir")
+    prepare_public.add_argument("--seed", type=int, default=20260825)
+    prepare_public.set_defaults(handler=command_prepare_public)
+
+    benchmark_public = subparsers.add_parser(
+        "benchmark-public", help="run the frozen public BM25 retrieval baseline"
+    )
+    benchmark_public.add_argument("--config")
+    benchmark_public.add_argument("--prepared-dir")
+    benchmark_public.add_argument("--output-dir")
+    benchmark_public.add_argument(
+        "--split", choices=("train", "validation", "test"), default="test"
+    )
+    benchmark_public.add_argument("--top-k", type=int, default=50)
+    benchmark_public.set_defaults(handler=command_benchmark_public)
+
+    serve = subparsers.add_parser(
+        "serve", help="serve retrieval and grounded verification"
+    )
     serve.add_argument("--config")
     serve.add_argument("--bm25-index")
     serve.add_argument("--dense-index")
     serve.add_argument("--device")
+    serve.add_argument(
+        "--reranker",
+        choices=("none", "deterministic", "qwen-local", "model-studio"),
+        default="none",
+    )
+    serve.add_argument("--reranker-model", default="Qwen/Qwen3-Reranker-4B")
+    serve.add_argument("--reranker-batch-size", type=int, default=4)
+    serve.add_argument("--reranker-dtype", default="bfloat16")
+    serve.add_argument("--verifier", choices=("none", "model-studio"), default="none")
+    serve.add_argument("--verifier-model", default="qwen3.7-plus")
+    serve.add_argument("--max-queries", type=int, default=2)
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
     serve.add_argument("--top-k", type=int, default=5)

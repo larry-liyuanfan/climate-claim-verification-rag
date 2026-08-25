@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "status": "verified-public-external-retrieval-baseline",
+  "dataset": "CLIMATE-FEVER",
+  "dataset_source": "https://github.com/tdiggelm/climate-fever-dataset",
+  "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
+  "implementation_git_sha": "b5fcdf159695197b76afec0707f17ad2e4091ae7",
+  "split": {
+    "seed": 20260825,
+    "train_claims": 1075,
+    "validation_claims": 230,
+    "test_claims": 230,
+    "test_claims_with_decisive_evidence": 129,
+    "manifest_sha256": "796cbfbdb7660cf258cb4d31a9f6c23e5dbb93b13998acd0f39d0d9226b8d651",
+    "shared_evidence_cross_split": 0,
+    "normalised_claim_duplicate_cross_split": 0,
+    "near_duplicate_jaccard_threshold": 0.9
+  },
+  "corpus": {
+    "claims": 1535,
+    "annotated_pairs": 7675,
+    "unique_evidence_documents": 5240,
+    "claims_with_decisive_evidence": 1061
+  },
+  "retrieval": {
+    "profile": "BM25 external-test baseline",
+    "top_k": 50,
+    "recall_at_5": 0.4571059431524548,
+    "recall_at_10": 0.5489664082687338,
+    "recall_at_50": 0.718217054263566,
+    "mrr_at_10": 0.45674910791189866,
+    "ndcg_at_10": 0.42207142141363385,
+    "evidence_f1_at_50": 0.06466716479019777,
+    "search_p50_ms": 0.592100084759295,
+    "search_p95_ms": 1.196300028823316
+  },
+  "artifact_hashes": {
+    "metrics_json_sha256": "50f56393bd8f800ab485c527a6ef4192d03e4115c04010424b5765ace7290048",
+    "per_claim_jsonl_sha256": "32252768405026db0c959dc7a92c5303b1432f34ac0e8ce82632962ae107def4",
+    "errors_jsonl_sha256": "cbc90d3e36c9c75fabf613a0c23d4eaa4aef065cfb955e0b8e55c1e32621776c"
+  },
+  "boundary": "Public external retrieval baseline only. It contains neither the Qwen3 cross-encoder nor a verdict model, so claim accuracy and end-to-end RAG quality are not claimed."
+}

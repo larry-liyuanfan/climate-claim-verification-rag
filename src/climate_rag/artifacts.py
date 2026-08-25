@@ -5,9 +5,10 @@ import os
 import platform
 import subprocess
 import sys
-from datetime import datetime, timezone
+from collections.abc import Mapping, Sequence
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from .io import write_json, write_jsonl
 
@@ -37,7 +38,14 @@ def build_manifest(
     started_at: str | None = None,
     repository: str | Path | None = None,
 ) -> dict[str, Any]:
-    finished = datetime.now(timezone.utc).isoformat()
+    finished_value = datetime.now(timezone.utc)
+    if started_at:
+        started_value = datetime.fromisoformat(started_at)
+        if finished_value <= started_value:
+            # Some Windows clocks expose coarser timestamp resolution than the
+            # measured operation. Preserve strict manifest ordering deterministically.
+            finished_value = started_value + timedelta(microseconds=1)
+    finished = finished_value.isoformat()
     files: list[dict[str, Any]] = []
     for raw_path in inputs:
         path = Path(raw_path)
