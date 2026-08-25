@@ -1,19 +1,19 @@
-# Climate Claim Verification RAG
+# Climate Evidence Retrieval and Grounded Verification
 
-A reproducible search-and-ranking extension of the **2026 COMP90042 Group 045 team project**. The course system used BM25 candidate retrieval, BGE bi-encoder reranking, and a LoRA-tuned claim classifier. This repository turns its retrieval work into a testable package and explicit five-stage experiment:
+A reproducible search-and-ranking extension of the **2026 COMP90042 Group 045 team project**. The course system used BM25 candidate retrieval, BGE bi-encoder reranking, and a LoRA-tuned claim classifier. This repository now separates two evidence tracks: a restricted 1.21M-document scale/selection track on Spartan and a public CLIMATE-FEVER external benchmark that can be reproduced without course data.
 
 ```text
-Claim
+claim normalisation + entity/year constraints
   ├─ BM25 lexical recall
-  └─ learned dense recall (optional Qwen3-Embedding)
+  └─ Qwen3 dense/HNSW recall
         ↓
-      RRF fusion
+      RRF → Qwen3-4B cross-encoder
         ↓
-      LambdaMART or declared linear pairwise fallback
+      evidence sufficiency / one bounded re-retrieval
         ↓
-      cross-encoder/API reranker
+      structured verdict provider
         ↓
-      evidence set → external trained classifier
+      validated citations or explicit abstention
 ```
 
 The repository does **not** claim an official leaderboard rank. Restricted course data, raw predictions, and private checkpoints are not redistributed.
@@ -27,9 +27,10 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
 | Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
 | Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved all four fixed-dev ranking metrics; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
-| Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, claim accuracy, H-mean, paired bootstrap | Macro-averaged over claims |
-| Confidence | Temperature scaling and coverage-risk/selective-abstention utilities | Requires real classifier logits |
-| Serving | FastAPI evidence retrieval endpoint | Returns `classification.status=not_configured`; never fabricates a label |
+| Public benchmark | CLIMATE-FEVER adapter, evidence-aware near-duplicate split and frozen-test BM25 baseline | 1,535 claims/7,675 annotations; final test is not used for model selection |
+| Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, verdict Macro-F1/Accuracy, citation quality, ECE/Brier and paired bootstrap | Retrieval and verification results remain separately labelled |
+| Confidence | Temperature scaling, coverage-risk and selective abstention utilities | Requires provider or classifier confidence |
+| Serving | FastAPI search/verify/trace/metrics endpoints with bounded re-retrieval | Verifier failure, invalid citation IDs or quote mismatch fail closed to `NOT_ENOUGH_INFO` |
 | Provenance | Input hashes, Git SHA, environment, metrics, predictions, error cases, report | Generated for every CLI run |
 
 ## Quick start
@@ -48,6 +49,15 @@ climate-rag evaluate \
   --predictions fixtures/predictions_candidate.json \
   --baseline-predictions fixtures/predictions_baseline.json \
   --output-dir runs/smoke-eval
+
+climate-rag prepare-public \
+  --output-dir data/climate-fever-public \
+  --seed 20260825
+
+climate-rag benchmark-public \
+  --prepared-dir data/climate-fever-public \
+  --split test \
+  --output-dir runs/climate-fever-bm25-test
 ```
 
 The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`.
@@ -130,13 +140,27 @@ climate-rag evaluate \
 
 It evaluates `bm25`, `dense`, `rrf`, `ltr`, and `ltr_reranker` with one claim split and one `final_k`, then bootstraps each stage against BM25. The configured reranker name is recorded. Deterministic fallback results cannot be described as Qwen3 results.
 
-Serve retrieval:
+Serve multi-stage retrieval and grounded verification:
 
 ```bash
-climate-rag serve --bm25-index /artifacts/bm25/bm25.pkl.gz --host 0.0.0.0 --port 8000
+climate-rag serve \
+  --bm25-index /artifacts/bm25/bm25.pkl.gz \
+  --dense-index /artifacts/dense-hnsw \
+  --reranker qwen-local \
+  --reranker-model Qwen/Qwen3-Reranker-4B \
+  --verifier model-studio \
+  --verifier-model qwen3.7-plus \
+  --max-queries 2 \
+  --host 0.0.0.0 --port 8000
 ```
 
-`POST /retrieve` accepts `{"claim_text": "...", "top_k": 5}` and returns evidence plus an explicit unconfigured-classifier state.
+The service exposes `POST /api/search`, `POST /api/verify`, `GET /api/traces/{trace_id}`, `GET /metrics`, and `GET /health`; legacy `POST /retrieve` remains for compatibility. Model Studio credentials are read only from environment variables. Without a configured verifier the service returns an explicit abstention rather than fabricating a verdict.
+
+## Public external baseline
+
+The public adapter pins the upstream CLIMATE-FEVER source hash, deduplicates 5,240 evidence passages, and keeps claims connected by shared evidence, normalised duplicates or high-similarity claim text in the same partition. The fixed `70/15/15` split (seed `20260825`) contains 1,075/230/230 claims and has zero shared-evidence or normalised-claim leakage across partitions.
+
+The first frozen-test run is deliberately only a lexical baseline. Among the 129 test claims with SUPPORTS/REFUTES evidence, BM25 reached Recall@5/10/50 `0.4571/0.5490/0.7182`, MRR@10 `0.4567`, and nDCG@10 `0.4221`. It does **not** establish verdict quality or cross-encoder gains. Exact hashes and boundaries are in [`docs/verified-runs/climate-fever-public-bm25-test-20260825.json`](docs/verified-runs/climate-fever-public-bm25-test-20260825.json). The test partition is now frozen; further retrieval/model selection must use train/validation before one final full-system evaluation.
 
 ## Data and artifacts
 
