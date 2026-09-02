@@ -11,6 +11,7 @@
 | LTR Top-K reachability correction | `verified-code; quality-pending` | feature rows now equal the serving-width RRF pool; unreachable positives are counted and excluded. Historical job `29504398` is not relabelled as a result of this code change |
 | Query taxonomy | `verified-diagnostic-code` | entity, numeric/year, geographic, lexical mismatch, semantic inference, multi-evidence and unanswerable; deterministic heuristic slices, not human labels |
 | Search Pareto record | `verified-derived-decision-record` | HNSW+RRF, RRF-prior LambdaMART and RRF/Qwen3-4B remain frontier operating points under fixed-dev stage-cost proxies; timings exclude BM25 and are not online SLA |
+| Iris isolated CPU preflight | `verified` | job `29926197`, exact SHA `09d2524`, 15 targeted tests passed in 7 s, exit `0:0`, batch MaxRSS `53,244 KiB`; public code/fixtures only, no GPU or frozen-test evaluation |
 
 Compact closeout: `docs/verified-runs/representation-evaluation-closeout-20260903.json`.
 

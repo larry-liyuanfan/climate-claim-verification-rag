@@ -5,6 +5,7 @@
     "branch": "codex/climate-representation-eval",
     "evaluation_contract_commit": "9f2fb05e80ff4559fddb25a246f95de651cdfab7",
     "split_and_documentation_commit": "1ad01ffd9e5529075c5194f91018063bd662e7df",
+    "iris_preflight_commit": "09d252414f9bc7a9dcdeb84392184ad2e32fe423",
     "base_commit": "1c4e405c5d932b338d623fd6936501734b99169a",
     "capabilities": [
       "consumed frozen-test fail-closed policy",
@@ -15,6 +16,22 @@
       "train/serve candidate contract audit",
       "quality-latency-memory Pareto builder"
     ]
+  },
+  "iris_cpu_preflight": {
+    "job_id": "29926197",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 7,
+    "batch_max_rss_kib": 53244,
+    "allocation": "1 CPU, 2 GB, sapphire, 5-minute limit",
+    "tests": "15 passed, 1 warning",
+    "environment": "Python 3.10.4 in project-local venv and cache",
+    "remote_root": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-representation-eval",
+    "environment_freeze_sha256": "ce47a1b010b79f4ac97d1807920df6b7b8c65633c93ab0d07a65a286ba99fe51",
+    "pareto_metrics_sha256": "9b1df9ec89c7e9541f450b5fe754fa593b53965c7bb0260f10179345ff30fa2f",
+    "run_manifest_sha256": "a95376fc238e909fa3dabd2be3ba849df58106feb5cd1e99cbdec6b7ce75f11f",
+    "slurm_log_sha256": "4709187b3b8e216f704b6bf8b2e0fd9350f93757d80da17fef63c7faddf5aed6",
+    "boundary": "CPU fixture and derived-Pareto preflight only; no restricted corpus, GPU training or frozen-test model evaluation."
   },
   "public_track": {
     "dataset": "CLIMATE-FEVER",
