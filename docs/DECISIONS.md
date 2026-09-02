@@ -1,5 +1,31 @@
 # Decision log
 
+## D0 — Retire the consumed public test and enforce representation contracts
+
+The CLIMATE-FEVER test was consumed by the 2026-08-25 BM25 lexical baseline.
+This closeout does not run a tuned representation, fusion model or reranker on
+that partition. A post-hoc audit found one train/test near-document variant at
+0.913 token Jaccard. Both annotations are `NOT_ENOUGH_INFO`, so the decisive
+retrieval subset remains clean, but the historical split fails the stricter
+all-document rule. The baseline is retained with that warning; new candidate
+test execution now fails closed. No public-validation candidate was available,
+so the pre-registered validation gate was not run.
+
+Future public preparation uses a v2 grouped split: normalised/near-duplicate
+claims, shared evidence IDs and normalised/near-duplicate evidence text all
+join the same claim component. Token-posting candidate blocking avoids an
+unbounded all-document pair scan. The verified full-data v2 build preserves
+1,075/230/230 claims and reports zero cross-partition variants, but it is not
+used to manufacture a second “independent” test result.
+
+Paired representation evaluation requires identical query, corpus,
+candidate-universe, width, cutoff and data hashes, plus at least 5,000 bootstrap
+samples. LTR training rows now come from the exact serving-width RRF pool.
+Unreachable positives are counted and excluded instead of receiving artificial
+zero retrieval features. Existing job `29504398` remains historical dev
+evidence; the correction itself is not reported as a new quality improvement
+until a fresh non-test artifact passes the contract.
+
 ## D1 — Preserve the lexical baseline
 
 The tokenizer lowercases text, normalizes `CO2`/`carbon dioxide`, and retains fact-changing negations. This keeps the BM25 baseline comparable in intent to the Group 045 notebook.

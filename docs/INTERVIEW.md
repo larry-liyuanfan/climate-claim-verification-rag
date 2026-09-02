@@ -80,6 +80,8 @@ generalisation. No public rank is claimed without an official source.
 | Dense encoding and FlatIP/HNSW/IVF-PQ adapters | `src/climate_rag/dense.py` |
 | RRF and learned-fusion feature path | `src/climate_rag/fusion.py` |
 | Hard-negative mining | `src/climate_rag/negatives.py` |
+| Frozen-test, paired-run and train/serve contracts | `src/climate_rag/evaluation_protocol.py`, `configs/public_evaluation_policy.json` |
+| Query taxonomy and quality/latency/memory Pareto | `src/climate_rag/representation_eval.py`, `configs/search_profiles.verified.json` |
 | Claim-grouped InfoNCE data and LoRA runtime | `scripts/prepare_embedding_training.py`, `hpc/train_embedding_lora_pilot.sbatch`, `hpc/adapter_runtime.sh` |
 | Sampled/full adapter promotion gates | `scripts/evaluate_embedding_adapter_gate.py`, `scripts/evaluate_embedding_adapter_full_gate.py`, `src/climate_rag/embedding_adapter_gate.py` |
 | Cross-encoder/Model Studio rerank adapters | `src/climate_rag/rerank.py` |

@@ -1,5 +1,19 @@
 # Evidence and claim boundaries
 
+## 2026-09-03 representation-evaluation closeout
+
+| Record | Status | Boundary |
+|---|---|---|
+| Public frozen-test policy | `verified-consumed-test` | CLIMATE-FEVER test was consumed on 2026-08-25 by `bm25-lexical-baseline-v1`; this closeout produced no new candidate test score and the validation gate was not run |
+| Historical split post-hoc audit | `strict-warning / decisive-pass` | exact source SHA `8a4b9032...`; zero claim/shared-ID/exact-text leaks, one 0.913-Jaccard train/test document variant; both annotations NEI, so decisive-evidence variant count is zero |
+| New v2 grouped split | `verified-public-data-preparation` | 1,535 claims/5,240 unique documents, 1,075/230/230 split; shared IDs, normalised/near claims and normalised/near evidence variants all have zero cross-partition leaks; no test model was run |
+| Base/adapted comparison contract | `verified-code` | exact query/corpus/candidate-universe/width/cutoff/data hashes plus >=5,000 paired bootstrap; fixture tests are not quality evidence |
+| LTR Top-K reachability correction | `verified-code; quality-pending` | feature rows now equal the serving-width RRF pool; unreachable positives are counted and excluded. Historical job `29504398` is not relabelled as a result of this code change |
+| Query taxonomy | `verified-diagnostic-code` | entity, numeric/year, geographic, lexical mismatch, semantic inference, multi-evidence and unanswerable; deterministic heuristic slices, not human labels |
+| Search Pareto record | `verified-derived-decision-record` | HNSW+RRF, RRF-prior LambdaMART and RRF/Qwen3-4B remain frontier operating points under fixed-dev stage-cost proxies; timings exclude BM25 and are not online SLA |
+
+Compact closeout: `docs/verified-runs/representation-evaluation-closeout-20260903.json`.
+
 ## Current repository
 
 | Evidence | Status | Verification |

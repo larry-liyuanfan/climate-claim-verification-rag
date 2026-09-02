@@ -54,13 +54,12 @@ climate-rag prepare-public \
   --output-dir data/climate-fever-public \
   --seed 20260825
 
-climate-rag benchmark-public \
+climate-rag audit-public-split \
   --prepared-dir data/climate-fever-public \
-  --split test \
-  --output-dir runs/climate-fever-bm25-test
+  --output-dir runs/climate-fever-split-audit
 ```
 
-The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`.
+The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`. The full representation-training case and two evidence-grounded resume bullets are in [`docs/REPRESENTATION_TRAINING_CASE.md`](docs/REPRESENTATION_TRAINING_CASE.md).
 
 ## Main commands
 
@@ -91,7 +90,8 @@ Mine hard negatives and train fusion:
 climate-rag mine-negatives \
   --claims /data/train-claims.json \
   --rankings /artifacts/train_rankings.jsonl \
-  --limit 20 \
+  --limit 100 \
+  --ltr-candidate-width 100 \
   --output-dir /artifacts/hard-negatives
 
 climate-rag train-fusion \
@@ -127,7 +127,33 @@ Compact sampled and full-corpus records are published in
 and
 [`docs/verified-runs/qwen3-embedding-lora-full-gate-20260821.json`](docs/verified-runs/qwen3-embedding-lora-full-gate-20260821.json).
 
-`auto` uses LightGBM LambdaMART when present. Otherwise it persists `linear_pairwise_ranknet_fallback`; it is never renamed LambdaMART. Candidate rows must be split by claim before held-out evaluation.
+`auto` uses LightGBM LambdaMART when present. Otherwise it persists `linear_pairwise_ranknet_fallback`; it is never renamed LambdaMART. Candidate rows must be split by claim before held-out evaluation. LTR rows are generated from the exact RRF Top-K used by serving; positives outside that set are counted as unreachable instead of being injected with zero retrieval features.
+
+Paired base/adapted comparison and train/serve consistency checks:
+
+```bash
+climate-rag evaluate-representation \
+  --claims /data/dev-claims.json \
+  --evidence /data/evidence.jsonl \
+  --baseline-predictions /artifacts/base.json \
+  --candidate-predictions /artifacts/adapted.json \
+  --baseline-contract /artifacts/base-contract.json \
+  --candidate-contract /artifacts/adapted-contract.json \
+  --bootstrap-samples 5000 \
+  --output-dir /artifacts/representation-pair
+
+climate-rag audit-stage-contract \
+  --training-contract /artifacts/training-contract.json \
+  --serving-contract /artifacts/serving-contract.json \
+  --output-dir /artifacts/stage-contract-audit
+
+climate-rag build-pareto \
+  --profiles configs/search_profiles.verified.json \
+  --output-dir /artifacts/search-pareto
+```
+
+The `configs/stage_contract.*.example.json` files contain labelled fixture
+values only. Promotion requires contracts generated from measured artifacts.
 
 Run the fixed five-stage comparison:
 
@@ -158,9 +184,17 @@ The service exposes `POST /api/search`, `POST /api/verify`, `GET /api/traces/{tr
 
 ## Public external baseline
 
-The public adapter pins the upstream CLIMATE-FEVER source hash, deduplicates 5,240 evidence passages, and keeps claims connected by shared evidence, normalised duplicates or high-similarity claim text in the same partition. The fixed `70/15/15` split (seed `20260825`) contains 1,075/230/230 claims and has zero shared-evidence or normalised-claim leakage across partitions.
+The public adapter pins the upstream CLIMATE-FEVER source hash, deduplicates 5,240 evidence passages, and keeps claims connected by shared evidence, normalised claim duplicates, high-similarity claim text, and exact/near-duplicate evidence text in the same partition. The v2 `70/15/15` split (seed `20260825`) contains 1,075/230/230 claims and passes the strict cross-partition claim/document-variant audit. It is a new split protocol, not a way to re-open the historical frozen test.
 
-The first frozen-test run is deliberately only a lexical baseline. Among the 129 test claims with SUPPORTS/REFUTES evidence, BM25 reached Recall@5/10/50 `0.4571/0.5490/0.7182`, MRR@10 `0.4567`, and nDCG@10 `0.4221`. It does **not** establish verdict quality or cross-encoder gains. Exact hashes and boundaries are in [`docs/verified-runs/climate-fever-public-bm25-test-20260825.json`](docs/verified-runs/climate-fever-public-bm25-test-20260825.json). The test partition is now frozen; further retrieval/model selection must use train/validation before one final full-system evaluation.
+The first frozen-test run is deliberately only a lexical baseline. Among the 129 test claims with SUPPORTS/REFUTES evidence, BM25 reached Recall@5/10/50 `0.4571/0.5490/0.7182`, MRR@10 `0.4567`, and nDCG@10 `0.4221`. It does **not** establish verdict quality or cross-encoder gains. Exact hashes and boundaries are in [`docs/verified-runs/climate-fever-public-bm25-test-20260825.json`](docs/verified-runs/climate-fever-public-bm25-test-20260825.json).
+
+That historical frozen test has already been consumed. A post-hoc strict audit
+found one cross-partition near-document pair at 0.90 Jaccard; both annotations
+are `NOT_ENOUGH_INFO`, and the decisive-evidence audit remains clean. The result
+is retained as a historical lexical baseline, but every new candidate test is
+blocked by `configs/public_evaluation_policy.json`. Model selection is
+validation-only; this project cycle no longer has an unused public test for a
+new independent claim.
 
 ## Data and artifacts
 

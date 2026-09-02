@@ -32,5 +32,16 @@
     ],
     "secondary_mean_non_regression_required": true
   },
+  "future_split_protocol": {
+    "name": "claim-and-evidence-variant-grouped-v2",
+    "verified_split_manifest_sha256": "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16",
+    "counts": {
+      "train": 1075,
+      "validation": 230,
+      "test": 230
+    },
+    "strict_variant_audit": "passed",
+    "test_use": "forbidden_in_this_project_cycle"
+  },
   "boundary": "The public frozen test was consumed by the lexical baseline. Further representation, fusion and reranker selection is validation-only; no new independent public-test claim is available in this project cycle."
 }

@@ -45,7 +45,19 @@ def test_grouped_split_keeps_shared_and_near_duplicates_together() -> None:
     records = [
         _record("1", "Global warming raises sea levels", "e1"),
         _record("2", "Global warming raises sea level", "e2"),
-        _record("3", "Arctic ice is declining", "e1"),
+        ClimateFeverRecord(
+            claim_id="3",
+            claim="Arctic ice is declining",
+            label="SUPPORTS",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "e1",
+                    "SUPPORTS",
+                    "Article",
+                    "Evidence for Global warming raises sea levels",
+                ),
+            ),
+        ),
         _record("4", "Ocean heat content is increasing", "e4"),
         _record("5", "Methane traps heat in the atmosphere", "e5"),
         _record("6", "Carbon dioxide traps heat in the atmosphere", "e6"),
@@ -56,6 +68,45 @@ def test_grouped_split_keeps_shared_and_near_duplicates_together() -> None:
         claim_id: name for name, claim_ids in split.items() for claim_id in claim_ids
     }
     assert owner["1"] == owner["2"] == owner["3"]
+
+
+def test_grouped_split_keeps_evidence_document_variants_together() -> None:
+    records = [
+        ClimateFeverRecord(
+            claim_id="1",
+            claim="First unrelated claim",
+            label="SUPPORTS",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "A:1", "SUPPORTS", "A", "One two three four five six."
+                ),
+            ),
+        ),
+        ClimateFeverRecord(
+            claim_id="2",
+            claim="Second unrelated claim",
+            label="REFUTES",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "B:1", "REFUTES", "B", "One two three four five six seven."
+                ),
+            ),
+        ),
+        _record("3", "A third unrelated claim", "C:1"),
+    ]
+    split = grouped_split(records, seed=7, near_duplicate_threshold=0.8)
+    owner = {
+        claim_id: split_name
+        for split_name, claim_ids in split.items()
+        for claim_id in claim_ids
+    }
+    assert owner["1"] == owner["2"]
+    assert audit_split_leakage(
+        records,
+        split,
+        claim_similarity_threshold=0.8,
+        evidence_similarity_threshold=0.8,
+    )["status"] == "passed"
 
 
 def test_split_audit_rejects_cross_partition_document_variants() -> None:

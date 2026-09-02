@@ -174,31 +174,46 @@ def grouped_split(
 
     claims_by_normalised: dict[str, list[str]] = defaultdict(list)
     claims_by_evidence: dict[str, list[str]] = defaultdict(list)
+    claims_by_normalised_evidence: dict[str, list[str]] = defaultdict(list)
+    evidence_tokens: dict[str, frozenset[str]] = {}
     for record in rows:
         claims_by_normalised[_normalise(record.claim)].append(record.claim_id)
         for item in record.evidences:
             claims_by_evidence[item.evidence_id].append(record.claim_id)
-    for groups in (claims_by_normalised.values(), claims_by_evidence.values()):
+            claims_by_normalised_evidence[_normalise(item.text)].append(record.claim_id)
+            previous = evidence_tokens.get(item.evidence_id)
+            current = _token_set(item.text)
+            if previous is not None and previous != current:
+                raise ValueError(
+                    f"evidence id has inconsistent text: {item.evidence_id}"
+                )
+            evidence_tokens[item.evidence_id] = current
+    for groups in (
+        claims_by_normalised.values(),
+        claims_by_evidence.values(),
+        claims_by_normalised_evidence.values(),
+    ):
         for claim_ids in groups:
             for claim_id in claim_ids[1:]:
                 union.union(claim_ids[0], claim_id)
 
     # The public benchmark is small (1,535 claims), so an exact pairwise check is
     # preferable to an approximate near-duplicate index whose misses could leak.
-    token_sets = {record.claim_id: _token_set(record.claim) for record in rows}
-    ordered_ids = sorted(token_sets)
-    for index, left_id in enumerate(ordered_ids):
-        left = token_sets[left_id]
-        if not left:
-            continue
-        for right_id in ordered_ids[index + 1 :]:
-            right = token_sets[right_id]
-            union_size = len(left | right)
-            if (
-                union_size
-                and len(left & right) / union_size >= near_duplicate_threshold
-            ):
-                union.union(left_id, right_id)
+    claim_tokens = {record.claim_id: _token_set(record.claim) for record in rows}
+    ordered_ids = sorted(claim_tokens)
+    for left_id, right_id in _near_duplicate_pairs(
+        claim_tokens, threshold=near_duplicate_threshold
+    ):
+        union.union(left_id, right_id)
+
+    for left_id, right_id in _near_duplicate_pairs(
+        evidence_tokens, threshold=near_duplicate_threshold
+    ):
+        left_claims = claims_by_evidence[left_id]
+        right_claims = claims_by_evidence[right_id]
+        anchor = left_claims[0]
+        for claim_id in (*left_claims[1:], *right_claims):
+            union.union(anchor, claim_id)
 
     components: dict[str, list[str]] = defaultdict(list)
     for claim_id in ordered_ids:
@@ -399,11 +414,22 @@ def _near_duplicate_pairs(
     token_sets: dict[str, frozenset[str]], *, threshold: float
 ) -> Iterable[tuple[str, str]]:
     ordered_ids = sorted(token_sets)
-    for index, left_id in enumerate(ordered_ids):
+    postings: dict[str, list[str]] = defaultdict(list)
+    for item_id in ordered_ids:
+        for token in token_sets[item_id]:
+            postings[token].append(item_id)
+    position = {item_id: index for index, item_id in enumerate(ordered_ids)}
+    for left_id in ordered_ids:
         left = token_sets[left_id]
         if not left:
             continue
-        for right_id in ordered_ids[index + 1 :]:
+        candidates = {
+            right_id
+            for token in left
+            for right_id in postings[token]
+            if position[right_id] > position[left_id]
+        }
+        for right_id in sorted(candidates):
             right = token_sets[right_id]
             if not right:
                 continue
@@ -463,7 +489,7 @@ def prepare_public_benchmark(
         "source_url": source_url,
         "source_sha256": _sha256(source),
         "seed": seed,
-        "split_protocol": "claim-grouped-v1-with-posthoc-document-variant-audit",
+        "split_protocol": "claim-and-evidence-variant-grouped-v2",
         "ratios": SPLIT_RATIOS,
         "claim_count": len(records),
         "annotated_pair_count": sum(len(record.evidences) for record in records),
