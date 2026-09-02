@@ -5,7 +5,7 @@ import hashlib
 import json
 import sys
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -17,8 +17,10 @@ from .artifacts import write_run_artifacts
 from .benchmark import run_five_stage_benchmark
 from .bm25 import BM25Index
 from .climate_fever import (
+    audit_split_leakage,
     benchmark_public_bm25,
     download_climate_fever,
+    load_climate_fever,
     prepare_public_benchmark,
 )
 from .dense import (
@@ -27,6 +29,13 @@ from .dense import (
     HashDenseEncoder,
     NumpyFlatIndex,
     SentenceTransformerEncoder,
+)
+from .evaluation_protocol import (
+    assert_paired_contracts,
+    audit_training_serving_contracts,
+    enforce_frozen_test_policy,
+    load_run_contract,
+    stable_id_sha256,
 )
 from .fusion import (
     DEFAULT_FEATURES,
@@ -49,6 +58,11 @@ from .metrics import evaluate_predictions, paired_bootstrap
 from .models import RankedDocument
 from .negatives import mine_hard_negatives
 from .pipeline import HybridRetriever
+from .representation_eval import (
+    build_pareto_report,
+    evaluate_representation_pair,
+    load_prediction_variant,
+)
 from .rerank import (
     DeterministicFeatureReranker,
     ModelStudioReranker,
@@ -109,6 +123,14 @@ def _recorded_arguments(args: argparse.Namespace) -> dict[str, Any]:
 
 def _started_at_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _sha256_file(path: str | Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def command_index(args: argparse.Namespace) -> int:
@@ -392,6 +414,8 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         bm25_index = None
     else:
         raise ValueError("provide --rankings or both --bm25-index and --dense-index")
+    if args.ltr_candidate_width <= 0:
+        raise ValueError("ltr_candidate_width must be positive")
     rows: list[dict[str, Any]] = []
     feature_rows: list[dict[str, Any]] = []
     ranking_rows: list[dict[str, Any]] = []
@@ -421,15 +445,19 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             assert bm25_index is not None
             bm25_by_id = {row.evidence_id: row for row in rankings[claim_id]["bm25"]}
             dense_by_id = {row.evidence_id: row for row in rankings[claim_id]["dense"]}
+            rrf_candidates = reciprocal_rank_fusion(
+                rankings[claim_id],
+                k=args.rrf_k,
+                top_k=args.ltr_candidate_width,
+            )
             rrf_by_id = {
                 row.evidence_id: row
-                for row in reciprocal_rank_fusion(rankings[claim_id], k=args.rrf_k)
+                for row in rrf_candidates
             }
-            retrieved_ids = bm25_by_id.keys() | dense_by_id.keys()
             supported_gold = [
                 evidence_id
                 for evidence_id in claims[claim_id].evidence_ids
-                if evidence_id in retrieved_ids
+                if evidence_id in rrf_by_id
             ]
             ltr_supported_positive_count += len(supported_gold)
             ltr_unsupported_positive_count += len(claims[claim_id].evidence_ids) - len(
@@ -438,11 +466,7 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
             if not supported_gold:
                 ltr_skipped_query_count += 1
                 continue
-            candidate_ids = [
-                *supported_gold,
-                *(str(row["evidence_id"]) for row in negatives),
-            ]
-            for evidence_id in dict.fromkeys(candidate_ids):
+            for evidence_id in rrf_by_id:
                 text = text_by_id.get(evidence_id)
                 if text is None:
                     continue
@@ -473,6 +497,14 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
     write_jsonl(output_dir / "rankings.jsonl", ranking_rows)
     if live_indexes:
         write_jsonl(output_dir / "ltr_features.jsonl", feature_rows)
+    candidate_source_distribution: Counter[str] = Counter()
+    for row in feature_rows:
+        features = row["features"]
+        in_bm25 = float(features["bm25_reciprocal_rank"]) > 0.0
+        in_dense = float(features["dense_reciprocal_rank"]) > 0.0
+        source = "both" if in_bm25 and in_dense else "bm25_only" if in_bm25 else "dense_only"
+        candidate_source_distribution[source] += 1
+    total_gold = ltr_supported_positive_count + ltr_unsupported_positive_count
     metrics = {
         "claim_count": len(claims),
         "claim_with_rankings_count": len(claims) - missing_rankings,
@@ -483,6 +515,16 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         "ltr_supported_positive_count": ltr_supported_positive_count,
         "ltr_unsupported_positive_count": ltr_unsupported_positive_count,
         "ltr_skipped_query_count": ltr_skipped_query_count,
+        "ltr_candidate_width": args.ltr_candidate_width,
+        "ltr_retained_group_positive_reachability": (
+            1.0 if feature_rows else 0.0
+        ),
+        "ltr_all_gold_positive_reachability": (
+            ltr_supported_positive_count / total_gold if total_gold else 0.0
+        ),
+        "ltr_candidate_source_distribution": dict(
+            sorted(candidate_source_distribution.items())
+        ),
     }
     write_run_artifacts(
         output_dir,
@@ -502,8 +544,8 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
         ],
         predictions=rows,
         notes=[
-            "LTR positives are restricted to the live BM25/dense candidate pool; unretrieved gold rows are never injected with zero retrieval features.",
-            "Queries with no candidate-supported positive are excluded from LTR training and counted in metrics.",
+            "LTR rows are the exact top-K RRF candidate set used by serving; positives outside that set are never injected with zero retrieval features.",
+            "Queries with no serving-reachable positive are excluded from LTR training and counted in metrics.",
             "Training rows record the same RRF score/rank prior used by five-stage inference.",
         ],
         repository=_repository(),
@@ -732,13 +774,195 @@ def command_prepare_public(args: argparse.Namespace) -> int:
 
 def command_benchmark_public(args: argparse.Namespace) -> int:
     _required(args, "prepared_dir", "output_dir")
+    policy = enforce_frozen_test_policy(
+        args.evaluation_policy,
+        split=args.split,
+        system_id=args.system_id,
+        exact_baseline_reproduction=args.reproduce_consumed_baseline,
+    )
     metrics = benchmark_public_bm25(
         args.prepared_dir,
         args.output_dir,
         split_name=args.split,
         top_k=args.top_k,
     )
+    metrics["evaluation_policy"] = policy
+    write_json(Path(args.output_dir) / "metrics.json", metrics)
     print(json.dumps(metrics, indent=2, sort_keys=True))
+    return 0
+
+
+def command_audit_public_split(args: argparse.Namespace) -> int:
+    _required(args, "prepared_dir", "output_dir")
+    started_at = _started_at_utc()
+    prepared = Path(args.prepared_dir)
+    source = Path(args.input) if args.input else prepared / "source" / "climate-fever.jsonl"
+    manifest = read_json(prepared / "split_manifest.json")
+    if not isinstance(manifest, dict) or not isinstance(manifest.get("split"), dict):
+        raise TypeError("prepared benchmark has no valid split manifest object")
+    if _sha256_file(source) != str(manifest.get("source_sha256")):
+        raise ValueError("source hash does not match split manifest")
+    records = load_climate_fever(source)
+    audit = audit_split_leakage(
+        records,
+        {str(name): [str(value) for value in ids] for name, ids in manifest["split"].items()},
+        claim_similarity_threshold=args.claim_similarity_threshold,
+        evidence_similarity_threshold=args.evidence_similarity_threshold,
+    )
+    audit["frozen_test_policy"] = enforce_frozen_test_policy(
+        args.evaluation_policy,
+        split="validation",
+        system_id="split-audit",
+    )
+    write_run_artifacts(
+        args.output_dir,
+        command="audit-public-split",
+        arguments=_recorded_arguments(args),
+        metrics=audit,
+        started_at=started_at,
+        inputs=[source, prepared / "split_manifest.json", args.evaluation_policy],
+        notes=[
+            "The audit reads the frozen partition without evaluating a retrieval candidate.",
+            "Shared evidence IDs, normalised evidence text and near-duplicate document text are checked separately.",
+        ],
+        repository=_repository(),
+    )
+    print(json.dumps(audit, indent=2, sort_keys=True))
+    return 0 if audit["status"] == "passed" else 2
+
+
+def command_evaluate_representation(args: argparse.Namespace) -> int:
+    _required(
+        args,
+        "claims",
+        "evidence",
+        "baseline_predictions",
+        "candidate_predictions",
+        "baseline_contract",
+        "candidate_contract",
+        "output_dir",
+    )
+    started_at = _started_at_utc()
+    claims = load_claims(args.claims)
+    documents = tuple(iter_evidence(args.evidence))
+    baseline = load_prediction_variant(
+        args.baseline_predictions, variant=args.baseline_variant
+    )
+    candidate = load_prediction_variant(
+        args.candidate_predictions, variant=args.candidate_variant
+    )
+    baseline_contract = load_run_contract(args.baseline_contract)
+    candidate_contract = load_run_contract(args.candidate_contract)
+    contract_audit = assert_paired_contracts(baseline_contract, candidate_contract)
+    query_hash = stable_id_sha256(sorted(claims))
+    candidate_universe_hash = stable_id_sha256(
+        [document.evidence_id for document in documents]
+    )
+    for contract in (baseline_contract, candidate_contract):
+        if contract.query_id_sha256 != query_hash:
+            raise ValueError(f"{contract.system_id} query hash does not match claims")
+        if contract.candidate_universe_sha256 != candidate_universe_hash:
+            raise ValueError(
+                f"{contract.system_id} candidate-universe hash does not match evidence order"
+            )
+        if contract.corpus_sha256 != _sha256_file(args.evidence):
+            raise ValueError(f"{contract.system_id} corpus SHA does not match evidence")
+        if contract.data_sha256 != _sha256_file(args.claims):
+            raise ValueError(f"{contract.system_id} data SHA does not match claims")
+    policy = enforce_frozen_test_policy(
+        args.evaluation_policy,
+        split=candidate_contract.split,
+        system_id=candidate_contract.system_id,
+    )
+    metrics, per_query = evaluate_representation_pair(
+        claims,
+        documents,
+        baseline,
+        candidate,
+        bootstrap_samples=args.bootstrap_samples,
+        seed=args.seed,
+    )
+    metrics["contract_audit"] = contract_audit
+    metrics["evaluation_policy"] = policy
+    metrics["evidence_track"] = candidate_contract.track
+    write_run_artifacts(
+        args.output_dir,
+        command="evaluate-representation",
+        arguments=_recorded_arguments(args),
+        metrics=metrics,
+        started_at=started_at,
+        inputs=[
+            args.claims,
+            args.evidence,
+            args.baseline_predictions,
+            args.candidate_predictions,
+            args.baseline_contract,
+            args.candidate_contract,
+            args.evaluation_policy,
+        ],
+        predictions=per_query,
+        notes=[
+            "Base and adapted systems use the same query IDs, corpus, candidate universe and cutoffs.",
+            "The seven query-taxonomy tags are deterministic diagnostics, not human labels.",
+            "A consumed public frozen test cannot pass this command's policy gate.",
+        ],
+        repository=_repository(),
+    )
+    print(json.dumps(metrics, indent=2, sort_keys=True))
+    return 0
+
+
+def command_audit_stage_contract(args: argparse.Namespace) -> int:
+    _required(args, "training_contract", "serving_contract", "output_dir")
+    started_at = _started_at_utc()
+    training = read_json(args.training_contract)
+    serving = read_json(args.serving_contract)
+    if not isinstance(training, dict) or not isinstance(serving, dict):
+        raise TypeError("training and serving contracts must be JSON objects")
+    audit = audit_training_serving_contracts(
+        training,
+        serving,
+        distribution_tv_limit=args.distribution_tv_limit,
+    )
+    write_run_artifacts(
+        args.output_dir,
+        command="audit-stage-contract",
+        arguments=_recorded_arguments(args),
+        metrics=audit,
+        started_at=started_at,
+        inputs=[args.training_contract, args.serving_contract],
+        notes=[
+            "A failed audit blocks LTR/reranker promotion; it is not converted into a quality result."
+        ],
+        repository=_repository(),
+    )
+    print(json.dumps(audit, indent=2, sort_keys=True))
+    return 0 if audit["status"] == "passed" else 2
+
+
+def command_build_pareto(args: argparse.Namespace) -> int:
+    _required(args, "profiles", "output_dir")
+    started_at = _started_at_utc()
+    payload = read_json(args.profiles)
+    profiles = payload.get("profiles") if isinstance(payload, dict) else payload
+    if not isinstance(profiles, list) or not all(
+        isinstance(profile, dict) for profile in profiles
+    ):
+        raise TypeError("profiles must be a JSON list or an object containing a profiles list")
+    report = build_pareto_report(profiles, quality_metric=args.quality_metric)
+    write_run_artifacts(
+        args.output_dir,
+        command="build-pareto",
+        arguments=_recorded_arguments(args),
+        metrics=report,
+        started_at=started_at,
+        inputs=[args.profiles],
+        notes=[
+            "Pareto dominance is never computed across unlike latency or memory scopes."
+        ],
+        repository=_repository(),
+    )
+    print(json.dumps(report, indent=2, sort_keys=True))
     return 0
 
 
@@ -817,6 +1041,7 @@ def build_parser() -> argparse.ArgumentParser:
     negatives.add_argument("--device")
     negatives.add_argument("--recall-k", type=int, default=1000)
     negatives.add_argument("--rrf-k", type=int, default=60)
+    negatives.add_argument("--ltr-candidate-width", type=int, default=100)
     negatives.add_argument("--output-dir")
     negatives.add_argument("--limit", type=int, default=20)
     negatives.set_defaults(handler=command_mine_negatives)
@@ -875,7 +1100,68 @@ def build_parser() -> argparse.ArgumentParser:
         "--split", choices=("train", "validation", "test"), default="test"
     )
     benchmark_public.add_argument("--top-k", type=int, default=50)
+    benchmark_public.add_argument(
+        "--evaluation-policy",
+        default=str(_repository() / "configs" / "public_evaluation_policy.json"),
+    )
+    benchmark_public.add_argument("--system-id", default="bm25-lexical-baseline-v1")
+    benchmark_public.add_argument("--reproduce-consumed-baseline", action="store_true")
     benchmark_public.set_defaults(handler=command_benchmark_public)
+
+    audit_public = subparsers.add_parser(
+        "audit-public-split",
+        help="audit query/evidence grouping without evaluating the frozen test",
+    )
+    audit_public.add_argument("--prepared-dir")
+    audit_public.add_argument("--input")
+    audit_public.add_argument("--output-dir")
+    audit_public.add_argument("--claim-similarity-threshold", type=float, default=0.90)
+    audit_public.add_argument("--evidence-similarity-threshold", type=float, default=0.90)
+    audit_public.add_argument(
+        "--evaluation-policy",
+        default=str(_repository() / "configs" / "public_evaluation_policy.json"),
+    )
+    audit_public.set_defaults(handler=command_audit_public_split)
+
+    representation = subparsers.add_parser(
+        "evaluate-representation",
+        help="paired base/adapted retrieval evaluation with taxonomy slices",
+    )
+    representation.add_argument("--claims")
+    representation.add_argument("--evidence")
+    representation.add_argument("--baseline-predictions")
+    representation.add_argument("--candidate-predictions")
+    representation.add_argument("--baseline-variant")
+    representation.add_argument("--candidate-variant")
+    representation.add_argument("--baseline-contract")
+    representation.add_argument("--candidate-contract")
+    representation.add_argument("--output-dir")
+    representation.add_argument("--bootstrap-samples", type=int, default=5_000)
+    representation.add_argument("--seed", type=int, default=17)
+    representation.add_argument(
+        "--evaluation-policy",
+        default=str(_repository() / "configs" / "public_evaluation_policy.json"),
+    )
+    representation.set_defaults(handler=command_evaluate_representation)
+
+    contract = subparsers.add_parser(
+        "audit-stage-contract",
+        help="check train/serve candidate width, features and negative-source drift",
+    )
+    contract.add_argument("--training-contract")
+    contract.add_argument("--serving-contract")
+    contract.add_argument("--output-dir")
+    contract.add_argument("--distribution-tv-limit", type=float, default=0.15)
+    contract.set_defaults(handler=command_audit_stage_contract)
+
+    pareto = subparsers.add_parser(
+        "build-pareto",
+        help="build quality/latency/memory Pareto fronts within comparable scopes",
+    )
+    pareto.add_argument("--profiles")
+    pareto.add_argument("--quality-metric", default="evidence_f1")
+    pareto.add_argument("--output-dir")
+    pareto.set_defaults(handler=command_build_pareto)
 
     serve = subparsers.add_parser(
         "serve", help="serve retrieval and grounded verification"

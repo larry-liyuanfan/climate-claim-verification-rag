@@ -253,6 +253,168 @@ def validate_split(
         raise ValueError("normalised duplicate claim leaked across splits")
 
 
+def audit_split_leakage(
+    records: Iterable[ClimateFeverRecord],
+    split: dict[str, list[str]],
+    *,
+    claim_similarity_threshold: float = 0.90,
+    evidence_similarity_threshold: float = 0.90,
+) -> dict[str, Any]:
+    """Audit claim groups, shared evidence and document variants across partitions."""
+
+    rows = list(records)
+    validate_split(rows, split)
+    owner = {
+        claim_id: split_name
+        for split_name, claim_ids in split.items()
+        for claim_id in claim_ids
+    }
+    evidence_owners: dict[str, set[str]] = defaultdict(set)
+    decisive_evidence_owners: dict[str, set[str]] = defaultdict(set)
+    evidence_text: dict[str, str] = {}
+    normalised_evidence_owners: dict[str, set[str]] = defaultdict(set)
+    normalised_decisive_evidence_owners: dict[str, set[str]] = defaultdict(set)
+    for record in rows:
+        split_name = owner[record.claim_id]
+        for item in record.evidences:
+            evidence_owners[item.evidence_id].add(split_name)
+            if item.evidence_label in {"SUPPORTS", "REFUTES"}:
+                decisive_evidence_owners[item.evidence_id].add(split_name)
+            existing = evidence_text.get(item.evidence_id)
+            if existing is not None and existing != item.text:
+                raise ValueError(f"evidence id has inconsistent text: {item.evidence_id}")
+            evidence_text[item.evidence_id] = item.text
+            normalised_evidence_owners[_normalise(item.text)].add(split_name)
+            if item.evidence_label in {"SUPPORTS", "REFUTES"}:
+                normalised_decisive_evidence_owners[_normalise(item.text)].add(split_name)
+
+    claim_tokens = {record.claim_id: _token_set(record.claim) for record in rows}
+    claim_owners = {claim_id: {split_name} for claim_id, split_name in owner.items()}
+    evidence_tokens = {
+        evidence_id: _token_set(text) for evidence_id, text in evidence_text.items()
+    }
+    near_claim_count, near_claim_examples = _cross_split_near_duplicates(
+        claim_tokens,
+        claim_owners,
+        threshold=claim_similarity_threshold,
+    )
+    near_evidence_count, near_evidence_examples = _cross_split_near_duplicates(
+        evidence_tokens,
+        evidence_owners,
+        threshold=evidence_similarity_threshold,
+    )
+    near_decisive_evidence_count, _ = _cross_split_near_duplicates(
+        evidence_tokens,
+        decisive_evidence_owners,
+        threshold=evidence_similarity_threshold,
+    )
+    result: dict[str, Any] = {
+        "shared_evidence_id_cross_split": sum(
+            len(names) > 1 for names in evidence_owners.values()
+        ),
+        "normalised_claim_duplicate_cross_split": sum(
+            len(names) > 1
+            for names in _owners_by_normalised_claim(rows, owner).values()
+        ),
+        "near_duplicate_claim_pairs_cross_split": near_claim_count,
+        "normalised_evidence_text_cross_split": sum(
+            len(names) > 1 for names in normalised_evidence_owners.values()
+        ),
+        "near_duplicate_evidence_pairs_cross_split": near_evidence_count,
+        "shared_decisive_evidence_id_cross_split": sum(
+            len(names) > 1 for names in decisive_evidence_owners.values()
+        ),
+        "normalised_decisive_evidence_text_cross_split": sum(
+            len(names) > 1 for names in normalised_decisive_evidence_owners.values()
+        ),
+        "near_duplicate_decisive_evidence_pairs_cross_split": near_decisive_evidence_count,
+        "claim_similarity_threshold": claim_similarity_threshold,
+        "evidence_similarity_threshold": evidence_similarity_threshold,
+        "near_duplicate_claim_examples": near_claim_examples,
+        "near_duplicate_evidence_examples": near_evidence_examples,
+    }
+    count_fields = (
+        "shared_evidence_id_cross_split",
+        "normalised_claim_duplicate_cross_split",
+        "near_duplicate_claim_pairs_cross_split",
+        "normalised_evidence_text_cross_split",
+        "near_duplicate_evidence_pairs_cross_split",
+    )
+    result["status"] = (
+        "passed" if all(int(result[name]) == 0 for name in count_fields) else "failed"
+    )
+    decisive_fields = (
+        "shared_decisive_evidence_id_cross_split",
+        "normalised_decisive_evidence_text_cross_split",
+        "near_duplicate_decisive_evidence_pairs_cross_split",
+    )
+    result["supervised_relevance_status"] = (
+        "passed"
+        if all(int(result[name]) == 0 for name in decisive_fields)
+        else "failed"
+    )
+    return result
+
+
+def _owners_by_normalised_claim(
+    records: Iterable[ClimateFeverRecord], owner: dict[str, str]
+) -> dict[str, set[str]]:
+    result: dict[str, set[str]] = defaultdict(set)
+    for record in records:
+        result[_normalise(record.claim)].add(owner[record.claim_id])
+    return result
+
+
+def _cross_split_near_duplicates(
+    token_sets: dict[str, frozenset[str]],
+    owners: dict[str, set[str]],
+    *,
+    threshold: float,
+) -> tuple[int, list[dict[str, Any]]]:
+    if not 0.0 < threshold <= 1.0:
+        raise ValueError("near-duplicate threshold must be in (0, 1]")
+    count = 0
+    examples: list[dict[str, Any]] = []
+    for left_id, right_id in _near_duplicate_pairs(token_sets, threshold=threshold):
+        if len(owners[left_id] | owners[right_id]) <= 1:
+            continue
+        left = token_sets[left_id]
+        right = token_sets[right_id]
+        similarity = len(left & right) / len(left | right)
+        count += 1
+        if len(examples) < 10:
+            examples.append(
+                {
+                    "left_id": left_id,
+                    "right_id": right_id,
+                    "similarity": similarity,
+                    "left_splits": sorted(owners[left_id]),
+                    "right_splits": sorted(owners[right_id]),
+                }
+            )
+    return count, examples
+
+
+def _near_duplicate_pairs(
+    token_sets: dict[str, frozenset[str]], *, threshold: float
+) -> Iterable[tuple[str, str]]:
+    ordered_ids = sorted(token_sets)
+    for index, left_id in enumerate(ordered_ids):
+        left = token_sets[left_id]
+        if not left:
+            continue
+        for right_id in ordered_ids[index + 1 :]:
+            right = token_sets[right_id]
+            if not right:
+                continue
+            smaller, larger = sorted((len(left), len(right)))
+            if smaller / larger < threshold:
+                continue
+            union_size = len(left | right)
+            if union_size and len(left & right) / union_size >= threshold:
+                yield left_id, right_id
+
+
 def prepare_public_benchmark(
     source: str | Path,
     output_dir: str | Path,
@@ -264,6 +426,7 @@ def prepare_public_benchmark(
     corpus = build_public_corpus(records)
     split = grouped_split(records, seed=seed)
     validate_split(records, split)
+    leakage_audit = audit_split_leakage(records, split)
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
 
@@ -300,6 +463,7 @@ def prepare_public_benchmark(
         "source_url": source_url,
         "source_sha256": _sha256(source),
         "seed": seed,
+        "split_protocol": "claim-grouped-v1-with-posthoc-document-variant-audit",
         "ratios": SPLIT_RATIOS,
         "claim_count": len(records),
         "annotated_pair_count": sum(len(record.evidences) for record in records),
@@ -307,11 +471,10 @@ def prepare_public_benchmark(
         "claims_with_decisive_evidence": decisive_claims,
         "label_counts": dict(sorted(label_counts.items())),
         "split": split,
-        "leakage_checks": {
-            "shared_evidence_cross_split": 0,
-            "normalised_claim_duplicate_cross_split": 0,
-            "near_duplicate_jaccard_threshold": 0.90,
-        },
+        "candidate_selection_status": (
+            "eligible" if leakage_audit["status"] == "passed" else "blocked"
+        ),
+        "leakage_checks": leakage_audit,
         "retrieval_relevance_definition": (
             "Only SUPPORTS/REFUTES evidence annotations are decisive retrieval positives; "
             "NOT_ENOUGH_INFO annotations remain searchable corpus candidates."
@@ -365,7 +528,8 @@ def benchmark_public_bm25(
             claim_id=claim_id,
             evidence_ids=tuple(row.evidence_id for row in rows),
         )
-    metrics, per_claim, errors = evaluate_predictions(claims, predictions)
+    raw_metrics, per_claim, errors = evaluate_predictions(claims, predictions)
+    metrics: dict[str, Any] = dict(raw_metrics)
     latency_ms.sort()
     percentile = lambda q: latency_ms[
         min(len(latency_ms) - 1, int(q * len(latency_ms)))

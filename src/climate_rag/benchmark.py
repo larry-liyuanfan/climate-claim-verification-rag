@@ -4,6 +4,7 @@ import json
 import os
 import re
 import time
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -216,6 +217,9 @@ def run_five_stage_benchmark(
     rerank_durations: list[float] = []
     reranked_pair_count = 0
     candidate_trace: list[dict[str, Any]] = []
+    candidate_source_distribution: Counter[str] = Counter()
+    serving_gold_total = 0
+    serving_gold_reachable = 0
     for claim_id in sorted(claims):
         query = claims[claim_id].text
         bm25_rows = bm25.search(query, recall_k)
@@ -223,6 +227,24 @@ def run_five_stage_benchmark(
         rrf_rows = reciprocal_rank_fusion(
             {"bm25": bm25_rows, "dense": dense_rows}, k=int(config.get("rrf_k", 60)), top_k=fusion_k
         )
+        bm25_ids = {row.evidence_id for row in bm25_rows}
+        dense_ids = {row.evidence_id for row in dense_rows}
+        rrf_ids = {row.evidence_id for row in rrf_rows}
+        serving_gold_total += len(claims[claim_id].evidence_ids)
+        serving_gold_reachable += sum(
+            evidence_id in rrf_ids for evidence_id in claims[claim_id].evidence_ids
+        )
+        for row in rrf_rows:
+            in_bm25 = row.evidence_id in bm25_ids
+            in_dense = row.evidence_id in dense_ids
+            source = (
+                "both"
+                if in_bm25 and in_dense
+                else "bm25_only"
+                if in_bm25
+                else "dense_only"
+            )
+            candidate_source_distribution[source] += 1
         ltr_rows = _rank_with_ltr(query, bm25_rows, dense_rows, rrf_rows, ranker)
         ltr_fused_by_profile = {
             profile["name"]: weighted_rank_fuse(
@@ -350,4 +372,16 @@ def run_five_stage_benchmark(
         },
         "claim_count": len(claims),
         "final_k": final_k,
+        "stage_contract": {
+            "candidate_width": fusion_k,
+            "feature_names": list(ranker.feature_names),
+            "gold_positive_reachability": (
+                serving_gold_reachable / serving_gold_total
+                if serving_gold_total
+                else 0.0
+            ),
+            "candidate_source_distribution": dict(
+                sorted(candidate_source_distribution.items())
+            ),
+        },
     }, long_rows

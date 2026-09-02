@@ -7,6 +7,7 @@ from climate_rag.bm25 import BM25Index
 from climate_rag.climate_fever import (
     ClimateFeverAnnotation,
     ClimateFeverRecord,
+    audit_split_leakage,
     benchmark_public_bm25,
     grouped_split,
     prepare_public_benchmark,
@@ -55,6 +56,72 @@ def test_grouped_split_keeps_shared_and_near_duplicates_together() -> None:
         claim_id: name for name, claim_ids in split.items() for claim_id in claim_ids
     }
     assert owner["1"] == owner["2"] == owner["3"]
+
+
+def test_split_audit_rejects_cross_partition_document_variants() -> None:
+    records = [
+        ClimateFeverRecord(
+            claim_id="1",
+            claim="First distinct claim",
+            label="SUPPORTS",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "A:1", "SUPPORTS", "A", "Same evidence text."
+                ),
+            ),
+        ),
+        ClimateFeverRecord(
+            claim_id="2",
+            claim="Second distinct claim",
+            label="REFUTES",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "A:2", "REFUTES", "A", "Same, evidence text!"
+                ),
+            ),
+        ),
+    ]
+    audit = audit_split_leakage(
+        records,
+        {"train": ["1"], "validation": ["2"], "test": []},
+    )
+    assert audit["status"] == "failed"
+    assert audit["normalised_evidence_text_cross_split"] == 1
+    assert audit["supervised_relevance_status"] == "failed"
+
+
+def test_split_audit_separates_non_decisive_document_variants() -> None:
+    records = [
+        ClimateFeverRecord(
+            claim_id="1",
+            claim="First distinct claim",
+            label="NOT_ENOUGH_INFO",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "A:1", "NOT_ENOUGH_INFO", "A", "Nearly same evidence text here."
+                ),
+            ),
+        ),
+        ClimateFeverRecord(
+            claim_id="2",
+            claim="Second distinct claim",
+            label="NOT_ENOUGH_INFO",
+            evidences=(
+                ClimateFeverAnnotation(
+                    "A:2", "NOT_ENOUGH_INFO", "A", "Nearly same evidence text, here!"
+                ),
+            ),
+        ),
+    ]
+    audit = audit_split_leakage(
+        records,
+        {"train": ["1"], "validation": [], "test": ["2"]},
+        evidence_similarity_threshold=0.8,
+    )
+    assert audit["status"] == "failed"
+    assert audit["near_duplicate_evidence_pairs_cross_split"] == 1
+    assert audit["near_duplicate_decisive_evidence_pairs_cross_split"] == 0
+    assert audit["supervised_relevance_status"] == "passed"
 
 
 def test_prepare_and_benchmark_public_fixture(tmp_path: Path) -> None:
