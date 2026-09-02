@@ -3,7 +3,8 @@
   "evidence_status": "verified-code-and-existing-artifact-closeout",
   "implementation": {
     "branch": "codex/climate-representation-eval",
-    "code_commit": "9f2fb05e80ff4559fddb25a246f95de651cdfab7",
+    "evaluation_contract_commit": "9f2fb05e80ff4559fddb25a246f95de651cdfab7",
+    "split_and_documentation_commit": "1ad01ffd9e5529075c5194f91018063bd662e7df",
     "base_commit": "1c4e405c5d932b338d623fd6936501734b99169a",
     "capabilities": [
       "consumed frozen-test fail-closed policy",
