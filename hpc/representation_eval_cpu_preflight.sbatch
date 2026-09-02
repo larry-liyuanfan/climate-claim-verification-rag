@@ -12,6 +12,9 @@ set -euo pipefail
 : "${CLIMATE_PREFLIGHT_ROOT:?Set the isolated project-storage root}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed commit}"
 
+module purge
+module load GCC/11.3.0 OpenMPI/4.1.4 Python/3.10.4
+
 REPO_DIR="${CLIMATE_PREFLIGHT_ROOT}/repo"
 PYTHON_BIN="${CLIMATE_PREFLIGHT_ROOT}/.venv/bin/python"
 test "$(readlink -f "${CLIMATE_PREFLIGHT_ROOT}")" = \
