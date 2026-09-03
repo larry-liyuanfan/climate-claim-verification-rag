@@ -37,11 +37,13 @@ Submit in stages; do not run Python/model work on a login node:
 4. Test-only and submit `public_v2_train_pilots.sbatch --array=0-5`.
 5. Use `public_v2_select.sbatch` with `PHASE=pilot`; inspect the fixed selection.
 6. Submit `public_v2_evaluate_full.sbatch` only for the selected one or two array
-   indices, then run `public_v2_select.sbatch` with `PHASE=full` to freeze the
-   configuration.
-7. Submit `public_v2_downstream.sbatch`, then exactly one
-   `public_v2_external_scifact.sbatch` using the frozen config and one-shot
-   ledger.
+   indices. A valid full result uses `PHASE=full`; when every pilot is ineligible
+   and the sole diagnostic fails integrity, use `PHASE=negative-closeout` with
+   the exact failed job/log to freeze no promotion and base-only downstream.
+7. Submit `public_v2_downstream.sbatch`. Submit exactly one
+   `public_v2_external_scifact.sbatch` only when the frozen config records a
+   promoted adapter and authorises transfer. A negative closeout must not create
+   a ledger or open SciFact qrels.
 8. Pass all job IDs to `public_v2_publish.sbatch`; it collects `sacct` inside
    the allocation. Only its compact, schema-checked JSON may enter Git.
 

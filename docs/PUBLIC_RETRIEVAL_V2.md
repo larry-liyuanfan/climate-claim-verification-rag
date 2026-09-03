@@ -17,7 +17,8 @@ newline serialization. This is a byte-serialization normalization only: the
 source digest, split algorithm, seed, assignments and expected digest are not
 changed.
 
-The sole independent transfer event is the official BEIR SciFact test split. The
+The sole conditionally authorised independent transfer event is the official
+BEIR SciFact test split. The
 archive URL and MD5 come from the
 [BEIR dataset registry](https://github.com/beir-cellar/beir/wiki/Datasets-available),
 and the equivalent MTEB dataset revision is pinned to
@@ -25,6 +26,9 @@ and the equivalent MTEB dataset revision is pinned to
 climate configuration is frozen. A project-local atomic ledger permits one
 completed evaluation; an infrastructure failure may retry the identical frozen
 configuration twice, while a quality failure never triggers tuning or a rerun.
+The event is authorised only when a climate adapter passes the full promotion
+gate. In the completed cycle no adapter was promoted, so SciFact was not run and
+its qrels were never opened.
 
 ## Frozen adapter matrix
 
@@ -55,8 +59,10 @@ Evidence F1. Every paired comparison uses exactly 5,000 samples and seed
 
 ## Frozen downstream comparison
 
-The selected full-run adapter (or the labelled diagnostic fallback) is compared
-as exact dense retrieval and HNSW, then combined with BM25 through RRF. The LTR
+When an adapter passes, the selected full-run adapter is compared as exact dense
+retrieval and HNSW, then combined with BM25 through RRF. If the mandatory
+diagnostic fallback is invalid or fails promotion, the closeout loads the frozen
+base embeddings only and labels the adapter as unused. The LTR
 path is LightGBM LambdaMART over the exact RRF Top-100 serving pool. Candidate
 width is 100, feature order is the repository `DEFAULT_FEATURES` tuple, and only
 serving-reachable positives enter training. A hash of every reachable
@@ -74,6 +80,46 @@ diagnostic taxonomy includes spelling variants, year/numeric, entity,
 geographic and semantic-paraphrase slices. These are deterministic text/gold
 heuristics rather than human semantic labels.
 
+## Observed negative closeout
+
+Final pilot array `30005221` completed all six registered configurations. Every
+archive hash matched its filename and internal manifest. On the deterministic
+64-query validation subset, every candidate exactly tied the base:
+
+- Recall@5 `0.53203125`;
+- MRR@10 `0.5338541667`;
+- mean Recall@5, MRR@10, nDCG@10 and Evidence-F1 deltas all `0.0`.
+
+CPU selector `30007095` therefore marked every adapter
+`advance_eligible=false` and selected `s100-r16-n4-t005` only as the one
+pre-registered diagnostic fallback. Full diagnostic `30007124` exited `1:0`:
+the runtime reported missing adapter keys, then the reporting layer hit the
+legacy `lower` versus `ci_lower` field mismatch. Because adapter integrity was
+not established, this is not a valid full effectiveness result. It authorises
+neither promotion nor a quality retry. Negative closeout `30007522` froze
+`selected_candidate_id=null`, `selected_candidate_promoted=false`, base-only
+downstream, forbidden test access and no external transfer. Its archive SHA-256
+is `66222cda5a66f0cbc73a79ea39396de6e7f7abcd0c9ab1c73d0557fa4483b348`.
+
+Validation-only downstream job `30007546` completed in `19:10` with exit `0:0`
+and batch MaxRSS `15,177,324 K`. It loaded no adapter and reported:
+
+| System | Recall@5 | MRR@10 | nDCG@10 | Evidence F1 |
+|---|---:|---:|---:|---:|
+| BM25 | 0.4401 | 0.4872 | 0.3966 | 0.2913 |
+| Base dense Flat/HNSW | 0.5939 | 0.5909 | 0.5241 | 0.3730 |
+| Base RRF | 0.5463 | 0.5995 | 0.5095 | 0.3571 |
+| Base Top-100 LambdaMART | 0.6054 | 0.6276 | 0.5488 | 0.3828 |
+| Base RRF + Qwen3-4B fusion | 0.6275 | 0.6197 | 0.5525 | 0.3969 |
+
+All five non-BM25 paired comparisons used 5,000 samples and had positive
+intervals versus BM25. HNSW matched Flat at Recall@5 `1.0`; the LambdaMART
+training/serving contract passed. The downstream archive SHA-256 is
+`b4d2a6ecda91d70d429ba98de40315884b80446e8fc604110803820bb7297503`.
+These are 126-decisive-claim validation selection results. They do not rescue or
+measure the invalid adapter, and they are not independent-test or online
+evidence.
+
 ## Reproduction and publication
 
 Spartan jobs run from a detached exact commit under the isolated root
@@ -89,10 +135,23 @@ temporary directory (`SLURM_TMPDIR` when exposed, otherwise the allocation's
 to `$HOME` or another project. The frozen peak budget is 34 new persistent
 inodes with a 68-free-inode admission gate. Submission order is
 `sbatch --test-only`, CPU/GPU preflight, six pilots, at most two full
-candidates, downstream comparison, one SciFact transfer and compact
-publication. See [the Spartan runbook](../hpc/README.md).
+candidates, downstream comparison, a conditional SciFact transfer only after
+promotion, and compact publication. See [the Spartan runbook](../hpc/README.md).
 
 GitHub receives only the schema-validated compact record. It never receives
-model caches, adapter checkpoints, predictions or large indexes. Until the
-Slurm chain completes, this document describes a frozen protocol, not a quality
-result.
+model caches, adapter checkpoints, predictions or large indexes. The completed
+record explicitly stores zero SciFact evaluations, unopened qrels, all six
+pilot outcomes, the invalid full diagnostic and the base-only downstream
+boundary. Publish job `30009231` completed with exit `0:0`; the source archive
+SHA-256 is
+`91e0e4f08df015d9caec0f0dd22e2e349a4e136b50b743b32cce6666504e99f3`,
+and the redacted JSON copied into Git has SHA-256
+`8aa96c1800061aa9c454f3cdd3f78bdd693387ec90a8342344c5db381f481efb`.
+
+## Evidence-grounded candidate bullet
+
+- Executed a six-configuration, validation-only CLIMATE-FEVER LoRA retrieval
+  gate on Spartan; preserved an exact-tie negative result, traced an adapter-key
+  integrity failure, stopped promotion/SciFact by policy, and published
+  content-addressed base-only BM25/dense/HNSW/RRF/LambdaMART/Qwen3 evidence with
+  5,000-sample paired intervals and sealed test access.

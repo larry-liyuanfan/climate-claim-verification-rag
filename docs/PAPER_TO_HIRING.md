@@ -87,7 +87,29 @@ than reported as “LambdaMART failed”.
 - Hiring signal: training-serving consistency, label reachability audits and
   failure forensics in a learning-to-rank pipeline.
 
-## 5. Sparse neural retrieval is a future candidate, not a hidden feature
+## 5. A negative gate is a systems result when it changes what ships
+
+The public-v2 cycle tested six fixed LoRA configurations on an isolated,
+leakage-audited CLIMATE-FEVER protocol. All six 64-query pilots tied the base;
+the mandatory diagnostic fallback then exposed missing adapter keys and could
+not produce a valid full promotion result. The workflow froze no selected
+adapter, prohibited SciFact access and completed the registered downstream stack
+with the base encoder only.
+
+- Evidence: jobs `30005221`, `30007095`, `30007124`, `30007522` and `30007546`,
+  plus `docs/verified-runs/climate-public-retrieval-v2-20260904.json`.
+- Hiring signal: fail-closed model governance, artifact/hash provenance,
+  test-set sealing, training/serving-contract checks and disciplined negative
+  result publication under HPC resource constraints.
+- Candidate bullet: Executed a six-configuration, validation-only
+  CLIMATE-FEVER LoRA retrieval gate on Spartan; preserved an exact-tie negative
+  result, traced an adapter-key integrity failure, stopped promotion/SciFact by
+  policy, and published content-addressed base-only ranking evidence with 5,000
+  paired-bootstrap samples.
+- Boundary: this is validation-only engineering evidence. It is not an adapter
+  improvement, independent-test generalisation or online A/B result.
+
+## 6. Sparse neural retrieval is a future candidate, not a hidden feature
 
 SPLADE-v3 shows that learned sparse retrieval can improve over BM25 while
 remaining compatible with inverted-index serving. It is a plausible next

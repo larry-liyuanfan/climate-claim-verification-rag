@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from climate_rag.bm25 import BM25Index
 from climate_rag.dense import SentenceTransformerEncoder
@@ -64,7 +65,7 @@ def parse_args() -> argparse.Namespace:
 
 def _dense_rows(
     claim_ids: list[str],
-    query_vectors: np.ndarray,
+    query_vectors: NDArray[np.float32],
     index: Any,
     documents: list[EvidenceDocument],
     *,
@@ -171,7 +172,7 @@ def _feature_row(
     lexical = by_bm25.get(evidence_id)
     dense = by_dense.get(evidence_id)
     rrf = by_rrf[evidence_id]
-    return build_candidate_features(
+    features: dict[str, float] = build_candidate_features(
         query,
         rrf.text,
         bm25_score=lexical.score if lexical else 0.0,
@@ -181,6 +182,7 @@ def _feature_row(
         rrf_score=rrf.score,
         rrf_rank=rrf.rank,
     )
+    return features
 
 
 def _rank_ltr(

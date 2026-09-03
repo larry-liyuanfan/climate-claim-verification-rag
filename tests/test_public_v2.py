@@ -6,6 +6,7 @@ import subprocess
 import sys
 import zipfile
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -30,7 +31,9 @@ def _repository() -> Path:
     return Path(__file__).parents[1]
 
 
-def _comparison(recall_lower: float, secondary_delta: float = 0.01) -> dict:
+def _comparison(
+    recall_lower: float, secondary_delta: float = 0.01
+) -> dict[str, Any]:
     return {
         "paired_bootstrap": {
             "recall@5": {
