@@ -13,11 +13,12 @@ from .metrics import evaluate_predictions, paired_bootstrap
 from .models import Claim, EvidenceDocument, Prediction, prediction_from_mapping
 
 TAXONOMY = (
+    "spelling",
     "entity",
-    "numeric_or_year",
+    "year_or_numeric",
     "geographic",
     "lexical_mismatch",
-    "semantic_inference",
+    "semantic_paraphrase",
     "multi_evidence",
     "unanswerable",
 )
@@ -54,6 +55,39 @@ def _normalise(value: str) -> str:
 
 def _tokens(value: str) -> frozenset[str]:
     return frozenset(_normalise(value).split())
+
+
+def _edit_distance_at_most_one(left: str, right: str) -> bool:
+    if left == right or abs(len(left) - len(right)) > 1:
+        return False
+    if len(left) > len(right):
+        left, right = right, left
+    if len(left) == len(right):
+        return sum(a != b for a, b in zip(left, right, strict=True)) == 1
+    offset = 0
+    edits = 0
+    for index, character in enumerate(left):
+        if character == right[index + offset]:
+            continue
+        edits += 1
+        offset += 1
+        if edits > 1 or character != right[index + offset]:
+            return False
+    return True
+
+
+def _has_spelling_variant(
+    claim_tokens: frozenset[str], evidence_tokens: frozenset[str]
+) -> bool:
+    claim_only = {token for token in claim_tokens - evidence_tokens if len(token) >= 5}
+    evidence_only = {
+        token for token in evidence_tokens - claim_tokens if len(token) >= 5
+    }
+    return any(
+        left[0] == right[0] and _edit_distance_at_most_one(left, right)
+        for left in claim_only
+        for right in evidence_only
+    )
 
 
 def load_prediction_variant(
@@ -111,7 +145,7 @@ def infer_query_taxonomy(
     tokens = _tokens(text)
     labels: list[str] = []
     if re.search(r"\b(?:18|19|20)\d{2}\b|\b\d+(?:\.\d+)?%?\b", text):
-        labels.append("numeric_or_year")
+        labels.append("year_or_numeric")
     if any(term in normalised for term in GEOGRAPHIC_TERMS):
         labels.append("geographic")
     if re.search(r"\b[A-Z]{2,}\b|(?:^|[.!?]\s+)[A-Z][a-z]+\s+[A-Z][a-z]+", text):
@@ -122,20 +156,26 @@ def infer_query_taxonomy(
         labels.append("unanswerable")
     else:
         overlaps: list[float] = []
+        spelling_variant = False
         for evidence_id in claim.evidence_ids:
             evidence = evidence_by_id.get(evidence_id)
             if evidence is None:
                 continue
             evidence_tokens = _tokens(evidence.text)
+            spelling_variant = spelling_variant or _has_spelling_variant(
+                tokens, evidence_tokens
+            )
             union = tokens | evidence_tokens
             overlaps.append(
                 len(tokens & evidence_tokens) / len(union) if union else 0.0
             )
         maximum_overlap = max(overlaps, default=0.0)
+        if spelling_variant:
+            labels.append("spelling")
         if maximum_overlap < lexical_mismatch_threshold:
             labels.append("lexical_mismatch")
         if maximum_overlap < 0.30:
-            labels.append("semantic_inference")
+            labels.append("semantic_paraphrase")
     return tuple(name for name in TAXONOMY if name in labels)
 
 

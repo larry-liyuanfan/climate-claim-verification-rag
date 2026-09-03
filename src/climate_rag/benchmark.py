@@ -36,6 +36,7 @@ def _make_reranker(config: dict[str, Any]) -> Reranker:
             max_length=int(config.get("max_length", 8192)),
             batch_size=int(config.get("batch_size", 8)),
             dtype=str(config.get("dtype", "auto")),
+            revision=config.get("revision"),
             instruction=str(
                 config.get(
                     "instruction",
@@ -159,7 +160,7 @@ def run_five_stage_benchmark(
     config_source = Path(config_path)
     if config_source.suffix.lower() in {".yaml", ".yml"}:
         try:
-            import yaml
+            import yaml  # type: ignore[import-untyped]
         except ImportError as exc:
             raise RuntimeError("PyYAML is required for YAML benchmark configs") from exc
         config = yaml.safe_load(config_source.read_text(encoding="utf-8"))
@@ -290,7 +291,7 @@ def run_five_stage_benchmark(
                     "reranker_score": reranked_row.score if reranked_row is not None else None,
                 }
             )
-        stage_rows = {
+        stage_rows: dict[str, list[RankedDocument]] = {
             "bm25": bm25_rows,
             "dense": dense_rows,
             "rrf": rrf_rows,
@@ -301,10 +302,12 @@ def run_five_stage_benchmark(
             stage_rows[fused_stages[profile_name]] = fused
         for profile_name, fused in ltr_fused_by_profile.items():
             stage_rows[ltr_fused_stages[profile_name]] = fused
-        for stage, rows in stage_rows.items():
+        for stage, ranked_rows in stage_rows.items():
             predictions[stage][claim_id] = Prediction(
                 claim_id=claim_id,
-                evidence_ids=tuple(row.evidence_id for row in rows[:final_k]),
+                evidence_ids=tuple(
+                    row.evidence_id for row in ranked_rows[:final_k]
+                ),
             )
     target = Path(output_dir)
     target.mkdir(parents=True, exist_ok=True)
@@ -313,9 +316,9 @@ def run_five_stage_benchmark(
     per_system_rows: dict[str, list[dict[str, Any]]] = {}
     long_rows: list[dict[str, Any]] = []
     for stage, stage_predictions in predictions.items():
-        metrics, rows, _ = evaluate_predictions(claims, stage_predictions)
+        metrics, metric_rows, _ = evaluate_predictions(claims, stage_predictions)
         system_metrics[stage] = metrics
-        per_system_rows[stage] = rows
+        per_system_rows[stage] = metric_rows
         write_json(
             target / f"predictions_{stage}.json",
             {
@@ -323,7 +326,7 @@ def run_five_stage_benchmark(
                 for claim_id, prediction in stage_predictions.items()
             },
         )
-        long_rows.extend({"system": stage, **row} for row in rows)
+        long_rows.extend({"system": stage, **row} for row in metric_rows)
     baseline = {row["claim_id"]: row for row in per_system_rows["bm25"]}
     comparisons: dict[str, Any] = {}
     for stage in predictions:

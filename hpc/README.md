@@ -1,5 +1,58 @@
 # Spartan runbook
 
+## Public retrieval v2 isolated chain
+
+The public-v2 workflow is independent of the historical restricted-data chain
+below. Its only valid root is:
+
+```text
+/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2
+```
+
+The required branch is `codex/climate-public-retrieval-v2`. Push an
+implementation commit, clone that exact commit into `repos/<sha>`, check it out
+detached, and keep the packed environment, data, runs, logs and durable
+artifacts inside the root. The project filesystem is inode-constrained, so the
+environment is expanded from `envs/runtime-py310-<sha256>.tar.gz` into each allocation's
+compute-node temporary directory (`SLURM_TMPDIR` when available, otherwise the
+allocation's `TMPDIR`); Hugging Face, ModelScope and pip download caches are
+also job-local and ephemeral. No stage writes a cache to `$HOME` or another project.
+Every sbatch script checks both the literal root and exact Git SHA before doing
+work.
+
+Every stage works entirely in that node-local directory and persists exactly
+one `stage-<sha256>.tar.gz` file. Each archive contains a manifest with the
+source commit, Slurm job, file count, byte count and payload-tree hash; consumers
+verify both the filename hash and manifest before unpacking. Stdout and stderr
+must use the same Slurm log path. The frozen storage budget in
+`configs/public_v2_storage.json` projects 34 peak new inodes and requires 68
+free before preflight, including a 2x safety factor. No persistent per-stage
+directory is allowed.
+
+Submit in stages; do not run Python/model work on a login node:
+
+1. Run `sbatch --test-only` for `public_v2_preflight.sbatch`, then submit it.
+2. After success, test-only and submit `public_v2_gpu_preflight.sbatch`.
+3. Test-only and submit `public_v2_build_base.sbatch`.
+4. Test-only and submit `public_v2_train_pilots.sbatch --array=0-5`.
+5. Use `public_v2_select.sbatch` with `PHASE=pilot`; inspect the fixed selection.
+6. Submit `public_v2_evaluate_full.sbatch` only for the selected one or two array
+   indices. A valid full result uses `PHASE=full`; when every pilot is ineligible
+   and the sole diagnostic fails integrity, use `PHASE=negative-closeout` with
+   the exact failed job/log to freeze no promotion and base-only downstream.
+7. Submit `public_v2_downstream.sbatch`. Submit exactly one
+   `public_v2_external_scifact.sbatch` only when the frozen config records a
+   promoted adapter and authorises transfer. A negative closeout must not create
+   a ledger or open SciFact qrels.
+8. Pass all job IDs to `public_v2_publish.sbatch`; it collects `sacct` inside
+   the allocation. Only its compact, schema-checked JSON may enter Git.
+
+Infrastructure failure may be retried twice with the identical config and a new
+output directory. A completed quality result is never rerun or used to alter a
+frozen hyperparameter. Keep every failed matrix result in the compact record.
+The public v2 test is not materialised as a claims file, and the historical
+consumed test cannot be reproduced.
+
 Verified account/project: `punim2936`. The restricted data directory is:
 
 ```text

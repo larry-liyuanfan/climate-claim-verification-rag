@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol
 
@@ -19,7 +19,9 @@ def l2_normalize(matrix: np.ndarray) -> np.ndarray:
     if values.ndim == 1:
         values = values.reshape(1, -1)
     norms = np.linalg.norm(values, axis=1, keepdims=True)
-    return values / np.maximum(norms, np.finfo(np.float32).eps)
+    return np.asarray(
+        values / np.maximum(norms, np.finfo(np.float32).eps), dtype=np.float32
+    )
 
 
 class DenseEncoder(Protocol):
@@ -76,6 +78,7 @@ class SentenceTransformerEncoder:
         device: str | None = None,
         truncate_dim: int | None = None,
         adapter_path: str | None = None,
+        revision: str | None = None,
     ) -> None:
         try:
             ensure_torch_pytree_compat()
@@ -96,7 +99,9 @@ class SentenceTransformerEncoder:
             model_name,
             device=device,
             truncate_dim=truncate_dim,
+            revision=revision,
         )
+        self.revision = revision
         self.adapter_path = adapter_path
         self.adapter_parameter_count = 0
         if adapter_path:
@@ -256,7 +261,11 @@ class FaissANNIndex:
             rows = len(np.atleast_2d(queries))
             return np.empty((rows, 0), dtype=np.float32), np.empty((rows, 0), dtype=np.int64)
         query_vectors = np.ascontiguousarray(l2_normalize(queries), dtype=np.float32)
-        return self.index.search(query_vectors, top_k)
+        scores, indices = self.index.search(query_vectors, top_k)
+        return (
+            np.asarray(scores, dtype=np.float32),
+            np.asarray(indices, dtype=np.int64),
+        )
 
     def save(self, path: str | Path) -> None:
         import faiss
@@ -268,9 +277,20 @@ class FaissANNIndex:
         import faiss
 
         instance = cls.__new__(cls)
-        instance.dimension = int(metadata["dimension"])
+        raw_dimension = metadata["dimension"]
+        if not isinstance(raw_dimension, (int, str)):
+            raise TypeError("FAISS metadata dimension must be an integer")
+        raw_parameters = metadata.get("parameters", {})
+        if not isinstance(raw_parameters, Mapping):
+            raise TypeError("FAISS metadata parameters must be an object")
+        parameters: dict[str, int] = {}
+        for name, value in raw_parameters.items():
+            if not isinstance(value, (int, str)):
+                raise TypeError(f"FAISS parameter must be an integer: {name}")
+            parameters[str(name)] = int(value)
+        instance.dimension = int(raw_dimension)
         instance.kind = str(metadata["kind"])
-        instance.parameters = dict(metadata.get("parameters", {}))
+        instance.parameters = parameters
         instance.index = faiss.read_index(str(path))
         return instance
 
@@ -343,6 +363,7 @@ class DenseRetriever:
             encoder_spec["query_prefix"] = self.encoder.query_prefix
             encoder_spec["query_prompt_name"] = self.encoder.query_prompt_name
             encoder_spec["adapter_path"] = self.encoder.adapter_path
+            encoder_spec["revision"] = self.encoder.revision
         backend_spec: dict[str, object] = {"type": backend_type}
         if isinstance(self.backend, FaissANNIndex):
             backend_spec.update(
@@ -378,6 +399,7 @@ class DenseRetriever:
                 query_prompt_name=encoder_spec.get("query_prompt_name"),
                 device=device,
                 adapter_path=encoder_spec.get("adapter_path"),
+                revision=encoder_spec.get("revision"),
             )
         backend_spec = spec["backend"]
         index_path = target / spec["index_file"]

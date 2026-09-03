@@ -5,6 +5,8 @@
   "split_seed": 20260825,
   "frozen_test": {
     "status": "consumed",
+    "permanently_sealed": true,
+    "sealed_at": "2026-09-03",
     "consumed_at": "2026-08-25",
     "consumed_system_id": "bm25-lexical-baseline-v1",
     "consumed_artifact": "docs/verified-runs/climate-fever-public-bm25-test-20260825.json",
@@ -18,7 +20,8 @@
       "decision": "Keep the historical BM25 baseline, but forbid any new candidate/final test claim on this split."
     },
     "additional_candidate_evaluations_allowed": false,
-    "exact_baseline_reproduction_allowed": true
+    "exact_baseline_reproduction_allowed": false,
+    "seal_boundary": "The historical CLIMATE-FEVER test is permanently retired. No further candidate or exact-baseline retrieval execution is allowed."
   },
   "validation_gate": {
     "bootstrap_samples": 5000,
@@ -35,6 +38,7 @@
   "future_split_protocol": {
     "name": "claim-and-evidence-variant-grouped-v2",
     "verified_split_manifest_sha256": "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16",
+    "verified_split_manifest_newline": "crlf",
     "counts": {
       "train": 1075,
       "validation": 230,
@@ -43,5 +47,9 @@
     "strict_variant_audit": "passed",
     "test_use": "forbidden_in_this_project_cycle"
   },
+  "allowed_selection_splits": [
+    "train",
+    "validation"
+  ],
   "boundary": "The public frozen test was consumed by the lexical baseline. Further representation, fusion and reranker selection is validation-only; no new independent public-test claim is available in this project cycle."
 }

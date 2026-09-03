@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/schemas/public_v2_compact.schema.json",
+  "title": "Climate public retrieval v2 compact evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evidence_status",
+    "protocol",
+    "data",
+    "baselines",
+    "adapter_matrix",
+    "full_selection",
+    "downstream",
+    "external_transfer",
+    "slurm_jobs",
+    "artifact_hashes",
+    "truth_boundaries"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "evidence_status": {"type": "string"},
+    "protocol": {"type": "object"},
+    "data": {"type": "object"},
+    "baselines": {"type": "object"},
+    "adapter_matrix": {"type": "array", "minItems": 6, "maxItems": 6},
+    "full_selection": {"type": "object"},
+    "downstream": {"type": "object"},
+    "external_transfer": {"type": "object"},
+    "slurm_jobs": {"type": "array", "minItems": 1},
+    "artifact_hashes": {"type": "object"},
+    "truth_boundaries": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"type": "string"}
+    }
+  }
+}

@@ -130,6 +130,7 @@ class Qwen3CausalLMReranker:
         batch_size: int = 8,
         dtype: str = "auto",
         instruction: str = "Given a climate claim, retrieve evidence that helps verify the claim",
+        revision: str | None = None,
     ) -> None:
         try:
             import torch
@@ -143,10 +144,14 @@ class Qwen3CausalLMReranker:
         self.batch_size = batch_size
         self.dtype = dtype
         self.instruction = instruction
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
+        self.revision = revision
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_name, padding_side="left", revision=revision
+        )
         self._model = AutoModelForCausalLM.from_pretrained(
             model_name,
             torch_dtype=_resolve_torch_dtype(torch, dtype),
+            revision=revision,
         ).eval()
         if device:
             self._model.to(device)

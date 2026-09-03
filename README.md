@@ -59,6 +59,32 @@ climate-rag audit-public-split \
   --output-dir runs/climate-fever-split-audit
 ```
 
+## Public retrieval v2
+
+The public-v2 cycle was pre-registered in
+[`configs/public_retrieval_v2.json`](configs/public_retrieval_v2.json). It uses
+only the 1,075-claim train partition for hard-negative LoRA/InfoNCE training and
+the 230-claim validation partition for pilot/full selection. The old consumed
+test is permanently sealed. Six fixed Qwen3-Embedding-0.6B adapters cover
+100/300 steps, rank 8/16, 4/8 hard negatives and temperatures 0.03/0.05; no more
+than two can reach full validation.
+
+All six 64-query pilots tied the base exactly (Recall@5 `0.53203125`, MRR@10
+`0.53385417`, and zero mean deltas for all four registered metrics). The one
+pre-registered full diagnostic then exposed missing adapter keys and did not
+produce a valid promotion result. No adapter was promoted, no quality retry was
+run, and the SciFact event was not authorised; its qrels were never opened.
+
+The validation-only base closeout compared BM25, base dense Flat/HNSW, fixed
+RRF, Top-100 LambdaMART and the fixed 1:1 RRF/Qwen3-4B fusion. The fusion reached
+Recall@5/MRR@10/nDCG@10/F1 `0.6275/0.6197/0.5525/0.3969` over 126 decisive
+validation claims. These are same-validation selection metrics, not adapter
+gains or independent-test evidence. The complete method, negative result,
+archive hashes and truth boundaries are in
+[`docs/PUBLIC_RETRIEVAL_V2.md`](docs/PUBLIC_RETRIEVAL_V2.md).
+The compact record is
+[`docs/verified-runs/climate-public-retrieval-v2-20260904.json`](docs/verified-runs/climate-public-retrieval-v2-20260904.json).
+
 The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`. The full representation-training case and two evidence-grounded resume bullets are in [`docs/REPRESENTATION_TRAINING_CASE.md`](docs/REPRESENTATION_TRAINING_CASE.md).
 
 ## Main commands

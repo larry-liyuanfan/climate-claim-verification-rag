@@ -52,3 +52,31 @@ def test_candidate_supported_ltr_copies_git_objects_to_node_local_storage() -> N
     assert "git clone --shared" not in script
     assert "trap 'rm -rf" in script
     assert '${CLIMATE_GIT_COMMIT:?Set an exact pushed Git commit}' in script
+
+
+def test_public_v2_jobs_preserve_module_pythonpath() -> None:
+    scripts = sorted((ROOT / "hpc").glob("public_v2_*.sbatch"))
+    assert len(scripts) == 9
+    expected = 'PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"'
+    for script_path in scripts:
+        assert expected in script_path.read_text(), script_path.name
+    runtime = (ROOT / "hpc" / "public_v2_runtime.sh").read_text()
+    assert 'runtime_site_packages="${runtime_env}/lib/python3.10/site-packages"' in runtime
+    assert 'PYTHONPATH="${runtime_site_packages}${PYTHONPATH:+:${PYTHONPATH}}"' in runtime
+
+
+def test_public_v2_pilots_use_frozen_hugging_face_revision() -> None:
+    script = (ROOT / "hpc" / "public_v2_train_pilots.sbatch").read_text()
+    assert "--model Qwen/Qwen3-Embedding-0.6B" in script
+    assert "--model_revision 97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3" in script
+    assert "--use_hf true" in script
+
+
+def test_public_v2_jobs_find_swift_nested_checkpoint() -> None:
+    for name in (
+        "public_v2_train_pilots.sbatch",
+        "public_v2_evaluate_full.sbatch",
+    ):
+        script = (ROOT / "hpc" / name).read_text()
+        assert "-mindepth 2 -maxdepth 2 -type d" in script
+        assert "-name 'checkpoint-*'" in script

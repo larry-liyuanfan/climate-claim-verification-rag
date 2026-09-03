@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "configuration_id": "inode-bounded-single-archive-v1",
+  "persistent_root": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2",
+  "node_temporary_precedence": [
+    "SLURM_TMPDIR",
+    "TMPDIR"
+  ],
+  "allowed_node_temporary_prefixes": [
+    "/tmp",
+    "/var/tmp",
+    "/jobfs"
+  ],
+  "archive": {
+    "format": "tar.gz",
+    "manifest_inside_archive": true,
+    "sha256_in_filename": true,
+    "verify_before_unpack": true
+  },
+  "persistent_inode_budget": {
+    "stage_archives": 17,
+    "external_transfer_ledger": 1,
+    "merged_slurm_logs": 15,
+    "transient_pack_or_atomic_write_peak": 1,
+    "projected_peak_new_inodes": 34,
+    "safety_factor": 2,
+    "minimum_free_inodes_before_preflight": 68
+  },
+  "boundaries": {
+    "persistent_stage_directories": 0,
+    "home_cache_writes": 0,
+    "other_project_cache_writes": 0,
+    "maximum_pilot_archives": 6,
+    "maximum_full_archives": 2
+  }
+}

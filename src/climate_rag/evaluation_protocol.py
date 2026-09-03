@@ -9,7 +9,13 @@ from typing import Any
 from .io import read_json
 
 ALLOWED_TRACKS = frozenset(
-    {"restricted_offline_dev", "public_validation", "public_frozen_test", "fixture"}
+    {
+        "restricted_offline_dev",
+        "public_validation",
+        "public_frozen_test",
+        "external_transfer",
+        "fixture",
+    }
 )
 
 
@@ -189,6 +195,12 @@ def audit_training_serving_contracts(
         abs(train_distribution.get(name, 0.0) - serving_distribution.get(name, 0.0))
         for name in sources
     )
+    training_reachable_hash = str(training.get("reachable_positive_id_sha256", ""))
+    serving_reachable_hash = str(
+        serving.get("training_reachable_positive_id_sha256", "")
+    )
+    training_positive_policy = str(training.get("positive_policy", ""))
+    serving_positive_policy = str(serving.get("positive_policy", ""))
     checks = {
         "candidate_width_equal": training_width == serving_width and training_width > 0,
         "feature_names_equal": bool(training_features)
@@ -198,6 +210,11 @@ def audit_training_serving_contracts(
         == set(serving_distribution),
         "candidate_source_total_variation_within_limit": total_variation
         <= distribution_tv_limit,
+        "reachable_positive_handoff_exact": len(training_reachable_hash) == 64
+        and training_reachable_hash == serving_reachable_hash,
+        "positive_policy_equal": training_positive_policy
+        == serving_positive_policy
+        == "candidate-supported-only",
     }
     return {
         "status": "passed" if all(checks.values()) else "failed",
@@ -208,6 +225,14 @@ def audit_training_serving_contracts(
             "serving": list(serving_features),
         },
         "reachable_positive_rate": reachable_rate,
+        "reachable_positive_handoff": {
+            "training_sha256": training_reachable_hash,
+            "serving_model_sha256": serving_reachable_hash,
+        },
+        "positive_policy": {
+            "training": training_positive_policy,
+            "serving": serving_positive_policy,
+        },
         "candidate_source_distribution": {
             "training": train_distribution,
             "serving": serving_distribution,
