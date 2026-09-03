@@ -63,6 +63,15 @@ def main() -> int:
     frozen = read_json(args.frozen_config)
     if not isinstance(frozen, dict):
         raise TypeError("frozen config must be an object")
+    external = frozen.get("external_transfer")
+    if (
+        not frozen.get("selected_candidate_promoted")
+        or not isinstance(external, dict)
+        or external.get("authorized") is False
+    ):
+        raise PermissionError(
+            "SciFact access is forbidden because no climate adapter was promoted"
+        )
     frozen_sha = file_sha256(args.frozen_config)
     attempt_id = os.environ.get("SLURM_JOB_ID", "local-attempt")
     reserve_external_transfer(

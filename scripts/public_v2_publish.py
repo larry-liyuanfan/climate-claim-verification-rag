@@ -23,10 +23,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base-metrics", required=True)
     parser.add_argument("--pilot-selection", required=True)
     parser.add_argument("--full-selection", required=True)
-    parser.add_argument("--full-metrics", action="append", required=True)
+    parser.add_argument("--full-metrics", action="append")
     parser.add_argument("--downstream-metrics", required=True)
-    parser.add_argument("--external-metrics", required=True)
-    parser.add_argument("--external-ledger", required=True)
+    parser.add_argument("--external-metrics")
+    parser.add_argument("--external-ledger")
     parser.add_argument("--sacct-json", required=True)
     parser.add_argument("--schema", required=True)
     parser.add_argument("--output-dir", required=True)
@@ -68,10 +68,18 @@ def main() -> int:
     base = _object(args.base_metrics)
     pilot = _object(args.pilot_selection)
     full = _object(args.full_selection)
-    full_metrics = [_object(path) for path in args.full_metrics]
+    full_metrics = [_object(path) for path in (args.full_metrics or [])]
     downstream = _object(args.downstream_metrics)
-    external = _object(args.external_metrics)
-    external_ledger = _object(args.external_ledger)
+    if bool(args.external_metrics) != bool(args.external_ledger):
+        raise ValueError("external metrics and ledger must be supplied together")
+    external = _object(args.external_metrics) if args.external_metrics else None
+    external_ledger = _object(args.external_ledger) if args.external_ledger else None
+    negative_closeout = external is None
+    if negative_closeout and (
+        full.get("selected_candidate_promoted")
+        or downstream.get("downstream_mode") != "base-only-negative-closeout"
+    ):
+        raise ValueError("external transfer may be omitted only for base-only closeout")
     sacct = read_json(args.sacct_json)
     if not isinstance(sacct, list):
         raise TypeError("sacct JSON must be a list")
@@ -105,9 +113,74 @@ def main() -> int:
                 ),
             }
         matrix.append(row)
+    if negative_closeout:
+        scifact: dict[str, Any] = {
+            "status": "not-run",
+            "qrels_opened": False,
+            "reason": "no-adapter-passed-promotion-gate",
+        }
+        external_record: dict[str, Any] = {
+            "dataset": "SciFact",
+            "status": "not-run",
+            "reason": "no-adapter-passed-promotion-gate",
+            "completed_evaluations": 0,
+            "attempt_count": 0,
+            "qrels_opened": False,
+            "truth_boundary": (
+                "SciFact was not evaluated and its qrels were never opened because no "
+                "climate adapter passed the pre-registered promotion boundary."
+            ),
+        }
+    else:
+        assert external is not None
+        assert external_ledger is not None
+        scifact = external["dataset_manifest"]
+        external_record = {
+            "dataset": "SciFact",
+            "status": "completed",
+            "base": _metric_summary(external["base"]),
+            "candidate": _metric_summary(external["candidate"]),
+            "paired_bootstrap": external["paired_bootstrap"],
+            "diagnostic_slices": external["diagnostic_slices"],
+            "completed_evaluations": external_ledger["completed_evaluations"],
+            "attempt_count": len(external_ledger["attempts"]),
+            "metrics_sha256": file_sha256(str(args.external_metrics)),
+            "truth_boundary": external["truth_boundary"],
+        }
+    artifact_hashes = {
+        "prepare_metrics_sha256": file_sha256(args.prepare_metrics),
+        "base_metrics_sha256": file_sha256(args.base_metrics),
+        "pilot_selection_sha256": file_sha256(args.pilot_selection),
+        "full_selection_sha256": file_sha256(args.full_selection),
+        "downstream_metrics_sha256": file_sha256(args.downstream_metrics),
+        "sacct_sha256": file_sha256(args.sacct_json),
+    }
+    if not negative_closeout:
+        artifact_hashes.update(
+            {
+                "external_metrics_sha256": file_sha256(str(args.external_metrics)),
+                "external_ledger_sha256": file_sha256(str(args.external_ledger)),
+            }
+        )
+    truth_boundaries = [
+        "All CLIMATE-FEVER candidate selection uses the 1,075-train/230-validation v2 partitions; the historical consumed test is permanently sealed.",
+        "Only decisive-evidence validation claims enter retrieval metrics; the full 230-claim partition count remains reported.",
+        "Pilot advancement is not promotion. Promotion requires Recall@5 paired CI lower bound above zero and no secondary mean regression.",
+        (
+            "No adapter was promoted; downstream uses the frozen base encoder only and SciFact qrels were never opened."
+            if negative_closeout
+            else "The SciFact result is one post-freeze external transfer event and cannot trigger tuning or a repeated quality run."
+        ),
+        "ANN, LambdaMART and reranker timings are component measurements on allocated Spartan hardware, not an online SLA.",
+        "Predictions, checkpoints, model caches and indexes remain on Spartan; Git contains only this compact redacted record.",
+    ]
     compact = {
         "schema_version": 1,
-        "evidence_status": "verified-public-validation-and-one-shot-external-transfer",
+        "evidence_status": (
+            "verified-public-validation-negative-adapter-closeout"
+            if negative_closeout
+            else "verified-public-validation-and-one-shot-external-transfer"
+        ),
         "protocol": {
             "id": protocol["protocol_id"],
             "git_commit": downstream["resource"]["git_commit"],
@@ -119,7 +192,7 @@ def main() -> int:
         },
         "data": {
             "climate_fever": prepared["climate_fever"],
-            "scifact": external["dataset_manifest"],
+            "scifact": scifact,
         },
         "baselines": {
             "selection_boundary": base["selection_boundary"],
@@ -141,36 +214,10 @@ def main() -> int:
             "reranker": downstream["reranker"],
             "selected_adapter": downstream["selected_adapter"],
         },
-        "external_transfer": {
-            "dataset": "SciFact",
-            "base": _metric_summary(external["base"]),
-            "candidate": _metric_summary(external["candidate"]),
-            "paired_bootstrap": external["paired_bootstrap"],
-            "diagnostic_slices": external["diagnostic_slices"],
-            "completed_evaluations": external_ledger["completed_evaluations"],
-            "attempt_count": len(external_ledger["attempts"]),
-            "metrics_sha256": file_sha256(args.external_metrics),
-            "truth_boundary": external["truth_boundary"],
-        },
+        "external_transfer": external_record,
         "slurm_jobs": sacct,
-        "artifact_hashes": {
-            "prepare_metrics_sha256": file_sha256(args.prepare_metrics),
-            "base_metrics_sha256": file_sha256(args.base_metrics),
-            "pilot_selection_sha256": file_sha256(args.pilot_selection),
-            "full_selection_sha256": file_sha256(args.full_selection),
-            "downstream_metrics_sha256": file_sha256(args.downstream_metrics),
-            "external_metrics_sha256": file_sha256(args.external_metrics),
-            "external_ledger_sha256": file_sha256(args.external_ledger),
-            "sacct_sha256": file_sha256(args.sacct_json),
-        },
-        "truth_boundaries": [
-            "All CLIMATE-FEVER candidate selection uses the 1,075-train/230-validation v2 partitions; the historical consumed test is permanently sealed.",
-            "Only decisive-evidence validation claims enter retrieval metrics; the full 230-claim partition count remains reported.",
-            "Pilot advancement is not promotion. Promotion requires Recall@5 paired CI lower bound above zero and no secondary mean regression.",
-            "The SciFact result is one post-freeze external transfer event and cannot trigger tuning or a repeated quality run.",
-            "ANN, LambdaMART and reranker timings are component measurements on allocated Spartan hardware, not an online SLA.",
-            "Predictions, checkpoints, model caches and indexes remain on Spartan; Git contains only this compact redacted record.",
-        ],
+        "artifact_hashes": artifact_hashes,
+        "truth_boundaries": truth_boundaries,
     }
     _assert_redacted(compact)
     schema = _object(args.schema)

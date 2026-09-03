@@ -35,8 +35,14 @@ def main() -> int:
     artifact = json.loads(raw)
     schema = json.loads(Path(args.schema).read_text(encoding="utf-8"))
     Draft202012Validator(schema).validate(artifact)
-    if artifact["external_transfer"]["completed_evaluations"] != 1:
-        raise ValueError("compact artifact must record exactly one external evaluation")
+    external = artifact["external_transfer"]
+    if external.get("status") == "not-run":
+        if external.get("completed_evaluations") != 0 or external.get("qrels_opened"):
+            raise ValueError("negative closeout must record zero unopened evaluations")
+        if artifact["full_selection"].get("selected_candidate_promoted"):
+            raise ValueError("a promoted adapter cannot skip external transfer")
+    elif external.get("completed_evaluations") != 1:
+        raise ValueError("promoted compact artifact must record one external evaluation")
     if len(artifact["adapter_matrix"]) != 6:
         raise ValueError("compact artifact must preserve all six adapter results")
     print("public-v2 artifact schema and redaction checks passed")

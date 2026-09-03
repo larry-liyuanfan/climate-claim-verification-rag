@@ -14,7 +14,6 @@ set -euo pipefail
 : "${REPO_DIR:?Set the exact detached repository}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed Git commit}"
 : "${PERSIST_DIR:?Set the pre-existing archive destination directory}"
-: "${LEDGER:?Set the completed external-transfer ledger}"
 : "${JOB_IDS:?Set the comma-separated Slurm job IDs for accounting}"
 
 test "$(readlink -f "${CLIMATE_V2_ROOT}")" = \
@@ -37,14 +36,32 @@ public_v2_unpack_stage \
 public_v2_unpack_stage \
   "${PERSIST_DIR}/full-selection" "${WORK_ROOT}/full-selection"
 public_v2_unpack_stage "${PERSIST_DIR}/downstream" "${WORK_ROOT}/downstream"
-public_v2_unpack_stage "${PERSIST_DIR}/external" "${WORK_ROOT}/external"
 export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 cd "${REPO_DIR}"
+
+EXTERNAL_STATUS=$(python - "${WORK_ROOT}/full-selection/full_selection.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+print(json.loads(Path(sys.argv[1]).read_text()).get("external_transfer_status", "authorized"))
+PY
+)
+EXTERNAL_ARGS=()
+if [[ "${EXTERNAL_STATUS}" = "not-authorized" ]]; then
+  test -z "${LEDGER:-}"
+else
+  : "${LEDGER:?Set the completed external-transfer ledger}"
+  public_v2_unpack_stage "${PERSIST_DIR}/external" "${WORK_ROOT}/external"
+  EXTERNAL_ARGS=(
+    --external-metrics "${WORK_ROOT}/external/metrics.json"
+    --external-ledger "${LEDGER}"
+  )
+fi
 
 shopt -s nullglob
 FULL_ARCHIVES=("${PERSIST_DIR}"/full-s*.tar.gz)
 shopt -u nullglob
-test "${#FULL_ARCHIVES[@]}" -ge 1
 test "${#FULL_ARCHIVES[@]}" -le 2
 for index in "${!FULL_ARCHIVES[@]}"; do
   archive="${FULL_ARCHIVES[${index}]}"
@@ -80,8 +97,7 @@ python scripts/public_v2_publish.py \
   --full-selection "${WORK_ROOT}/full-selection/full_selection.json" \
   "${FULL_ARGS[@]}" \
   --downstream-metrics "${WORK_ROOT}/downstream/metrics.json" \
-  --external-metrics "${WORK_ROOT}/external/metrics.json" \
-  --external-ledger "${LEDGER}" \
+  "${EXTERNAL_ARGS[@]}" \
   --sacct-json "${SACCT_JSON}" \
   --schema schemas/public_v2_compact.schema.json \
   --output-dir "${OUTPUT_DIR}"

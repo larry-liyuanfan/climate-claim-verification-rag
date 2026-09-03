@@ -47,15 +47,15 @@ from climate_rag.rerank import Qwen3CausalLMReranker, weighted_rank_fuse
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the frozen adapted/HNSW/RRF/LambdaMART/Qwen4B comparison."
+        description="Run the frozen HNSW/RRF/LambdaMART/Qwen4B comparison."
     )
     parser.add_argument("--protocol", required=True)
     parser.add_argument("--prepared-dir", required=True)
     parser.add_argument("--selection-dir", required=True)
     parser.add_argument("--base-dir", required=True)
     parser.add_argument("--frozen-config", required=True)
-    parser.add_argument("--adapter-dir", required=True)
-    parser.add_argument("--candidate-embeddings", required=True)
+    parser.add_argument("--adapter-dir")
+    parser.add_argument("--candidate-embeddings")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--batch-size", type=int, default=32)
@@ -69,6 +69,7 @@ def _dense_rows(
     documents: list[EvidenceDocument],
     *,
     width: int,
+    source: str,
 ) -> tuple[dict[str, list[RankedDocument]], list[float]]:
     result: dict[str, list[RankedDocument]] = {}
     latencies: list[float] = []
@@ -82,7 +83,7 @@ def _dense_rows(
                 score=float(score),
                 rank=rank,
                 text=documents[int(position)].text,
-                source="adapted_dense_hnsw",
+                source=source,
             )
             for rank, (score, position) in enumerate(
                 zip(scores[0], positions[0], strict=True), start=1
@@ -103,6 +104,7 @@ def _retrieve_bundles(
     candidate_width: int,
     rrf_k: int,
     batch_size: int,
+    dense_source: str,
 ) -> tuple[dict[str, dict[str, list[RankedDocument]]], dict[str, Any]]:
     claim_ids = sorted(claims)
     encode_started = time.perf_counter()
@@ -111,7 +113,12 @@ def _retrieve_bundles(
     )
     encode_seconds = time.perf_counter() - encode_started
     dense, dense_latencies = _dense_rows(
-        claim_ids, query_vectors, hnsw, documents, width=recall_width
+        claim_ids,
+        query_vectors,
+        hnsw,
+        documents,
+        width=recall_width,
+        source=dense_source,
     )
     bundles: dict[str, dict[str, list[RankedDocument]]] = {}
     bm25_latencies: list[float] = []
@@ -243,15 +250,31 @@ def main() -> int:
     rrf_k = int(ranking["rrf_k"])
     bm25 = BM25Index.load(Path(args.base_dir) / "bm25.pkl.gz")
 
-    adapter_path = Path(args.adapter_dir)
-    if tree_sha256(adapter_path) != str(frozen["adapter_sha256"]):
-        raise ValueError("selected adapter changed after configuration freeze")
-    embedding_path = Path(args.candidate_embeddings)
-    if file_sha256(embedding_path) != str(frozen["candidate_embeddings_sha256"]):
-        raise ValueError("selected embeddings changed after configuration freeze")
+    mode = str(frozen.get("downstream_mode", "adapted"))
+    base_only = mode == "base-only-negative-closeout"
+    if base_only:
+        if frozen.get("selected_candidate_promoted"):
+            raise ValueError("base-only closeout cannot contain a promoted adapter")
+        if args.adapter_dir or args.candidate_embeddings:
+            raise ValueError("base-only closeout forbids adapter/candidate inputs")
+        adapter_path: Path | None = None
+        embedding_path = Path(args.base_dir) / "base_embeddings.npy"
+        if file_sha256(embedding_path) != str(frozen["base_embeddings_sha256"]):
+            raise ValueError("base embeddings changed after closeout freeze")
+        dense_prefix = "base_dense"
+    else:
+        if not args.adapter_dir or not args.candidate_embeddings:
+            raise ValueError("adapted downstream requires adapter and embeddings")
+        adapter_path = Path(args.adapter_dir)
+        if tree_sha256(adapter_path) != str(frozen["adapter_sha256"]):
+            raise ValueError("selected adapter changed after configuration freeze")
+        embedding_path = Path(args.candidate_embeddings)
+        if file_sha256(embedding_path) != str(frozen["candidate_embeddings_sha256"]):
+            raise ValueError("selected embeddings changed after configuration freeze")
+        dense_prefix = "adapted_dense"
     vectors = np.load(embedding_path, mmap_mode="r")
     flat, flat_index_metrics = build_faiss_index(vectors, kind="flat")
-    hnsw_path = output / "adapted_hnsw.faiss"
+    hnsw_path = output / f"{dense_prefix}_hnsw.faiss"
     hnsw, hnsw_index_metrics = build_faiss_index(
         vectors,
         kind="hnsw",
@@ -266,7 +289,7 @@ def main() -> int:
         device=args.device,
         truncate_dim=int(model["dimension"]),
         revision=str(model["revision"]),
-        adapter_path=str(adapter_path),
+        adapter_path=None if adapter_path is None else str(adapter_path),
     )
     flat_metrics, _, flat_rows = score_dense_index(
         encoder,
@@ -287,6 +310,7 @@ def main() -> int:
         candidate_width=candidate_width,
         rrf_k=rrf_k,
         batch_size=args.batch_size,
+        dense_source=f"{dense_prefix}_hnsw",
     )
     validation_bundles, serving_timings = _retrieve_bundles(
         validation,
@@ -298,6 +322,7 @@ def main() -> int:
         candidate_width=candidate_width,
         rrf_k=rrf_k,
         batch_size=args.batch_size,
+        dense_source=f"{dense_prefix}_hnsw",
     )
 
     feature_rows: list[dict[str, Any]] = []
@@ -410,8 +435,8 @@ def main() -> int:
 
     predictions: dict[str, dict[str, Prediction]] = {
         "bm25": {},
-        "adapted_dense_flat": predictions_from_rows(flat_rows),
-        "adapted_dense_hnsw": {},
+        f"{dense_prefix}_flat": predictions_from_rows(flat_rows),
+        f"{dense_prefix}_hnsw": {},
         "rrf": {},
         "top100_lambdamart": {},
         "rrf_qwen3_reranker_4b_fusion": {},
@@ -423,7 +448,7 @@ def main() -> int:
         predictions["bm25"][claim_id] = Prediction(
             claim_id, tuple(row.evidence_id for row in bundle["bm25"][:5])
         )
-        predictions["adapted_dense_hnsw"][claim_id] = Prediction(
+        predictions[f"{dense_prefix}_hnsw"][claim_id] = Prediction(
             claim_id, tuple(row.evidence_id for row in bundle["dense"][:5])
         )
         predictions["rrf"][claim_id] = Prediction(
@@ -482,11 +507,11 @@ def main() -> int:
         )
     flat_top5 = {
         claim_id: set(prediction.evidence_ids)
-        for claim_id, prediction in predictions["adapted_dense_flat"].items()
+        for claim_id, prediction in predictions[f"{dense_prefix}_flat"].items()
     }
     hnsw_top5 = {
         claim_id: set(prediction.evidence_ids)
-        for claim_id, prediction in predictions["adapted_dense_hnsw"].items()
+        for claim_id, prediction in predictions[f"{dense_prefix}_hnsw"].items()
     }
     ann_recall = float(
         np.mean(
@@ -500,7 +525,14 @@ def main() -> int:
     metrics = {
         "schema_version": 1,
         "dataset": "CLIMATE-FEVER-v2-validation",
+        "downstream_mode": mode,
         "claim_count": len(validation),
+        "data_access": {
+            "train_claim_count": len(train_all),
+            "validation_claim_count": len(validation_all),
+            "validation_decisive_claim_count": len(validation),
+            "test_claims_loaded": 0,
+        },
         "systems": systems,
         "paired_bootstrap_vs_bm25": paired,
         "diagnostic_slices_vs_bm25": slice_reports,
@@ -542,14 +574,23 @@ def main() -> int:
             "fusion": ranking["reranker_fusion"],
         },
         "selected_adapter": {
-            "id": frozen["selected_candidate_id"],
-            "promoted": frozen["selected_candidate_promoted"],
-            "sha256": frozen["adapter_sha256"],
+            "id": frozen.get("selected_candidate_id"),
+            "diagnostic_id": frozen.get("diagnostic_candidate_id"),
+            "promoted": bool(frozen["selected_candidate_promoted"]),
+            "used_in_downstream": not base_only,
+            "status": (
+                "not-used-invalid-adapter-integrity" if base_only else "used"
+            ),
         },
         "truth_boundary": (
             "All effectiveness metrics are CLIMATE-FEVER v2 validation selection. "
-            "ANN and stage timings are component benchmarks, not an online SLA. A failed "
-            "contract or promotion gate remains a negative result."
+            "ANN and stage timings are component benchmarks, not an online SLA. "
+            + (
+                "No adapter is loaded in this base-only negative closeout; the historical "
+                "test and SciFact qrels are not opened."
+                if base_only
+                else "A failed contract or promotion gate remains a negative result."
+            )
         ),
     }
     write_json(output / "metrics.json", metrics)

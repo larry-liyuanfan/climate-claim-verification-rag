@@ -299,7 +299,11 @@ def paired_promotion_decision(metrics: Mapping[str, Any]) -> dict[str, Any]:
         raise TypeError("metrics are missing paired_bootstrap")
     recall = _mapping(comparisons, "recall@5")
     secondary_names = ("mrr@10", "ndcg@10", "evidence_f1")
-    primary_pass = float(recall["lower"]) > 0.0
+    # ``evaluate_representation_pair`` emits ``ci_lower``.  Accept the older
+    # fixture spelling as a compatibility fallback, but always apply the same
+    # pre-registered lower-bound rule.
+    lower_key = "ci_lower" if "ci_lower" in recall else "lower"
+    primary_pass = float(recall[lower_key]) > 0.0
     secondary = {
         name: float(_mapping(comparisons, name)["mean_difference"]) >= 0.0
         for name in secondary_names

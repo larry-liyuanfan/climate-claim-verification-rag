@@ -37,25 +37,41 @@ export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 cd "${REPO_DIR}"
 
-CONFIG_ID=$(python - "${FROZEN_CONFIG}" <<'PY'
+DOWNSTREAM_MODE=$(python - "${FROZEN_CONFIG}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+print(json.loads(Path(sys.argv[1]).read_text()).get("downstream_mode", "adapted"))
+PY
+)
+MODEL_ARGS=()
+if [[ "${DOWNSTREAM_MODE}" = "base-only-negative-closeout" ]]; then
+  MODEL_ARGS=()
+else
+  CONFIG_ID=$(python - "${FROZEN_CONFIG}" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 print(json.loads(Path(sys.argv[1]).read_text())["selected_candidate_id"])
 PY
-)
-public_v2_unpack_stage \
-  "${PERSIST_DIR}/pilot-${CONFIG_ID}" "${WORK_ROOT}/pilot"
-public_v2_unpack_stage \
-  "${PERSIST_DIR}/full-${CONFIG_ID}" "${WORK_ROOT}/full"
-mapfile -t CHECKPOINTS < <(
-  find "${WORK_ROOT}/pilot/training" -mindepth 1 -maxdepth 1 -type d \
-    -name 'checkpoint-*' -print | sort -V
-)
-test "${#CHECKPOINTS[@]}" -eq 1
-EMBEDDINGS="${WORK_ROOT}/full/evaluation/candidate_embeddings.npy"
-test -f "${EMBEDDINGS}"
+  )
+  public_v2_unpack_stage \
+    "${PERSIST_DIR}/pilot-${CONFIG_ID}" "${WORK_ROOT}/pilot"
+  public_v2_unpack_stage \
+    "${PERSIST_DIR}/full-${CONFIG_ID}" "${WORK_ROOT}/full"
+  mapfile -t CHECKPOINTS < <(
+    find "${WORK_ROOT}/pilot/training" -type d -name 'checkpoint-*' -print | sort -V
+  )
+  test "${#CHECKPOINTS[@]}" -eq 1
+  EMBEDDINGS="${WORK_ROOT}/full/evaluation/candidate_embeddings.npy"
+  test -f "${EMBEDDINGS}"
+  MODEL_ARGS=(
+    --adapter-dir "${CHECKPOINTS[0]}"
+    --candidate-embeddings "${EMBEDDINGS}"
+  )
+fi
 OUTPUT_DIR="${WORK_ROOT}/downstream"
 
 /usr/bin/time -v python scripts/public_v2_downstream.py \
@@ -64,8 +80,7 @@ OUTPUT_DIR="${WORK_ROOT}/downstream"
   --selection-dir "${WORK_ROOT}/preflight/data/climate-fever-v2/selection-only" \
   --base-dir "${WORK_ROOT}/base" \
   --frozen-config "${FROZEN_CONFIG}" \
-  --adapter-dir "${CHECKPOINTS[0]}" \
-  --candidate-embeddings "${EMBEDDINGS}" \
+  "${MODEL_ARGS[@]}" \
   --output-dir "${OUTPUT_DIR}" \
   --device cuda \
   --batch-size 32

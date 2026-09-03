@@ -164,6 +164,13 @@ def test_full_promotion_requires_positive_recall_ci_and_no_secondary_regression(
     assert selection["selected_candidate_promoted"] is True
 
 
+def test_full_promotion_accepts_runtime_ci_field_name() -> None:
+    metrics = _comparison(0.001)
+    recall = metrics["paired_bootstrap"]["recall@5"]
+    recall["ci_lower"] = recall.pop("lower")
+    assert paired_promotion_decision(metrics)["promotion_pass"]
+
+
 def test_full_freeze_uses_portable_artifact_identifiers(tmp_path: Path) -> None:
     metrics = _comparison(0.002)
     metrics.update(
@@ -198,6 +205,118 @@ def test_full_freeze_uses_portable_artifact_identifiers(tmp_path: Path) -> None:
     assert frozen["adapter_artifact"] == "selected-pilot-checkpoint"
     assert frozen["candidate_embeddings_artifact"].startswith("selected-full")
     assert not any("path" in key for key in frozen)
+
+
+def test_negative_closeout_freezes_base_only_and_forbids_external(
+    tmp_path: Path,
+) -> None:
+    matrix = [
+        {"id": row["id"]}
+        for row in read_json(
+            _repository() / "configs" / "public_retrieval_v2.json"
+        )["adapter_matrix"]
+    ]
+    pilot = {
+        "schema_version": 1,
+        "diagnostic_fallback": True,
+        "selected_for_full": [matrix[2]["id"]],
+        "all_pilot_results": [
+            {
+                "id": row["id"],
+                "pilot": {
+                    "advance_eligible": False,
+                    "mean_deltas": {
+                        "recall@5": 0.0,
+                        "mrr@10": 0.0,
+                        "ndcg@10": 0.0,
+                        "evidence_f1": 0.0,
+                    },
+                },
+            }
+            for row in matrix
+        ],
+    }
+    pilot_path = tmp_path / "pilot.json"
+    pilot_path.write_text(json.dumps(pilot), encoding="utf-8")
+    base_embeddings = tmp_path / "base.npy"
+    base_embeddings.write_bytes(b"frozen-base")
+    log = tmp_path / "diagnostic.log"
+    log.write_text(
+        "Found missing adapter keys while loading the checkpoint\nKeyError: 'lower'\n",
+        encoding="utf-8",
+    )
+    output = tmp_path / "closeout"
+    subprocess.run(
+        [
+            sys.executable,
+            str(_repository() / "scripts" / "public_v2_select.py"),
+            "--protocol",
+            str(_repository() / "configs" / "public_retrieval_v2.json"),
+            "--phase",
+            "negative-closeout",
+            "--pilot-selection",
+            str(pilot_path),
+            "--base-embeddings",
+            str(base_embeddings),
+            "--diagnostic-log",
+            str(log),
+            "--diagnostic-job-id",
+            "30007124",
+            "--diagnostic-exit-code",
+            "1:0",
+            "--output-dir",
+            str(output),
+        ],
+        check=True,
+        cwd=_repository(),
+    )
+    selection = read_json(output / "full_selection.json")
+    frozen = read_json(output / "frozen_config.json")
+    assert selection["full_result_count"] == 0
+    assert selection["diagnostic_attempt"]["adapter_integrity"] == "failed"
+    assert selection["selected_candidate_id"] is None
+    assert frozen["downstream_mode"] == "base-only-negative-closeout"
+    assert frozen["selected_candidate_promoted"] is False
+    assert frozen["external_transfer"]["authorized"] is False
+    assert frozen["test_access"] == "forbidden"
+
+
+def test_scifact_fails_before_ledger_when_adapter_not_promoted(tmp_path: Path) -> None:
+    frozen = tmp_path / "frozen.json"
+    frozen.write_text(
+        json.dumps(
+            {
+                "selected_candidate_promoted": False,
+                "external_transfer": {"authorized": False},
+            }
+        ),
+        encoding="utf-8",
+    )
+    ledger = tmp_path / "ledger.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(_repository() / "scripts" / "public_v2_external_scifact.py"),
+            "--protocol",
+            str(_repository() / "configs" / "public_retrieval_v2.json"),
+            "--frozen-config",
+            str(frozen),
+            "--adapter-dir",
+            str(tmp_path / "adapter"),
+            "--archive",
+            str(tmp_path / "scifact.zip"),
+            "--ledger",
+            str(ledger),
+            "--output-dir",
+            str(tmp_path / "output"),
+        ],
+        cwd=_repository(),
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0
+    assert "SciFact access is forbidden" in result.stderr
+    assert not ledger.exists()
 
 
 def test_scifact_adapter_reads_official_beir_layout_once(
