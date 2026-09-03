@@ -16,6 +16,8 @@
     "query_length",
     "document_length"
   ],
+  "training_reachable_positive_id_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "positive_policy": "candidate-supported-only",
   "candidate_source_distribution": {
     "bm25_only": 44,
     "dense_only": 46,

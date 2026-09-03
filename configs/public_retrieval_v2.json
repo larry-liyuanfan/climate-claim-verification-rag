@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "protocol_id": "climate-public-retrieval-v2-20260903",
+  "base_git_commit": "28ea0503d1c0aea5615e2e1f038bc739bfdcb855",
+  "seed": 20260903,
+  "dataset": {
+    "name": "CLIMATE-FEVER",
+    "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
+    "split_manifest_sha256": "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16",
+    "split_counts": {
+      "train": 1075,
+      "validation": 230,
+      "test": 230
+    },
+    "selection_splits": [
+      "train",
+      "validation"
+    ],
+    "training_split": "train",
+    "selection_split": "validation",
+    "prohibited_split": "test"
+  },
+  "models": {
+    "dense": {
+      "name": "Qwen/Qwen3-Embedding-0.6B",
+      "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+      "dimension": 1024,
+      "dtype": "bfloat16",
+      "query_prompt_name": "query"
+    },
+    "reranker": {
+      "name": "Qwen/Qwen3-Reranker-4B",
+      "revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+      "dtype": "bfloat16",
+      "instruction": "Given a climate claim, rank passages that directly support, refute, or materially qualify it; prefer exact entity, numeric, temporal and geographic matches over topic-only overlap."
+    }
+  },
+  "adapter_matrix": [
+    {
+      "id": "s100-r8-n4-t003",
+      "max_steps": 100,
+      "lora_rank": 8,
+      "hard_negatives": 4,
+      "temperature": 0.03
+    },
+    {
+      "id": "s100-r8-n8-t005",
+      "max_steps": 100,
+      "lora_rank": 8,
+      "hard_negatives": 8,
+      "temperature": 0.05
+    },
+    {
+      "id": "s100-r16-n4-t005",
+      "max_steps": 100,
+      "lora_rank": 16,
+      "hard_negatives": 4,
+      "temperature": 0.05
+    },
+    {
+      "id": "s300-r8-n8-t003",
+      "max_steps": 300,
+      "lora_rank": 8,
+      "hard_negatives": 8,
+      "temperature": 0.03
+    },
+    {
+      "id": "s300-r16-n4-t003",
+      "max_steps": 300,
+      "lora_rank": 16,
+      "hard_negatives": 4,
+      "temperature": 0.03
+    },
+    {
+      "id": "s300-r16-n8-t005",
+      "max_steps": 300,
+      "lora_rank": 16,
+      "hard_negatives": 8,
+      "temperature": 0.05
+    }
+  ],
+  "training": {
+    "method": "claim-grouped-hard-negative-InfoNCE-LoRA",
+    "learning_rate": 0.00005,
+    "warmup_ratio": 0.05,
+    "per_device_train_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "max_length": 512,
+    "target_modules": "all-linear",
+    "false_negative_mask": true,
+    "runtime": {
+      "pytorch_module": "PyTorch/2.1.2-CUDA-12.2.0",
+      "transformers": "4.51.3",
+      "ms_swift": "3.9.3",
+      "sentence_transformers": "4.1.0",
+      "peft": "0.15.2"
+    }
+  },
+  "evaluation": {
+    "pilot_query_count": 64,
+    "pilot_seed": 20260903,
+    "pilot_corpus": "full-5240-document-public-corpus",
+    "max_full_candidates": 2,
+    "minimum_full_diagnostic_candidates": 1,
+    "full_split": "validation",
+    "bootstrap_samples": 5000,
+    "primary_metric": "recall@5",
+    "promotion_rule": "recall_ci_lower_positive_and_secondary_mean_non_regression",
+    "secondary_metrics": [
+      "mrr@10",
+      "ndcg@10",
+      "evidence_f1"
+    ],
+    "diagnostic_slices": [
+      "spelling",
+      "year_or_numeric",
+      "entity",
+      "geographic",
+      "semantic_paraphrase"
+    ]
+  },
+  "downstream_ranking": {
+    "recall_width": 1000,
+    "candidate_width": 100,
+    "final_k": 5,
+    "rrf_k": 60,
+    "positive_policy": "candidate-supported-only",
+    "feature_order": [
+      "bm25_score",
+      "bm25_reciprocal_rank",
+      "dense_score",
+      "dense_reciprocal_rank",
+      "rrf_score",
+      "rrf_reciprocal_rank",
+      "token_overlap",
+      "number_overlap",
+      "year_overlap",
+      "query_length",
+      "document_length"
+    ],
+    "hnsw": {
+      "m": 32,
+      "ef_construction": 200,
+      "ef_search": 64
+    },
+    "lambdamart": {
+      "n_estimators": 200,
+      "learning_rate": 0.05,
+      "num_leaves": 31
+    },
+    "reranker_candidate_width": 100,
+    "reranker_fusion": {
+      "kind": "weighted-rank-fusion",
+      "base": "rrf",
+      "base_weight": 1.0,
+      "reranker_weight": 1.0,
+      "k": 60
+    }
+  },
+  "external_transfer": {
+    "dataset": "SciFact",
+    "source": "official MTEB/BEIR",
+    "beir_url": "https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/scifact.zip",
+    "beir_md5": "5f7d1de60b170fc8027bb7898e2efca1",
+    "mteb_dataset_revision": "cf10ab6856b15b0e670ef8ae5dae4e266c12d035",
+    "split": "test",
+    "max_completed_evaluations": 1,
+    "configuration_must_be_frozen": true,
+    "allowed_systems": [
+      "qwen3-embedding-0.6b-base",
+      "frozen-selected-climate-adapter"
+    ],
+    "tuning_allowed": false
+  },
+  "infrastructure": {
+    "remote_root": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2",
+    "maximum_same_configuration_retries": 2,
+    "quality_failure_retries": 0,
+    "submission_order": [
+      "sbatch-test-only",
+      "preflight",
+      "pilot",
+      "at-most-two-full-candidates",
+      "downstream-comparisons",
+      "one-external-transfer",
+      "compact-publish"
+    ]
+  }
+}

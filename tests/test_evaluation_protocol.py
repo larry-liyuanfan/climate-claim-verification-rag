@@ -66,6 +66,32 @@ def test_frozen_test_policy_blocks_new_candidate(tmp_path: Path) -> None:
     assert allowed["status"] == "allowed_exact_consumed_baseline_reproduction"
 
 
+def test_permanent_frozen_test_seal_blocks_even_exact_reproduction(
+    tmp_path: Path,
+) -> None:
+    policy = tmp_path / "policy.json"
+    policy.write_text(
+        json.dumps(
+            {
+                "frozen_test": {
+                    "status": "consumed",
+                    "permanently_sealed": True,
+                    "consumed_system_id": "bm25-v1",
+                    "exact_baseline_reproduction_allowed": False,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="already consumed"):
+        enforce_frozen_test_policy(
+            policy,
+            split="test",
+            system_id="bm25-v1",
+            exact_baseline_reproduction=True,
+        )
+
+
 def test_training_serving_contract_audit_detects_feature_drift() -> None:
     audit = audit_training_serving_contracts(
         {
@@ -82,6 +108,29 @@ def test_training_serving_contract_audit_detects_feature_drift() -> None:
     )
     assert audit["status"] == "failed"
     assert audit["checks"]["feature_names_equal"] is False
+
+
+def test_training_serving_contract_requires_exact_reachable_positive_handoff() -> None:
+    digest = "c" * 64
+    training = {
+        "candidate_width": 100,
+        "feature_names": ["bm25_score", "dense_score"],
+        "reachable_positive_rate": 1.0,
+        "reachable_positive_id_sha256": digest,
+        "positive_policy": "candidate-supported-only",
+        "candidate_source_distribution": {"both": 100},
+    }
+    serving = {
+        "candidate_width": 100,
+        "feature_names": ["bm25_score", "dense_score"],
+        "training_reachable_positive_id_sha256": digest,
+        "positive_policy": "candidate-supported-only",
+        "candidate_source_distribution": {"both": 100},
+    }
+    audit = audit_training_serving_contracts(training, serving)
+    assert audit["status"] == "passed"
+    serving["training_reachable_positive_id_sha256"] = "d" * 64
+    assert audit_training_serving_contracts(training, serving)["status"] == "failed"
 
 
 def test_stable_id_hash_is_order_sensitive_and_unambiguous() -> None:

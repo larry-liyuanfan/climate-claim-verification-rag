@@ -17,6 +17,8 @@
     "document_length"
   ],
   "reachable_positive_rate": 1.0,
+  "reachable_positive_id_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "positive_policy": "candidate-supported-only",
   "candidate_source_distribution": {
     "bm25_only": 45,
     "dense_only": 45,

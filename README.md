@@ -59,6 +59,22 @@ climate-rag audit-public-split \
   --output-dir runs/climate-fever-split-audit
 ```
 
+## Public retrieval v2
+
+The next public cycle is fully pre-registered in
+[`configs/public_retrieval_v2.json`](configs/public_retrieval_v2.json). It uses
+only the 1,075-claim train partition for hard-negative LoRA/InfoNCE training and
+the 230-claim validation partition for pilot/full selection. The old consumed
+test is permanently sealed. Six fixed Qwen3-Embedding-0.6B adapters cover
+100/300 steps, rank 8/16, 4/8 hard negatives and temperatures 0.03/0.05; no more
+than two can reach full validation.
+
+After configuration freeze, exactly one official MTEB/BEIR SciFact transfer
+event compares the base representation with the frozen selected adapter. The
+complete method, promotion rule, Top-100 LambdaMART contract, 4B reranker fusion
+and truth boundaries are in
+[`docs/PUBLIC_RETRIEVAL_V2.md`](docs/PUBLIC_RETRIEVAL_V2.md).
+
 The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`. The full representation-training case and two evidence-grounded resume bullets are in [`docs/REPRESENTATION_TRAINING_CASE.md`](docs/REPRESENTATION_TRAINING_CASE.md).
 
 ## Main commands

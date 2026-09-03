@@ -1,5 +1,42 @@
 # Spartan runbook
 
+## Public retrieval v2 isolated chain
+
+The public-v2 workflow is independent of the historical restricted-data chain
+below. Its only valid root is:
+
+```text
+/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2
+```
+
+The required branch is `codex/climate-public-retrieval-v2`. Push an
+implementation commit, clone that exact commit into `repos/<sha>`, check it out
+detached, and keep `envs/`, `cache/`, `data/`, `runs/`, `logs/` and `artifacts/`
+inside the root. Every sbatch script checks both the literal root and exact Git
+SHA before doing work.
+
+Submit in stages; do not run Python/model work on a login node:
+
+1. Run `sbatch --test-only` for `public_v2_preflight.sbatch`, then submit it.
+2. After success, test-only and submit `public_v2_gpu_preflight.sbatch`.
+3. Test-only and submit `public_v2_build_base.sbatch`.
+4. Test-only and submit `public_v2_train_pilots.sbatch --array=0-5`.
+5. Use `public_v2_select.sbatch` with `PHASE=pilot`; inspect the fixed selection.
+6. Submit `public_v2_evaluate_full.sbatch` only for the selected one or two array
+   indices, then run `public_v2_select.sbatch` with `PHASE=full` to freeze the
+   configuration.
+7. Submit `public_v2_downstream.sbatch`, then exactly one
+   `public_v2_external_scifact.sbatch` using the frozen config and one-shot
+   ledger.
+8. Collect `sacct` fields and run `public_v2_publish.sbatch`. Only its compact,
+   schema-checked JSON may enter Git.
+
+Infrastructure failure may be retried twice with the identical config and a new
+output directory. A completed quality result is never rerun or used to alter a
+frozen hyperparameter. Keep every failed matrix result in the compact record.
+The public v2 test is not materialised as a claims file, and the historical
+consumed test cannot be reproduced.
+
 Verified account/project: `punim2936`. The restricted data directory is:
 
 ```text

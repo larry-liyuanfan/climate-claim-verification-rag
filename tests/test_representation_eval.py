@@ -53,11 +53,19 @@ def test_query_taxonomy_is_explicitly_multilabel() -> None:
             "e2": EvidenceDocument("e2", "Another unrelated sentence."),
         },
     )
-    assert "numeric_or_year" in labels
+    assert "year_or_numeric" in labels
     assert "geographic" in labels
     assert "multi_evidence" in labels
     assert "lexical_mismatch" in labels
-    assert "semantic_inference" in labels
+    assert "semantic_paraphrase" in labels
+
+
+def test_query_taxonomy_marks_spelling_variants_against_gold_text() -> None:
+    labels = infer_query_taxonomy(
+        Claim("q", "Global temprature is rising", evidence_ids=("e1",)),
+        {"e1": EvidenceDocument("e1", "Global temperature has risen.")},
+    )
+    assert "spelling" in labels
 
 
 def test_pareto_never_compares_different_measurement_scopes() -> None:

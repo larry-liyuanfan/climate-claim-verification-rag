@@ -36,6 +36,7 @@ def _make_reranker(config: dict[str, Any]) -> Reranker:
             max_length=int(config.get("max_length", 8192)),
             batch_size=int(config.get("batch_size", 8)),
             dtype=str(config.get("dtype", "auto")),
+            revision=config.get("revision"),
             instruction=str(
                 config.get(
                     "instruction",

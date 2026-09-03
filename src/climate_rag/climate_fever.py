@@ -557,9 +557,8 @@ def benchmark_public_bm25(
     raw_metrics, per_claim, errors = evaluate_predictions(claims, predictions)
     metrics: dict[str, Any] = dict(raw_metrics)
     latency_ms.sort()
-    percentile = lambda q: latency_ms[
-        min(len(latency_ms) - 1, int(q * len(latency_ms)))
-    ]
+    def percentile(q: float) -> float:
+        return latency_ms[min(len(latency_ms) - 1, int(q * len(latency_ms)))]
     metrics.update(
         {
             "dataset": "CLIMATE-FEVER",

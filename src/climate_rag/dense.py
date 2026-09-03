@@ -76,6 +76,7 @@ class SentenceTransformerEncoder:
         device: str | None = None,
         truncate_dim: int | None = None,
         adapter_path: str | None = None,
+        revision: str | None = None,
     ) -> None:
         try:
             ensure_torch_pytree_compat()
@@ -96,7 +97,9 @@ class SentenceTransformerEncoder:
             model_name,
             device=device,
             truncate_dim=truncate_dim,
+            revision=revision,
         )
+        self.revision = revision
         self.adapter_path = adapter_path
         self.adapter_parameter_count = 0
         if adapter_path:
@@ -343,6 +346,7 @@ class DenseRetriever:
             encoder_spec["query_prefix"] = self.encoder.query_prefix
             encoder_spec["query_prompt_name"] = self.encoder.query_prompt_name
             encoder_spec["adapter_path"] = self.encoder.adapter_path
+            encoder_spec["revision"] = self.encoder.revision
         backend_spec: dict[str, object] = {"type": backend_type}
         if isinstance(self.backend, FaissANNIndex):
             backend_spec.update(
@@ -378,6 +382,7 @@ class DenseRetriever:
                 query_prompt_name=encoder_spec.get("query_prompt_name"),
                 device=device,
                 adapter_path=encoder_spec.get("adapter_path"),
+                revision=encoder_spec.get("revision"),
             )
         backend_spec = spec["backend"]
         index_path = target / spec["index_file"]
