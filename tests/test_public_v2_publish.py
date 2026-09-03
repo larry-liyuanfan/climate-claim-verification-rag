@@ -23,7 +23,15 @@ def test_publish_negative_closeout_without_external_transfer(tmp_path: Path) -> 
             encoding="utf-8"
         )
     )
-    prepare = _write(tmp_path / "prepare.json", {"climate_fever": {"claims": 1535}})
+    prepare = _write(
+        tmp_path / "prepare.json",
+        {
+            "climate_fever": {
+                "claims": 1535,
+                "source_url": "https://example.test/climate-fever.jsonl",
+            }
+        },
+    )
     base = _write(
         tmp_path / "base.json",
         {

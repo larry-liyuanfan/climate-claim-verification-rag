@@ -12,7 +12,7 @@ SECRET_PATTERNS = (
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
     re.compile(r"(?i)\b(?:api[_-]?key|access[_-]?token|secret)\s*[:=]\s*['\"][^'\"]+"),
     re.compile(r"(?i)\bbearer\s+[A-Za-z0-9._~+/=-]{20,}"),
-    re.compile(r"(?:[A-Za-z]:[\\/]|/data/gpfs/|/home/)"),
+    re.compile(r"(?<![A-Za-z])[A-Za-z]:[\\/]|/data/gpfs/|/home/"),
 )
 
 
