@@ -7,7 +7,7 @@ import os
 import time
 from collections import Counter
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import numpy as np
 
@@ -164,18 +164,15 @@ def _feature_row(
     lexical = by_bm25.get(evidence_id)
     dense = by_dense.get(evidence_id)
     rrf = by_rrf[evidence_id]
-    return cast(
-        dict[str, float],
-        build_candidate_features(
-            query,
-            rrf.text,
-            bm25_score=lexical.score if lexical else 0.0,
-            bm25_rank=lexical.rank if lexical else None,
-            dense_score=dense.score if dense else 0.0,
-            dense_rank=dense.rank if dense else None,
-            rrf_score=rrf.score,
-            rrf_rank=rrf.rank,
-        ),
+    return build_candidate_features(
+        query,
+        rrf.text,
+        bm25_score=lexical.score if lexical else 0.0,
+        bm25_rank=lexical.rank if lexical else None,
+        dense_score=dense.score if dense else 0.0,
+        dense_rank=dense.rank if dense else None,
+        rrf_score=rrf.score,
+        rrf_rank=rrf.rank,
     )
 
 
