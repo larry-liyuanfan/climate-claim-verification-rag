@@ -7,6 +7,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
 #SBATCH --time=00:10:00
+#SBATCH --tmp=10G
 
 set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
@@ -23,8 +24,8 @@ test ! -e "${OUTPUT_DIR}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 Python/3.10.4
-source "${CLIMATE_V2_ROOT}/envs/runtime-py310/bin/activate"
-export PYTHONNOUSERSITE=1
+source "${REPO_DIR}/hpc/public_v2_runtime.sh"
+public_v2_activate_runtime
 export PYTHONPATH="${REPO_DIR}/src"
 cd "${REPO_DIR}"
 

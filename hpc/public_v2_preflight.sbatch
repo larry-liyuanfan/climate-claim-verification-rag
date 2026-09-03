@@ -7,6 +7,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=00:45:00
+#SBATCH --tmp=20G
 
 set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
@@ -23,12 +24,11 @@ test ! -e "${PREP_OUTPUT}"
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 
-RUNTIME_ENV="${CLIMATE_V2_ROOT}/envs/runtime-py310"
-PIP_CACHE_DIR="${CLIMATE_V2_ROOT}/cache/pip"
-mkdir -p "${CLIMATE_V2_ROOT}/envs" "${PIP_CACHE_DIR}"
-if [[ ! -x "${RUNTIME_ENV}/bin/python" ]]; then
-  python -m venv --system-site-packages "${RUNTIME_ENV}"
-fi
+RUNTIME_ENV="${JOBFS:?Request Slurm job-local storage with --tmp}/climate-v2-runtime-${SLURM_JOB_ID}"
+RUNTIME_ARCHIVE="${CLIMATE_V2_ROOT}/envs/runtime-py310.tar.gz"
+PIP_CACHE_DIR="${JOBFS}/pip-cache"
+test ! -e "${RUNTIME_ARCHIVE}"
+python -m venv --system-site-packages "${RUNTIME_ENV}"
 source "${RUNTIME_ENV}/bin/activate"
 export PIP_CACHE_DIR
 export PIP_DEFAULT_TIMEOUT="${PIP_DEFAULT_TIMEOUT:-120}"
@@ -54,12 +54,12 @@ export PYTHONNOUSERSITE=1
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
 export PYTHONPATH="${REPO_DIR}/src"
-export XDG_CACHE_HOME="${CLIMATE_V2_ROOT}/cache/xdg"
-export HF_HOME="${CLIMATE_V2_ROOT}/cache/huggingface"
+export XDG_CACHE_HOME="${JOBFS}/cache/xdg"
+export HF_HOME="${JOBFS}/cache/huggingface"
 export HF_HUB_CACHE="${HF_HOME}/hub"
 export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
 export SENTENCE_TRANSFORMERS_HOME="${HF_HOME}/sentence-transformers"
-export MODELSCOPE_CACHE="${CLIMATE_V2_ROOT}/cache/modelscope"
+export MODELSCOPE_CACHE="${JOBFS}/cache/modelscope"
 export MODELSCOPE_HOME="${MODELSCOPE_CACHE}"
 export HF_HUB_DISABLE_TELEMETRY=1
 mkdir -p "${XDG_CACHE_HOME}" "${HF_HOME}" "${MODELSCOPE_CACHE}"
@@ -77,3 +77,8 @@ python scripts/public_v2_prepare.py \
 python -m pip freeze > "${PREP_OUTPUT}/environment-freeze.txt"
 sha256sum "${PREP_OUTPUT}/environment-freeze.txt" \
   > "${PREP_OUTPUT}/environment-freeze.sha256"
+mkdir -p "${CLIMATE_V2_ROOT}/envs"
+TEMP_ARCHIVE="${CLIMATE_V2_ROOT}/envs/.runtime-py310-${SLURM_JOB_ID}.tar.gz"
+tar -czf "${TEMP_ARCHIVE}" -C "${RUNTIME_ENV}" .
+mv "${TEMP_ARCHIVE}" "${RUNTIME_ARCHIVE}"
+sha256sum "${RUNTIME_ARCHIVE}" > "${CLIMATE_V2_ROOT}/envs/runtime-py310.tar.gz.sha256"

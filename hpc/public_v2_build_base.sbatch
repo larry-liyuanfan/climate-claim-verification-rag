@@ -8,6 +8,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=00:45:00
+#SBATCH --tmp=30G
 
 set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
@@ -22,16 +23,10 @@ test ! -e "${OUTPUT_DIR}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
-source "${CLIMATE_V2_ROOT}/envs/runtime-py310/bin/activate"
-export PYTHONNOUSERSITE=1
-export PYTHONUNBUFFERED=1
+source "${REPO_DIR}/hpc/public_v2_runtime.sh"
+public_v2_activate_runtime
 export PYTHONPATH="${REPO_DIR}/src"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
-export HF_HOME="${CLIMATE_V2_ROOT}/cache/huggingface"
-export HF_HUB_CACHE="${HF_HOME}/hub"
-export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
-export SENTENCE_TRANSFORMERS_HOME="${HF_HOME}/sentence-transformers"
-export HF_HUB_DISABLE_TELEMETRY=1
 cd "${REPO_DIR}"
 
 /usr/bin/time -v python scripts/public_v2_build_base.py \
