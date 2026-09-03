@@ -70,3 +70,13 @@ def test_public_v2_pilots_use_frozen_hugging_face_revision() -> None:
     assert "--model Qwen/Qwen3-Embedding-0.6B" in script
     assert "--model_revision 97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3" in script
     assert "--use_hf true" in script
+
+
+def test_public_v2_jobs_find_swift_nested_checkpoint() -> None:
+    for name in (
+        "public_v2_train_pilots.sbatch",
+        "public_v2_evaluate_full.sbatch",
+    ):
+        script = (ROOT / "hpc" / name).read_text()
+        assert "-mindepth 2 -maxdepth 2 -type d" in script
+        assert "-name 'checkpoint-*'" in script

@@ -128,7 +128,7 @@ DATASET_DIR="${BASE_DIR}/training-n${HARD_NEGATIVES}"
   --output_dir "${TASK_ROOT}/training"
 
 mapfile -t CHECKPOINTS < <(
-  find "${TASK_ROOT}/training" -mindepth 1 -maxdepth 1 -type d \
+  find "${TASK_ROOT}/training" -mindepth 2 -maxdepth 2 -type d \
     -name 'checkpoint-*' -print | sort -V
 )
 test "${#CHECKPOINTS[@]}" -eq 1

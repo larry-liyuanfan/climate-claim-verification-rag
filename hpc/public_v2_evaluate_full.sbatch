@@ -50,7 +50,7 @@ PY
 public_v2_unpack_stage \
   "${PERSIST_DIR}/pilot-${CONFIG_ID}" "${WORK_ROOT}/pilot"
 mapfile -t CHECKPOINTS < <(
-  find "${WORK_ROOT}/pilot/training" -mindepth 1 -maxdepth 1 -type d \
+  find "${WORK_ROOT}/pilot/training" -mindepth 2 -maxdepth 2 -type d \
     -name 'checkpoint-*' -print | sort -V
 )
 test "${#CHECKPOINTS[@]}" -eq 1
