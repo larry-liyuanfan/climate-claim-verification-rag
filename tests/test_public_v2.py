@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -14,6 +15,7 @@ from climate_rag.public_v2 import (
     export_public_v2_splits,
     file_md5,
     load_public_v2_protocol,
+    newline_normalized_sha256,
     paired_promotion_decision,
     prepare_scifact_transfer,
     reserve_external_transfer,
@@ -59,6 +61,20 @@ def test_repository_public_v2_protocol_is_fully_frozen() -> None:
     assert result["adapter_count"] == 6
     assert result["max_full_candidates"] == 2
     assert result["external_transfer_budget"] == 1
+    assert protocol["dataset"]["split_manifest_newline"] == "crlf"
+    assert (
+        protocol["dataset"]["split_manifest_sha256"]
+        == "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16"
+    )
+
+
+def test_split_manifest_hash_has_frozen_cross_platform_newlines(
+    tmp_path: Path,
+) -> None:
+    manifest = tmp_path / "manifest.json"
+    manifest.write_bytes(b'{\n  "split": [1, 2]\n}\n')
+    expected = hashlib.sha256(b'{\r\n  "split": [1, 2]\r\n}\r\n').hexdigest()
+    assert newline_normalized_sha256(manifest, newline="crlf") == expected
 
 
 def test_repository_public_v2_storage_budget_is_inode_bounded() -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol
 
@@ -19,7 +19,9 @@ def l2_normalize(matrix: np.ndarray) -> np.ndarray:
     if values.ndim == 1:
         values = values.reshape(1, -1)
     norms = np.linalg.norm(values, axis=1, keepdims=True)
-    return values / np.maximum(norms, np.finfo(np.float32).eps)
+    return np.asarray(
+        values / np.maximum(norms, np.finfo(np.float32).eps), dtype=np.float32
+    )
 
 
 class DenseEncoder(Protocol):
@@ -259,7 +261,11 @@ class FaissANNIndex:
             rows = len(np.atleast_2d(queries))
             return np.empty((rows, 0), dtype=np.float32), np.empty((rows, 0), dtype=np.int64)
         query_vectors = np.ascontiguousarray(l2_normalize(queries), dtype=np.float32)
-        return self.index.search(query_vectors, top_k)
+        scores, indices = self.index.search(query_vectors, top_k)
+        return (
+            np.asarray(scores, dtype=np.float32),
+            np.asarray(indices, dtype=np.int64),
+        )
 
     def save(self, path: str | Path) -> None:
         import faiss
@@ -271,9 +277,20 @@ class FaissANNIndex:
         import faiss
 
         instance = cls.__new__(cls)
-        instance.dimension = int(metadata["dimension"])
+        raw_dimension = metadata["dimension"]
+        if not isinstance(raw_dimension, (int, str)):
+            raise TypeError("FAISS metadata dimension must be an integer")
+        raw_parameters = metadata.get("parameters", {})
+        if not isinstance(raw_parameters, Mapping):
+            raise TypeError("FAISS metadata parameters must be an object")
+        parameters: dict[str, int] = {}
+        for name, value in raw_parameters.items():
+            if not isinstance(value, (int, str)):
+                raise TypeError(f"FAISS parameter must be an integer: {name}")
+            parameters[str(name)] = int(value)
+        instance.dimension = int(raw_dimension)
         instance.kind = str(metadata["kind"])
-        instance.parameters = dict(metadata.get("parameters", {}))
+        instance.parameters = parameters
         instance.index = faiss.read_index(str(path))
         return instance
 

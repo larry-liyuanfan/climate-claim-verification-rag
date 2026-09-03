@@ -15,6 +15,7 @@ from climate_rag.public_v2 import (
     export_public_v2_splits,
     file_sha256,
     load_public_v2_protocol,
+    newline_normalized_sha256,
     validate_public_v2_protocol,
     verify_scifact_archive,
 )
@@ -63,11 +64,15 @@ def main() -> int:
     if not isinstance(manifest, dict):
         raise TypeError("CLIMATE-FEVER split manifest must be an object")
     expected_split_hash = str(protocol["dataset"]["split_manifest_sha256"])
-    observed_split_hash = file_sha256(prepared / "split_manifest.json")
-    if observed_split_hash != expected_split_hash:
+    split_newline = str(protocol["dataset"]["split_manifest_newline"])
+    native_split_hash = file_sha256(prepared / "split_manifest.json")
+    protocol_split_hash = newline_normalized_sha256(
+        prepared / "split_manifest.json", newline=split_newline
+    )
+    if protocol_split_hash != expected_split_hash:
         raise ValueError(
             "CLIMATE-FEVER split manifest differs from the frozen v2 protocol: "
-            f"{observed_split_hash}"
+            f"native={native_split_hash}, protocol={protocol_split_hash}"
         )
     selection_dir = climate_root / "selection-only"
     if not (selection_dir / "selection-splits.json").exists():
@@ -85,7 +90,9 @@ def main() -> int:
         "protocol_validation": validation,
         "climate_fever": {
             "source_sha256": expected_source_hash,
-            "split_manifest_sha256": observed_split_hash,
+            "split_manifest_sha256": protocol_split_hash,
+            "split_manifest_native_sha256": native_split_hash,
+            "split_manifest_newline": split_newline,
             "split_counts": {
                 name: len(manifest["split"][name])
                 for name in ("train", "validation", "test")

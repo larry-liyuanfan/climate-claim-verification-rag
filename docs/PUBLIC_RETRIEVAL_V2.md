@@ -9,6 +9,14 @@ BM25 baseline is now permanently sealed, including exact-baseline reruns. The v2
 test assignment stays in the provenance manifest but is not exported as a claims
 file and is not accepted by any selection command.
 
+The verified manifest digest
+`66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16`
+was originally frozen from CRLF-serialized JSON. Preparation therefore records
+the native file digest but performs the protocol comparison after explicit CRLF
+newline serialization. This is a byte-serialization normalization only: the
+source digest, split algorithm, seed, assignments and expected digest are not
+changed.
+
 The sole independent transfer event is the official BEIR SciFact test split. The
 archive URL and MD5 come from the
 [BEIR dataset registry](https://github.com/beir-cellar/beir/wiki/Datasets-available),

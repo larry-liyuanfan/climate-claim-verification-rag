@@ -45,6 +45,18 @@ def file_sha256(path: str | Path) -> str:
     return digest.hexdigest()
 
 
+def newline_normalized_sha256(path: str | Path, *, newline: str) -> str:
+    """Hash UTF-8 text with an explicitly frozen newline serialization."""
+
+    if newline not in {"lf", "crlf"}:
+        raise ValueError("newline must be lf or crlf")
+    with Path(path).open("r", encoding="utf-8", newline=None) as handle:
+        text = handle.read()
+    separator = "\n" if newline == "lf" else "\r\n"
+    payload = text.replace("\n", separator).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def file_md5(path: str | Path) -> str:
     digest = hashlib.md5(usedforsecurity=False)
     with Path(path).open("rb") as handle:
@@ -101,6 +113,16 @@ def validate_public_v2_protocol(
         raise ValueError("validation must be the only selection/evaluation split")
     if str(dataset.get("prohibited_split")) != "test":
         raise ValueError("the public v2 test must remain prohibited")
+    if str(dataset.get("split_manifest_newline")) != "crlf":
+        raise ValueError("the verified split manifest hash freezes CRLF serialization")
+
+    future = _mapping(policy, "future_split_protocol")
+    if str(future.get("verified_split_manifest_sha256")) != str(
+        dataset.get("split_manifest_sha256")
+    ):
+        raise ValueError("protocol and policy split manifest hashes differ")
+    if str(future.get("verified_split_manifest_newline")) != "crlf":
+        raise ValueError("policy must record the verified manifest newline")
 
     frozen = _mapping(policy, "frozen_test")
     if str(frozen.get("status")) != "consumed":

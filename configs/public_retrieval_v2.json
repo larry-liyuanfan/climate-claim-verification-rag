@@ -7,6 +7,7 @@
     "name": "CLIMATE-FEVER",
     "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
     "split_manifest_sha256": "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16",
+    "split_manifest_newline": "crlf",
     "split_counts": {
       "train": 1075,
       "validation": 230,
