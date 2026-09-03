@@ -71,11 +71,15 @@ heuristics rather than human semantic labels.
 Spartan jobs run from a detached exact commit under the isolated root
 `/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2`.
 The packed environment, data, logs, checkpoints, predictions and indexes remain
-under that root. To respect the measured shared-filesystem inode ceiling, each
-allocation expands the environment and model-download cache into its requested
-Spartan compute-node temporary directory (`SLURM_TMPDIR` when exposed,
-otherwise the allocation's `TMPDIR`); those caches are ephemeral, never Git
-artifacts, and never fall back to `$HOME` or another project. Submission order is
+under that root as content-addressed tar archives rather than directory trees.
+Every archive carries an internal payload manifest and its filename carries the
+archive SHA-256; downstream allocations verify both before unpacking. To respect
+the measured shared-filesystem inode ceiling, each allocation expands its input
+archives, environment and model-download cache into the Spartan compute-node
+temporary directory (`SLURM_TMPDIR` when exposed, otherwise the allocation's
+`TMPDIR`); those caches are ephemeral, never Git artifacts, and never fall back
+to `$HOME` or another project. The frozen peak budget is 34 new persistent
+inodes with a 68-free-inode admission gate. Submission order is
 `sbatch --test-only`, CPU/GPU preflight, six pilots, at most two full
 candidates, downstream comparison, one SciFact transfer and compact
 publication. See [the Spartan runbook](../hpc/README.md).

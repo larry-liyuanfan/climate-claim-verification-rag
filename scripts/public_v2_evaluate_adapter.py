@@ -174,6 +174,7 @@ def main() -> int:
         "candidate_flat_index": candidate_index_metrics,
         "candidate_embedding_bytes": embedding_path.stat().st_size,
         "candidate_embeddings_path": str(embedding_path),
+        "candidate_embeddings_sha256": file_sha256(embedding_path),
         "candidate_flat_index_path": str(flat_path),
         "adapter_parameter_count": candidate_encoder.adapter_parameter_count,
         "adapter_path": str(adapter_path),

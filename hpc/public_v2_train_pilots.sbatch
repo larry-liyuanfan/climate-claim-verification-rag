@@ -14,18 +14,27 @@ set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
 : "${REPO_DIR:?Set the exact detached repository}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed Git commit}"
-: "${BASE_DIR:?Set the verified public-v2 base directory}"
-: "${PILOT_ROOT:?Set a new pilot root}"
+: "${PERSIST_DIR:?Set the pre-existing archive destination directory}"
 
 test "$(readlink -f "${CLIMATE_V2_ROOT}")" = \
   "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
 test "$(git -C "${REPO_DIR}" rev-parse HEAD)" = "${CLIMATE_GIT_COMMIT}"
 test "${SLURM_ARRAY_TASK_COUNT}" = "6"
+test -d "${PERSIST_DIR}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${REPO_DIR}/hpc/public_v2_runtime.sh"
 public_v2_activate_runtime
+NODE_TMP="$(public_v2_node_tmp)"
+WORK_ROOT="${NODE_TMP}/climate-v2-pilot-${SLURM_ARRAY_JOB_ID}-${SLURM_ARRAY_TASK_ID}"
+test ! -e "${WORK_ROOT}"
+mkdir -p "${WORK_ROOT}"
+public_v2_unpack_stage "${PERSIST_DIR}/preflight" "${WORK_ROOT}/preflight"
+public_v2_unpack_stage "${PERSIST_DIR}/base" "${WORK_ROOT}/base"
+BASE_DIR="${WORK_ROOT}/base"
+TASK_ROOT="${WORK_ROOT}/pilot"
+export BASE_DIR
 export PYTHONPATH="${REPO_DIR}/src"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 export TOKENIZERS_PARALLELISM=false
@@ -53,8 +62,6 @@ HARD_NEGATIVES="${CONFIG_FIELDS[3]}"
 INFONCE_TEMPERATURE="${CONFIG_FIELDS[4]}"
 CONFIG_JSON="${CONFIG_FIELDS[5]}"
 LORA_ALPHA="$((LORA_RANK * 4))"
-TASK_ROOT="${PILOT_ROOT}/${CONFIG_ID}-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
-test ! -e "${TASK_ROOT}"
 mkdir -p "${TASK_ROOT}/training"
 
 python - "${TASK_ROOT}/adapter_config.json" "${CONFIG_JSON}" <<'PY'
@@ -129,8 +136,8 @@ ADAPTER_DIR="${CHECKPOINTS[0]}"
 /usr/bin/time -v python scripts/public_v2_evaluate_adapter.py \
   --protocol configs/public_retrieval_v2.json \
   --policy configs/public_evaluation_policy.json \
-  --prepared-dir "${CLIMATE_V2_ROOT}/data/climate-fever-v2/prepared" \
-  --selection-dir "${CLIMATE_V2_ROOT}/data/climate-fever-v2/selection-only" \
+  --prepared-dir "${WORK_ROOT}/preflight/data/climate-fever-v2/prepared" \
+  --selection-dir "${WORK_ROOT}/preflight/data/climate-fever-v2/selection-only" \
   --base-dir "${BASE_DIR}" \
   --adapter-dir "${ADAPTER_DIR}" \
   --training-record "${TASK_ROOT}/adapter_config.json" \
@@ -139,4 +146,6 @@ ADAPTER_DIR="${CHECKPOINTS[0]}"
   --output-dir "${TASK_ROOT}/evaluation" \
   --device cuda \
   --batch-size 32
+public_v2_pack_stage \
+  "${TASK_ROOT}" "${PERSIST_DIR}/pilot-${CONFIG_ID}" "pilot-${CONFIG_ID}"
 sync

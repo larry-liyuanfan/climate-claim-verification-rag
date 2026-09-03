@@ -14,19 +14,26 @@ set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
 : "${REPO_DIR:?Set the exact detached repository}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed Git commit}"
-: "${BASE_DIR:?Set the verified public-v2 base directory}"
-: "${PILOT_ROOT:?Set the completed six-pilot root}"
-: "${PILOT_SELECTION:?Set pilot_selection.json}"
-: "${FULL_ROOT:?Set a new full-evaluation root}"
+: "${PERSIST_DIR:?Set the pre-existing archive destination directory}"
 
 test "$(readlink -f "${CLIMATE_V2_ROOT}")" = \
   "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
 test "$(git -C "${REPO_DIR}" rev-parse HEAD)" = "${CLIMATE_GIT_COMMIT}"
+test -d "${PERSIST_DIR}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${REPO_DIR}/hpc/public_v2_runtime.sh"
 public_v2_activate_runtime
+NODE_TMP="$(public_v2_node_tmp)"
+WORK_ROOT="${NODE_TMP}/climate-v2-full-${SLURM_ARRAY_JOB_ID}-${SLURM_ARRAY_TASK_ID}"
+test ! -e "${WORK_ROOT}"
+mkdir -p "${WORK_ROOT}"
+public_v2_unpack_stage "${PERSIST_DIR}/preflight" "${WORK_ROOT}/preflight"
+public_v2_unpack_stage "${PERSIST_DIR}/base" "${WORK_ROOT}/base"
+public_v2_unpack_stage \
+  "${PERSIST_DIR}/pilot-selection" "${WORK_ROOT}/pilot-selection"
+PILOT_SELECTION="${WORK_ROOT}/pilot-selection/pilot_selection.json"
 export PYTHONPATH="${REPO_DIR}/src"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 cd "${REPO_DIR}"
@@ -40,32 +47,28 @@ selection = json.loads(Path(sys.argv[1]).read_text())
 print(selection["selected_for_full"][int(sys.argv[2])])
 PY
 )
-mapfile -t PILOT_MATCHES < <(
-  find "${PILOT_ROOT}" -mindepth 1 -maxdepth 1 -type d \
-    -name "${CONFIG_ID}-*" -print
-)
-test "${#PILOT_MATCHES[@]}" -eq 1
-PILOT_DIR="${PILOT_MATCHES[0]}"
+public_v2_unpack_stage \
+  "${PERSIST_DIR}/pilot-${CONFIG_ID}" "${WORK_ROOT}/pilot"
 mapfile -t CHECKPOINTS < <(
-  find "${PILOT_DIR}/training" -mindepth 1 -maxdepth 1 -type d \
+  find "${WORK_ROOT}/pilot/training" -mindepth 1 -maxdepth 1 -type d \
     -name 'checkpoint-*' -print | sort -V
 )
 test "${#CHECKPOINTS[@]}" -eq 1
-TASK_ROOT="${FULL_ROOT}/${CONFIG_ID}-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
-test ! -e "${TASK_ROOT}"
-mkdir -p "${TASK_ROOT}"
+OUTPUT_DIR="${WORK_ROOT}/full"
 
 /usr/bin/time -v python scripts/public_v2_evaluate_adapter.py \
   --protocol configs/public_retrieval_v2.json \
   --policy configs/public_evaluation_policy.json \
-  --prepared-dir "${CLIMATE_V2_ROOT}/data/climate-fever-v2/prepared" \
-  --selection-dir "${CLIMATE_V2_ROOT}/data/climate-fever-v2/selection-only" \
-  --base-dir "${BASE_DIR}" \
+  --prepared-dir "${WORK_ROOT}/preflight/data/climate-fever-v2/prepared" \
+  --selection-dir "${WORK_ROOT}/preflight/data/climate-fever-v2/selection-only" \
+  --base-dir "${WORK_ROOT}/base" \
   --adapter-dir "${CHECKPOINTS[0]}" \
-  --training-record "${PILOT_DIR}/adapter_config.json" \
+  --training-record "${WORK_ROOT}/pilot/adapter_config.json" \
   --adapter-config-id "${CONFIG_ID}" \
   --mode full \
-  --output-dir "${TASK_ROOT}/evaluation" \
+  --output-dir "${OUTPUT_DIR}/evaluation" \
   --device cuda \
   --batch-size 32
+public_v2_pack_stage \
+  "${OUTPUT_DIR}" "${PERSIST_DIR}/full-${CONFIG_ID}" "full-${CONFIG_ID}"
 sync

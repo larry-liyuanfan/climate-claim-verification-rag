@@ -37,6 +37,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--protocol", required=True)
     parser.add_argument("--frozen-config", required=True)
+    parser.add_argument("--adapter-dir", required=True)
     parser.add_argument("--archive", required=True)
     parser.add_argument("--ledger", required=True)
     parser.add_argument("--output-dir", required=True)
@@ -104,7 +105,7 @@ def main() -> int:
     del base_encoder, base_vectors, base_index
     _release_gpu()
 
-    adapter_path = Path(str(frozen["adapter_path"]))
+    adapter_path = Path(args.adapter_dir)
     if tree_sha256(adapter_path) != str(frozen["adapter_sha256"]):
         raise ValueError("selected adapter changed after configuration freeze")
     candidate_encoder = SentenceTransformerEncoder(

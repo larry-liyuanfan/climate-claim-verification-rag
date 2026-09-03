@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -19,6 +21,7 @@ from climate_rag.public_v2 import (
     select_pilot_candidates,
     validate_public_v2_protocol,
 )
+from scripts.public_v2_stage_manifest import verify_manifest, write_manifest
 
 
 def _repository() -> Path:
@@ -56,6 +59,41 @@ def test_repository_public_v2_protocol_is_fully_frozen() -> None:
     assert result["adapter_count"] == 6
     assert result["max_full_candidates"] == 2
     assert result["external_transfer_budget"] == 1
+
+
+def test_repository_public_v2_storage_budget_is_inode_bounded() -> None:
+    storage = read_json(_repository() / "configs" / "public_v2_storage.json")
+    assert isinstance(storage, dict)
+    budget = storage["persistent_inode_budget"]
+    projected = (
+        budget["stage_archives"]
+        + budget["external_transfer_ledger"]
+        + budget["merged_slurm_logs"]
+        + budget["transient_pack_or_atomic_write_peak"]
+    )
+    assert projected == budget["projected_peak_new_inodes"] == 34
+    assert budget["minimum_free_inodes_before_preflight"] == 2 * projected
+    assert storage["boundaries"]["persistent_stage_directories"] == 0
+    assert storage["boundaries"]["home_cache_writes"] == 0
+    assert storage["boundaries"]["other_project_cache_writes"] == 0
+
+
+def test_stage_manifest_detects_payload_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("REPO_DIR", str(_repository()))
+    monkeypatch.setenv("CLIMATE_GIT_COMMIT", "test-commit")
+    monkeypatch.setenv("SLURM_JOB_ID", "test-job")
+    payload = tmp_path / "payload"
+    payload.mkdir()
+    value = payload / "value.txt"
+    value.write_text("original", encoding="utf-8")
+    manifest = write_manifest(payload, "test-stage")
+    assert manifest["file_count"] == 1
+    assert verify_manifest(payload) == manifest
+    value.write_text("changed", encoding="utf-8")
+    with pytest.raises(ValueError, match="changed"):
+        verify_manifest(payload)
 
 
 def test_export_public_v2_splits_never_materialises_test_claims(tmp_path: Path) -> None:
@@ -108,6 +146,42 @@ def test_full_promotion_requires_positive_recall_ci_and_no_secondary_regression(
     )
     assert selection["selected_candidate_id"] == "pass"
     assert selection["selected_candidate_promoted"] is True
+
+
+def test_full_freeze_uses_portable_artifact_identifiers(tmp_path: Path) -> None:
+    metrics = _comparison(0.002)
+    metrics.update(
+        {
+            "adapter_config_id": "s100-r8-n4-t003",
+            "candidate_embeddings_sha256": "e" * 64,
+            "adapter_path": "/tmp/ephemeral-adapter",
+            "candidate_embeddings_path": "/tmp/ephemeral-embeddings.npy",
+        }
+    )
+    metrics_path = tmp_path / "metrics.json"
+    metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+    output = tmp_path / "selection"
+    subprocess.run(
+        [
+            sys.executable,
+            str(_repository() / "scripts" / "public_v2_select.py"),
+            "--protocol",
+            str(_repository() / "configs" / "public_retrieval_v2.json"),
+            "--phase",
+            "full",
+            "--metrics",
+            str(metrics_path),
+            "--output-dir",
+            str(output),
+        ],
+        check=True,
+        cwd=_repository(),
+    )
+    frozen = read_json(output / "frozen_config.json")
+    assert isinstance(frozen, dict)
+    assert frozen["adapter_artifact"] == "selected-pilot-checkpoint"
+    assert frozen["candidate_embeddings_artifact"].startswith("selected-full")
+    assert not any("path" in key for key in frozen)
 
 
 def test_scifact_adapter_reads_official_beir_layout_once(

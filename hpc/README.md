@@ -13,12 +13,21 @@ The required branch is `codex/climate-public-retrieval-v2`. Push an
 implementation commit, clone that exact commit into `repos/<sha>`, check it out
 detached, and keep the packed environment, data, runs, logs and durable
 artifacts inside the root. The project filesystem is inode-constrained, so the
-environment is expanded from `envs/runtime-py310.tar.gz` into each allocation's
+environment is expanded from `envs/runtime-py310-<sha256>.tar.gz` into each allocation's
 compute-node temporary directory (`SLURM_TMPDIR` when available, otherwise the
 allocation's `TMPDIR`); Hugging Face, ModelScope and pip download caches are
 also job-local and ephemeral. No stage writes a cache to `$HOME` or another project.
 Every sbatch script checks both the literal root and exact Git SHA before doing
 work.
+
+Every stage works entirely in that node-local directory and persists exactly
+one `stage-<sha256>.tar.gz` file. Each archive contains a manifest with the
+source commit, Slurm job, file count, byte count and payload-tree hash; consumers
+verify both the filename hash and manifest before unpacking. Stdout and stderr
+must use the same Slurm log path. The frozen storage budget in
+`configs/public_v2_storage.json` projects 34 peak new inodes and requires 68
+free before preflight, including a 2x safety factor. No persistent per-stage
+directory is allowed.
 
 Submit in stages; do not run Python/model work on a login node:
 
@@ -33,8 +42,8 @@ Submit in stages; do not run Python/model work on a login node:
 7. Submit `public_v2_downstream.sbatch`, then exactly one
    `public_v2_external_scifact.sbatch` using the frozen config and one-shot
    ledger.
-8. Collect `sacct` fields and run `public_v2_publish.sbatch`. Only its compact,
-   schema-checked JSON may enter Git.
+8. Pass all job IDs to `public_v2_publish.sbatch`; it collects `sacct` inside
+   the allocation. Only its compact, schema-checked JSON may enter Git.
 
 Infrastructure failure may be retried twice with the identical config and a new
 output directory. A completed quality result is never rerun or used to alter a

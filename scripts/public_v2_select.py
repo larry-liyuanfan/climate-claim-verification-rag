@@ -51,14 +51,14 @@ def main() -> int:
                 "protocol_sha256": file_sha256(args.protocol),
                 "selected_candidate_id": selected_id,
                 "selected_candidate_promoted": result["selected_candidate_promoted"],
-                "adapter_path": selected_metrics["adapter_path"],
+                "adapter_artifact": "selected-pilot-checkpoint",
                 "adapter_sha256": selected_metrics["adapter_sha256"],
-                "candidate_embeddings_path": selected_metrics[
-                    "candidate_embeddings_path"
-                ],
-                "candidate_embeddings_sha256": file_sha256(
-                    selected_metrics["candidate_embeddings_path"]
+                "candidate_embeddings_artifact": (
+                    "selected-full-evaluation-candidate-embeddings"
                 ),
+                "candidate_embeddings_sha256": selected_metrics[
+                    "candidate_embeddings_sha256"
+                ],
                 "climate_validation_metrics_sha256": selected_metrics["metrics_sha256"],
                 "dense_model": protocol["models"]["dense"],
                 "downstream_ranking": protocol["downstream_ranking"],

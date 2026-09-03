@@ -14,31 +14,48 @@ set -euo pipefail
 : "${REPO_DIR:?Set the exact detached repository}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed Git commit}"
 : "${PHASE:?Set pilot or full}"
-: "${METRICS_ROOT:?Set the pilot/full metrics root}"
-: "${OUTPUT_DIR:?Set a unique selection output directory}"
+: "${PERSIST_DIR:?Set the pre-existing archive destination directory}"
+test "${PHASE}" = "pilot" || test "${PHASE}" = "full"
 
 test "$(readlink -f "${CLIMATE_V2_ROOT}")" = \
   "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
 test "$(git -C "${REPO_DIR}" rev-parse HEAD)" = "${CLIMATE_GIT_COMMIT}"
-test ! -e "${OUTPUT_DIR}"
+test -d "${PERSIST_DIR}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 Python/3.10.4
 source "${REPO_DIR}/hpc/public_v2_runtime.sh"
 public_v2_activate_runtime
+NODE_TMP="$(public_v2_node_tmp)"
+WORK_ROOT="${NODE_TMP}/climate-v2-${PHASE}-selection-${SLURM_JOB_ID}"
+METRICS_ROOT="${WORK_ROOT}/metrics"
+OUTPUT_DIR="${WORK_ROOT}/selection"
+test ! -e "${WORK_ROOT}"
+mkdir -p "${METRICS_ROOT}"
 export PYTHONPATH="${REPO_DIR}/src"
 cd "${REPO_DIR}"
 
+shopt -s nullglob
+ARCHIVES=("${PERSIST_DIR}/${PHASE}"-*.tar.gz)
+shopt -u nullglob
+if [[ "${PHASE}" = "pilot" ]]; then
+  test "${#ARCHIVES[@]}" -eq 6
+else
+  test "${#ARCHIVES[@]}" -ge 1
+  test "${#ARCHIVES[@]}" -le 2
+fi
+for index in "${!ARCHIVES[@]}"; do
+  archive="${ARCHIVES[${index}]}"
+  stem="${archive%.tar.gz}"
+  digest="${stem##*-}"
+  prefix="${stem%-${digest}}"
+  public_v2_unpack_stage "${prefix}" "${METRICS_ROOT}/${index}"
+done
 mapfile -t METRICS < <(
-  find "${METRICS_ROOT}" -mindepth 2 -maxdepth 2 -type f \
+  find "${METRICS_ROOT}" -mindepth 3 -maxdepth 3 -type f \
     -path '*/evaluation/metrics.json' -print | sort
 )
-if [[ "${PHASE}" = "pilot" ]]; then
-  test "${#METRICS[@]}" -eq 6
-else
-  test "${#METRICS[@]}" -ge 1
-  test "${#METRICS[@]}" -le 2
-fi
+test "${#METRICS[@]}" -eq "${#ARCHIVES[@]}"
 ARGS=()
 for path in "${METRICS[@]}"; do
   ARGS+=(--metrics "${path}")
@@ -48,3 +65,6 @@ python scripts/public_v2_select.py \
   --phase "${PHASE}" \
   "${ARGS[@]}" \
   --output-dir "${OUTPUT_DIR}"
+public_v2_pack_stage \
+  "${OUTPUT_DIR}" "${PERSIST_DIR}/${PHASE}-selection" "${PHASE}-selection"
+sync

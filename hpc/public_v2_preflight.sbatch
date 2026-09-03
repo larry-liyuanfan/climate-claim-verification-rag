@@ -13,27 +13,28 @@ set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
 : "${REPO_DIR:?Set the exact detached repository}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed Git commit}"
-: "${PREP_OUTPUT:?Set a unique preparation output directory}"
+: "${PERSIST_DIR:?Set the pre-existing archive destination directory}"
 
 test "$(readlink -f "${CLIMATE_V2_ROOT}")" = \
   "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
 test "$(git -C "${REPO_DIR}" rev-parse HEAD)" = "${CLIMATE_GIT_COMMIT}"
 test -z "$(git -C "${REPO_DIR}" status --porcelain)"
-test ! -e "${PREP_OUTPUT}"
+test -d "${PERSIST_DIR}"
+AVAILABLE_INODES="$(df --output=iavail "${PERSIST_DIR}" | tail -n 1 | tr -d ' ')"
+MINIMUM_INODES=68
+printf 'persistent_inode_available=%s\npersistent_inode_minimum=%s\n' \
+  "${AVAILABLE_INODES}" "${MINIMUM_INODES}"
+test "${AVAILABLE_INODES}" -ge "${MINIMUM_INODES}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
-
-NODE_TMP="${SLURM_TMPDIR:-${TMPDIR:-}}"
-: "${NODE_TMP:?Spartan did not expose node-local temporary storage}"
-case "$(readlink -f "${NODE_TMP}")" in
-  /tmp|/tmp/*|/var/tmp|/var/tmp/*|/jobfs/*) ;;
-  *) echo "Refusing non-local temporary directory: ${NODE_TMP}" >&2; exit 92 ;;
-esac
+source "${REPO_DIR}/hpc/public_v2_runtime.sh"
+NODE_TMP="$(public_v2_node_tmp)"
+WORK_ROOT="${NODE_TMP}/climate-v2-preflight-${SLURM_JOB_ID}"
 RUNTIME_ENV="${NODE_TMP}/climate-v2-runtime-${SLURM_JOB_ID}"
-RUNTIME_ARCHIVE="${CLIMATE_V2_ROOT}/envs/runtime-py310.tar.gz"
 PIP_CACHE_DIR="${NODE_TMP}/climate-v2-pip-${SLURM_JOB_ID}"
-test ! -e "${RUNTIME_ARCHIVE}"
+test ! -e "${WORK_ROOT}"
+mkdir -p "${WORK_ROOT}/preflight"
 python -m venv --system-site-packages "${RUNTIME_ENV}"
 source "${RUNTIME_ENV}/bin/activate"
 export PIP_CACHE_DIR
@@ -70,21 +71,24 @@ export MODELSCOPE_HOME="${MODELSCOPE_CACHE}"
 export HF_HUB_DISABLE_TELEMETRY=1
 mkdir -p "${XDG_CACHE_HOME}" "${HF_HOME}" "${MODELSCOPE_CACHE}"
 
+PREP_OUTPUT="${WORK_ROOT}/preflight/prepare"
+DATA_ROOT="${WORK_ROOT}/preflight/data"
 cd "${REPO_DIR}"
 python -m pytest -q -p no:cacheprovider
 python -m climate_rag.cli build-pareto \
   --profiles configs/search_profiles.verified.json \
-  --output-dir "${PREP_OUTPUT}-pareto-smoke"
+  --output-dir "${WORK_ROOT}/preflight/pareto-smoke"
 python scripts/public_v2_prepare.py \
   --protocol configs/public_retrieval_v2.json \
   --policy configs/public_evaluation_policy.json \
-  --data-root "${CLIMATE_V2_ROOT}/data" \
+  --data-root "${DATA_ROOT}" \
   --output-dir "${PREP_OUTPUT}"
 python -m pip freeze > "${PREP_OUTPUT}/environment-freeze.txt"
 sha256sum "${PREP_OUTPUT}/environment-freeze.txt" \
   > "${PREP_OUTPUT}/environment-freeze.sha256"
-mkdir -p "${CLIMATE_V2_ROOT}/envs"
-TEMP_ARCHIVE="${CLIMATE_V2_ROOT}/envs/.runtime-py310-${SLURM_JOB_ID}.tar.gz"
-tar -czf "${TEMP_ARCHIVE}" -C "${RUNTIME_ENV}" .
-mv "${TEMP_ARCHIVE}" "${RUNTIME_ARCHIVE}"
-sha256sum "${RUNTIME_ARCHIVE}" > "${CLIMATE_V2_ROOT}/envs/runtime-py310.tar.gz.sha256"
+
+public_v2_pack_stage \
+  "${RUNTIME_ENV}" "${CLIMATE_V2_ROOT}/envs/runtime-py310" "runtime-py310"
+public_v2_pack_stage \
+  "${WORK_ROOT}/preflight" "${PERSIST_DIR}/preflight" "preflight"
+sync

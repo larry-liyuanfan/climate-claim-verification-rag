@@ -14,18 +14,22 @@ set -euo pipefail
 : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
 : "${REPO_DIR:?Set the exact detached repository}"
 : "${CLIMATE_GIT_COMMIT:?Set the exact pushed Git commit}"
-: "${OUTPUT_DIR:?Set a unique GPU preflight output directory}"
+: "${PERSIST_DIR:?Set the pre-existing archive destination directory}"
 
 test "$(readlink -f "${CLIMATE_V2_ROOT}")" = \
   "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
 test "$(git -C "${REPO_DIR}" rev-parse HEAD)" = "${CLIMATE_GIT_COMMIT}"
-test ! -e "${OUTPUT_DIR}"
-mkdir -p "${OUTPUT_DIR}"
+test -d "${PERSIST_DIR}"
 
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 source "${REPO_DIR}/hpc/public_v2_runtime.sh"
 public_v2_activate_runtime
+NODE_TMP="$(public_v2_node_tmp)"
+WORK_ROOT="${NODE_TMP}/climate-v2-gpu-preflight-${SLURM_JOB_ID}"
+OUTPUT_DIR="${WORK_ROOT}/gpu-preflight"
+test ! -e "${WORK_ROOT}"
+mkdir -p "${OUTPUT_DIR}"
 export PYTHONPATH="${REPO_DIR}/src"
 
 cd "${REPO_DIR}"
@@ -56,3 +60,6 @@ print(json.dumps({
 }, sort_keys=True))
 PY
 sha256sum "${OUTPUT_DIR}/runtime.json" > "${OUTPUT_DIR}/runtime.sha256"
+public_v2_pack_stage \
+  "${OUTPUT_DIR}" "${PERSIST_DIR}/gpu-preflight" "gpu-preflight"
+sync

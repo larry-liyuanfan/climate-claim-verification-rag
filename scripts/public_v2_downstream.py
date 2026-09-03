@@ -7,7 +7,7 @@ import os
 import time
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -54,6 +54,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--selection-dir", required=True)
     parser.add_argument("--base-dir", required=True)
     parser.add_argument("--frozen-config", required=True)
+    parser.add_argument("--adapter-dir", required=True)
+    parser.add_argument("--candidate-embeddings", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--batch-size", type=int, default=32)
@@ -162,15 +164,18 @@ def _feature_row(
     lexical = by_bm25.get(evidence_id)
     dense = by_dense.get(evidence_id)
     rrf = by_rrf[evidence_id]
-    return build_candidate_features(
-        query,
-        rrf.text,
-        bm25_score=lexical.score if lexical else 0.0,
-        bm25_rank=lexical.rank if lexical else None,
-        dense_score=dense.score if dense else 0.0,
-        dense_rank=dense.rank if dense else None,
-        rrf_score=rrf.score,
-        rrf_rank=rrf.rank,
+    return cast(
+        dict[str, float],
+        build_candidate_features(
+            query,
+            rrf.text,
+            bm25_score=lexical.score if lexical else 0.0,
+            bm25_rank=lexical.rank if lexical else None,
+            dense_score=dense.score if dense else 0.0,
+            dense_rank=dense.rank if dense else None,
+            rrf_score=rrf.score,
+            rrf_rank=rrf.rank,
+        ),
     )
 
 
@@ -241,10 +246,10 @@ def main() -> int:
     rrf_k = int(ranking["rrf_k"])
     bm25 = BM25Index.load(Path(args.base_dir) / "bm25.pkl.gz")
 
-    adapter_path = Path(str(frozen["adapter_path"]))
+    adapter_path = Path(args.adapter_dir)
     if tree_sha256(adapter_path) != str(frozen["adapter_sha256"]):
         raise ValueError("selected adapter changed after configuration freeze")
-    embedding_path = Path(str(frozen["candidate_embeddings_path"]))
+    embedding_path = Path(args.candidate_embeddings)
     if file_sha256(embedding_path) != str(frozen["candidate_embeddings_sha256"]):
         raise ValueError("selected embeddings changed after configuration freeze")
     vectors = np.load(embedding_path, mmap_mode="r")
