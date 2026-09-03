@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "dataset": "CLIMATE-FEVER",
+  "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
+  "split_seed": 20260825,
+  "frozen_test": {
+    "status": "consumed",
+    "consumed_at": "2026-08-25",
+    "consumed_system_id": "bm25-lexical-baseline-v1",
+    "consumed_artifact": "docs/verified-runs/climate-fever-public-bm25-test-20260825.json",
+    "split_manifest_sha256": "796cbfbdb7660cf258cb4d31a9f6c23e5dbb93b13998acd0f39d0d9226b8d651",
+    "posthoc_document_variant_audit": {
+      "status": "strict_split_warning",
+      "near_duplicate_evidence_pairs_cross_split": 1,
+      "near_duplicate_decisive_evidence_pairs_cross_split": 0,
+      "jaccard_threshold": 0.9,
+      "affected_annotations": "Both annotations are NOT_ENOUGH_INFO and were not decisive retrieval positives.",
+      "decision": "Keep the historical BM25 baseline, but forbid any new candidate/final test claim on this split."
+    },
+    "additional_candidate_evaluations_allowed": false,
+    "exact_baseline_reproduction_allowed": true
+  },
+  "validation_gate": {
+    "bootstrap_samples": 5000,
+    "primary_metric": "recall@5",
+    "primary_mean_delta_must_be_positive": true,
+    "primary_ci_lower_must_be_positive": true,
+    "secondary_metrics": [
+      "mrr@10",
+      "ndcg@10",
+      "evidence_f1"
+    ],
+    "secondary_mean_non_regression_required": true
+  },
+  "future_split_protocol": {
+    "name": "claim-and-evidence-variant-grouped-v2",
+    "verified_split_manifest_sha256": "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16",
+    "counts": {
+      "train": 1075,
+      "validation": 230,
+      "test": 230
+    },
+    "strict_variant_audit": "passed",
+    "test_use": "forbidden_in_this_project_cycle"
+  },
+  "boundary": "The public frozen test was consumed by the lexical baseline. Further representation, fusion and reranker selection is validation-only; no new independent public-test claim is available in this project cycle."
+}

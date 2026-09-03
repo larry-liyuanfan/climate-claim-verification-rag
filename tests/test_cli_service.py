@@ -88,6 +88,11 @@ def test_cli_index_evaluate_negatives_and_ltr(tmp_path: Path) -> None:
     negative_metrics = json.loads((negatives_dir / "metrics.json").read_text(encoding="utf-8"))
     assert negative_metrics["ltr_query_group_count"] > 0
     assert negative_metrics["ltr_skipped_query_count"] == 0
+    assert negative_metrics["ltr_candidate_width"] == 100
+    assert negative_metrics["ltr_retained_group_positive_reachability"] == 1.0
+    assert sum(negative_metrics["ltr_candidate_source_distribution"].values()) == len(
+        ltr_rows
+    )
 
     ltr_dir = tmp_path / "ltr"
     assert main(
@@ -195,6 +200,9 @@ def test_five_stage_benchmark_entrypoint(tmp_path: Path, monkeypatch) -> None:
         "rrf_ltr_fusion_base4",
     }
     assert metrics["reranker"] == "deterministic-feature-fallback"
+    assert metrics["stage_contract"]["candidate_width"] == 8
+    assert metrics["stage_contract"]["feature_names"]
+    assert sum(metrics["stage_contract"]["candidate_source_distribution"].values()) > 0
     assert metrics["reranker_base"] == "rrf"
     assert metrics["reranker_timing"]["query_count"] == metrics["claim_count"] == 2
     assert metrics["reranker_timing"]["candidate_pair_count"] > 0

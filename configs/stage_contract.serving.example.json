@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "evidence_status": "illustrative-fixture-not-a-measured-run",
+  "scope": "serving candidate union before LTR",
+  "candidate_width": 100,
+  "feature_names": [
+    "bm25_score",
+    "bm25_reciprocal_rank",
+    "dense_score",
+    "dense_reciprocal_rank",
+    "rrf_score",
+    "rrf_reciprocal_rank",
+    "token_overlap",
+    "number_overlap",
+    "year_overlap",
+    "query_length",
+    "document_length"
+  ],
+  "candidate_source_distribution": {
+    "bm25_only": 44,
+    "dense_only": 46,
+    "both": 10
+  },
+  "boundary": "Example values exercise the fail-closed contract checker. They are not project evidence. Generate measured distributions from a run artifact before promotion."
+}

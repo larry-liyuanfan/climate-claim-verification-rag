@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "evidence_status": "verified-derived-decision-record",
+  "profiles": [
+    {
+      "name": "HNSW + RRF latency default",
+      "comparability_group": "restricted-fixed-dev-stage-cost-proxy-v1",
+      "recall@5": 0.2708874458874459,
+      "mrr@10": 0.34458874458874456,
+      "ndcg@10": 0.2494881908130123,
+      "evidence_f1": 0.17845804988662134,
+      "p95_ms": 15.41,
+      "memory_bytes": 11875217408,
+      "latency_scope": "HNSW ANN-only P95; BM25 and RRF overhead excluded",
+      "memory_scope": "fixed-dev Slurm batch MaxRSS",
+      "source": "five-stage-fixed-dev-20260819 + ANN jobs 29418470/29418595"
+    },
+    {
+      "name": "HNSW + RRF-prior LambdaMART CPU profile",
+      "comparability_group": "restricted-fixed-dev-stage-cost-proxy-v1",
+      "recall@5": 0.2800865800865801,
+      "mrr@10": 0.36482683982683983,
+      "ndcg@10": 0.2604513887807157,
+      "evidence_f1": 0.1824263038548753,
+      "p95_ms": 23.209952337518334,
+      "memory_bytes": 12435144704,
+      "latency_scope": "derived HNSW ANN P95 + deterministic LTR scoring P95; BM25 overhead excluded",
+      "memory_scope": "job 29504398 Slurm batch MaxRSS",
+      "source": "rrf-prior-ltr-fusion-gate-20260822"
+    },
+    {
+      "name": "HNSW + RRF/Qwen3-4B balanced quality profile",
+      "comparability_group": "restricted-fixed-dev-stage-cost-proxy-v1",
+      "recall@5": 0.3153,
+      "mrr@10": 0.3961,
+      "ndcg@10": 0.2849,
+      "evidence_f1": 0.2131,
+      "p95_ms": 4835.41,
+      "memory_bytes": 20860936192,
+      "latency_scope": "derived HNSW ANN P95 + 4B reranker P95; BM25 overhead excluded",
+      "memory_scope": "job 29453918 Slurm batch MaxRSS",
+      "source": "Qwen3-4B job 29453918 + comparison job 29455049"
+    }
+  ],
+  "boundary": "Latency is a stage-cost proxy, not an end-to-end service SLA. Every profile uses the same restricted 154-claim dev selection scope; none is an independent test result."
+}
