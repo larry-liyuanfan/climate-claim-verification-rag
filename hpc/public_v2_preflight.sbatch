@@ -24,9 +24,15 @@ test ! -e "${PREP_OUTPUT}"
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 
-RUNTIME_ENV="${JOBFS:?Request Slurm job-local storage with --tmp}/climate-v2-runtime-${SLURM_JOB_ID}"
+NODE_TMP="${SLURM_TMPDIR:-${TMPDIR:-}}"
+: "${NODE_TMP:?Spartan did not expose node-local temporary storage}"
+case "$(readlink -f "${NODE_TMP}")" in
+  /tmp|/tmp/*|/var/tmp|/var/tmp/*|/jobfs/*) ;;
+  *) echo "Refusing non-local temporary directory: ${NODE_TMP}" >&2; exit 92 ;;
+esac
+RUNTIME_ENV="${NODE_TMP}/climate-v2-runtime-${SLURM_JOB_ID}"
 RUNTIME_ARCHIVE="${CLIMATE_V2_ROOT}/envs/runtime-py310.tar.gz"
-PIP_CACHE_DIR="${JOBFS}/pip-cache"
+PIP_CACHE_DIR="${NODE_TMP}/climate-v2-pip-${SLURM_JOB_ID}"
 test ! -e "${RUNTIME_ARCHIVE}"
 python -m venv --system-site-packages "${RUNTIME_ENV}"
 source "${RUNTIME_ENV}/bin/activate"
@@ -54,12 +60,12 @@ export PYTHONNOUSERSITE=1
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
 export PYTHONPATH="${REPO_DIR}/src"
-export XDG_CACHE_HOME="${JOBFS}/cache/xdg"
-export HF_HOME="${JOBFS}/cache/huggingface"
+export XDG_CACHE_HOME="${NODE_TMP}/climate-v2-cache-${SLURM_JOB_ID}/xdg"
+export HF_HOME="${NODE_TMP}/climate-v2-cache-${SLURM_JOB_ID}/huggingface"
 export HF_HUB_CACHE="${HF_HOME}/hub"
 export TRANSFORMERS_CACHE="${HF_HOME}/transformers"
 export SENTENCE_TRANSFORMERS_HOME="${HF_HOME}/sentence-transformers"
-export MODELSCOPE_CACHE="${JOBFS}/cache/modelscope"
+export MODELSCOPE_CACHE="${NODE_TMP}/climate-v2-cache-${SLURM_JOB_ID}/modelscope"
 export MODELSCOPE_HOME="${MODELSCOPE_CACHE}"
 export HF_HUB_DISABLE_TELEMETRY=1
 mkdir -p "${XDG_CACHE_HOME}" "${HF_HOME}" "${MODELSCOPE_CACHE}"

@@ -73,8 +73,9 @@ Spartan jobs run from a detached exact commit under the isolated root
 The packed environment, data, logs, checkpoints, predictions and indexes remain
 under that root. To respect the measured shared-filesystem inode ceiling, each
 allocation expands the environment and model-download cache into its requested
-Spartan `JOBFS`; those caches are ephemeral, never Git artifacts, and never
-fall back to `$HOME` or another project. Submission order is
+Spartan compute-node temporary directory (`SLURM_TMPDIR` when exposed,
+otherwise the allocation's `TMPDIR`); those caches are ephemeral, never Git
+artifacts, and never fall back to `$HOME` or another project. Submission order is
 `sbatch --test-only`, CPU/GPU preflight, six pilots, at most two full
 candidates, downstream comparison, one SciFact transfer and compact
 publication. See [the Spartan runbook](../hpc/README.md).

@@ -14,8 +14,9 @@ implementation commit, clone that exact commit into `repos/<sha>`, check it out
 detached, and keep the packed environment, data, runs, logs and durable
 artifacts inside the root. The project filesystem is inode-constrained, so the
 environment is expanded from `envs/runtime-py310.tar.gz` into each allocation's
-requested `JOBFS`; Hugging Face, ModelScope and pip download caches are also
-job-local and ephemeral. No stage writes a cache to `$HOME` or another project.
+compute-node temporary directory (`SLURM_TMPDIR` when available, otherwise the
+allocation's `TMPDIR`); Hugging Face, ModelScope and pip download caches are
+also job-local and ephemeral. No stage writes a cache to `$HOME` or another project.
 Every sbatch script checks both the literal root and exact Git SHA before doing
 work.
 
