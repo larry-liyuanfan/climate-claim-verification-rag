@@ -34,7 +34,7 @@ public_v2_unpack_stage "${PERSIST_DIR}/base" "${WORK_ROOT}/base"
 public_v2_unpack_stage \
   "${PERSIST_DIR}/pilot-selection" "${WORK_ROOT}/pilot-selection"
 PILOT_SELECTION="${WORK_ROOT}/pilot-selection/pilot_selection.json"
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 cd "${REPO_DIR}"
 

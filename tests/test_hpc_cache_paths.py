@@ -52,3 +52,14 @@ def test_candidate_supported_ltr_copies_git_objects_to_node_local_storage() -> N
     assert "git clone --shared" not in script
     assert "trap 'rm -rf" in script
     assert '${CLIMATE_GIT_COMMIT:?Set an exact pushed Git commit}' in script
+
+
+def test_public_v2_jobs_preserve_module_pythonpath() -> None:
+    scripts = sorted((ROOT / "hpc").glob("public_v2_*.sbatch"))
+    assert len(scripts) == 9
+    expected = 'PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"'
+    for script_path in scripts:
+        assert expected in script_path.read_text(), script_path.name
+    runtime = (ROOT / "hpc" / "public_v2_runtime.sh").read_text()
+    assert 'runtime_site_packages="${runtime_env}/lib/python3.10/site-packages"' in runtime
+    assert 'PYTHONPATH="${runtime_site_packages}${PYTHONPATH:+:${PYTHONPATH}}"' in runtime

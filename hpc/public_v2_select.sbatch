@@ -32,7 +32,7 @@ METRICS_ROOT="${WORK_ROOT}/metrics"
 OUTPUT_DIR="${WORK_ROOT}/selection"
 test ! -e "${WORK_ROOT}"
 mkdir -p "${METRICS_ROOT}"
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 cd "${REPO_DIR}"
 
 shopt -s nullglob

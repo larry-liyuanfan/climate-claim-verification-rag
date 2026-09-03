@@ -34,7 +34,7 @@ mkdir -p "${WORK_ROOT}"
 public_v2_unpack_stage "${PERSIST_DIR}/preflight" "${WORK_ROOT}/preflight"
 public_v2_unpack_stage "${PERSIST_DIR}/full-selection" "${WORK_ROOT}/full-selection"
 FROZEN_CONFIG="${WORK_ROOT}/full-selection/frozen_config.json"
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 cd "${REPO_DIR}"
 

@@ -30,11 +30,12 @@ WORK_ROOT="${NODE_TMP}/climate-v2-gpu-preflight-${SLURM_JOB_ID}"
 OUTPUT_DIR="${WORK_ROOT}/gpu-preflight"
 test ! -e "${WORK_ROOT}"
 mkdir -p "${OUTPUT_DIR}"
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 
 cd "${REPO_DIR}"
 python - <<'PY' > "${OUTPUT_DIR}/runtime.json"
 import json
+import sys
 import torch
 from climate_rag.dense import SentenceTransformerEncoder
 
@@ -55,7 +56,11 @@ print(json.dumps({
     "model_revision": revision,
     "shape": list(vector.shape),
     "torch": torch.__version__,
+    "torch_module": torch.__file__,
     "cuda": torch.version.cuda,
+    "python_executable": sys.executable,
+    "python_prefix": sys.prefix,
+    "python_path": sys.path,
     "peak_torch_gpu_bytes": int(torch.cuda.max_memory_allocated()),
 }, sort_keys=True))
 PY

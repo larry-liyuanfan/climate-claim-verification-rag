@@ -93,14 +93,16 @@ public_v2_unpack_stage() {
 
 public_v2_activate_runtime() {
   : "${CLIMATE_V2_ROOT:?Set the isolated public-v2 root}"
-  local node_tmp runtime_env
+  local node_tmp runtime_env runtime_site_packages
   node_tmp="$(public_v2_node_tmp)"
   runtime_env="${node_tmp}/climate-v2-runtime-${SLURM_JOB_ID}"
   public_v2_unpack_stage \
     "${CLIMATE_V2_ROOT}/envs/runtime-py310" "${runtime_env}"
+  runtime_site_packages="${runtime_env}/lib/python3.10/site-packages"
+  test -d "${runtime_site_packages}"
 
-  # Console entry points contain the preflight temporary prefix. Python itself
-  # is relocatable, so make only those text shebangs resolve through this job's PATH.
+  # Console entry points contain the preflight temporary prefix. Rewrite only
+  # those text shebangs; the dependency path is composed explicitly below.
   local entrypoint first_line
   for entrypoint in "${runtime_env}"/bin/*; do
     test -f "${entrypoint}" || continue
@@ -112,6 +114,7 @@ public_v2_activate_runtime() {
 
   export VIRTUAL_ENV="${runtime_env}"
   export PATH="${runtime_env}/bin:${PATH}"
+  export PYTHONPATH="${runtime_site_packages}${PYTHONPATH:+:${PYTHONPATH}}"
   export PYTHONNOUSERSITE=1
   export PYTHONDONTWRITEBYTECODE=1
   export PYTHONUNBUFFERED=1

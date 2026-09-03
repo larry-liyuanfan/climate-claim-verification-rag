@@ -35,7 +35,7 @@ public_v2_unpack_stage "${PERSIST_DIR}/base" "${WORK_ROOT}/base"
 BASE_DIR="${WORK_ROOT}/base"
 TASK_ROOT="${WORK_ROOT}/pilot"
 export BASE_DIR
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 export TOKENIZERS_PARALLELISM=false
 cd "${REPO_DIR}"

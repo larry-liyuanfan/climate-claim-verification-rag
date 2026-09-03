@@ -38,7 +38,7 @@ public_v2_unpack_stage \
   "${PERSIST_DIR}/full-selection" "${WORK_ROOT}/full-selection"
 public_v2_unpack_stage "${PERSIST_DIR}/downstream" "${WORK_ROOT}/downstream"
 public_v2_unpack_stage "${PERSIST_DIR}/external" "${WORK_ROOT}/external"
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 cd "${REPO_DIR}"
 
 shopt -s nullglob

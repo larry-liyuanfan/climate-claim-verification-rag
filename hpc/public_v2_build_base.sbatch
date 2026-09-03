@@ -31,7 +31,7 @@ test ! -e "${WORK_ROOT}"
 mkdir -p "${WORK_ROOT}"
 public_v2_unpack_stage "${PERSIST_DIR}/preflight" "${WORK_ROOT}/preflight"
 OUTPUT_DIR="${WORK_ROOT}/base"
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 cd "${REPO_DIR}"
 

@@ -60,7 +60,7 @@ python -m pip install --no-input --retries 5 \
 export PYTHONNOUSERSITE=1
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
-export PYTHONPATH="${REPO_DIR}/src"
+export PYTHONPATH="${REPO_DIR}/src${PYTHONPATH:+:${PYTHONPATH}}"
 export XDG_CACHE_HOME="${NODE_TMP}/climate-v2-cache-${SLURM_JOB_ID}/xdg"
 export HF_HOME="${NODE_TMP}/climate-v2-cache-${SLURM_JOB_ID}/huggingface"
 export HF_HUB_CACHE="${HF_HOME}/hub"
