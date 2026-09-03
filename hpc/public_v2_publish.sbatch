@@ -60,7 +60,7 @@ else
 fi
 
 shopt -s nullglob
-FULL_ARCHIVES=("${PERSIST_DIR}"/full-s*.tar.gz)
+FULL_ARCHIVES=("${PERSIST_DIR}"/full-s[0-9]*-r*-n*-t*.tar.gz)
 shopt -u nullglob
 test "${#FULL_ARCHIVES[@]}" -le 2
 for index in "${!FULL_ARCHIVES[@]}"; do
