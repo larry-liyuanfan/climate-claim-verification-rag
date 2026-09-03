@@ -98,6 +98,7 @@ DATASET_DIR="${BASE_DIR}/training-n${HARD_NEGATIVES}"
 /usr/bin/time -v swift sft \
   --model Qwen/Qwen3-Embedding-0.6B \
   --model_revision 97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3 \
+  --use_hf true \
   --model_type qwen3_emb \
   --task_type embedding \
   --train_type lora \

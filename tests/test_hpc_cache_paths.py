@@ -63,3 +63,10 @@ def test_public_v2_jobs_preserve_module_pythonpath() -> None:
     runtime = (ROOT / "hpc" / "public_v2_runtime.sh").read_text()
     assert 'runtime_site_packages="${runtime_env}/lib/python3.10/site-packages"' in runtime
     assert 'PYTHONPATH="${runtime_site_packages}${PYTHONPATH:+:${PYTHONPATH}}"' in runtime
+
+
+def test_public_v2_pilots_use_frozen_hugging_face_revision() -> None:
+    script = (ROOT / "hpc" / "public_v2_train_pilots.sbatch").read_text()
+    assert "--model Qwen/Qwen3-Embedding-0.6B" in script
+    assert "--model_revision 97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3" in script
+    assert "--use_hf true" in script
