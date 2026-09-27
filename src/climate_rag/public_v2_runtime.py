@@ -104,11 +104,11 @@ def score_dense_index(
     claims: Mapping[str, Claim],
     *,
     batch_size: int,
-    search_width: int = 5,
+    search_width: int = 100,
     final_k: int = 5,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
-    if search_width < final_k:
-        raise ValueError("search_width must be at least final_k")
+    if search_width < max(final_k, 50):
+        raise ValueError("search_width must cover final_k and reported Recall@50")
     claim_ids = sorted(claims)
     reset_peak_gpu_memory()
     encode_started = time.perf_counter()
@@ -129,7 +129,7 @@ def score_dense_index(
             for position in positions[0]
             if int(position) >= 0
         ]
-        predictions[claim_id] = Prediction(claim_id, tuple(ranked_ids[:final_k]))
+        predictions[claim_id] = Prediction(claim_id, tuple(ranked_ids))
         rows.append(
             {
                 "claim_id": claim_id,
@@ -138,7 +138,7 @@ def score_dense_index(
             }
         )
     aggregate, metric_rows, errors = evaluate_predictions(
-        claims, predictions, ks=(5, 10)
+        claims, predictions, ks=(5, 10, 50), evidence_k=final_k, evaluate_labels=False
     )
     metrics = {
         **aggregate,
@@ -156,7 +156,7 @@ def score_dense_index(
 
 
 def predictions_from_rows(
-    rows: Sequence[Mapping[str, Any]], *, final_k: int = 5
+    rows: Sequence[Mapping[str, Any]], *, final_k: int | None = None
 ) -> dict[str, Prediction]:
     result: dict[str, Prediction] = {}
     for row in rows:

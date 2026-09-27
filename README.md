@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+> 2026-09-27 audit: public-v2 Top-10 metrics were censored by Top-5 prediction
+> storage; its Recall@5 and Evidence F1@5 are unaffected. Public adapter loading
+> also needs checkpoint-value and output-effect verification, not parameter
+> counting. See [repair contract and remaining gates](docs/SEARCH_TRADEOFFS_20260927.md).
+
 A reproducible search-and-ranking extension of the **2026 COMP90042 Group 045 team project**. The course system used BM25 candidate retrieval, BGE bi-encoder reranking, and a LoRA-tuned claim classifier. This repository now separates two evidence tracks: a restricted 1.21M-document scale/selection track on Spartan and a public CLIMATE-FEVER external benchmark that can be reproduced without course data.
 
 ```text

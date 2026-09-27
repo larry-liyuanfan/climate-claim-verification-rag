@@ -42,7 +42,10 @@ def _object(path: str | Path) -> dict[str, Any]:
 
 def _metric_summary(metrics: dict[str, Any]) -> dict[str, Any]:
     return {
-        name: metrics[name] for name in ("recall@5", "mrr@10", "ndcg@10", "evidence_f1")
+        name: metrics[name] for name in (
+            "recall@5", "recall@10", "recall@50", "mrr@10", "ndcg@10",
+            "evidence_f1", "evidence_f1@5", "evidence_k",
+        ) if name in metrics
     }
 
 

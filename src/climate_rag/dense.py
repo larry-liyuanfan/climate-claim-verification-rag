@@ -8,6 +8,7 @@ from typing import Protocol
 
 import numpy as np
 
+from .adapter_integrity import embedding_effect_audit, load_verified_lora
 from .io import write_json
 from .models import EvidenceDocument, RankedDocument
 from .tokenize import climate_tokenize
@@ -104,36 +105,41 @@ class SentenceTransformerEncoder:
         self.revision = revision
         self.adapter_path = adapter_path
         self.adapter_parameter_count = 0
+        self.adapter_integrity: dict[str, object] | None = None
         if adapter_path:
-            try:
-                from peft import PeftModel
-            except ImportError as exc:
-                raise RuntimeError("peft is required to load a dense encoder adapter") from exc
             transformer_module = self._model[0]
             auto_model = getattr(transformer_module, "auto_model", None)
             if auto_model is None:
                 raise RuntimeError(
                     "the first SentenceTransformer module does not expose auto_model"
                 )
-            # ms-swift trains Qwen3-Embedding through Qwen3ForCausalLM, whose
-            # adapter keys contain an extra `model.` level. SentenceTransformers
-            # serves the bare Qwen3Model. PEFT applies this mapping after
-            # stripping its own base_model.model prefix, so both structures
-            # resolve to the same `layers.*` modules without rewriting the
-            # source checkpoint.
-            transformer_module.auto_model = PeftModel.from_pretrained(
-                auto_model,
-                adapter_path,
-                key_mapping={r"^model\.": ""},
+            transformer_module.auto_model, integrity = load_verified_lora(
+                auto_model, adapter_path
             )
-            self.adapter_parameter_count = sum(
-                parameter.numel()
-                for name, parameter in transformer_module.auto_model.named_parameters()
-                if "lora_" in name
-            )
-            if self.adapter_parameter_count <= 0:
-                raise RuntimeError("adapter loaded without any LoRA parameters")
+            self.adapter_integrity = integrity
+            self.adapter_parameter_count = int(integrity["lora_parameter_count"])
         self.dimension = int(self._model.get_sentence_embedding_dimension())
+
+    def probe_adapter_effect(
+        self, query_texts: Sequence[str], document_texts: Sequence[str]
+    ) -> dict[str, object]:
+        if self.adapter_integrity is None or not query_texts or not document_texts:
+            raise ValueError("adapter probe requires an adapter and query/document inputs")
+        self._model.eval()
+        query_on = self.encode_queries(query_texts)
+        document_on = self.encode_documents(document_texts)
+        with self._model[0].auto_model.disable_adapter():
+            query_off = self.encode_queries(query_texts)
+            document_off = self.encode_documents(document_texts)
+        query_audit = embedding_effect_audit(
+            query_on, query_off, self.encode_queries(query_texts)
+        )
+        document_audit = embedding_effect_audit(
+            document_on, document_off, self.encode_documents(document_texts)
+        )
+        verified = bool(query_audit["effect_verified"] and document_audit["effect_verified"])
+        self.adapter_integrity["output_effect_verified"] = verified
+        return {"query": query_audit, "document": document_audit, "effect_verified": verified}
 
     def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray:
         values = self._model.encode(

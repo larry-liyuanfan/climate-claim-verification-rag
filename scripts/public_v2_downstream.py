@@ -221,7 +221,9 @@ def _metric_bundle(
     systems: dict[str, Any] = {}
     rows: dict[str, list[dict[str, Any]]] = {}
     for name, system in predictions.items():
-        metrics, metric_rows, _ = evaluate_predictions(claims, system, ks=(5, 10))
+        metrics, metric_rows, _ = evaluate_predictions(
+            claims, system, ks=(5, 10, 50), evidence_k=5, evaluate_labels=False
+        )
         systems[name] = metrics
         rows[name] = metric_rows
     return systems, rows
@@ -293,13 +295,13 @@ def main() -> int:
         revision=str(model["revision"]),
         adapter_path=None if adapter_path is None else str(adapter_path),
     )
-    flat_metrics, _, flat_rows = score_dense_index(
+    _flat_metrics, _, flat_rows = score_dense_index(
         encoder,
         flat,
         documents,
         validation,
         batch_size=args.batch_size,
-        search_width=5,
+        search_width=100,
         final_k=5,
     )
     train_bundles, train_timings = _retrieve_bundles(
@@ -448,19 +450,19 @@ def main() -> int:
     for claim_id in sorted(validation):
         bundle = validation_bundles[claim_id]
         predictions["bm25"][claim_id] = Prediction(
-            claim_id, tuple(row.evidence_id for row in bundle["bm25"][:5])
+            claim_id, tuple(row.evidence_id for row in bundle["bm25"][:100])
         )
         predictions[f"{dense_prefix}_hnsw"][claim_id] = Prediction(
-            claim_id, tuple(row.evidence_id for row in bundle["dense"][:5])
+            claim_id, tuple(row.evidence_id for row in bundle["dense"][:100])
         )
         predictions["rrf"][claim_id] = Prediction(
-            claim_id, tuple(row.evidence_id for row in bundle["rrf"][:5])
+            claim_id, tuple(row.evidence_id for row in bundle["rrf"])
         )
         started = time.perf_counter()
         ltr = _rank_ltr(validation[claim_id].text, bundle, ranker)
         ltr_latencies.append((time.perf_counter() - started) * 1000.0)
         predictions["top100_lambdamart"][claim_id] = Prediction(
-            claim_id, tuple(row.evidence_id for row in ltr[:5])
+            claim_id, tuple(row.evidence_id for row in ltr)
         )
         started = time.perf_counter()
         reranked = reranker.rerank(
@@ -469,7 +471,7 @@ def main() -> int:
         fused = weighted_rank_fuse(
             bundle["rrf"],
             reranked,
-            5,
+            candidate_width,
             k=int(ranking["reranker_fusion"]["k"]),
             base_weight=float(ranking["reranker_fusion"]["base_weight"]),
             reranker_weight=float(ranking["reranker_fusion"]["reranker_weight"]),
@@ -492,6 +494,7 @@ def main() -> int:
             system,
             bootstrap_samples=int(protocol["evaluation"]["bootstrap_samples"]),
             seed=int(protocol["seed"]),
+            evidence_k=5,
         )
         paired[name] = report["paired_bootstrap"]
         slice_reports[name] = report["taxonomy"]
@@ -508,11 +511,11 @@ def main() -> int:
             ),
         )
     flat_top5 = {
-        claim_id: set(prediction.evidence_ids)
+        claim_id: set(prediction.evidence_ids[:5])
         for claim_id, prediction in predictions[f"{dense_prefix}_flat"].items()
     }
     hnsw_top5 = {
-        claim_id: set(prediction.evidence_ids)
+        claim_id: set(prediction.evidence_ids[:5])
         for claim_id, prediction in predictions[f"{dense_prefix}_hnsw"].items()
     }
     ann_recall = float(
