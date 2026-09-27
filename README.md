@@ -43,6 +43,19 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 
 ## Quick start
 
+### Agent-consumable evidence, without claiming an autonomous Agent
+
+The optional **LangChain Core 1.6.5** integration uses a real `BaseRetriever`,
+source-bearing `Document` objects, an LCEL sequence and a Pydantic `StructuredTool`.
+Its manual CPU demo ran against the existing **5,240-document public corpus**;
+it does not repeat frozen-test evaluation or load a verdict model. Source IDs,
+corpus/text hashes and exact text spans survive the adapter; an empty result
+remains `no_evidence`, never a fabricated refutation.
+See [the reproducible application handoff](docs/AGENT_APPLICATION_HANDOFF_20260927.md)
+for commands, cases, framework boundaries and the separately measured search tradeoff.
+
+### Existing retrieval CLI
+
 ```bash
 python -m pip install -e ".[test]"
 pytest

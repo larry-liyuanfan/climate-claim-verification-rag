@@ -17,6 +17,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+langchain = ["langchain-core==1.6.5"]
 dense = [
   "faiss-cpu>=1.8; python_version < '3.13'",
   "sentence-transformers>=3.0",
