@@ -44,7 +44,7 @@ def build_dense_vectors(
     documents: Sequence[EvidenceDocument],
     *,
     batch_size: int,
-) -> tuple[np.ndarray, dict[str, Any]]:
+) -> tuple[np.ndarray[Any, Any], dict[str, Any]]:
     reset_peak_gpu_memory()
     started = time.perf_counter()
     vectors = encoder.encode_documents(
@@ -61,7 +61,7 @@ def build_dense_vectors(
 
 
 def build_faiss_index(
-    vectors: np.ndarray,
+    vectors: np.ndarray[Any, Any],
     *,
     kind: str,
     output_path: str | Path | None = None,

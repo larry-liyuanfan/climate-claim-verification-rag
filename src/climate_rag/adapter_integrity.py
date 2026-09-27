@@ -75,6 +75,7 @@ def load_verified_lora(auto_model: Any, adapter_path: str) -> tuple[Any, dict[st
         if not bool(torch.isfinite(value).all()) or not torch.equal(value, reference):
             raise ValueError(f"checkpoint value not restored: {key}")
     model.set_adapter("default")
+    model.requires_grad_(False)
     model.eval()
     count = sum(value.numel() for key, value in restored.items() if "lora_" in key)
     if count <= 0:

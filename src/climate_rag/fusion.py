@@ -6,7 +6,7 @@ from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
@@ -105,9 +105,11 @@ def build_candidate_features(
 class Ranker(Protocol):
     feature_names: tuple[str, ...]
 
-    def fit(self, features: np.ndarray, labels: np.ndarray, groups: Sequence[str]) -> None: ...
+    def fit(self, features: np.ndarray[Any, Any], labels: np.ndarray[Any, Any], groups: Sequence[str]) -> None: ...
 
-    def predict(self, features: np.ndarray) -> np.ndarray: ...
+    def predict(self, features: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]: ...
+
+    def save(self, path: str | Path) -> None: ...
 
 
 @dataclass
@@ -129,7 +131,7 @@ class LinearPairwiseLTR:
         self.mean = np.zeros(len(self.feature_names), dtype=np.float64)
         self.scale = np.ones(len(self.feature_names), dtype=np.float64)
 
-    def fit(self, features: np.ndarray, labels: np.ndarray, groups: Sequence[str]) -> None:
+    def fit(self, features: np.ndarray[Any, Any], labels: np.ndarray[Any, Any], groups: Sequence[str]) -> None:
         matrix = np.asarray(features, dtype=np.float64)
         targets = np.asarray(labels, dtype=np.float64)
         if matrix.ndim != 2 or matrix.shape[1] != len(self.feature_names):
@@ -143,7 +145,7 @@ class LinearPairwiseLTR:
         by_group: dict[str, list[int]] = defaultdict(list)
         for index, group in enumerate(groups):
             by_group[str(group)].append(index)
-        pairs: list[np.ndarray] = []
+        pairs: list[np.ndarray[Any, Any]] = []
         for group in sorted(by_group):
             indices = by_group[group]
             for left in indices:
@@ -165,7 +167,7 @@ class LinearPairwiseLTR:
             weights -= step * gradient
         self.weights = weights
 
-    def predict(self, features: np.ndarray) -> np.ndarray:
+    def predict(self, features: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         matrix = np.asarray(features, dtype=np.float64)
         return ((matrix - self.mean) / self.scale) @ self.weights
 
@@ -224,7 +226,7 @@ class LightGBMLambdaMART:
             verbosity=-1,
         )
 
-    def fit(self, features: np.ndarray, labels: np.ndarray, groups: Sequence[str]) -> None:
+    def fit(self, features: np.ndarray[Any, Any], labels: np.ndarray[Any, Any], groups: Sequence[str]) -> None:
         order = sorted(range(len(groups)), key=lambda index: (str(groups[index]), index))
         sorted_features = np.asarray(features)[order]
         sorted_labels = np.asarray(labels)[order]
@@ -239,7 +241,7 @@ class LightGBMLambdaMART:
                 counts[-1] += 1
         self.model.fit(sorted_features, sorted_labels, group=counts, feature_name=list(self.feature_names))
 
-    def predict(self, features: np.ndarray) -> np.ndarray:
+    def predict(self, features: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         matrix = np.asarray(features)
         if matrix.ndim != 2 or matrix.shape[1] != len(self.feature_names):
             raise ValueError("feature matrix shape does not match feature_names")
@@ -275,8 +277,8 @@ class LightGBMLambdaMART:
 
 
 def train_ranker(
-    features: np.ndarray,
-    labels: np.ndarray,
+    features: np.ndarray[Any, Any],
+    labels: np.ndarray[Any, Any],
     groups: Sequence[str],
     *,
     feature_names: Sequence[str] = DEFAULT_FEATURES,

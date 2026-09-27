@@ -160,7 +160,7 @@ def run_five_stage_benchmark(
     config_source = Path(config_path)
     if config_source.suffix.lower() in {".yaml", ".yml"}:
         try:
-            import yaml  # type: ignore[import-untyped]
+            import yaml
         except ImportError as exc:
             raise RuntimeError("PyYAML is required for YAML benchmark configs") from exc
         config = yaml.safe_load(config_source.read_text(encoding="utf-8"))

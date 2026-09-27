@@ -4,7 +4,7 @@ import hashlib
 import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
@@ -15,7 +15,7 @@ from .tokenize import climate_tokenize
 from .torch_compat import ensure_torch_pytree_compat
 
 
-def l2_normalize(matrix: np.ndarray) -> np.ndarray:
+def l2_normalize(matrix: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
     values = np.asarray(matrix, dtype=np.float32)
     if values.ndim == 1:
         values = values.reshape(1, -1)
@@ -29,9 +29,9 @@ class DenseEncoder(Protocol):
     dimension: int
     name: str
 
-    def encode_queries(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray: ...
+    def encode_queries(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray[Any, Any]: ...
 
-    def encode_documents(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray: ...
+    def encode_documents(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray[Any, Any]: ...
 
 
 class HashDenseEncoder:
@@ -47,7 +47,7 @@ class HashDenseEncoder:
         self.dimension = dimension
         self.name = f"hash-baseline-{dimension}"
 
-    def _encode(self, texts: Sequence[str]) -> np.ndarray:
+    def _encode(self, texts: Sequence[str]) -> np.ndarray[Any, Any]:
         vectors = np.zeros((len(texts), self.dimension), dtype=np.float32)
         for row, text in enumerate(texts):
             tokens = climate_tokenize(text)
@@ -58,11 +58,11 @@ class HashDenseEncoder:
                 vectors[row, column] += sign
         return l2_normalize(vectors)
 
-    def encode_queries(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray:
+    def encode_queries(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray[Any, Any]:
         del batch_size
         return self._encode(texts)
 
-    def encode_documents(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray:
+    def encode_documents(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray[Any, Any]:
         del batch_size
         return self._encode(texts)
 
@@ -141,7 +141,7 @@ class SentenceTransformerEncoder:
         self.adapter_integrity["output_effect_verified"] = verified
         return {"query": query_audit, "document": document_audit, "effect_verified": verified}
 
-    def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray:
+    def _encode(self, texts: Sequence[str], batch_size: int) -> np.ndarray[Any, Any]:
         values = self._model.encode(
             list(texts),
             batch_size=batch_size,
@@ -151,7 +151,7 @@ class SentenceTransformerEncoder:
         )
         return np.asarray(values, dtype=np.float32)
 
-    def encode_queries(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray:
+    def encode_queries(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray[Any, Any]:
         if self.query_prefix:
             return self._encode([self.query_prefix + text for text in texts], batch_size)
         if self.query_prompt_name:
@@ -166,7 +166,7 @@ class SentenceTransformerEncoder:
             return np.asarray(values, dtype=np.float32)
         return self._encode(texts, batch_size)
 
-    def encode_documents(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray:
+    def encode_documents(self, texts: Sequence[str], batch_size: int = 32) -> np.ndarray[Any, Any]:
         return self._encode(texts, batch_size)
 
 
@@ -174,12 +174,12 @@ class NumpyFlatIndex:
     """Exact inner-product index used when FAISS is unavailable."""
 
     def __init__(self) -> None:
-        self.vectors: np.ndarray | None = None
+        self.vectors: np.ndarray[Any, Any] | None = None
 
-    def build(self, vectors: np.ndarray) -> None:
+    def build(self, vectors: np.ndarray[Any, Any]) -> None:
         self.vectors = l2_normalize(vectors)
 
-    def search(self, queries: np.ndarray, top_k: int) -> tuple[np.ndarray, np.ndarray]:
+    def search(self, queries: np.ndarray[Any, Any], top_k: int) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         if self.vectors is None:
             raise RuntimeError("index has not been built")
         if top_k <= 0:
@@ -251,7 +251,7 @@ class FaissANNIndex:
             )
             self.index.nprobe = nprobe
 
-    def build(self, vectors: np.ndarray, training_vectors: np.ndarray | None = None) -> None:
+    def build(self, vectors: np.ndarray[Any, Any], training_vectors: np.ndarray[Any, Any] | None = None) -> None:
         normalized = np.ascontiguousarray(l2_normalize(vectors), dtype=np.float32)
         if self.kind == "ivfpq" and not self.index.is_trained:
             training = normalized if training_vectors is None else np.ascontiguousarray(
@@ -262,7 +262,7 @@ class FaissANNIndex:
             self.index.train(training)
         self.index.add(normalized)
 
-    def search(self, queries: np.ndarray, top_k: int) -> tuple[np.ndarray, np.ndarray]:
+    def search(self, queries: np.ndarray[Any, Any], top_k: int) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         if top_k <= 0:
             rows = len(np.atleast_2d(queries))
             return np.empty((rows, 0), dtype=np.float32), np.empty((rows, 0), dtype=np.int64)
@@ -318,9 +318,9 @@ class DenseRetriever:
     def fit_vectors(
         self,
         documents: Sequence[EvidenceDocument],
-        vectors: np.ndarray,
+        vectors: np.ndarray[Any, Any],
         *,
-        training_vectors: np.ndarray | None = None,
+        training_vectors: np.ndarray[Any, Any] | None = None,
     ) -> DenseRetriever:
         self.doc_ids = [document.evidence_id for document in documents]
         if len(set(self.doc_ids)) != len(self.doc_ids):
@@ -336,6 +336,16 @@ class DenseRetriever:
 
     def search(self, query: str, top_k: int = 10) -> list[RankedDocument]:
         query_vector = self.encoder.encode_queries([query])
+        return self.search_encoded(query_vector, top_k)
+
+    def search_encoded(
+        self, query_vector: np.ndarray[Any, Any], top_k: int = 10
+    ) -> list[RankedDocument]:
+        """Search one already encoded query; used to time encoding separately."""
+        if query_vector.shape != (1, self.encoder.dimension):
+            raise ValueError("encoded query must have shape (1, encoder.dimension)")
+        if top_k <= 0:
+            return []
         scores, indices = self.backend.search(query_vector, min(top_k, len(self.doc_ids)))
         rows: list[tuple[str, float, int]] = []
         for score, index in zip(scores[0], indices[0], strict=True):

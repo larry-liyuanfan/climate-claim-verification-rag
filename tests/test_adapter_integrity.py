@@ -89,6 +89,7 @@ def test_real_peft_checkpoint_values_and_toggle(tmp_path) -> None:
     assert audit["all_checkpoint_values_match"]
     assert audit["remapped_tensor_count"] == 2
     assert audit["lora_parameter_count"] == 16
+    assert not any(value.requires_grad for value in restored.parameters())
     x = torch.ones((2, 4))
     with torch.no_grad():
         enabled = restored(x).numpy()

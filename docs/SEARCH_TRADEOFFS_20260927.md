@@ -1,6 +1,7 @@
 # Search tradeoffs and representation integrity — 2026-09-27
 
-Status: implementation and integrity preflight; not new model-quality results.
+Status: real CPU integrity preflight passed; latency profiling implementation
+awaits a free authorized GPU slot. No new model-quality improvement is claimed.
 Base commit: `272ab93256202e517a8aebf36992fbdf93dc922e`.
 
 ## Findings and repair
@@ -69,16 +70,59 @@ SciFact remains unopened.
 
 ## Remaining release gates
 
-1. Real preflight artifact/accounting must prove weight equality and nonzero
-   output delta. Until then this is tested implementation, not validated repair.
+1. Integrity passed: see the verified result below. This satisfies the plan's
+   representation-repair option; independent transfer is not required or run.
 2. Same-query serial-request profiling of low-latency LambdaMART and bounded 4B
    widths must measure encoding, recall, ranking, end-to-end P50/P95, peak memory
    and compute cost. These will be offline benchmarks, not online SLA.
 3. Full-ranking metrics and 5,000 paired bootstrap comparisons require new
    validation-only artifacts, without reopening frozen test.
-4. Clean-checkout reproduction and strict type checks must pass. Initial local
-   run: 96 tests passed; real Torch integration skipped because Torch is not
-   installed locally. Full strict mypy exposed historical debt in 13 files;
-   repository-wide type cleanliness is not yet achieved.
+4. Clean-checkout reproduction remains due. Current local tests: 101 passed,
+   one real-Torch test skipped locally but passed on Spartan. Ruff passed and
+   strict mypy passed all 31 source modules after annotation/Protocol repairs.
+   This is source type checking, not static analysis of every experimental script.
+
+## Verified CPU result
+
+Job `31364439`, exact compute SHA `1636ab253295b4ec0a33fcfc4471a706989073e5`,
+completed with exit 0 in 110 s, MaxRSS 5,830,904 KiB and TotalCPU 49.965 s.
+All 392 checkpoint tensors match after dtype conversion, covering 10,092,544
+LoRA parameters in this **public 100-step** checkpoint (not the separate
+restricted 20-step checkpoint). Query/document maximum embedding deltas are
+0.0630181 / 0.0423742; enabled-output repeat delta is zero. Seven real PEFT
+integration tests passed. No quality evaluation, training or test access ran.
+See [compact evidence](verified-runs/adapter-integrity-20260927.json), including
+model, adapter, probe and archive hashes. This proves the loader repair, not
+better retrieval or failure of all historical pilots.
+
+## Frozen P0 profiling comparison
+
+`hpc/search_tradeoffs.sbatch` runs three fresh processes, sequentially:
+
+- Existing Top-100 LambdaMART (11 unchanged features, no retraining).
+- Existing Qwen3-Reranker-4B on Top-20 RRF candidates, fused with all Top-100;
+  unscored tail remains reachable.
+- Existing Qwen3-Reranker-4B on all Top-100 candidates, same fusion weights.
+
+All use the same archived BM25, HNSW, corpus order, encoder revision and 126
+decisive validation queries. Each query is encoded at batch size one. One
+fixed unlabelled warmup is excluded. CUDA synchronization brackets stages and
+the separately measured complete request. No sum of stage percentiles is
+reported as E2E. Model loading, HTTP and concurrent traffic are excluded.
+Per-process peak RSS and Torch allocated/reserved memory are retained; no
+API requests occur. Serial runtime per 1,000 requests is a compute-time proxy,
+not billed cost or monetary savings.
+
+The comparison script rejects different inputs, query IDs, candidate pools,
+commit, runtime, device, or model revisions, verifies prediction/trace hashes
+and exact query coverage. All processes use `PYTHONHASHSEED=0`. It retains full rankings and 5,000 paired
+bootstrap comparisons versus LambdaMART. These are development/validation
+tradeoffs, not independent generalization. No adapter is used in this P0 run.
+
+Resource proposal: one MIG 20 GiB, 8 CPU, 32 GiB RAM, 40 GiB local scratch,
+45 minutes. Prior Top-100 rerank P95 was 9.28 s/query; `126 * 9.28 * 1.2` is
+about 23.4 minutes for the two rerank widths, with load/serialization/safety
+allowance. This is a walltime bound derived from prior measurements, not a
+new measured duration. Do not submit while another authorized GPU job runs.
 
 No current resume or shared career material was modified.

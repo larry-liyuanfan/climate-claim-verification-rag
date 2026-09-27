@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from typing import cast
 
 from .models import RankedDocument
 
@@ -30,9 +31,9 @@ def mine_hard_negatives(
             source_ranks = item["sources"]
             assert isinstance(source_ranks, dict)
             source_ranks[source] = row.rank if row.rank > 0 else fallback_rank
-            item["best_rank"] = min(int(item["best_rank"]), row.rank or fallback_rank)
+            item["best_rank"] = min(cast(int, item["best_rank"]), row.rank or fallback_rank)
     ordered = sorted(
-        candidates.values(), key=lambda row: (int(row["best_rank"]), str(row["evidence_id"]))
+        candidates.values(), key=lambda row: (cast(int, row["best_rank"]), str(row["evidence_id"]))
     )
     return ordered[: max(limit, 0)]
 

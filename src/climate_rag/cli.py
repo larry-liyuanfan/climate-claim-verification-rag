@@ -24,6 +24,7 @@ from .climate_fever import (
     prepare_public_benchmark,
 )
 from .dense import (
+    DenseEncoder,
     DenseRetriever,
     FaissANNIndex,
     HashDenseEncoder,
@@ -41,6 +42,7 @@ from .fusion import (
     DEFAULT_FEATURES,
     LightGBMLambdaMART,
     LinearPairwiseLTR,
+    Ranker,
     build_candidate_features,
     reciprocal_rank_fusion,
     train_ranker,
@@ -67,6 +69,7 @@ from .rerank import (
     DeterministicFeatureReranker,
     ModelStudioReranker,
     Qwen3CausalLMReranker,
+    Reranker,
 )
 from .verification import AbstainingVerifier, ModelStudioStructuredVerifier
 
@@ -156,6 +159,8 @@ def command_index(args: argparse.Namespace) -> int:
         )
     if args.backend in {"dense", "both"}:
         route_started = time.perf_counter()
+        encoder: DenseEncoder
+        ann: NumpyFlatIndex | FaissANNIndex
         if args.encoder == "hash":
             encoder = HashDenseEncoder(args.dimension)
             notes.append(
@@ -555,7 +560,7 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
 
 
 def _pairwise_accuracy(
-    scores: np.ndarray, labels: np.ndarray, groups: list[str]
+    scores: np.ndarray[Any, Any], labels: np.ndarray[Any, Any], groups: list[str]
 ) -> float:
     correct = 0
     total = 0
@@ -588,6 +593,7 @@ def command_train_fusion(args: argparse.Namespace) -> int:
     )
     labels = np.asarray([float(row["relevance"]) for row in rows], dtype=np.float64)
     groups = [str(row["query_id"]) for row in rows]
+    model: Ranker
     if args.algorithm == "linear":
         model = LinearPairwiseLTR(feature_names, seed=args.seed)
         model.fit(matrix, labels, groups)
@@ -682,12 +688,15 @@ def command_evaluate(args: argparse.Namespace) -> int:
             comparisons[metric] = paired_bootstrap(
                 left, right, samples=args.bootstrap_samples, seed=args.seed
             )
-        metrics["paired_bootstrap"] = comparisons
+        metrics_with_comparisons: dict[str, Any] = dict(metrics)
+        metrics_with_comparisons["paired_bootstrap"] = comparisons
+    else:
+        metrics_with_comparisons = dict(metrics)
     write_run_artifacts(
         args.output_dir,
         command="evaluate",
         arguments=_recorded_arguments(args),
-        metrics=metrics,
+        metrics=metrics_with_comparisons,
         started_at=started_at,
         inputs=[
             args.claims,
@@ -702,7 +711,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
         ],
         repository=_repository(),
     )
-    print(json.dumps(metrics, indent=2, sort_keys=True))
+    print(json.dumps(metrics_with_comparisons, indent=2, sort_keys=True))
     return 0
 
 
@@ -720,6 +729,7 @@ def command_serve(args: argparse.Namespace) -> int:
         if args.dense_index
         else None
     )
+    reranker: Reranker | None
     if args.reranker == "none":
         reranker = None
     elif args.reranker == "deterministic":

@@ -17,7 +17,8 @@ def ensure_torch_pytree_compat(pytree_module: Any | None = None) -> bool:
     """
 
     if pytree_module is None:
-        import torch.utils._pytree as pytree_module
+        from torch.utils import _pytree
+        pytree_module = _pytree
 
     if hasattr(pytree_module, "register_pytree_node"):
         return False
