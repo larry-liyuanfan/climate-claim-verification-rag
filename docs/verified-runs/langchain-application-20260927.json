@@ -53,12 +53,8 @@
     {
       "query": "zxqv_nonexistent_term_20260927",
       "status": "no_evidence",
-      "evidence_ids": [
-        null
-      ],
-      "citation_ids": [
-        null
-      ],
+      "evidence_ids": [],
+      "citation_ids": [],
       "answer": null,
       "verdict": {
         "label": null,
