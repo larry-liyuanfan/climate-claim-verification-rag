@@ -64,6 +64,14 @@ censored, not complete Top-10 metrics. Renaming nDCG@10 to nDCG@5 is incorrect
 because its ideal denominator used ten. Historical timing retains its original
 depth and stage scope; new numbers must not replace the old immutable artifacts.
 
+Follow-up source audit also found the same five-rank storage in restricted
+five-stage LTR/4B paths. Their Recall@5/F1@5 remain valid; MRR is interpretable
+only as MRR@5 and nDCG@10 is censored. In contrast, the separate restricted
+20-step LoRA gate saved Top-50 and its MRR@10/nDCG@10/F1@50 retain their scope.
+See [D9 source map and legacy-entry-point repair](DECISIONS.md#d9--audit-ranking-depth-and-checkpoint-values-before-model-selection).
+The historical component-sum Pareto config is retired, not used to populate
+the pending P0 comparison. None of these follow-up changes alters job 31364586.
+
 Restricted 1,208,827-document / 154-query / 20-step LoRA remains offline-dev
 evidence, not independent test or online A/B. This public loader defect alone
 does not prove or disprove the integrity of that separate run. Pilot ties alone

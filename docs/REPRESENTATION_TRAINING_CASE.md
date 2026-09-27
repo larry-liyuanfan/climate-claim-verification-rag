@@ -12,7 +12,7 @@ Two evidence tracks are intentionally separate:
 | Track | Purpose | Allowed claim |
 |---|---|---|
 | Restricted COMP90042 corpus | full-scale indexing, hard-negative task adaptation and fixed 154-claim offline development | model selection on offline dev only |
-| Public CLIMATE-FEVER | reproducible data adapter and the historical BM25 external baseline | no new candidate test result; the frozen test was consumed on 2026-08-25 |
+| Public CLIMATE-FEVER | reproducible data adapter, historical BM25 test baseline and base-only public-v2 validation ranking | no new candidate test result; consumed test sealed; adapter quality remains unestablished |
 | Fixtures | executable schema and failure-path tests | no retrieval-quality claim |
 
 ## Method and reproducible chain
@@ -55,15 +55,19 @@ annotations.
 On the restricted 154-claim offline-dev track, the task-adapted 0.6B encoder was
 paired against the base encoder on the same 1,208,827-document corpus. Recall@5
 rose `0.2793 -> 0.2970`, MRR@10 `0.3633 -> 0.3869`, nDCG@10
-`0.2994 -> 0.3203`, and Evidence F1 `0.07253 -> 0.07544`; all four
+`0.2994 -> 0.3203`, and Evidence F1@50 `0.07253 -> 0.07544`; all four
 5,000-sample paired intervals were above zero. The adapter therefore passed the
 offline-dev promotion gate. This is not an independent-test or online A/B
-result.
+result. The exact `c815070` full-gate entry point retained Top-50 rankings,
+so these MRR@10/nDCG@10 values are not affected by the later public-v2
+Top-5 storage defect. Its F1@50 must not be compared directly with downstream
+F1@5 values.
 
 The downstream ranking case exposed two operating points. HNSW+RRF reached
 Recall@5/Evidence F1 `0.2709/0.1785`. RRF-prior LambdaMART improved
-MRR@10/nDCG@10 `0.3446/0.2495 -> 0.3648/0.2605` at a derived stage-cost P95
-of `23.21 ms/query`, but Recall@5/F1 intervals crossed zero. Balanced
+MRR@5 `0.3446 -> 0.3648` with a positive paired interval. Both historical downstream paths saved only five ranks, so their old MRR@10 is MRR@5 and nDCG@10 is censored (not nDCG@5). Its old `23.21 ms/query`
+cost proxy sums ANN and ranker P95 values; that sum is **not** a measured
+path P95. Recall@5/F1 intervals crossed zero. Balanced
 RRF/Qwen3-Reranker-4B reached the best dev Recall@5/Evidence F1
 `0.3153/0.2131`, while its measured reranker P95 was `4.82 s/query`. Thus LTR
 is retained as a low-latency rank-position profile and 4B as the offline quality
@@ -84,9 +88,13 @@ near-document pair between train and test; both annotations are
 does not retroactively turn the baseline into a candidate-selection result, but
 it means the historical partition fails the stricter all-document audit.
 Therefore `configs/public_evaluation_policy.json` marks the test consumed and
-forbids every new candidate evaluation. The validation promotion gate was not
-run in this closeout because no new public-validation representation artifact
-exists. No new frozen-test score was produced.
+forbids every new test-candidate evaluation. At the early 2026-09-03 closeout,
+no new public-validation candidate was available. The later public-v2 cycle
+attempted six pilots and one full diagnostic, but checkpoint integrity failed
+and no adapter was promoted. On 2026-09-27, real checkpoint restoration and
+embedding changes were verified using fixed label-free probes. That repair is
+not a quality gain. New full-ranking profiling compares frozen base/LTR/4B
+routes on validation only; no new frozen-test score was produced.
 
 ## Problem-method-result-trade-off summary
 
@@ -98,7 +106,7 @@ improved all four paired retrieval metrics. I then preserved lexical and dense
 signals through RRF, corrected an unreachable-positive/train-serve mismatch in
 LambdaMART, and compared a millisecond CPU ranker with a 4B cross-encoder. The
 4B path achieved the best quality but cost seconds per query, while LTR improved
-rank-position metrics at far lower stage cost. I kept both operating points and
+Top-5 reciprocal rank at far lower stage cost. I kept both operating points and
 retired the already-consumed public test rather than tune against it.
 
 ## Resume bullet candidates

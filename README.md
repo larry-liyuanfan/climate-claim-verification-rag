@@ -1,7 +1,7 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-> 2026-09-27 audit: public-v2 Top-10 metrics were censored by Top-5 prediction
-> storage; its Recall@5 and Evidence F1@5 are unaffected. The public adapter
+> 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
+> storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter
 > loader is repaired and real checkpoint/output-effect checks passed on Spartan.
 > This proves restoration, not better retrieval. A same-candidate quality/latency
 > comparison is submitted, not yet measured. See [repair contract and remaining gates](docs/SEARCH_TRADEOFFS_20260927.md).
@@ -32,7 +32,7 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; a 20-step hard-negative LoRA adapter passed the full-corpus offline official-dev promotion gate; hash mode is not a semantic model |
 | ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
 | Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
-| Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved all four fixed-dev ranking metrics; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
+| Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved fixed-dev Recall@5 and Evidence F1@5; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
 | Public benchmark | CLIMATE-FEVER adapter, evidence-aware near-duplicate split and frozen-test BM25 baseline | 1,535 claims/7,675 annotations; final test is not used for model selection |
 | Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, verdict Macro-F1/Accuracy, citation quality, ECE/Brier and paired bootstrap | Retrieval and verification results remain separately labelled |
 | Confidence | Temperature scaling, coverage-risk and selective abstention utilities | Requires provider or classifier confidence |
@@ -75,17 +75,21 @@ test is permanently sealed. Six fixed Qwen3-Embedding-0.6B adapters cover
 100/300 steps, rank 8/16, 4/8 hard negatives and temperatures 0.03/0.05; no more
 than two can reach full validation.
 
-All six 64-query pilots tied the base exactly (Recall@5 `0.53203125`, MRR@10
-`0.53385417`, and zero mean deltas for all four registered metrics). The one
+All six 64-query pilots historically tied the base (Recall@5 `0.53203125`).
+Those ties do not establish adapter ineffectiveness: weight restoration was not
+verified, and historical Top-10 metrics used Top-5 prediction lists. The one
 pre-registered full diagnostic then exposed missing adapter keys and did not
 produce a valid promotion result. No adapter was promoted, no quality retry was
 run, and the SciFact event was not authorised; its qrels were never opened.
+The 2026-09-27 repair subsequently proved checkpoint restoration and output
+changes on fixed label-free probes, not a new quality gain.
 
 The validation-only base closeout compared BM25, base dense Flat/HNSW, fixed
 RRF, Top-100 LambdaMART and the fixed 1:1 RRF/Qwen3-4B fusion. The fusion reached
-Recall@5/MRR@10/nDCG@10/F1 `0.6275/0.6197/0.5525/0.3969` over 126 decisive
-validation claims. These are same-validation selection metrics, not adapter
-gains or independent-test evidence. The complete method, negative result,
+Recall@5/Evidence F1@5 `0.6275/0.3969` over 126 decisive validation claims.
+Historical MRR@10/nDCG@10 and Recall@10 were censored by the Top-5 output and
+are not complete Top-10 estimates. These are same-validation selection metrics,
+not adapter gains or independent-test evidence. The complete method, no-promotion decision,
 archive hashes and truth boundaries are in
 [`docs/PUBLIC_RETRIEVAL_V2.md`](docs/PUBLIC_RETRIEVAL_V2.md).
 The compact record is
@@ -180,12 +184,14 @@ climate-rag audit-stage-contract \
   --output-dir /artifacts/stage-contract-audit
 
 climate-rag build-pareto \
-  --profiles configs/search_profiles.verified.json \
+  --profiles /artifacts/same-query-measured-profiles.json \
   --output-dir /artifacts/search-pareto
 ```
 
 The `configs/stage_contract.*.example.json` files contain labelled fixture
 values only. Promotion requires contracts generated from measured artifacts.
+The old `configs/search_profiles.verified.json` is a retired historical proxy,
+not a measured request-P95 table; the CLI refuses it for new Pareto decisions.
 
 Run the fixed five-stage comparison:
 
@@ -342,11 +348,11 @@ Job `29435589` evaluated 154 restricted dev claims at `final_k=5` using commit `
 
 Against BM25, RRF improved Recall@5 by `0.0988` (paired-bootstrap 95% interval `0.0543–0.1452`) and Evidence F1 by `0.0616` (`0.0360–0.0893`). The first pure Qwen replacement run (`29448904`) regressed, exposing an architectural error: it discarded a strong first-stage order. Job `29452723` preserved that order with 0.6B weighted-rank fusion; its selected 4:1 profile improved Recall@5, MRR and nDCG, but not Evidence F1 with a stable interval.
 
-The aggregate five-stage metrics and exact input/artifact hashes are published in [`docs/verified-runs/five-stage-fixed-dev-20260819.json`](docs/verified-runs/five-stage-fixed-dev-20260819.json). A later audit found that the legacy LTR training builder injected unretrieved gold evidence with zero retrieval features, so the two LTR rows above are retained as failure-forensics evidence, not model-quality evidence. The corrected candidate-supported job `29484697` removed that defect but remained a negative gate: 1,169 train groups/26,626 rows reached `0.9529` train pairwise accuracy, while fixed-dev Recall@5/F1 collapsed to `0.0075/0.0059` versus RRF `0.2709/0.1785`. The compact record is in [`docs/verified-runs/candidate-supported-ltr-gate-20260822.json`](docs/verified-runs/candidate-supported-ltr-gate-20260822.json). Commit `b47e437` then recorded the RRF prior, matched the 100-candidate training and serving widths and predeclared a 4:1 rank-preserving fusion. CPU job `29504398` completed 1,169 groups/120,146 rows and raised fixed-dev MRR@10/nDCG@10 from RRF `0.3446/0.2495` to `0.3648/0.2605`; 5,000-sample paired intervals were `[+0.0032,+0.0390]` and `[+0.0012,+0.0228]`. Recall@5/F1 rose to `0.2801/0.1824`, but their intervals versus RRF crossed zero. CPU feature scoring took P95 `7.80 ms/query`. This is retained as a low-latency rank-position profile, not the main quality profile; see the [compact record](docs/verified-runs/rrf-prior-ltr-fusion-gate-20260822.json). Restricted predictions and candidate lists remain on Spartan.
+The aggregate five-stage metrics and exact input/artifact hashes are published in [`docs/verified-runs/five-stage-fixed-dev-20260819.json`](docs/verified-runs/five-stage-fixed-dev-20260819.json). A later audit found that the legacy LTR training builder injected unretrieved gold evidence with zero retrieval features, so the two LTR rows above are retained as failure-forensics evidence, not model-quality evidence. The corrected candidate-supported job `29484697` removed that defect but remained a negative gate: 1,169 train groups/26,626 rows reached `0.9529` train pairwise accuracy, while fixed-dev Recall@5/F1 collapsed to `0.0075/0.0059` versus RRF `0.2709/0.1785`. The compact record is in [`docs/verified-runs/candidate-supported-ltr-gate-20260822.json`](docs/verified-runs/candidate-supported-ltr-gate-20260822.json). Commit `b47e437` then recorded the RRF prior, matched the 100-candidate training and serving widths and predeclared a 4:1 rank-preserving fusion. CPU job `29504398` completed 1,169 groups/120,146 rows and raised fixed-dev MRR@5 from RRF `0.3446` to `0.3648`, with a 5,000-sample paired interval `[+0.0032,+0.0390]`. The old `mrr@10` field used only five saved ranks and is reinterpreted as MRR@5; old nDCG@10 was also censored and is not retained as a complete Top-10 result. Recall@5/F1 rose to `0.2801/0.1824`, but their intervals versus RRF crossed zero. CPU feature scoring took P95 `7.80 ms/query`. This is retained as a low-latency rank-position profile, not the main quality profile; see the [compact record](docs/verified-runs/rrf-prior-ltr-fusion-gate-20260822.json). Restricted predictions and candidate lists remain on Spartan.
 
-The model-size gate then ran Qwen3-Reranker-4B in BF16 on the identical 154-claim/7,700-pair split. Full job `29453918` completed in `12 min 48 s` on one A100 `1g.20gb` MIG slice (`8 CPU`, `32 GB` request; batch MaxRSS `20,372,008 K`). It recorded P50/P95 `4.20/4.82 s` per query. Pure 4B aggregate metrics rose but paired intervals versus RRF crossed zero. The selected 1:1 RRF/4B rank fusion reached Recall@5 `0.3153`, MRR@10 `0.3961`, nDCG@10 `0.2849`, and Evidence F1 `0.2131`. Comparison job `29455049` measured deltas versus RRF of `+0.0444` Recall@5 (95% interval `0.0163–0.0733`, `p=0.0024`), `+0.0515` MRR (`0.0149–0.0883`), `+0.0354` nDCG (`0.0123–0.0576`), and `+0.0347` Evidence F1 (`0.0165–0.0535`). All values come from 5,000 paired bootstrap samples. Because the fusion weights and model size were selected on this same fixed dev split, these are dev-set model-selection results, not an independent test claim.
+The model-size gate then ran Qwen3-Reranker-4B in BF16 on the identical 154-claim/7,700-pair split. Full job `29453918` completed in `12 min 48 s` on one A100 `1g.20gb` MIG slice (`8 CPU`, `32 GB` request; batch MaxRSS `20,372,008 K`). It recorded P50/P95 `4.20/4.82 s` per query. Pure 4B aggregate metrics rose but paired intervals versus RRF crossed zero. The selected 1:1 RRF/4B rank fusion reached Recall@5 `0.3153` and Evidence F1@5 `0.2131`. Its legacy Top-10 fields used Top-5 predictions; MRR can be interpreted only as MRR@5, while nDCG cannot be relabelled because its ideal denominator used ten. Comparison job `29455049` measured deltas versus RRF of `+0.0444` Recall@5 (95% interval `0.0163–0.0733`, `p=0.0024`), `+0.0515` MRR@5 (`0.0149–0.0883`), and `+0.0347` Evidence F1@5 (`0.0165–0.0535`). All values come from 5,000 paired bootstrap samples. Because the fusion weights and model size were selected on this same fixed dev split, these are dev-set model-selection results, not an independent test claim.
 
-The optional 8B gate was also executed rather than left as a configuration claim. The first attempt (`29456746`) failed before inference because the shared project filesystem lacked room for the weight shards; four incomplete files totalling about 3.2 GB were removed, and commit `53a3782` moved the one-off cache to node-local ephemeral storage. Replacement pilot `29456898` completed in `2 min 19 s` on the same A100 `1g.20gb` MIG shape (batch MaxRSS `29,380,852 K`). On the same eight claims/400 pairs, the best 8B fusion tied 4B on Evidence F1 (`0.3016`) and Recall@5 (`0.4688`), was slightly lower on MRR@10 (`0.5042` vs `0.5104`), and raised P95 latency from `5.13 s` to `8.25 s` (`+60.8%`). The full 8B run was therefore deliberately not submitted. This is a resource-selection gate, not a full-dev 8B quality result; the derived record is in [`docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json`](docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json).
+The optional 8B gate was also executed rather than left as a configuration claim. The first attempt (`29456746`) failed before inference because the shared project filesystem lacked room for the weight shards; four incomplete files totalling about 3.2 GB were removed, and commit `53a3782` moved the one-off cache to node-local ephemeral storage. Replacement pilot `29456898` completed in `2 min 19 s` on the same A100 `1g.20gb` MIG shape (batch MaxRSS `29,380,852 K`). On the same eight claims/400 pairs, the best 8B fusion tied 4B on Evidence F1 (`0.3016`) and Recall@5 (`0.4688`), was slightly lower on the archived truncated reciprocal-rank metric (`0.5042` vs `0.5104`; not claimed as complete MRR@10), and raised P95 latency from `5.13 s` to `8.25 s` (`+60.8%`). The full 8B run was therefore deliberately not submitted. This is a resource-selection gate, not a full-dev 8B quality result; the derived record is in [`docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json`](docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json).
 
 Two RouteLLM-inspired cost-aware gates then tested whether the 4B path could be
 called selectively. Both used deterministic five-fold hash cross-fitting, so a

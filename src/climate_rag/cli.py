@@ -642,6 +642,8 @@ def command_evaluate(args: argparse.Namespace) -> int:
     _required(args, "claims", "output_dir")
     started_at = _started_at_utc()
     if args.experiment_config:
+        if args.evidence_k is not None:
+            raise ValueError("--evidence-k applies to prediction-file evaluation; five-stage configs use final_k")
         metrics, rows = run_five_stage_benchmark(
             claims_path=args.claims,
             config_path=args.experiment_config,
@@ -658,7 +660,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
             inputs=[args.claims, args.experiment_config],
             predictions=rows,
             notes=[
-                "All configured systems use the same claims and final_k.",
+                "All systems share claims/evidence cutoff; full metric ranks and served evidence files are separate.",
                 "The reranker base stage is recorded; RRF and LTR candidates are not interchangeable.",
                 "The configured reranker name is recorded; deterministic fallback results must not be described as Qwen3.",
             ],
@@ -670,10 +672,16 @@ def command_evaluate(args: argparse.Namespace) -> int:
     claims = load_claims(args.claims)
     predictions = load_predictions(args.predictions)
     ks = tuple(int(item) for item in str(args.ks).split(",") if item)
-    metrics, rows, errors = evaluate_predictions(claims, predictions, ks)
+    metrics, rows, errors = evaluate_predictions(
+        claims, predictions, ks, evidence_k=args.evidence_k,
+        evaluate_labels=not args.retrieval_only,
+    )
     if args.baseline_predictions:
         baseline = load_predictions(args.baseline_predictions)
-        _, baseline_rows, _ = evaluate_predictions(claims, baseline, ks)
+        _, baseline_rows, _ = evaluate_predictions(
+            claims, baseline, ks, evidence_k=args.evidence_k,
+            evaluate_labels=not args.retrieval_only,
+        )
         baseline_by_id = {row["claim_id"]: row for row in baseline_rows}
         comparisons: dict[str, Any] = {}
         compare_metrics = [
@@ -954,6 +962,8 @@ def command_build_pareto(args: argparse.Namespace) -> int:
     _required(args, "profiles", "output_dir")
     started_at = _started_at_utc()
     payload = read_json(args.profiles)
+    if isinstance(payload, dict) and payload.get("retired"):
+        raise ValueError(f"retired profiles cannot support a new Pareto decision: {payload.get('retirement_reason', '')}")
     profiles = payload.get("profiles") if isinstance(payload, dict) else payload
     if not isinstance(profiles, list) or not all(
         isinstance(profile, dict) for profile in profiles
@@ -1079,6 +1089,8 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--baseline-predictions")
     evaluate.add_argument("--output-dir")
     evaluate.add_argument("--ks", default="5,10,50")
+    evaluate.add_argument("--evidence-k", type=int, help="evidence cutoff independent of saved ranking depth")
+    evaluate.add_argument("--retrieval-only", action="store_true", help="do not score absent verdict labels")
     evaluate.add_argument("--bootstrap-samples", type=int, default=2000)
     evaluate.add_argument("--seed", type=int, default=17)
     evaluate.set_defaults(handler=command_evaluate)

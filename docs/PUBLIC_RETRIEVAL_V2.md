@@ -74,21 +74,26 @@ The expensive path reranks the same RRF Top-100 with
 `22e683669bc0f0bd69640a1354a6d0aebcfeede5`, then applies one fixed balanced
 1:1 rank fusion with RRF. There is no weight sweep.
 
-All stages report Recall@5, MRR@10, nDCG@10, Evidence F1, paired intervals,
+The protocol specifies Recall@5, MRR@10, nDCG@10, Evidence F1, paired intervals,
 index build time/bytes, component P50/P95 and peak Torch GPU memory. The
 diagnostic taxonomy includes spelling variants, year/numeric, entity,
 geographic and semantic-paraphrase slices. These are deterministic text/gold
 heuristics rather than human semantic labels.
 
-## Observed negative closeout
+## Historical no-promotion closeout and metric correction
 
 Final pilot array `30005221` completed all six registered configurations. Every
 archive hash matched its filename and internal manifest. On the deterministic
 64-query validation subset, every candidate exactly tied the base:
 
 - Recall@5 `0.53203125`;
-- MRR@10 `0.5338541667`;
-- mean Recall@5, MRR@10, nDCG@10 and Evidence-F1 deltas all `0.0`.
+- archived metric deltas were all `0.0`; those outputs used Top-5 prediction
+  lists, so their MRR@10/nDCG@10 are censored, not complete Top-10 estimates.
+
+These historical ties are **inconclusive about adapter quality**, because
+restoration was not verified. Counting injected parameters did not establish
+checkpoint loading. The 2026-09-27 fixed-input integrity repair passed, but it
+did not rerun a quality gate or identify the cause of every historical pilot tie.
 
 CPU selector `30007095` therefore marked every adapter
 `advance_eligible=false` and selected `s100-r16-n4-t005` only as the one
@@ -104,21 +109,27 @@ is `66222cda5a66f0cbc73a79ea39396de6e7f7abcd0c9ab1c73d0557fa4483b348`.
 Validation-only downstream job `30007546` completed in `19:10` with exit `0:0`
 and batch MaxRSS `15,177,324 K`. It loaded no adapter and reported:
 
-| System | Recall@5 | MRR@10 | nDCG@10 | Evidence F1 |
-|---|---:|---:|---:|---:|
-| BM25 | 0.4401 | 0.4872 | 0.3966 | 0.2913 |
-| Base dense Flat/HNSW | 0.5939 | 0.5909 | 0.5241 | 0.3730 |
-| Base RRF | 0.5463 | 0.5995 | 0.5095 | 0.3571 |
-| Base Top-100 LambdaMART | 0.6054 | 0.6276 | 0.5488 | 0.3828 |
-| Base RRF + Qwen3-4B fusion | 0.6275 | 0.6197 | 0.5525 | 0.3969 |
+| System | Recall@5 | Evidence F1@5 |
+|---|---:|---:|
+| BM25 | 0.4401 | 0.2913 |
+| Base dense Flat/HNSW | 0.5939 | 0.3730 |
+| Base RRF | 0.5463 | 0.3571 |
+| Base Top-100 LambdaMART | 0.6054 | 0.3828 |
+| Base RRF + Qwen3-4B fusion | 0.6275 | 0.3969 |
 
 All five non-BM25 paired comparisons used 5,000 samples and had positive
-intervals versus BM25. HNSW matched Flat at Recall@5 `1.0`; the LambdaMART
+Recall@5 and Evidence-F1@5 intervals versus BM25. The archived MRR@10,
+nDCG@10, Recall@10 and their intervals used only five saved ranks; retain
+those original values as historical records, not complete Top-10 evidence.
+Do not rename nDCG@10 to nDCG@5: its ideal denominator still used ten.
+HNSW/Flat Top-5 ANN overlap was `1.0` (not gold-evidence Recall@5); the LambdaMART
 training/serving contract passed. The downstream archive SHA-256 is
 `b4d2a6ecda91d70d429ba98de40315884b80446e8fc604110803820bb7297503`.
 These are 126-decisive-claim validation selection results. They do not rescue or
 measure the invalid adapter, and they are not independent-test or online
-evidence.
+evidence. Corrected full-ranking measurement is tracked separately in
+[the 2026-09-27 comparison](SEARCH_TRADEOFFS_20260927.md); it is not a rewrite
+of the archived run and does not reopen frozen test.
 
 ## Reproduction and publication
 
@@ -151,7 +162,7 @@ and the redacted JSON copied into Git has SHA-256
 ## Evidence-grounded candidate bullet
 
 - Executed a six-configuration, validation-only CLIMATE-FEVER LoRA retrieval
-  gate on Spartan; preserved an exact-tie negative result, traced an adapter-key
+  gate on Spartan; retained inconclusive historical ties, traced an adapter-key
   integrity failure, stopped promotion/SciFact by policy, and published
   content-addressed base-only BM25/dense/HNSW/RRF/LambdaMART/Qwen3 evidence with
   5,000-sample paired intervals and sealed test access.

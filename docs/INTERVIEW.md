@@ -25,7 +25,7 @@ rebuildable 4.95 GB index under project quota; I removed only the incomplete
 file and made index persistence explicit. Replacement job 29465819 then
 completed all 154 official-dev claims against 1,208,827 documents. The adapter
 raised Recall@5 from 0.2793 to 0.2970, MRR from 0.3633 to 0.3869, nDCG from
-0.2994 to 0.3203 and Evidence F1 from 0.07253 to 0.07544; every 5,000-sample
+0.2994 to 0.3203 and Evidence F1@50 from 0.07253 to 0.07544; every 5,000-sample
 paired interval was above zero. It passes my offline dev promotion gate, but I
 still do not call it independent test generalisation or an online A/B result.
 On the fixed 154-claim dev split, RRF improved Recall@5 from
@@ -33,8 +33,10 @@ On the fixed 154-claim dev split, RRF improved Recall@5 from
 regressed because it erased the strong first-stage order. I corrected the
 architecture by fusing cross-encoder rank back with RRF, then gated a BF16 4B
 model on the identical 154-claim/7,700-pair split. Balanced RRF/4B fusion reached
-Recall@5 0.3153, MRR@10 0.3961, nDCG@10 0.2849 and Evidence F1 0.2131; all four
-5,000-sample paired intervals versus RRF were above zero. The full 4B job used a
+Recall@5 0.3153 and Evidence F1@5 0.2131; both 5,000-sample paired intervals
+versus RRF were above zero. A later audit found the downstream Top-10 fields
+had only five stored ranks; I keep those original records but do not present
+them as complete Top-10 metrics. This does not affect the separate Top-50 LoRA run. The full 4B job used a
 20 GB A100 MIG slice and recorded P95 4.82 seconds/query, so I expose it as an
 offline quality profile and keep HNSW+RRF as the latency default. Because model
 size and weights were selected on dev, I do not call this independent test
