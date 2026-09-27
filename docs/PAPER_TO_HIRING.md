@@ -104,12 +104,20 @@ with the base encoder only.
   test-set sealing, training/serving-contract checks and disciplined negative
   result publication under HPC resource constraints.
 - Candidate bullet: Executed a six-configuration, validation-only
-  CLIMATE-FEVER LoRA retrieval gate on Spartan; preserved an exact-tie negative
-  result, traced an adapter-key integrity failure, stopped promotion/SciFact by
+  CLIMATE-FEVER LoRA retrieval gate on Spartan; preserved inconclusive pilot
+  ties, traced an adapter-key integrity failure, stopped promotion/SciFact by
   policy, and published content-addressed base-only ranking evidence with 5,000
   paired-bootstrap samples.
 - Boundary: this is validation-only engineering evidence. It is not an adapter
   improvement, independent-test generalisation or online A/B result.
+
+The 2026-09-27 repair verified all 392 restored tensors and fixed-probe output
+changes; this establishes loading integrity, not quality. A separate base-only
+three-route validation benchmark then measured complete requests. LTR is the
+latency-sensitive candidate (77.8 ms P95); Top-100 4B remains optional (9.30 s),
+with Top-5 paired differences crossing zero. Top-20 did not establish useful
+benefit over LTR. [Measured report](SEARCH_TRADEOFFS_20260927.md) records why
+practical model choice differs from a naive point-estimate Pareto frontier.
 
 ## 6. Sparse neural retrieval is a future candidate, not a hidden feature
 

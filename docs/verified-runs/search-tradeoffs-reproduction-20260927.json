@@ -22,6 +22,26 @@
     "github_ci": {"head_sha": "b797f6606ced013b1a0adee915c996b593f180a3", "conclusion": "success",
       "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36282638143"}
   },
+  "followup_validation": {
+    "git_commit": "97b2dc8eb5748cbf25ae1a4fccbec8c405b72342",
+    "method": "same clean GitHub clone fetched and fast-forwarded; non-editable package force-reinstalled; no original worktree environment",
+    "pytest": {"passed": 106, "skipped": 1, "elapsed_seconds": 3.94},
+    "skip_reason": "Torch absent locally; actual PEFT integration is validated separately on Spartan",
+    "ruff": "passed: src scripts tests",
+    "mypy": "passed: all 31 source modules",
+    "git_status_after_checks": "clean",
+    "changes_covered": "full legacy rankings plus served cutoff; CLI cutoff rejection; direct Top-20/Top-100 saved-profile comparison",
+    "github_ci": {
+      "git_commit": "97b2dc8eb5748cbf25ae1a4fccbec8c405b72342",
+      "conclusion": "success",
+      "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36283921887"
+    },
+    "prior_followup_ci": {
+      "git_commit": "aa523ee89d98f6f7f4bc1b9ec81fee6c298d93f5",
+      "conclusion": "success",
+      "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36283542744"
+    }
+  },
   "boundary": "software and fixture reproduction, not a full-corpus model run or quality gain; actual pinned PEFT runtime integration is separately recorded",
   "profiling_submission": {
     "job_id": 31364586,

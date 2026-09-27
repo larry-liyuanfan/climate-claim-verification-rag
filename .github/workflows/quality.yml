@@ -25,3 +25,5 @@ jobs:
           python -m mypy src/climate_rag
       - name: Run full test suite
         run: python -m pytest -q
+      - name: Scan tracked text for secrets and PII
+        run: python scripts/scan_tracked_secrets.py --repository .

@@ -16,7 +16,8 @@ set -euo pipefail
 : "${CLIMATE_GIT_COMMIT:?Exact pushed commit}"
 : "${SOURCE_RUN:?Read-only input run}"
 : "${PERSIST_DIR:?New run destination}"
-test "$(id -un)" = yzhang3504
+: "${CLIMATE_EXPECTED_USER:?Set the authorised SSH account outside the repository}"
+test "$(id -un)" = "${CLIMATE_EXPECTED_USER}"
 test "$(git -C "${REPO_DIR}" rev-parse HEAD)" = "${CLIMATE_GIT_COMMIT}"
 test -z "$(git -C "${REPO_DIR}" status --porcelain)"
 test -d "${PERSIST_DIR}"

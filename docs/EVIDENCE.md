@@ -17,11 +17,16 @@ with downstream F1@5. Fixture classifier scores are not live verdict quality.
   restored exactly and fixed query/document embeddings changed repeatably;
   [compact record](verified-runs/adapter-integrity-20260927.json). This is not
   an adapter quality improvement or proof of every historical pilot's cause.
-- Clean code reproduction at `b797f66`: 101 passed, one Torch test skipped
-  locally; source mypy/Ruff/CI passed. See [runtime record](verified-runs/search-tradeoffs-reproduction-20260927.json).
-- New same-query, full-ranking P0 profiling is job `31364586`, still queued
-  when this correction was written. No new quality/latency table is claimed.
-  Old sums of stage P95 values are cost proxies, not measured request P95.
+- Clean code reproduction at `97b2dc8`: 106 passed, one Torch test skipped
+  locally; source mypy/Ruff passed. Seven real PEFT tests passed on Spartan.
+  See [runtime record](verified-runs/search-tradeoffs-reproduction-20260927.json).
+- Same-query full-ranking profiling job `31364586` completed in 1,334 s,
+  exit 0:0. Public validation LTR / Top-20 / Top-100 R@5 is
+  .6054 / .5948 / .6275, F1@5 .3828 / .3829 / .3969, measured E2E P95
+  77.8 ms / 1.91 s / 9.30 s. All R@5/F1@5 paired intervals cross zero;
+  low-latency LTR is a practical offline recommendation, not a noninferiority
+  result or deployment. [Full record](verified-runs/search-tradeoffs-20260927.json).
+  Old sums of stage P95 values remain cost proxies, not request P95.
 
 
 ## 2026-09-03 representation-evaluation closeout
@@ -34,7 +39,7 @@ with downstream F1@5. Fixture classifier scores are not live verdict quality.
 | Base/adapted comparison contract | `verified-code` | exact query/corpus/candidate-universe/width/cutoff/data hashes plus >=5,000 paired bootstrap; fixture tests are not quality evidence |
 | LTR Top-K reachability correction | `verified-code; quality-pending` | feature rows now equal the serving-width RRF pool; unreachable positives are counted and excluded. Historical job `29504398` is not relabelled as a result of this code change |
 | Query taxonomy | `verified-diagnostic-code` | entity, numeric/year, geographic, lexical mismatch, semantic inference, multi-evidence and unanswerable; deterministic heuristic slices, not human labels |
-| Historical search Pareto record | `retired-component-cost-proxy` | Original values remain for audit, but sums of component P95 values are not request P95; the CLI now refuses this config for new Pareto decisions. The pending same-query public comparison must supply actual E2E timings |
+| Historical search Pareto record | `retired-component-cost-proxy` | Original values remain for audit, but sums of component P95 values are not request P95; the CLI now refuses this config for new Pareto decisions. The 2026-09-27 public comparison supplies independently timed E2E instead |
 | Iris isolated CPU preflight | `verified` | job `29926197`, exact SHA `09d2524`, 15 targeted tests passed in 7 s, exit `0:0`, batch MaxRSS `53,244 KiB`; public code/fixtures only, no GPU or frozen-test evaluation |
 
 Compact closeout: `docs/verified-runs/representation-evaluation-closeout-20260903.json`.
@@ -43,7 +48,8 @@ Compact closeout: `docs/verified-runs/representation-evaluation-closeout-2026090
 
 | Evidence | Status | Verification |
 |---|---|---|
-| Package and CLI workflows | `verified-software` | Clean clone/new environment at `b797f66`: 101 passed, 1 Torch-dependent skip, Ruff and strict mypy (31 source modules); historical test counts below identify old runs, not the current total |
+| Package and CLI workflows | `verified-software` | Clean GitHub clone at `97b2dc8`: 106 passed, 1 Torch-dependent skip, Ruff and strict mypy (31 source modules); historical test counts below identify old runs, not the current total |
+| Same-candidate LTR / bounded 4B profiles | `verified-public-validation-only` | Job `31364586`, inference SHA `b797f66`, 126 queries/5,240 docs and identical Top-100 pools; all Top-5 paired intervals cross zero. LTR recommended for latency; Top-100 retained as optional offline quality candidate. No public adapter promotion, test reopening, verdict score or online SLA |
 | BM25, hash dense exact search, RRF, hard negatives | `verified` | deterministic unit tests |
 | Claim-grouped Qwen3-Embedding-0.6B InfoNCE/LoRA adaptation | `verified-offline-dev-promotion` | data job `29460405`, 20-step training `29462754`, injection preflight `29463845`, sampled screen `29463846`, full-corpus gate `29465819`; all 154 official-dev claims/1,208,827 documents; Recall@5 `0.2793→0.2970`, MRR `0.3633→0.3869`, nDCG@10 `0.2994→0.3203`, F1@50 `0.07253→0.07544`; all 5,000-sample paired intervals positive; offline dev, not independent test/online A/B |
 | Pairwise LTR fallback and LightGBM persistence | `verified-code` | 48-test project environment; commit `636e915` fixes persisted LightGBM feature metadata; effectiveness requires a valid candidate-supported run |

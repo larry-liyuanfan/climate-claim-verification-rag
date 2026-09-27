@@ -1,5 +1,27 @@
 # Decision log
 
+## D10 — Select a practical latency route from measured requests
+
+Public-validation job `31364586` completed on 2026-09-27 using the frozen
+`b797f66` implementation, identical ordered RRF pools and 126 queries. LTR,
+4B Top-20 and 4B Top-100 have R@5 .6054/.5948/.6275 and F1@5
+.3828/.3829/.3969; independently measured E2E P95 is .0778/1.909/9.298 s.
+The full-ranking MRR@10 and nDCG@10 in this run are not censored.
+
+Recommend LTR for the latency-sensitive candidate, not a production rollout.
+Top-100 remains the optional slower quality profile. Top-20's tiny F1 difference
+from LTR does not justify its substantially greater observed latency and memory.
+All three Top-5 pairwise bootstrap intervals cross zero: no equivalence or
+significant reranker superiority is claimed. Point-estimate Pareto membership
+alone is too weak a selection rule. The Top-20 tail survives in stored rankings
+but cannot enter Top-5 under the frozen rank-fusion weights.
+
+Public adapter integrity is repaired, but no new quality evaluation or SciFact
+transfer is needed for the plan's chosen representation-repair option. Keep
+the consumed public test closed. See [complete report](SEARCH_TRADEOFFS_20260927.md)
+and [compact results](verified-runs/search-tradeoffs-20260927.json), including
+5,000-draw intervals, actual dtypes, memory and final accounting.
+
 ## D9 — Audit ranking depth and checkpoint values before model selection
 
 On 2026-09-27 a source audit found two distinct integrity defects. First,
@@ -37,9 +59,9 @@ climate-rag evaluate --claims CLAIMS.json --predictions rankings_rrf.json \
   --evidence-k 5 --retrieval-only --output-dir NEW_EVALUATION
 ```
 
-New profiling job `31364586` remains pinned to `b797f66`; this later legacy-path
-repair does not modify the queued checkout or recompute old results. The full
-search tradeoff delivery still requires its verified output and accounting.
+Profiling job `31364586` remains pinned to `b797f66`; this later legacy-path
+repair does not modify its checkout or recompute old results. Its verified
+output and accounting are now available in D10.
 
 ## D0 — Retire the consumed public test and enforce representation contracts
 

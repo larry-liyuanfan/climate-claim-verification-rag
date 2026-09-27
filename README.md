@@ -3,8 +3,10 @@
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter
 > loader is repaired and real checkpoint/output-effect checks passed on Spartan.
-> This proves restoration, not better retrieval. A same-candidate quality/latency
-> comparison is submitted, not yet measured. See [repair contract and remaining gates](docs/SEARCH_TRADEOFFS_20260927.md).
+> This proves restoration, not better retrieval. The three-route validation
+> profile is complete: LambdaMART is the recommended low-latency candidate;
+> Top-100 4B retains the highest Top-5 point estimates at a much higher cost.
+> See [measured tradeoffs, uncertainty and reproduction](docs/SEARCH_TRADEOFFS_20260927.md).
 
 A reproducible search-and-ranking extension of the **2026 COMP90042 Group 045 team project**. The course system used BM25 candidate retrieval, BGE bi-encoder reranking, and a LoRA-tuned claim classifier. This repository now separates two evidence tracks: a restricted 1.21M-document scale/selection track on Spartan and a public CLIMATE-FEVER external benchmark that can be reproduced without course data.
 
@@ -31,7 +33,7 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Full 1,208,827-document Spartan build verified; retrieval quality evaluation remains separate |
 | Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; a 20-step hard-negative LoRA adapter passed the full-corpus offline official-dev promotion gate; hash mode is not a semantic model |
 | ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
-| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
+| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Historical restricted LTR failures remain recorded; the separately trained public Top-100 LTR is the measured low-latency candidate, not a production rollout |
 | Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved fixed-dev Recall@5 and Evidence F1@5; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
 | Public benchmark | CLIMATE-FEVER adapter, evidence-aware near-duplicate split and frozen-test BM25 baseline | 1,535 claims/7,675 annotations; final test is not used for model selection |
 | Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, verdict Macro-F1/Accuracy, citation quality, ECE/Brier and paired bootstrap | Retrieval and verification results remain separately labelled |
@@ -94,6 +96,28 @@ archive hashes and truth boundaries are in
 [`docs/PUBLIC_RETRIEVAL_V2.md`](docs/PUBLIC_RETRIEVAL_V2.md).
 The compact record is
 [`docs/verified-runs/climate-public-retrieval-v2-20260904.json`](docs/verified-runs/climate-public-retrieval-v2-20260904.json).
+
+### Measured search-model choice, not just a component list
+
+On the same 5,240 documents and 126 decisive **public validation** queries,
+each route used the same ordered Top-100 BM25/HNSW/RRF pool. Full rankings now
+support genuine Top-10 metrics; evidence F1 is explicitly Top-5.
+
+| Route | Recall@5 | F1@5 | Warm serial E2E P95 | Peak Torch allocated |
+|---|---:|---:|---:|---:|
+| LambdaMART | .6054 | .3828 | 77.8 ms | 2.25 GiB |
+| RRF + 4B Top-20 | .5948 | .3829 | 1.91 s | 10.54 GiB |
+| RRF + 4B Top-100 | .6275 | .3969 | 9.30 s | 11.07 GiB |
+
+**Recommendation:** LTR for latency-sensitive use; keep Top-100 4B as an
+optional offline quality profile. Top-20 did not establish a useful benefit
+over LTR. The 5,000-draw paired Recall@5/F1@5 intervals cross zero for all
+three comparisons; no equivalence or significant reranker win is claimed.
+LTR scoring is CPU-based, but this complete path still encodes queries on GPU.
+These are single-process warmed measurements, not HTTP SLA, billed cost, an
+independent test or an adapter-quality gain. Details, taxonomy, stage timings
+and hashes: [decision report](docs/SEARCH_TRADEOFFS_20260927.md) and
+[compact evidence](docs/verified-runs/search-tradeoffs-20260927.json).
 
 The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`. The full representation-training case and two evidence-grounded resume bullets are in [`docs/REPRESENTATION_TRAINING_CASE.md`](docs/REPRESENTATION_TRAINING_CASE.md).
 
