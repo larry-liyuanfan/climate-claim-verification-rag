@@ -5,7 +5,8 @@
 - 独占工作区：`E:/Project/_codex_worktrees/climate-representation-eval`。
 - 分支：`codex/climate-search-tradeoffs-20260927`；增量基线 `b81cfde2d3d148e5797e1b63ba14606cd311dabe`。
 - 已有检索/训练证据保持不变；本轮仅增加证据包、真实 LangChain 适配和应用演示。
-- 最终交付 SHA 由后续记录提交填写；不修改主简历、求职共享文件、其他项目。
+- 实现/演示代码 SHA `6aa28f838f85e740e344ed1b1840970384ba8e4b`；后续提交只固化本报告和摘要。
+- 不修改主简历、求职共享文件、其他项目。
 - 这是个人作品集扩展，课程团队原始系统不是全部个人完成。
 
 ## 应用问题与调用链
@@ -82,6 +83,12 @@ python -m venv .venv
 定向测试覆盖原文/ID 篡改、重复 ID、非法 URL/摘要、空结果、schema 额外字段、
 空白/超长/非字符串输入、候选宽度、真实 LCEL/工具返回一致性和 fixture API trace。
 本轮不重跑未修改训练/索引的完整套件。最终验证数字与代码 SHA 见末尾版本记录。
+
+本轮版本记录：**15 passed**（两份新测试文件）；changed-file Ruff 通过；两模块
+strict mypy 通过；tracked secret/PII scan 通过。独立只读 review 发现并修复证据包
+`query_processing` 类型不一致，统一为对象；复测和真实 demo 再运行通过。
+新环境初装 NumPy 2.5 的 stub 不兼容项目 Python 3.10 type target，已使用原 CI
+NumPy 1.26.4 并锁定，未降低类型检查标准。未运行 GPU 或任何新质量评测。
 
 官方接口依据（已查阅，不把主分支示例当锁定版本）：
 [LangChain retrievers](https://docs.langchain.com/oss/python/integrations/retrievers)、
