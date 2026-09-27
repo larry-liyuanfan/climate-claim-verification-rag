@@ -1,7 +1,9 @@
 # Search tradeoffs and representation integrity — 2026-09-27
 
-Status: real CPU integrity preflight passed; latency profiling implementation
-awaits a free authorized GPU slot. No new model-quality improvement is claimed.
+Status: real CPU integrity preflight and clean-checkout validation passed;
+GPU profiling job `31364586` is PENDING Resources as of 2026-09-27 10:32 AEST.
+Scheduler estimate: 13:48:44 AEST, not a guaranteed start.
+No new model-quality improvement is claimed.
 Base commit: `272ab93256202e517a8aebf36992fbdf93dc922e`.
 
 ## Findings and repair
@@ -77,10 +79,12 @@ SciFact remains unopened.
    and compute cost. These will be offline benchmarks, not online SLA.
 3. Full-ranking metrics and 5,000 paired bootstrap comparisons require new
    validation-only artifacts, without reopening frozen test.
-4. Clean-checkout reproduction remains due. Current local tests: 101 passed,
-   one real-Torch test skipped locally but passed on Spartan. Ruff passed and
+4. Clean-checkout reproduction passed at `b797f6606ced013b1a0adee915c996b593f180a3`:
+   fresh GitHub clone + new virtual environment, 101 tests passed,
+   one real-Torch test skipped locally (the prior version passed on Spartan). Ruff passed and
    strict mypy passed all 31 source modules after annotation/Protocol repairs.
    This is source type checking, not static analysis of every experimental script.
+   Exact runtime and CI evidence: [reproduction record](verified-runs/search-tradeoffs-reproduction-20260927.json).
 
 ## Verified CPU result
 
@@ -124,5 +128,15 @@ Resource proposal: one MIG 20 GiB, 8 CPU, 32 GiB RAM, 40 GiB local scratch,
 about 23.4 minutes for the two rerank widths, with load/serialization/safety
 allowance. This is a walltime bound derived from prior measurements, not a
 new measured duration. Do not submit while another authorized GPU job runs.
+
+The prior Trip allocation had COMPLETED before submission. Job `31364586`
+uses exact compute SHA `b797f6606ced013b1a0adee915c996b593f180a3`, a new
+`checkouts/search-tradeoffs-b797f66` checkout and
+`runs/search-tradeoffs-20260927-b797f66` beneath the existing Climate public-v2
+root. `bash -n` and `sbatch --test-only` passed. It is the sole submitted
+profiling job; do not cancel/requeue to guess at queue priority. Logs are
+`slurm-31364586.out`. Completion requires the three profile archives,
+comparison archive, manifests/hashes and final Slurm accounting; submission
+alone is not a result. No new polling automation was created.
 
 No current resume or shared career material was modified.
