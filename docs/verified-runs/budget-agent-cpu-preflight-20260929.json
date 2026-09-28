@@ -1,0 +1,82 @@
+{
+  "kind": "CPU-only readiness; not inference or model-quality evidence",
+  "verified_date": "2026-09-29",
+  "source_git_sha": "ca9fa53f2d4b70091fd08a8a1512e263f329fc61",
+  "artifact": {
+    "relative_path": "runs/budget-agent-cpu-preflight-ca9fa53-20260929.tar.gz",
+    "bytes": 575,
+    "sha256": "036fe036b04dd5b4c00ceb1fb8304737cbb18cb2917abb82f9b734b4ac3de6bf",
+    "member": "result/run.json",
+    "member_bytes": 813,
+    "member_sha256": "8190facfb8a5832852ec374f6ddda536ea9aa90fb74a6531af5c723a71b05105",
+    "local_remote_sha_match": true
+  },
+  "scheduler": {
+    "source": "sacct for job 31486505 and batch step",
+    "job_id": "31486505",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "partition": "sapphire",
+    "start_scheduler_time": "2026-09-29T02:24:00",
+    "end_scheduler_time": "2026-09-29T02:25:16",
+    "scheduler_timezone": "not captured",
+    "elapsed_seconds": 76,
+    "requested_cpus": 4,
+    "allocated_cpus": 4,
+    "requested_memory": "8G",
+    "requested_tres": "billing=4,cpu=4,mem=8G,node=1",
+    "allocated_tres": "billing=15,cpu=4,mem=8G,node=1",
+    "gpu_allocated": false,
+    "batch_max_rss": "8384124K",
+    "batch_total_cpu_seconds": 66.238,
+    "time_limit_seconds": 1200,
+    "scratch_requested_gib_from_wrapper": 24,
+    "scratch_peak": null,
+    "resource_caveat": "MaxRSS approximately 7.996 GiB nearly exhausted the 8 GiB allocation; not a safe-headroom or GPU memory result."
+  },
+  "input_archive_sha256": {
+    "source": "74e64f5732ff82a59abf59c630ea39502b4a72f6a9a7878c939cbc14c7622fdc",
+    "inputs": "563738f0be1f7bf7b99b8de20bcdeab552f7e893166dec260b8f7f1e7951c3c1",
+    "runtime": "2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8",
+    "linux_overlay": "e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce"
+  },
+  "provenance": {
+    "operator_script_sha256": "78fdc39692d9928a502c9ab874abaefc19b90ff1aec4f87968b6a3b89a75a2da",
+    "log_relative_path": "runs/slurm-agent-cpu-preflight-31486505.log",
+    "log_sha256": "28ce2823d7309bd555e499e5c0e96265ffce04126bc9b409475b37d3e08b3f9f",
+    "public_corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+    "identity_basis": "Matching local/remote operator script, source archive rehash and SOURCE_REVISION; successful fail-closed launcher gates check all four archives on the compute node. These external identities are not fields recorded in the original report.",
+    "no_generation_basis": "Original report plus reviewed preflight code path returns after hash/import/config/tokenizer checks, before model construction or retrieval; no independent profiler was run."
+  },
+  "original_report": {
+    "dependencies": {
+      "cuda_available": false,
+      "model_generation_calls": 0,
+      "real_weights_loaded": false,
+      "tokenizers_checked": 2,
+      "versions": {
+        "langchain-core": "1.6.5",
+        "pydantic": "2.13.5",
+        "torch": "2.1.2",
+        "transformers": "4.51.3",
+        "websockets": "16.0"
+      }
+    },
+    "execution_manifest": {
+      "dense_file_hashes": null,
+      "model_manifest_sha256": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+      "protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+      "reranker_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed"
+    },
+    "model_generation": false,
+    "preflight": "passed",
+    "protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2"
+  },
+  "gpu_pilot_authorized": false,
+  "new_quality_metrics": null,
+  "limits": [
+    "No weights instantiated, forward pass, generation, GPU-memory or model-quality measurement.",
+    "Preflight receipt omits job, timing, source and archive-input identity; scheduler and hash-chain evidence supplement it explicitly.",
+    "No new test exposure; no quality promotion or resume claim."
+  ]
+}

@@ -23,8 +23,8 @@ Trip → Energy → Climate resource release.
 - 34 wheels, SHA-locked dependencies and a Python3.10/Linux metadata closure check
   were packed into one 12,475,491-byte archive. SHA-256:
   `e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce`.
-  SCP completed and the remote digest matched. **Linux imports and GPU inference
-  are not yet validated**; dependency metadata/download success is not that result.
+  SCP completed and the remote digest matched. Linux joint imports subsequently
+  passed in CPU preflight31486505; GPU inference remains unvalidated.
 - No full restricted dense index is copied into the public study. The available
   old HNSW index belongs to a different corpus. This minimal released comparison
   uses the same 5,240-document public BM25 first stage for all three routes,
@@ -34,7 +34,8 @@ Official immutable model documentation:
 [generator](https://huggingface.co/Qwen/Qwen3-4B/blob/350135a4de9a3407be836fa238cccc1d61503a85/README.md),
 [reranker](https://huggingface.co/Qwen/Qwen3-Reranker-4B/blob/22e683669bc0f0bd69640a1354a6d0aebcfeede5/README.md).
 The generator card requires Transformers≥4.51; old Torch uses the repository's
-existing pytree compatibility bridge, whose actual joint imports remain preflight work.
+existing pytree compatibility bridge. Its actual joint imports passed the CPU
+preflight below; loading parameters and running forward/generation did not run.
 
 ## Immutable artifacts and paths
 
@@ -43,9 +44,9 @@ Only the existing isolated Climate root is used remotely:
 
 | Input | Location relative to that root | Verification |
 |---|---|---|
-| Existing module-dependent runtime | `envs/runtime-py310-2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8.tar.gz` | 348,977,995 bytes, digest encoded in prior artifact name; full rehash enforced on node |
+| Existing module-dependent runtime | `envs/runtime-py310-2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8.tar.gz` | 348,977,995 bytes; full hash gate passed on the allocated CPU node |
 | New Linux overlay | `envs/budget-agent-linux-overlay-20260929-e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce.tar.gz` | Remote SHA rechecked; still packed, one persistent inode |
-| Model/input bundle | `envs/budget-agent-inputs-20260929-563738f0be1f7bf7b99b8de20bcdeab552f7e893166dec260b8f7f1e7951c3c1.tar` | 16,122,255,360 bytes; local SHA verified, transfer in progress at handoff; full remote rehash must occur on CPU node |
+| Model/input bundle | `envs/budget-agent-inputs-20260929-563738f0be1f7bf7b99b8de20bcdeab552f7e893166dec260b8f7f1e7951c3c1.tar` | 16,122,255,360 bytes; transfer completed and full hash gate passed on the allocated CPU node |
 | Final executable source | `envs/budget-agent-source-ca9fa53-74e64f5732ff82a59abf59c630ea39502b4a72f6a9a7878c939cbc14c7622fdc.tar` | Transferred and remote SHA rechecked; `SOURCE_REVISION` expands to ca9fa53f2d4b70091fd08a8a1512e263f329fc61 |
 
 Read-only inode inventory found 1,207 free of 500,000 at the later check, after
@@ -92,8 +93,9 @@ Set `CLIMATE_RUNTIME_TAR`, `CLIMATE_RUNTIME_SHA256`, `CLIMATE_OVERLAY_TAR`,
 `CLIMATE_OVERLAY_SHA256`, `CLIMATE_SOURCE_TAR`, `CLIMATE_SOURCE_SHA256`,
 `CLIMATE_RUN_BUNDLE`, `CLIMATE_BUNDLE_SHA256` and a new `CLIMATE_RESULT_TAR` under
 `runs/`. `CLIMATE_PREFLIGHT_ONLY=1` checks all large-file hashes, imports the real
-Linux packages/Qwen implementation, reads model config/tokenizers, and saves an
-allocation receipt; it loads no real model parameters and generates no tokens.
+Linux packages/Qwen implementation, reads model config/tokenizers, and saves a
+readiness report; it loads no real model parameters and generates no tokens.
+The report is not an allocation receipt: job/resources require separate sacct evidence.
 This is not an inexpensive login-node check. The coordinator subsequently authorized
 one CPU-only readiness allocation after complete inputs. Use the separate
 `hpc/budget_agent_preflight.sbatch`: sapphire,4CPU,8G RAM,24G node scratch,
@@ -106,8 +108,8 @@ Both Slurm wrappers read the common launcher from the exact SHA-verified source
 tar, so they do not depend on a sibling file beside Slurm's spooled job script.
 
 Before any submission: explicit resource release, exact committed source/archive
-identities, completed input bundle, and `sbatch --test-only`. None has been
-submitted by this preparation. Pilot walltime/resource proposal remains15min,
+identities, completed input bundle, and `sbatch --test-only`. The single authorized
+CPU preflight completed; no GPU pilot was submitted. Its resource proposal remains15min,
 8CPU/32G/30G scratch; measured pilot usage must determine any final job.
 
 ## Preparation state at this commit
@@ -129,27 +131,59 @@ input archive identity is in [input manifest](verified-runs/budget-agent-inputs-
 Generator manifest SHA `8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917`;
 reranker manifest SHA `e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed`.
 
-Source and Linux overlay archives have transferred. **The16.12GB input transfer
-is still running at this handoff. No actual CPU job ID is claimed yet.** A one-shot
-local continuation is waiting on this exact transfer process: check input byte
-count/no existing result/no duplicate named job → repeat `sbatch --test-only` →
-submit one `clim-preflight-ca9fa53` CPU job. It has no polling loop, GPU request,
-automatic retry, Git/shared-career writes or authentication mutation.
+All archives have transferred. The one-shot continuation completed its byte-count,
+duplicate/result guards and `sbatch --test-only`, then submitted one CPU job.
+**31486505 completed on sapphire, exit0:0, elapsed76s,4CPU/8G and no GPU TRES.**
+Start/end were `2026-09-29T02:24:00`/`02:25:16` in scheduler-reported time
+(timezone not recorded). Eligible partitions were `cascade,sapphire`;20min/24G
+scratch were request ceilings, not usage measurements.
 
-Read-only scheduler trials accepted both general CPU partitions: sapphire had
-an Oct8 estimate, cascade Sep29 05:57 at a Sep29 02:00 check. Estimates are not
-guarantees. Final submission uses one job with eligible partitions
-`cascade,sapphire`, the same4CPU/8G/20min/24G request, project working directory
-and `runs/slurm-agent-cpu-preflight-%j.log`; it does not submit competing jobs.
-The operator pins are saved remotely in `envs/submit-climate-agent-cpu-ca9fa53.sh`.
-That script rejects incomplete input sizes, existing result paths and an active
-job with its unique name before proceeding.
+The batch step recorded TotalCPU66.238s and MaxRSS8,384,124K (~7.996GiB), almost
+the entire8GiB allocation. This successful run is **not evidence of safe8GiB
+headroom**; no CPU rerun is needed. Scratch high-watermark was not captured.
+CPU setup time/RSS do not establish GPU load time, generation speed or VRAM.
 
-When submission succeeds, the local generated receipt is
-`artifacts/budget-agent-cpu-submission-20260929.json`. The intended sole output
-is `runs/budget-agent-cpu-preflight-ca9fa53-20260929.tar.gz`. A later check must
-read that receipt/job state and verify archive/import/tokenizer results before
-claiming Linux readiness. If pending, preserve age; if failed, inspect first.
-GPU pilot remains separately gated. There are no new model-quality results.
-Existing CPU negative results, LoRA dev findings and independent-test restrictions
-remain unchanged. No current resume or shared career files were edited.
+The575-byte result archive contains only `result/run.json` (813bytes). Its local
+and remote SHA-256 matched
+`036fe036b04dd5b4c00ceb1fb8304737cbb18cb2917abb82f9b734b4ac3de6bf`.
+The [compact readiness evidence](verified-runs/budget-agent-cpu-preflight-20260929.json)
+preserves the actual report, scheduler facts, input identities and provenance limits.
+LangChain core1.6.5, Pydantic2.13.5, Torch2.1.2, Transformers4.51.3 and
+websockets16.0 imported together; two local Qwen3 configs/tokenizers passed.
+`cuda_available=false`, `real_weights_loaded=false`, `model_generation_calls=0`.
+
+The report directly contains protocol/model-manifest hashes, but not job ID or
+archive-input hashes. The latter are linked through the matching operator script,
+source archive/SOURCE_REVISION and successful fail-closed launcher hash gates;
+they are not invented fields of `run.json`. Model-file verification and the
+public corpus hash gate precede the preflight report. Original log and compact
+archive remain under Climate `runs/`; no large artifact is added to GitHub.
+
+## Next pilot handoff — prepared, not released
+
+Use the same ca9fa53 source and four archive hashes above; no source, model,
+protocol or candidate tuning is introduced by this closeout. Only after an
+explicit GPU resource release, run `sbatch --test-only` for the frozen
+`hpc/budget_agent_pilot.sbatch` and one new result path under Climate `runs/`.
+The existing proposal is1A100,8CPU,32G host RAM,30G scratch,15min ceiling.
+It is an unvalidated GPU pilot envelope, not a full-run estimate derived from76s.
+Do not carry CPU `CUDA_VISIBLE_DEVICES=""` or `CLIMATE_PREFLIGHT_ONLY=1` into it;
+CUDA visibility must come from its Slurm allocation. `CLIMATE_AGENT_PHASE=pilot`.
+
+- Scope:3 authored questions × fixed retrieval/fixed rerank/adaptive routes,
+  same5,240-document public BM25 first stage; no dense/ANN or benchmark gold.
+- Frozen generator/reranker4B revisions above; reranker batch1/max length2048.
+- Per-query ceilings:model calls3, tool calls3, input8192/output512 tokens per
+  model call, candidates20/context5,120s/query. At most15 generation attempts
+  and7,680 generated tokens across the3×3 pilot; reranker forward passes are
+  separate and are not included in the generation-attempt count.
+- Measure actual loading/forward/generation, per-route stage latency, failure
+  behavior, host/GPU peaks and emitted traces before proposing any larger job.
+  No automatic validation/vNext follow-on is authorized. Authored questions are
+  a demonstration, not independent quality/generalization evidence.
+
+This package ends at verified CPU readiness. Passing full CI for executable
+ca9fa53 is retained without rerunning the unchanged suite; this closeout changes
+only documentation/evidence. No GPU job, paid API, career file or current resume
+was changed. Existing CPU negative results, restricted LoRA dev findings and
+independent-test restrictions remain unchanged; there is no new model-quality result.
