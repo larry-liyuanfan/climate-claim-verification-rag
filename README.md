@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+2026-09-29: [budgeted evidence-driven Agent CPU package](docs/BUDGET_AGENT_CPU_HANDOFF_20260929.md)
+adds a source/constraint ledger, bounded rewrite/rerank decisions, cited-answer
+validation and fixed-chain comparison runners. Real local-model execution remains
+pending resource release; the CPU heuristic pilot is **not** a new RAG quality result.
+
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter
 > loader is repaired and real checkpoint/output-effect checks passed on Spartan.

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "study_kind": "authored_application_vnext_not_independent_generalization_test",
+  "source": "New author-written questions over existing public CLIMATE-FEVER evidence only",
+  "exposure": "Corpus/model pretraining exposure possible; no claims read from retired tests. No human gold or blind judging.",
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "official_gold_available": false,
+  "budget": {
+    "max_model_calls": 3,
+    "max_tool_calls": 3,
+    "max_output_tokens_per_call": 512,
+    "max_input_tokens_per_call": 8192,
+    "candidate_k": 20,
+    "context_k": 5,
+    "timeout_seconds": 120.0
+  },
+  "strategies": ["fixed_retrieval", "fixed_rerank", "adaptive"],
+  "pilot": [
+    {"id": "pilot-ice", "claim_text": "Arctic sea ice has declined."},
+    {"id": "pilot-multi", "claim_text": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide."},
+    {"id": "pilot-empty", "claim_text": "zxqv_nonexistent_term_20260929"}
+  ],
+  "vnext": [
+    {"id": "vnext-01", "claim_text": "Water vapour amplifies warming in the atmosphere."},
+    {"id": "vnext-02", "claim_text": "Sea level rise can result from both thermal expansion and melting land ice."},
+    {"id": "vnext-03", "claim_text": "Antarctic sea ice and Arctic sea ice show the same trend in every year."},
+    {"id": "vnext-04", "claim_text": "Atmospheric carbon dioxide was exactly 800 ppm in 2010."},
+    {"id": "vnext-05", "claim_text": "Volcanic eruptions can cool surface temperatures while adding carbon dioxide."},
+    {"id": "vnext-06", "claim_text": "The greenhouse effect depends on infrared radiation, not just incoming sunlight."},
+    {"id": "vnext-07", "claim_text": "Every glacier in Greenland gained mass in 2023."},
+    {"id": "vnext-08", "claim_text": "The precise temperature at an unnamed private weather station tomorrow is 17.321 degrees Celsius."}
+  ],
+  "predeclared_gates": {
+    "schema_and_citation_id_validity": 1.0,
+    "budget_overrun_count": 0,
+    "unknown_quote_or_uncited_number_published": 0,
+    "semantic_success": "Not established by syntactic checks; no success-rate target without independent labels",
+    "promotion": "No promotion or test reuse; report positive and negative application cases"
+  }
+}
