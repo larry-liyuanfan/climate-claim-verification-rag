@@ -1,0 +1,3 @@
+configs/budget_agent_vnext_20260929.json text eol=lf
+hpc/budget_agent_pilot.sbatch text eol=lf
+SOURCE_REVISION export-subst

@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -28,12 +29,22 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def code_identity() -> tuple[str, bool]:
+    archive_revision = (Path(__file__).resolve().parents[1] / "SOURCE_REVISION").read_text().strip()
+    if re.fullmatch(r"[0-9a-f]{40}", archive_revision):
+        return archive_revision, False  # git archive export-subst; archive hash checked by launcher
+    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    dirty = bool(subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=normal"], text=True).strip())
+    return commit, dirty
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--protocol", type=Path, required=True)
     parser.add_argument("--expected-protocol-sha256", required=True)
-    parser.add_argument("--phase", choices=["pilot", "vnext"], default="pilot")
+    parser.add_argument("--phase", choices=["pilot", "vnext", "validation"], default="pilot")
     parser.add_argument("--provider", choices=["heuristic", "local-qwen"], default="heuristic")
     parser.add_argument("--model-dir", type=Path)
     parser.add_argument("--model-manifest", type=Path)
@@ -43,6 +54,7 @@ def main() -> int:
     parser.add_argument("--execution-manifest", type=Path)
     parser.add_argument("--expected-execution-sha256")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
     if sha(args.protocol) != args.expected_protocol_sha256:
         raise ValueError("protocol changed after freeze")
@@ -73,6 +85,14 @@ def main() -> int:
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     budget = AgentBudget.model_validate(protocol["budget"])
+    if args.preflight_only:
+        if args.provider == "local-qwen":
+            verify_model_files(args.model_dir, json.loads(args.model_manifest.read_text()))
+            if args.reranker_dir:
+                verify_model_files(args.reranker_dir, json.loads(args.reranker_manifest.read_text()))
+        print(json.dumps({"preflight": "passed", "model_generation": False,
+                          "protocol_sha256": sha(args.protocol), "execution_manifest": execution}))
+        return 0
     # A consumed output path is never silently reused after an interrupted run.
     args.output.parent.mkdir(parents=True, exist_ok=True)
     receipt = args.output.with_suffix(".consumed.json")
@@ -123,10 +143,9 @@ def main() -> int:
             for strategy in protocol["strategies"]:
                 runs.append({"task_id": task["id"], **agent.run(
                     {"claim_text": task["claim_text"]}, strategy=strategy)})
+    code_sha, dirty = code_identity()
     write_json(args.output, {
-        "code_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
-        "working_tree_dirty": bool(subprocess.check_output(
-            ["git", "status", "--porcelain", "--untracked-files=normal"], text=True).strip()),
+        "code_sha": code_sha, "working_tree_dirty": dirty,
         "protocol_sha256": sha(args.protocol), "corpus_sha256": sha(args.evidence),
         "document_count": len(documents), "phase": args.phase,
         "study_kind": protocol["study_kind"], "model_sha256": model_hash,
