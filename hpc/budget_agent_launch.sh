@@ -25,7 +25,7 @@ test "$(sha256sum "${CLIMATE_SOURCE_TAR}" | cut -d' ' -f1)" = "${CLIMATE_SOURCE_
 test "$(sha256sum "${CLIMATE_RUN_BUNDLE}" | cut -d' ' -f1)" = "${CLIMATE_BUNDLE_SHA256}"
 TASK_TMP="${SLURM_TMPDIR:-${TMPDIR:-}}"
 test -n "${TASK_TMP}"
-case "$(readlink -f "${TASK_TMP}")" in /tmp/*|/var/tmp/*|/jobfs/*) ;; *) exit 92 ;; esac
+case "$(readlink -f "${TASK_TMP}")" in /tmp|/tmp/*|/var/tmp|/var/tmp/*|/jobfs/*) ;; *) exit 92 ;; esac
 TASK_ROOT="$(mktemp -d "${TASK_TMP}/climate-agent-${SLURM_JOB_ID}-XXXXXX")"
 export TASK_ROOT CLIMATE_SOURCE_TAR CLIMATE_RUN_BUNDLE
 "${CLIMATE_PYTHON}" - <<'PY'
