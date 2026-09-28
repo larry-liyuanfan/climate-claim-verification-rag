@@ -7,6 +7,8 @@ import tarfile
 from pathlib import Path
 from typing import Any
 
+from climate_rag.verification import normalise_claim
+
 ARCHIVE_SHA = "bef810a9a3a4eb2f4a4a2684e1362b0c02b6a231c56202d9d1b1b7d478eab329"
 MEMBER = "./data/climate-fever-v2/selection-only/validation-claims.json"
 
@@ -60,7 +62,7 @@ def main() -> int:
                        "split": "repeated_validation_replay", "archive_sha256": ARCHIVE_SHA,
                        "member_sha256": hashlib.sha256(raw).hexdigest()},
         "claims": {key: {
-            "claim_sha256": hashlib.sha256(claims[key]["claim_text"].encode()).hexdigest(),
+            "claim_sha256": hashlib.sha256(normalise_claim(claims[key]["claim_text"]).encode()).hexdigest(),
             "evidence_ids": claims[key]["evidences"], "label": claims[key]["claim_label"],
         } for key in selected},
     }

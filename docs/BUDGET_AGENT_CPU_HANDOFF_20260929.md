@@ -67,6 +67,56 @@ the evaluation policy still forbids tuning on a consumed final set. Freeze exact
 model manifests and retrieval config after a released pilot **before** running
 vNext; retain failures, do not tune/retry for better scores.
 
+### Separate public-qrels replay (not the 8 authored examples)
+
+`prepare_agent_validation.py` verifies the archived public-v2 preflight SHA and
+reads **only** its `selection-only/validation-claims.json` member, never the combined
+claims or test seal. It sorts IDs by `SHA256(agent-validation-20260929:<id>)`, taking
+24 of 126 evidence-bearing validation claims and 8 of 104 nondecisive claims.
+Selection is fixed without model outcomes. Retrieval denominator is 24; calls,
+latency and failure denominator is 32 per route. This validation was used before
+for model selection; it is not a new held-out test. Queries and gold are separate
+files; gold cannot be passed to the runner/controller. Classification accuracy is
+only enabled for a real model on available decisive SUPPORTS/REFUTES labels;
+no heuristic/no-provider output is counted as classification effectiveness.
+
+- Validation protocol SHA: `abfcb61e9e6a54641f025101a4011fa88e07e3697a36f0acd308fa8e86052674`.
+- Normalized-claim gold SHA: `d2dd28422bffacf87ded2153b3bfac4ca9e1edc903e1d4e7a88d3a40f5d2fd8b`.
+- [Selection manifest](verified-runs/budget-agent-validation-selection-20260929.json).
+- The first scorer attempt caught raw-vs-normalized whitespace hash mismatch;
+  gold hash generation was corrected to the runner's documented whitespace
+  normalization. No retrieval/generation was rerun to change results.
+
+### Actually measured CPU results
+
+Implementation/pilot `401f8b8`, validation runner `7167686` (both clean at execution).
+5,240 real public documents; 9 authored-pilot runs and 96 validation route runs;
+**zero generative model calls**, all 96 correctly retain answer unavailable.
+This is a heuristic routing + BM25/deterministic feature-reranker development
+control, not a Qwen answer-quality demonstration.
+
+| CPU route | Recall@5 | MRR@10 | nDCG@10 | Evidence F1@5 | Tools/query | P50/P95 ms |
+|---|---:|---:|---:|---:|---:|---:|
+| Fixed BM25 | .43194 | .40417 | .38759 | .25784 | 1.000 | 3.00 / 4.64 |
+| Fixed deterministic rerank | .36389 | .37655 | .36985 | .21260 | 2.000 | 4.77 / 6.74 |
+| Heuristic adaptive control | .37778 | .35810 | .36294 | .22302 | 1.594 | 3.57 / 8.13 |
+
+The added heuristics **did not improve** the fixed BM25 control. Adaptive R@5
+delta −.05417 (5,000 paired-bootstrap 95% CI −.13194, +.00833); F1 delta −.03482
+(−.08929, +.01250). No promotion/no retuning on these outcomes. These single-pass
+in-process timings exclude index construction; 32 requests are not online SLA.
+[Full scores and paired intervals](verified-runs/budget-agent-cpu-score-20260929.json).
+Raw run SHA `96f0b946a7f0068f970f3179f123e703c9286711a12a564255c7f2141e04b7aa`;
+raw Windows score SHA `721fdd8a3c982fd74f521e34d5e848b44c6f61f4542a53a7bf8c310b4ebd8d19`;
+the public JSON copy is LF-normalized by Git, with identical values.
+
+Targeted 40 tests passed (25 new +15 prior integration); new modules pass strict
+mypy and Ruff. Clean `git archive` export at `401f8b8` independently ran the 25
+new tests. Full heavy suite was not repeated locally; remote CI remains a
+separate status, not inferred from these checks. Three CPU pilot cases cover
+single-topic evidence, compound evidence, and empty/OOV; fixture cases cover
+wrong citation, missing year, entity/polarity drift and late result rejection.
+
 ## Reproduction
 
 Use the existing `.venv` / `requirements-agent-demo.lock`; no new environment is
@@ -89,13 +139,35 @@ this is not permission to consume GPUs or proof other accounts are idle.
 The coordinator controls Trip → Energy → Climate ordering. No GPU/API call,
 remote environment creation, model download or cleanup performed.
 
+Prepared executable launcher: `hpc/budget_agent_pilot.sbatch` (Bash syntax checked,
+not submitted). One immutable `git archive` source tar plus one input bundle;
+safe member validation and extraction only under unique node TMPDIR; existing
+locked runtime via explicit `CLIMATE_PYTHON`; persist one result tar plus Slurm log,
+not a new project venv/cache. `SOURCE_REVISION` is expanded by git archive.
+Input bundle contains public evidence, chosen protocol, execution/model manifests,
+and operator-authored `args.json` (a CLI argument array, `{INPUT}` is replaced by
+node-local bundle path). Existing model directories remain read-only. Runtime
+checks exact LangChain 1.6.5; no pip/network fallback.
+
+- Preflight: use the same launcher with `CLIMATE_PREFLIGHT_ONLY=1`; imports and
+  model/data/manifest checks only, no model generation. Run inside a released
+  allocation, not a login-node model/hash workload.
+- Pilot: args select `--phase pilot`; 3 tasks ×3 routes, at most 15 generation
+  attempts /7,680 new tokens. Explicit release then `sbatch --test-only` first.
+- Validation/full: args select `--phase validation` and frozen replay protocol;
+  32 ×3 runs, at most160 generation attempts /81,920 new tokens. Optional authored
+  vNext is separate 8 ×3 application runs, not added to the quality denominator.
+  Override walltime only after measured pilot establishes a bounded estimate.
+
 Proposed release sequence: verify existing generator/reranker archives and exact
 model hashes without unpacking to project storage → node-local short pilot,
-one A100 40GB slice/card, 8 CPUs, 32G RAM, 30G node-local scratch, **15 minutes /
+one full A100 (`gpu-a100`, `gpu:A100:1` observed by sinfo), 8 CPUs, 32G RAM,
+30G node-local scratch, **15 minutes /
 0.25 allocated GPU-hours ceiling** → use measured peak RAM/VRAM and elapsed to
 derive one final job. Generator Qwen3-4B + optional Qwen3-Reranker-4B + 0.6B query
 encoder nominal BF16 weights about 17.2GB before activations, so a 20GB allocation
-is not assumed sufficient. Pilot runtime is an estimate, not a measured speed.
+is not assumed sufficient. The available MIG inventory showed 10/20GB slices,
+so a nonexistent 40GB MIG type is not requested. Pilot runtime is an estimate, not a measured speed.
 Tentative final ceiling 45 minutes / 0.75 GPU-hours, contingent on pilot; no request
 has been submitted and no `sbatch --test-only` scheduling claim is made.
 
