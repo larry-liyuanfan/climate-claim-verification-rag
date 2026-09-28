@@ -7,3 +7,5 @@ configs/budget_agent_assets_20260929.json text eol=lf
 SOURCE_REVISION export-subst
 docs/verified-runs/budget-agent-cpu-score-20260929.json text eol=lf
 docs/verified-runs/budget-agent-validation-selection-20260929.json text eol=lf
+docs/verified-runs/budget-agent-inputs-manifest-20260929.json text eol=lf
+docs/verified-runs/budget-agent-model-assets-20260929.json text eol=lf
