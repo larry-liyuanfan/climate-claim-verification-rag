@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 
 from climate_rag.runtime_bundle import resolve_bundle_args
 
@@ -32,3 +33,14 @@ def test_bundle_rejects_external_or_missing_path(tmp_path, value):
 def test_no_output_override_duplicates_or_unpaired_reranker(tmp_path, extra):
     with pytest.raises(ValueError):
         resolve_bundle_args(arguments(tmp_path) + extra, tmp_path)
+
+
+def test_cpu_preflight_cannot_inherit_gpu_script_directives():
+    source = (Path(__file__).resolve().parents[1] / "hpc/budget_agent_preflight.sbatch").read_text()
+    directives = [line for line in source.splitlines() if line.startswith("#SBATCH")]
+    assert "#SBATCH --partition=sapphire" in directives
+    assert not any("gres" in line or "gpu" in line for line in directives)
+    assert 'export CLIMATE_PREFLIGHT_ONLY=1' in source
+    assert 'export CUDA_VISIBLE_DEVICES=""' in source
+    assert 'sha256sum "${CLIMATE_SOURCE_TAR}"' in source
+    assert 'tar -xOf "${CLIMATE_SOURCE_TAR}" hpc/budget_agent_launch.sh' in source

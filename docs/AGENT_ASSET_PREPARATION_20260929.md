@@ -94,9 +94,16 @@ Set `CLIMATE_RUNTIME_TAR`, `CLIMATE_RUNTIME_SHA256`, `CLIMATE_OVERLAY_TAR`,
 `runs/`. `CLIMATE_PREFLIGHT_ONLY=1` checks all large-file hashes, imports the real
 Linux packages/Qwen implementation, reads model config/tokenizers, and saves an
 allocation receipt; it loads no real model parameters and generates no tokens.
-This is not an inexpensive login-node check. The prepared script still requests
-one A100 even for preflight; combine readiness validation with a released pilot
-or explicitly arrange a CPU-only allocation, rather than submitting extra jobs.
+This is not an inexpensive login-node check. The coordinator subsequently authorized
+one CPU-only readiness allocation after complete inputs. Use the separate
+`hpc/budget_agent_preflight.sbatch`: sapphire,4CPU,8G RAM,24G node scratch,
+20min ceiling, **no GPU directives**, CUDA visibility disabled. The IO-dominated
+estimate covers about16GB of model input extraction and two hash passes plus
+dependency/tokenizer startup; it is not a measured runtime. GPU pilot retains its
+separate resource request and is not authorized by CPU preflight success.
+
+Both Slurm wrappers read the common launcher from the exact SHA-verified source
+tar, so they do not depend on a sibling file beside Slurm's spooled job script.
 
 Before any submission: explicit resource release, exact committed source/archive
 identities, completed input bundle, and `sbatch --test-only`. None has been
