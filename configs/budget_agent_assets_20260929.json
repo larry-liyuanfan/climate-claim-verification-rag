@@ -1,0 +1,13 @@
+{
+  "scope": "CPU-side preparation only; no GPU execution or model promotion",
+  "models": {
+    "generator": {
+      "repo": "Qwen/Qwen3-4B",
+      "revision": "350135a4de9a3407be836fa238cccc1d61503a85"
+    },
+    "reranker": {
+      "repo": "Qwen/Qwen3-Reranker-4B",
+      "revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5"
+    }
+  }
+}

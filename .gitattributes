@@ -1,5 +1,7 @@
 configs/budget_agent_vnext_20260929.json text eol=lf
 hpc/budget_agent_pilot.sbatch text eol=lf
+hpc/budget_agent_runtime.sh text eol=lf
+configs/budget_agent_assets_20260929.json text eol=lf
 SOURCE_REVISION export-subst
 docs/verified-runs/budget-agent-cpu-score-20260929.json text eol=lf
 docs/verified-runs/budget-agent-validation-selection-20260929.json text eol=lf

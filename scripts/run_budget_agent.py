@@ -20,7 +20,9 @@ from climate_rag.budget_agent import (
 from climate_rag.dense import DenseRetriever
 from climate_rag.io import iter_evidence, write_json
 from climate_rag.langchain_evidence import ClimateEvidenceRetriever, create_evidence_tool
-from climate_rag.local_agent_model import LocalQwenDecisionProvider, verify_model_files
+from climate_rag.local_agent_model import (
+    LocalQwenDecisionProvider, preflight_local_dependencies, verify_model_files,
+)
 from climate_rag.pipeline import HybridRetriever
 from climate_rag.rerank import DeterministicFeatureReranker, Qwen3CausalLMReranker, Reranker
 
@@ -67,6 +69,8 @@ def main() -> int:
         raise ValueError("CPU control may not implicitly load GPU components")
     execution = None
     if args.provider == "local-qwen":
+        if not args.model_dir or not args.model_manifest:
+            raise ValueError("local generation requires model and complete SHA manifest")
         if not args.execution_manifest or not args.expected_execution_sha256:
             raise ValueError("local-model execution requires a frozen execution manifest")
         if sha(args.execution_manifest) != args.expected_execution_sha256:
@@ -86,12 +90,23 @@ def main() -> int:
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     budget = AgentBudget.model_validate(protocol["budget"])
     if args.preflight_only:
+        dependency_report = None
         if args.provider == "local-qwen":
             verify_model_files(args.model_dir, json.loads(args.model_manifest.read_text()))
+            model_dirs = [args.model_dir]
             if args.reranker_dir:
+                if not args.reranker_manifest:
+                    raise ValueError("reranker requires full model SHA manifest")
                 verify_model_files(args.reranker_dir, json.loads(args.reranker_manifest.read_text()))
-        print(json.dumps({"preflight": "passed", "model_generation": False,
-                          "protocol_sha256": sha(args.protocol), "execution_manifest": execution}))
+                model_dirs.append(args.reranker_dir)
+            dependency_report = preflight_local_dependencies(model_dirs)
+        report = {"preflight": "passed", "model_generation": False,
+                  "protocol_sha256": sha(args.protocol), "execution_manifest": execution,
+                  "dependencies": dependency_report}
+        if args.output.exists():
+            raise ValueError("preflight output already exists")
+        write_json(args.output, report)
+        print(json.dumps(report))
         return 0
     # A consumed output path is never silently reused after an interrupted run.
     args.output.parent.mkdir(parents=True, exist_ok=True)

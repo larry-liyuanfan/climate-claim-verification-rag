@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 from pathlib import Path
 from typing import Any
@@ -92,3 +93,27 @@ class LocalQwenDecisionProvider:
         except (ValueError, TypeError) as exc:
             raise GeneratedResponseError(usage) from exc
         return {"decision": decision.model_dump(), "usage": usage}
+
+
+def preflight_local_dependencies(model_dirs: list[Path]) -> dict[str, Any]:
+    """Import/tokenizer preflight, never allocate real model parameters or generate."""
+    from .torch_compat import ensure_torch_pytree_compat
+
+    ensure_torch_pytree_compat()
+    import torch
+    from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+
+    # Force Qwen3's lazy Python imports now, not during a later paid allocation.
+    from transformers.models.qwen3.modeling_qwen3 import Qwen3ForCausalLM
+    assert Qwen3ForCausalLM and AutoModelForCausalLM
+    for model_dir in model_dirs:
+        config = AutoConfig.from_pretrained(str(model_dir), local_files_only=True, trust_remote_code=False)
+        if config.model_type != "qwen3":
+            raise ValueError("preflight requires the frozen Qwen3 architecture")
+        tokenizer = AutoTokenizer.from_pretrained(str(model_dir), local_files_only=True, trust_remote_code=False)
+        if not tokenizer("dependency preflight")["input_ids"]:
+            raise ValueError("tokenizer preflight empty")
+    return {"versions": {name: importlib.metadata.version(name) for name in
+                         ("langchain-core", "pydantic", "torch", "transformers", "websockets")},
+            "cuda_available": bool(torch.cuda.is_available()), "real_weights_loaded": False,
+            "model_generation_calls": 0, "tokenizers_checked": len(model_dirs)}
