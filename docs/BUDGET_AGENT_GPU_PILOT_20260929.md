@@ -59,8 +59,32 @@ The frozen executable's previously passing full CI remains the test evidence;
 the unchanged CPU suite is not rerun. Static operator checks do not prove Slurm
 signal delivery or successful GPU runtime behavior.
 
-## Result
+## Submitted; execution pending
 
-Not submitted at this commit. Append the actual job ID, terminal evidence and
-resource-based follow-on estimate here after the single pilot; do not infer
-completion from the existence of an allocation or an empty result directory.
+Actual job **31510619** was submitted after successful `sbatch --test-only`.
+The test-only response used31510618; that is **not** an allocated pilot.
+Submission operator SHA-256:
+`b2ac83bb40e8056d17b839bab7dedeb4cfdab965baab035b240246ca0a402f15`.
+The wrapper is committed in `ae5166b872c9e0f71be09df1dd557c1804c01bf7`;
+executable source remains ca9fa53. The remote wrapper/operator hashes matched.
+
+Initial state was PENDING/Priority, priority13157 (fairshare13146, jobsize11,
+age0). Requested8CPU/32G/1A100, with no allocation yet. Slurm defaulted to
+Requeue=1; it was explicitly changed to0 on this exact job without cancellation
+or resubmission, and read back as0/Restarts0. This prevents automatic retry.
+The next scheduler snapshot estimated `2026-09-29T16:49:40` (scheduler time,
+timezone not captured); estimates can change and do not mean the job is running.
+The earlier test-only Oct5 estimate was superseded by this live job estimate.
+
+Output remains a new `runs/budget-agent-pilot-ca9fa53-release-20260929.tar.gz`;
+diagnostics use the same stem plus `-diagnostics/`, and Slurm log is
+`runs/slurm-agent-pilot-31510619.log`. The [submission receipt](verified-runs/budget-agent-pilot-submission-20260929.json)
+records identity and state, not model execution. Preserve queue age, do not
+submit another job or poll with a new automation. A subsequent authorized
+status check should inspect31510619 only and retain its failure/timeout evidence.
+
+No actual weight loading, generation, tokens, forwards or GPU/resource timing is
+claimed while pending. A resource-based estimate for32validation×3routes and
+8authored×3routes must wait for the pilot. Only frozen workload ceilings can
+currently be stated: at most160/40 generation attempts and81,920/20,480 new
+tokens respectively, excluding reranker compute. Neither workload is released.
