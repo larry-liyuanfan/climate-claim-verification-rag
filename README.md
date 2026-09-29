@@ -9,8 +9,10 @@ a RAG quality gain. A separately released diagnostic canary also rejected9/9;
 in-place replay of the original strings through the frozen validator confirmed
 non-rewrite actions illegally carrying `query`. The minimal model-visible
 cross-field contract repair is CPU-tested, **not yet confirmed by a new model
-run**; strict validators and generation settings remain unchanged. No next GPU
-run or full evaluation is released. The CPU heuristic control remains negative.
+run**; strict validators and generation settings remain unchanged. One same-task
+confirmation pilot31520350 is now separately released/submitted; its initial
+state is PENDING/Priority, with no result yet. Full evaluation is not released.
+The CPU heuristic control remains negative.
 
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter

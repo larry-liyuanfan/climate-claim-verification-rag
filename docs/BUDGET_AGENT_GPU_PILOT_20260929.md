@@ -3,8 +3,9 @@
 **Latest update:**31510619 and diagnostic31519179 both completed0:0, but each
 rejected all9 responses. Only31519179 retained private originals: exact frozen
 Pydantic replay confirms illegal non-rewrite `query` in9/9. The model-visible
-contract repair is CPU-tested, not model-confirmed; no subsequent GPU run/full
-evaluation is released. Earlier submission/readiness sections are historical.
+contract repair is CPU-tested, not model-confirmed. Confirmation31520350 was
+subsequently released/submitted (initially PENDING/Priority); full evaluation
+remains unreleased. Earlier submission/readiness sections are historical.
 
 Release: `climate-authored-pilot-ca9fa53-20260929-user-resume`. The coordinator
 relayed the user's explicit bounded exception at18% remaining allowance after
@@ -285,3 +286,39 @@ schema/operator/input identities and negative-result boundaries. The66 tests
 also passed from a clean Git archive with source-import origin checked; the
 compact canary audit reproduced identical structured evidence. This archive
 has not been uploaded to Spartan. Waiting for a separate confirmation release.
+
+## Subsequent single confirmation release:31520350
+
+Release `climate-protocol-confirm-72eaa90-20260929` explicitly authorizes only
+the same3 authored questions ×3 routes, with frozen72eaa90 source/system-prompt
+identities, unchanged models/inputs/budgets/operator and fresh output paths.
+The [submission manifest](verified-runs/budget-agent-protocol-confirm-submission-20260929.json)
+records remote source/archive checks, the empty account queue before submission,
+and successful bash syntax / `sbatch --test-only`. Actual job31520350 was
+submitted once at2026-09-29T17:06:35+10:00; its initial state was PENDING/Priority,
+with no scheduler start estimate. The test-only estimate is not a reservation.
+Requested resources are one full A100,8CPU/32GiB/30GiB scratch/15minutes,
+no-requeue. Both earlier results are preserved.
+
+No retry, further prompt/model/input/budget adjustment,32-query validation,
+8-task vNext run, test reuse or deployment is released. Original responses and
+full answer text stay on Spartan; only compact counts/hashes/validation outcomes
+may be exported. Completion must distinguish schema-valid proposals, permitted
+executed actions, validated final answers, model abstention and controller
+rejections. Protocol compliance alone cannot demonstrate semantic or retrieval
+quality. No new recurring monitor or shared career/resume edit was created.
+
+A later queue snapshot still showed PENDING/Priority, now with scheduler estimate
+2026-09-29T22:50:00+10:00 (not guaranteed). Priority13171 decomposed as age14,
+fairshare13146 and jobsize11, QoS publicgpu. There is no actual generation,
+answer or resource result for31520350 yet. Do not cancel/requeue or submit a
+competing job; continue from this job ID when terminal evidence is available.
+
+For eventual closeout, the existing32-validation +8-vNext workload has120
+routes and controller ceilings of200 generation attempts /102,400 new tokens,
+240 tool calls,160 retrievals and80 rerank calls /1,600 attempted candidate pairs.
+The3-task pilot ceilings are15 /7,680 /18 /12 /6 /120 respectively. These bounds
+were checked against the frozen controller, not measured on the pending job.
+The120-second guard is soft: synchronous tool work is not hard-preempted.
+No full-run walltime, GPU-memory headroom or eligibility recommendation can be
+made before confirmation results. Even a passed pilot needs a separate release.
