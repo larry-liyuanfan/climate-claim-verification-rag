@@ -7,6 +7,8 @@ repeat guards and test-only, the original owner submitted exactly one job:
 **31542525**, initially PENDING/Priority. The
 [immutable submission receipt](verified-runs/budget-agent-full-submission-20260930.json)
 supersedes the preparation-only status below, not the frozen operator or inputs.
+The job subsequently FAILED1:0 after39s in runtime preparation; neither inference
+phase started. See the [preserved failure and preparation-only repair](BUDGET_AGENT_FULL_FAILURE_20260930.md).
 No full results yet; do not resubmit this consumed release or alter other jobs.
 
 The coordinator subsequently extended the same job's partition candidates to
@@ -33,8 +35,13 @@ an authorization. Do not submit automatically when a queue becomes empty.
 
 Operator archive SHA:
 `0965c471b2f13197ae0eaffa30ada17745734fc5cf77e4ff06f853830da73cef`.
-Operator Python SHA:
+Original working-file Python SHA (LF, not the executed archive-member bytes):
 `f442ec5c638c14c1a4ede7ef55d1cc300f88536c07a91397e42cac1990e39796`.
+Actual original archive member/executed Python SHA (314 CRLF line endings):
+`09e438a6496499b0da47d8b2b08ccd404bbb6d1105722febe12af31857e4a654`.
+The archived bytes normalize exactly to the working-file bytes; this is an
+archive line-ending difference, not the runtime-prefix root cause. The repair
+pins the operator Python file to LF for subsequent archives, without rewriting r1.
 Wrapper SHA:
 `c266835b8dc614f221a66269e6f89224f7d7630bc550bbaa3c6f3d774bb56bf9`.
 

@@ -17,7 +17,7 @@ import sys
 import tarfile
 import tempfile
 import time
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path("/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2")
 INFERENCE = "72eaa90567e3603a3b940edffbb21b684bf1d1ba"
@@ -51,9 +51,36 @@ def digest(path: Path) -> str:
     return value.hexdigest()
 
 
+SAFE_ERROR_CODES = frozenset({
+    "allocation_required", "separate_full_release_required", "scratch_scope", "scratch_name",
+    "result_scope", "frozen_gold_missing_or_mismatch", "archive_scope", "archive_sha_mismatch",
+    "extraction_destination_exists", "empty_archive", "runtime_site_packages_absent",
+    "archive_traversal", "archive_link_or_special", "archive_duplicate", "scratch_capacity",
+    "exported_git_mismatch", "selection_sha_mismatch", "protocol_sha_mismatch", "child_failed",
+    "bundle_loader_missing", "argument_phase_mismatch", "unapproved_argument", "phase_mismatch",
+    "inference_identity", "dirty_inference", "provider_mismatch", "protocol_mismatch",
+    "scorer_identity", "run_sha_mismatch", "matrix_incomplete", "prompt_identity",
+    "schema_identity", "corpus_identity", "model_identity", "dense_disabled", "gold_identity",
+    "selection_identity",
+})
+
+
+class OperatorError(ValueError):
+    """Only allowlisted diagnostic codes may leave private logs."""
+
+
+def error_code(error: BaseException) -> str:
+    if (isinstance(error, OperatorError) and error.args and isinstance(error.args[0], str)
+            and error.args[0] in SAFE_ERROR_CODES):
+        return error.args[0]
+    if isinstance(error, InterruptedError):
+        return "allocation_interrupted"
+    return "unexpected_error"
+
+
 def require(condition: bool, code: str) -> None:
     if not condition:
-        raise ValueError(code)
+        raise OperatorError(code)
 
 
 def atomic_status(path: Path, state: dict) -> None:
@@ -73,10 +100,12 @@ def safe_extract(archive: Path, target: Path, *, runtime: bool = False) -> int:
     with tarfile.open(archive) as bundle:
         members = bundle.getmembers()
         if runtime:
-            members = [m for m in members if m.name.startswith("lib/python3.10/site-packages/")]
-        require(bool(members), "empty_archive")
+            members = [m for m in members if PurePosixPath(m.name).as_posix().startswith(
+                "lib/python3.10/site-packages/")]
+        require(bool(members), "runtime_site_packages_absent" if runtime else "empty_archive")
         names = set()
         for member in members:
+            require(".." not in PurePosixPath(member.name).parts, "archive_traversal")
             path = (target / member.name).resolve()
             require(path.is_relative_to(target.resolve()), "archive_traversal")
             require(member.isfile() or member.isdir(), "archive_link_or_special")
@@ -121,15 +150,20 @@ def run_phases(state: dict, status_path: Path, infer, score, validate) -> None:
     for phase in PHASES:
         row = state["phases"][phase]
         row["status"] = "inference_started"
+        state["stage"] = phase + "_inference"
         atomic_status(status_path, state)
         infer(phase)
         row["status"] = "scoring_started"
+        state["stage"] = phase + "_scoring"
         atomic_status(status_path, state)
         score(phase)
+        state["stage"] = phase + "_verify"
+        atomic_status(status_path, state)
         validate(phase)
         row["status"] = "complete"
         atomic_status(status_path, state)
     state["status"] = "complete"
+    state["stage"] = "complete"
     atomic_status(status_path, state)
 
 
@@ -191,7 +225,7 @@ def main() -> int:
     result.mkdir(mode=0o700)
     os.umask(0o077)
     status_path = result / "operator-status.json"
-    state = {"status": "preparing", "job_id": os.environ["SLURM_JOB_ID"], "release_id": release,
+    state = {"status": "preparing", "stage": "reserve_result", "job_id": os.environ["SLURM_JOB_ID"], "release_id": release,
              "inference_git_sha": INFERENCE, "scorer_git_sha": SCORER,
              "operator_git_sha": os.environ["CLIMATE_OPERATOR_GIT"],
              "operator_archive_sha256": os.environ["CLIMATE_OPERATOR_SHA256"],
@@ -209,21 +243,30 @@ def main() -> int:
 
     for number in (signal.SIGUSR1, signal.SIGTERM, signal.SIGINT):
         signal.signal(number, interrupted)
+
+    def stage(name):
+        state["stage"] = name
+        atomic_status(status_path, state)
+
     try:
+        stage("verify_gold")
         gold = ROOT / "envs" / f"budget-agent-validation-gold-{GOLD_SHA}.json"
         require(gold.is_file() and digest(gold) == GOLD_SHA, "frozen_gold_missing_or_mismatch")
         state["gold_sha256"] = GOLD_SHA
         state["archives"] = {}
         state["extracted_bytes"] = {}
         for name, (filename, expected) in ARCHIVES.items():
+            stage("hash_" + name)
             archive = ROOT / "envs" / filename
             require(archive.resolve().is_relative_to(ROOT / "envs"), "archive_scope")
             require(digest(archive) == expected, "archive_sha_mismatch")
             state["archives"][name] = {"sha256": expected, "bytes": archive.stat().st_size}
+            stage("extract_" + name)
             state["extracted_bytes"][name] = safe_extract(archive, work / name, runtime=name == "runtime")
             if name == "input":
                 state["input_extractions"] += 1
             atomic_status(status_path, state)
+        stage("verify_sources_and_inputs")
         for name, revision in (("inference", INFERENCE), ("scorer", SCORER)):
             require((work / name / "SOURCE_REVISION").read_text().strip() == revision, "exported_git_mismatch")
         selection = work / "scorer/docs/verified-runs/budget-agent-validation-selection-20260929.json"
@@ -239,6 +282,7 @@ def main() -> int:
         read_only_tree(work / "input")
         for name in ("inference", "scorer"):
             read_only_tree(work / name)
+        stage("install_overlay")
         execute([sys.executable, "-m", "pip", "install", "--no-index", "--no-deps", "--require-hashes",
                  "--no-compile", "--no-cache-dir", "--disable-pip-version-check", "--target", str(work / "overlay-site"),
                  "--find-links", str(work / "overlay/wheels"), "-r", str(work / "overlay/requirements.lock")],
@@ -256,8 +300,10 @@ def main() -> int:
             return {**env, "PYTHONPATH": os.pathsep.join((str(work / "overlay-site"),
                     str(work / "runtime/lib/python3.10/site-packages"), str(work / source / "src"), module_path))}
 
+        stage("verify_dependencies")
         execute([sys.executable, "-c", "import importlib.metadata; assert importlib.metadata.version('langchain-core') == '1.6.5'"],
                 cwd=work, env=environment("inference"), log=result / "dependency-check.log")
+        stage("resolve_frozen_arguments")
         spec = importlib.util.spec_from_file_location("frozen_bundle", work / "inference/src/climate_rag/runtime_bundle.py")
         require(spec is not None and spec.loader is not None, "bundle_loader_missing")
         bundle_module = importlib.util.module_from_spec(spec)
@@ -291,6 +337,7 @@ def main() -> int:
     except BaseException as error:
         state["status"] = "interrupted" if isinstance(error, InterruptedError) else "failed"
         state["error_type"] = type(error).__name__  # never raw model text / exception input
+        state["error_code"] = error_code(error)
         for row in state["phases"].values():
             if row["status"] in {"inference_started", "scoring_started"}:
                 row["status"] = "incomplete"
@@ -310,5 +357,5 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except Exception as error:
-        print("Full operator failed: " + type(error).__name__, file=sys.stderr)
+        print("Full operator failed: " + type(error).__name__ + " [" + error_code(error) + "]", file=sys.stderr)
         raise SystemExit(1) from None

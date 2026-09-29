@@ -66,6 +66,26 @@
       "coordinator_reported_fairshare_tradeoff": "short-partition GPU billing weight200 versus long100; no spending or outcome claim inferred"
     }
   ],
+  "terminal_observation": {
+    "state": "FAILED",
+    "exit_code": "1:0",
+    "partition": "gpu-a100-short",
+    "start_cluster_local": "2026-09-30T02:02:42+10:00",
+    "end_cluster_local": "2026-09-30T02:03:21+10:00",
+    "elapsed_seconds": 39,
+    "total_cpu_seconds": 34.931,
+    "batch_max_rss_kib": 15854940,
+    "operator_elapsed_seconds": 34.43178033828735,
+    "validation_status": "not_started",
+    "vnext_status": "not_started",
+    "input_extractions": 1,
+    "error_type_observed": "ValueError",
+    "diagnosed_stage": "extract_runtime",
+    "original_status_did_not_record_error_code": true,
+    "diagnosis": "runtime tar members use ./lib prefix; original literal lib prefix selected zero members",
+    "model_quality_result": null,
+    "details": "budget-agent-full-failure-31542525.json"
+  },
   "spartan_relative_paths": {
     "operator_archive": "envs/budget-agent-full-operator-0fa11b5.tar",
     "wrapper": "envs/budget-agent-full-0fa11b5.sbatch",

@@ -115,6 +115,76 @@ def test_existing_output_and_low_scratch_refused(tmp_path, monkeypatch):
     assert not (tmp_path / "other").exists()
 
 
+@pytest.mark.parametrize("prefix", ["", "./"])
+def test_runtime_selects_normalized_site_packages_only(tmp_path, prefix):
+    source = tmp_path / "runtime.tar"
+    archive(source, [prefix + "lib/python3.10/site-packages/package.py", prefix + "bin/python"])
+    target = tmp_path / "runtime"
+    assert operator.safe_extract(source, target, runtime=True) == 4
+    assert (target / "lib/python3.10/site-packages/package.py").read_bytes() == b"test"
+    assert not (target / "bin").exists()
+
+
+@pytest.mark.parametrize("names,link,code", [
+    (["./lib/python3.10/site-packages/../../outside"], False, "archive_traversal"),
+    (["./lib/python3.10/site-packages/link"], True, "archive_link_or_special"),
+    (["./lib/python3.10/site-packages/same", "lib/python3.10/site-packages/same"], False, "archive_duplicate"),
+    (["./bin/python"], False, "runtime_site_packages_absent"),
+])
+def test_runtime_normalization_preserves_safety_checks(tmp_path, names, link, code):
+    source = tmp_path / "runtime.tar"
+    archive(source, names, link)
+    with pytest.raises(operator.OperatorError, match=code):
+        operator.safe_extract(source, tmp_path / "runtime", runtime=True)
+    assert not (tmp_path / "runtime").exists()
+
+
+@pytest.mark.parametrize("error,expected", [
+    (operator.OperatorError("archive_traversal"), "archive_traversal"),
+    (operator.OperatorError("PRIVATE response or credential"), "unexpected_error"),
+    (ValueError("PRIVATE response or credential"), "unexpected_error"),
+    (operator.OperatorError({"PRIVATE": "value"}), "unexpected_error"),
+    (InterruptedError("PRIVATE response or credential"), "allocation_interrupted"),
+])
+def test_error_code_never_exports_unapproved_exception_payload(error, expected):
+    assert operator.error_code(error) == expected
+
+
+def test_main_persists_runtime_failure_stage_and_safe_code(tmp_path, monkeypatch):
+    root, work = tmp_path / "project", tmp_path / "climate-agent-full-synthetic"
+    (root / "runs").mkdir(parents=True)
+    (root / "envs").mkdir()
+    work.mkdir()
+    gold = root / "envs" / f"budget-agent-validation-gold-{operator.GOLD_SHA}.json"
+    gold.write_text("synthetic")
+    runtime = root / "envs/runtime.tar"
+    archive(runtime, ["./bin/python"])
+    original_digest = operator.digest
+    monkeypatch.setattr(operator, "digest", lambda p: operator.GOLD_SHA if p == gold else original_digest(p))
+    monkeypatch.setattr(operator, "ROOT", root)
+    monkeypatch.setattr(operator, "ARCHIVES", {"runtime": ("runtime.tar", original_digest(runtime))})
+    monkeypatch.setattr(operator.os, "umask", lambda mask: None)
+    monkeypatch.setattr(operator.signal, "SIGUSR1", 10, raising=False)
+    monkeypatch.setattr(operator.signal, "signal", lambda *args: None)
+    for key, value in {
+        "SLURM_JOB_ID": "synthetic", "CUDA_VISIBLE_DEVICES": "synthetic",
+        "CLIMATE_FULL_RELEASE_ID": "climate-full-72eaa90-synthetic-test",
+        "CLIMATE_FULL_TASK_ROOT": str(work), "CLIMATE_FULL_SCRATCH_PARENT": str(tmp_path),
+        "CLIMATE_OPERATOR_GIT": "synthetic", "CLIMATE_OPERATOR_SHA256": "synthetic",
+        "CLIMATE_FULL_WRAPPER_SHA256": "synthetic",
+    }.items():
+        monkeypatch.setenv(key, value)
+    with pytest.raises(operator.OperatorError, match="runtime_site_packages_absent"):
+        operator.main()
+    saved = json.loads((root / "runs/climate-full-72eaa90-synthetic-test/operator-status.json").read_text())
+    assert saved["status"] == "failed"
+    assert saved["stage"] == "extract_runtime"
+    assert saved["error_code"] == "runtime_site_packages_absent"
+    assert saved["file_receipts"] == {}
+    assert saved["input_extractions"] == 0
+    assert all(row["status"] == "not_started" for row in saved["phases"].values())
+
+
 def phase_fixture(directory, phase):
     directory.mkdir()
     protocol = operator.PROTOCOLS[phase][1]

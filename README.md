@@ -28,7 +28,11 @@ is published. Official pilot retrieval/verdict quality is null, not zero.
 The [serial full operator](docs/BUDGET_AGENT_FULL_OPERATOR_20260929.md) was separately
 released on2026-09-30 and submitted once as **31542525 (initially PENDING/Priority)**;
 see the [submission receipt](docs/verified-runs/budget-agent-full-submission-20260930.json).
-There are no full-comparison results yet. It shares one read-only
+It failed during runtime preparation after39s; both inference phases remained
+not started. The [CPU diagnosis and minimal repair](docs/BUDGET_AGENT_FULL_FAILURE_20260930.md)
+identify a `./lib/...` tar-prefix mismatch, not a model/scoring failure.
+No r2 or other new compute job is authorized by that repair.
+There are no full-comparison results yet. The operator shares one read-only
 input/model extraction across separate frozen validation and authored-vNext
 processes, with phase-specific receipts and fail-closed scoring.
 
