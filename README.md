@@ -25,8 +25,10 @@ remains72eaa90. Original decoded responses stay on Spartan; only the reviewed
 [compact receipt](docs/verified-runs/budget-agent-protocol-confirm-31520350.json)
 is published. Official pilot retrieval/verdict quality is null, not zero.
 
-The [serial full operator](docs/BUDGET_AGENT_FULL_OPERATOR_20260929.md) is prepared
-and test-only checked, **not released or submitted**. It shares one read-only
+The [serial full operator](docs/BUDGET_AGENT_FULL_OPERATOR_20260929.md) was separately
+released on2026-09-30 and submitted once as **31542525 (initially PENDING/Priority)**;
+see the [submission receipt](docs/verified-runs/budget-agent-full-submission-20260930.json).
+There are no full-comparison results yet. It shares one read-only
 input/model extraction across separate frozen validation and authored-vNext
 processes, with phase-specific receipts and fail-closed scoring.
 

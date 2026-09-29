@@ -1,5 +1,14 @@
 # Serial full operator preparation — NOT a GPU release
 
+**Subsequent explicit release,2026-09-30:** coordinator authorized
+`climate-full-72eaa90-20260930-r1` and clarified that unrelated shared-account
+GPU jobs do not consume this career work package's single-job slot. After
+repeat guards and test-only, the original owner submitted exactly one job:
+**31542525**, initially PENDING/Priority. The
+[immutable submission receipt](verified-runs/budget-agent-full-submission-20260930.json)
+supersedes the preparation-only status below, not the frozen operator or inputs.
+No full results yet; do not resubmit this consumed release or alter other jobs.
+
 Status: operator prepared,18 targeted synthetic tests passed locally and from a
 clean Git archive; Ruff, secret/PII and diff checks passed. Remote bash syntax
 and `sbatch --test-only` passed. **No GPU or CPU job was submitted in this package.**
