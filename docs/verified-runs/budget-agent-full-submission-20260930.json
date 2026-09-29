@@ -40,6 +40,32 @@
     "time_limit_seconds": 7200,
     "actual_gpu_or_quality_results": null
   },
+  "partition_revisions": [
+    {
+      "performed_by": "career coordinator; project owner observed read-only",
+      "observation_time_cluster_local": "2026-09-30T01:41:14+10:00",
+      "job_id_unchanged": "31542525",
+      "partition_candidates": ["gpu-a100", "gpu-a100-short"],
+      "submit_time_cluster_local": "2026-09-30T01:31:13",
+      "eligible_time_cluster_local": "2026-09-30T01:31:13",
+      "accrue_time_cluster_local": "2026-09-30T01:40:43",
+      "state": "PENDING",
+      "reason": "Priority",
+      "estimated_start_cluster_local": "2026-09-30T04:10:00",
+      "estimate_is_not_guaranteed": true,
+      "priority_observed": 13252,
+      "age_factor_observed": 0,
+      "fairshare_factor_observed": 13251,
+      "jobsize_factor_observed": 1,
+      "nice": 0,
+      "requested_resources_unchanged": true,
+      "requeue": 0,
+      "restarts": 0,
+      "operator_runtime_scorer_inputs_unchanged": true,
+      "boundary": "in-place candidate-partition extension, not resubmission; no claim of preserved age score, causal priority increase or guaranteed earlier start",
+      "coordinator_reported_fairshare_tradeoff": "short-partition GPU billing weight200 versus long100; no spending or outcome claim inferred"
+    }
+  ],
   "spartan_relative_paths": {
     "operator_archive": "envs/budget-agent-full-operator-0fa11b5.tar",
     "wrapper": "envs/budget-agent-full-0fa11b5.sbatch",

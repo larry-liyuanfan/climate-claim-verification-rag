@@ -9,6 +9,14 @@ repeat guards and test-only, the original owner submitted exactly one job:
 supersedes the preparation-only status below, not the frozen operator or inputs.
 No full results yet; do not resubmit this consumed release or alter other jobs.
 
+The coordinator subsequently extended the same job's partition candidates to
+`gpu-a100,gpu-a100-short` in place. A read-only snapshot at01:41:14+10:00
+recorded PENDING/Priority and a nonbinding04:10 start estimate on2026-09-30.
+Submit/eligible time remains01:31:13, resources and requeue/restart0 are unchanged;
+observed AccrueTime01:40:43 and AGE factor0 do not establish preservation of all
+age credit. The submission receipt appends this revision without overwriting
+the original allocation request. No project-owner scheduling action or retry.
+
 Status: operator prepared,18 targeted synthetic tests passed locally and from a
 clean Git archive; Ruff, secret/PII and diff checks passed. Remote bash syntax
 and `sbatch --test-only` passed. **No GPU or CPU job was submitted in this package.**
