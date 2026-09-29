@@ -195,3 +195,13 @@ These synthetic diagnostics do **not** diagnose the lost outputs or establish
 that the real-model root cause has been fixed. Prompt/generate arguments and
 strict schema remain unchanged. No pilot/canary/full rerun, deployment, shared
 career update or resume claim is authorized by this diagnostic commit.
+
+Frozen diagnostic source: `6a764a1b4f9137cf8e8c29abfbc14572c3a1039d`;
+1,310,720-byte source archive SHA
+`ecdfc7c05334af64d11adb0f03ead5042f9168e9c182968a51936ee33413ba34`.
+The [readiness receipt](verified-runs/budget-agent-diagnostic-readiness-20260929.json)
+separates this new CPU-tested identity from the old actual pilot runtime/operator.
+Thirteen new diagnostics cases also passed from the clean Git archive with imports
+verified against its source; its audit script reproduced identical structured
+pilot evidence. No new source archive has been uploaded to Spartan and no new
+Slurm job has been submitted. Await an explicit diagnostic-canary release.
