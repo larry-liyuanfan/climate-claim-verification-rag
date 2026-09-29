@@ -289,6 +289,11 @@ has not been uploaded to Spartan. Waiting for a separate confirmation release.
 
 ## Subsequent single confirmation release:31520350
 
+**Terminal update:** this historical submission record is superseded by the
+[confirmation closeout](BUDGET_AGENT_CONFIRMATION_20260929.md). Job31520350
+completed in137seconds; frozen CPU scoring confirmed2 mechanically checked
+answers and7 action/query-contract failures. No full comparison is released.
+
 Release `climate-protocol-confirm-72eaa90-20260929` explicitly authorizes only
 the same3 authored questions ×3 routes, with frozen72eaa90 source/system-prompt
 identities, unchanged models/inputs/budgets/operator and fresh output paths.
@@ -308,11 +313,11 @@ executed actions, validated final answers, model abstention and controller
 rejections. Protocol compliance alone cannot demonstrate semantic or retrieval
 quality. No new recurring monitor or shared career/resume edit was created.
 
-A later queue snapshot still showed PENDING/Priority, now with scheduler estimate
+A pre-completion queue snapshot showed PENDING/Priority, then with scheduler estimate
 2026-09-29T22:50:00+10:00 (not guaranteed). Priority13171 decomposed as age14,
 fairshare13146 and jobsize11, QoS publicgpu. There is no actual generation,
-answer or resource result for31520350 yet. Do not cancel/requeue or submit a
-competing job; continue from this job ID when terminal evidence is available.
+answer or resource result at that snapshot. The linked terminal closeout now
+records the result; preserve this queue history rather than treating it as current.
 
 For eventual closeout, the existing32-validation +8-vNext workload has120
 routes and controller ceilings of200 generation attempts /102,400 new tokens,

@@ -8,16 +8,22 @@ validation** before any accepted action. It is a negative integration result, no
 a RAG quality gain. A separately released diagnostic canary also rejected9/9;
 in-place replay of the original strings through the frozen validator confirmed
 non-rewrite actions illegally carrying `query`. The minimal model-visible
-cross-field contract repair is CPU-tested, **not yet confirmed by a new model
-run**; strict validators and generation settings remain unchanged. One same-task
-confirmation pilot31520350 is now separately released/submitted; its initial
-state is PENDING/Priority, with no result yet. Full evaluation is not released.
-The CPU heuristic control remains negative.
+cross-field contract repair has now been checked in
+[confirmation31520350](docs/BUDGET_AGENT_CONFIRMATION_20260929.md): **2/9 responses
+passed mechanical answer checks, while7/9 still violated the action/query
+contract**. None was a valid model-requested abstention; no adaptive rewrite or
+rerank executed. This is a negative protocol-compliance result, not semantic
+accuracy or Agent-quality improvement. A frozen-protocol offline comparison is
+technically interpretable with failures retained, but remains separately gated
+on coordinator release and a free GPU slot. The CPU heuristic control remains negative.
 
 The [offline scoring audit](docs/BUDGET_AGENT_SCORING_AUDIT_20260929.md) now requires
 complete frozen task/route matrices and gold identities, preserves partial token
 accounting, and separates model abstention from controller rejection/failure.
-This is scorer-only correctness work, not a new inference or quality result.
+The confirmation was scored separately on CPU using frozen208ff93; inference
+remains72eaa90. Original decoded responses stay on Spartan; only the reviewed
+[compact receipt](docs/verified-runs/budget-agent-protocol-confirm-31520350.json)
+is published. Official pilot retrieval/verdict quality is null, not zero.
 
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter

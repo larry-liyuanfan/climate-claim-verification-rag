@@ -1,5 +1,6 @@
 """Synthetic redaction checks only; no real result/raw response is opened."""
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 
@@ -10,6 +11,28 @@ def test_cpu_wrapper_preserves_module_dependency_path():
     assert 'src${PYTHONPATH:+:${PYTHONPATH}}' in wrapper
     assert '#SBATCH --cpus-per-task=1' in wrapper
     assert '#SBATCH --gres' not in wrapper
+
+
+def test_frozen_compact_receipt_keeps_failures_and_null_quality():
+    receipt = (Path(__file__).resolve().parents[1]
+               / "docs/verified-runs/budget-agent-protocol-confirm-31520350.json").read_bytes()
+    assert hashlib.sha256(receipt).hexdigest() == (
+        "0d9ca572d1976e842fb317761bf6fcad3d52448bfb93ebcd05262a0666da0973")
+    result = json.loads(receipt)
+    rows = result["rows"]
+    assert len({(r["task_id"], r["strategy"]) for r in rows}) == len(rows) == 9
+    assert result["private_original_validation"] == {
+        "schema_validation_failure": 7, "schema_valid_answer": 2}
+    assert all(not r["successful_model_tool_events"] for r in rows)
+    assert sum(r["usage"]["input_tokens"] for r in rows) == 11619
+    assert sum(r["usage"]["output_tokens"] for r in rows) == 2337
+    assert all(r["usage_known"] for r in rows)
+    assert result["compact_score"]["paired_bootstrap"] is None
+    assert all(a["evidence_metrics"] is None for a in result["compact_score"]["aggregates"].values())
+    assert not result["private_originals_exported"]
+    for diagnostic in result["private_original_safe_diagnostics"]:
+        if diagnostic["category"] == "schema_validation":
+            assert diagnostic["cross_field_codes"] == ["query_only_allowed_for_rewrite"]
 
 
 def test_compact_row_excludes_prose_and_source_text():

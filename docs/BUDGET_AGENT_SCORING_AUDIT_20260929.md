@@ -1,5 +1,10 @@
 # Offline scoring contract closeout
 
+Subsequent execution: frozen208ff93 was used in CPU audit31537871 to score
+confirmation31520350; see the [terminal report](BUDGET_AGENT_CONFIRMATION_20260929.md).
+The development/clean-archive verification statements below describe the earlier
+scorer-only package, not a claim that the completed audit remains unexecuted.
+
 This package changes only the post-hoc scorer, its synthetic tests and handoff.
 Confirmation job31520350 still executes frozen source72eaa90567e3603a3b940edffbb21b684bf1d1ba.
 Its prompt, input bundle, models, budgets and Slurm request are unchanged. No
