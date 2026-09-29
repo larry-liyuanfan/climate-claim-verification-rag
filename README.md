@@ -25,6 +25,11 @@ remains72eaa90. Original decoded responses stay on Spartan; only the reviewed
 [compact receipt](docs/verified-runs/budget-agent-protocol-confirm-31520350.json)
 is published. Official pilot retrieval/verdict quality is null, not zero.
 
+The [serial full operator](docs/BUDGET_AGENT_FULL_OPERATOR_20260929.md) is prepared
+and test-only checked, **not released or submitted**. It shares one read-only
+input/model extraction across separate frozen validation and authored-vNext
+processes, with phase-specific receipts and fail-closed scoring.
+
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter
 > loader is repaired and real checkpoint/output-effect checks passed on Spartan.
