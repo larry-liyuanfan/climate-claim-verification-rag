@@ -21,7 +21,7 @@ from climate_rag.dense import DenseRetriever
 from climate_rag.io import iter_evidence, write_json
 from climate_rag.langchain_evidence import ClimateEvidenceRetriever, create_evidence_tool
 from climate_rag.local_agent_model import (
-    LocalQwenDecisionProvider, preflight_local_dependencies, verify_model_files,
+    LocalQwenDecisionProvider, agent_prompt_identity, preflight_local_dependencies, verify_model_files,
 )
 from climate_rag.pipeline import HybridRetriever
 from climate_rag.rerank import DeterministicFeatureReranker, Qwen3CausalLMReranker, Reranker
@@ -177,6 +177,7 @@ def main() -> int:
         "dense_enabled": dense is not None, "budget": budget.model_dump(),
         "dense_file_hashes": dense_hashes,
         "execution_manifest": execution,
+        "prompt_identity": agent_prompt_identity() if args.provider == "local-qwen" else None,
         "neural_work_accounting": {
             "dense_query_attempts": sum(row["retrieval_calls"] for row in runs) if dense else 0,
             "reranker_pair_attempts": sum(row["rerank_candidate_pairs"] for row in runs)

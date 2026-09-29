@@ -24,6 +24,7 @@ class FakeTokenizer:
         self.text = text
 
     def apply_chat_template(self, messages, **kwargs):
+        self.messages = messages
         return "fixed CPU fixture prompt"
 
     def __call__(self, prompt, **kwargs):

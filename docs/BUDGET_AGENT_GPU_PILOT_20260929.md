@@ -1,8 +1,10 @@
 # Single authored GPU pilot — operator record
 
-**Terminal update:**31510619 completed0:0, but all9 generated responses failed
-structured parsing/validation. The full evaluation is blocked, not released.
-The earlier pending record below is historical; see terminal acceptance below.
+**Latest update:**31510619 and diagnostic31519179 both completed0:0, but each
+rejected all9 responses. Only31519179 retained private originals: exact frozen
+Pydantic replay confirms illegal non-rewrite `query` in9/9. The model-visible
+contract repair is CPU-tested, not model-confirmed; no subsequent GPU run/full
+evaluation is released. Earlier submission/readiness sections are historical.
 
 Release: `climate-authored-pilot-ca9fa53-20260929-user-resume`. The coordinator
 relayed the user's explicit bounded exception at18% remaining allowance after
@@ -157,7 +159,7 @@ not a placeholder dataset. The audit validates identities, row completeness,
 candidate IDs and token totals and retains the original three case trajectories.
 No raw individual predictions are copied to the career workspace.
 
-## Authorized CPU-only diagnostic repair; canary not released
+## Historical CPU-only diagnostic repair (before canary release)
 
 The coordinator subsequently authorized a minimal diagnosis patch, not a model,
 prompt, label, budget, schema or tolerant-parser change. It distinguishes
@@ -205,3 +207,69 @@ Thirteen new diagnostics cases also passed from the clean Git archive with impor
 verified against its source; its audit script reproduced identical structured
 pilot evidence. No new source archive has been uploaded to Spartan and no new
 Slurm job has been submitted. Await an explicit diagnostic-canary release.
+
+## Diagnostic canary31519179: confirmed protocol failure
+
+A later explicit release, `climate-response-diagnostic-6a764a1-20260929`, allowed
+one diagnostics-only repeat of the original3 authored tasks ×3 routes.
+The [submission receipt](verified-runs/budget-agent-diagnostic-submission-20260929.json)
+preserves its initial state and is superseded by this
+[terminal audit](verified-runs/budget-agent-diagnostic-canary-31519179.json).
+The source was6a764a1, with unchanged models, input bundle, budget and prompt.
+No validation/frozen-test run, dense retrieval, training or deployment occurred.
+
+- COMPLETED0:0;142s Slurm elapsed,125.008 CPU-seconds;
+  batch MaxRSS18,102,124KiB (17.264GiB);8CPU/32GiB/one full A100.
+-9 generation attempts;10,531 input /2,165 output tokens. All usage is known.
+-9/9 schema-validation failures, not JSON-decode failures; all9 observed EOS,
+  zero observed token-cap hits. No accepted action, decision or published answer.
+-9 retrieval calls;3 fixed-rerank calls, including one empty no-op and two
+  nonempty20-pair stages. GPU peak memory was **not measured**.
+
+Private originals were inspected only inside the existing Spartan Climate run.
+The complete unmodified strings parsed as JSON. Frozen6a764a1 class AST and
+Pydantic2.13.5 then validated those original objects without deleting or repairing
+fields. The [content-free exact-validation receipt](verified-runs/budget-agent-canary-31519179-frozen-validation.json)
+confirms all9 raised only the existing `query is only allowed for rewrite`
+cross-field rule. Six raw objects proposed `answer` and three proposed `abstain`;
+all carried a non-null, nonempty `query`. These **rejected candidates are not
+accepted decisions**, and their factual/citation correctness was not assessed.
+Only four query fields exactly echoed the input claim; no blanket echo claim
+is made. Private directories inherit GPFS setgid (mode2700, access0700), files
+are0600. No raw text was exported to this repository or career materials.
+
+The original31510619 strings were not retained: this diagnosis must not be
+retroactively attributed to that batch. Different outputs/tokens across these
+two executions are not a quality comparison; observations include a dynamic
+remaining-seconds field even with identical frozen code and input bundles.
+
+Reproduce the compact audit without reading private originals:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/audit_budget_canary_31519179.py --artifacts artifacts/canary-31519179 --inspection docs/verified-runs/budget-agent-canary-31519179-private-inspection.json --frozen-validation docs/verified-runs/budget-agent-canary-31519179-frozen-validation.json --output artifacts/canary-31519179/reproduced-audit.json
+```
+
+## Minimal model-visible contract repair (CPU-only)
+
+The subsequent repair exposes existing conditional rules in the actual system
+message: only rewrite accepts a nonblank query; other actions require null or
+omission; only answer can carry a label/statements; answer requires sufficient
+assessment, SUPPORTS/REFUTES and1–3 cited statements. There are no task-specific
+answers or examples. `AgentDecision`, statement/budget schemas, action meaning,
+whole-string JSON parsing, strict validation, decoding/generation parameters and
+downstream citation checks are unchanged. No field deletion, Markdown stripping,
+tolerant parsing or acceptance-set relaxation is used.
+
+The runner records static system-message/schema SHA-256 and Pydantic version.
+This identity explicitly excludes dynamic observations and the tokenizer chat
+template; the model manifest continues to cover tokenizer/template assets.
+The31 added CPU contract cases and35 prior affected regressions passed
+(66 total); Ruff passed, mypy checked37 source files, and independent read-only
+review found no blocking issue. These are fixtures, **not real-model success**.
+The first diagnostic batch remains negative and its originals stay private.
+
+A new source/prompt freeze is required before a separately authorized small
+confirmation pilot. No new job has been submitted, no full evaluation is
+released, and no career/resume files were changed. A passing protocol pilot
+would still not establish semantic entailment, citation completeness, independent
+benchmark improvement or an online SLA.
