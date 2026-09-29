@@ -5,7 +5,7 @@ umask 077
 root=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2
 release=climate-full-72eaa90-20260930-r1
 test ! -e "${root}/runs/${release}"
-existing=$(squeue -u yzhang3504 -h -o '%i|%Z' | awk -F'|' 'index($2,"climate") {print $1}')
+existing=$(squeue -u "$(id -un)" -h -o '%i|%Z' | awk -F'|' 'index($2,"climate") {print $1}')
 test -z "${existing}"
 test "$(sha256sum "${root}/envs/budget-agent-full-operator-0fa11b5.tar" | cut -d' ' -f1)" = 0965c471b2f13197ae0eaffa30ada17745734fc5cf77e4ff06f853830da73cef
 test "$(sha256sum "${root}/envs/budget-agent-full-0fa11b5.sbatch" | cut -d' ' -f1)" = c266835b8dc614f221a66269e6f89224f7d7630bc550bbaa3c6f3d774bb56bf9
