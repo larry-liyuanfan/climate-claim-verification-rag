@@ -1,9 +1,19 @@
 # Full r1 preparation failure: CPU diagnosis and minimal repair
 
-Status: **repair only; no replacement allocation authorized or submitted**.
+Original repair-package status: **repair only; no replacement allocation authorized or submitted**.
 The original release `climate-full-72eaa90-20260930-r1` is consumed and must not
 be reused. Its logs, status, submission guard and original immutable archives
 remain unchanged. [Compact diagnosis](verified-runs/budget-agent-full-failure-31542525.json).
+
+**Subsequent separate release:** after acceptance, the coordinator authorized
+`climate-full-72eaa90-20260930-r2`. The sole submitter used the resource-pinned
+[one-shot helper](../hpc/submit_climate_full_20260930_r2.sh), cleared inherited
+`SBATCH_*` overrides only in that helper, supplied an explicit project chdir,
+passed test-only and submitted exactly one job31543304. See the
+[actual submission receipt](verified-runs/budget-agent-full-r2-submission-20260930.json).
+Initial state at02:22:46+10:00 was PENDING/Resources with StartTimeUnknown.
+The preparation-only commands below are historical handoff, **not permission to
+execute again**: the r2 submission lock is now consumed. No results yet.
 
 ## Observed failure and cause
 
