@@ -114,3 +114,14 @@ Local verification:42 synthetic scorer tests passed; Ruff and explicit strict
 mypy of `scripts/score_budget_agent.py` passed. No changed inference files and
 no actual-result rescoring. The corrected scorer does not relabel earlier
 negative pilot batches or silently overwrite their existing score artifacts.
+
+Frozen scorer source: `208ff931badff270cbbc9593c8ab54f5c79aec9e`.
+Clean source archive:1,402,880 bytes, SHA-256
+`7498d367565eeb59bb7cf724c33f835608a0c9f01da3768d7308700a380c00a1`.
+Archive scorer-script SHA-256:
+`758bb04e9d99cdfb298c936de550dc66055a706fbe82bd19e1f5db200ccf3b86`.
+The42 tests also passed from this clean archive; import origin, source revision
+and pinned selection manifest were independently checked. Read-only review
+found no remaining material blocker. No scorer archive was uploaded to Spartan
+and no real outcome was rescored. This scorer identity is **not** the inference
+identity of confirmation31520350, which remains72eaa90.
