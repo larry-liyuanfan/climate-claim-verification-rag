@@ -1,5 +1,9 @@
 # Agent Linux/runtime preparation — 2026-09-29
 
+Historical CPU-readiness handoff. The subsequently released GPU pilot and its
+negative integration result are recorded in [the pilot closeout](BUDGET_AGENT_GPU_PILOT_20260929.md).
+Authorization/status statements below describe the earlier preparation package.
+
 This follows the [CPU control handoff](BUDGET_AGENT_CPU_HANDOFF_20260929.md).
 No GPU job, paid API, production deployment, test-set reuse or new model matrix
 is authorized by this preparation. Model execution still awaits the coordinator's

@@ -264,6 +264,8 @@ class BudgetedEvidenceAgent:
                 events.append({"stage": "decision", "decision": decision.model_dump(),
                                "elapsed_ms": (self.clock() - begin) * 1000,
                                "ledger": ledger})
+                if self.provider.kind == "local_model" and raw.get("diagnostics"):
+                    events[-1]["generation_diagnostics"] = raw["diagnostics"]
                 if time_left() <= 0:
                     raise TimeoutError("deadline")
                 if decision.action not in allowed:
@@ -339,7 +341,10 @@ class BudgetedEvidenceAgent:
                         usage[key] += int(failed_usage[key])
             # No provider response/paths/credentials in public failure details.
             reason = "deadline_exceeded" if isinstance(exc, TimeoutError) else "stage_failed"
-            events.append({"stage": "failure", "error_type": type(exc).__name__})
+            failure: dict[str, Any] = {"stage": "failure", "error_type": type(exc).__name__}
+            if type(exc).__name__ == "GeneratedResponseError" and getattr(exc, "diagnostics", None):
+                failure["generation_diagnostics"] = getattr(exc, "diagnostics")
+            events.append(failure)
         return {
             "schema_version": "1.0", "claim_text": claim, "strategy": strategy,
             "provider": self.provider.name, "provider_kind": self.provider.kind,

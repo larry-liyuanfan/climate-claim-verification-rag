@@ -5,16 +5,21 @@ from __future__ import annotations
 import hashlib
 import importlib.metadata
 import json
+import time
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+
 from .budget_agent import AgentBudget, AgentDecision
+from .model_diagnostics import response_diagnostics, schema_error_locations, validate_private_directory
 
 
 class GeneratedResponseError(ValueError):
-    def __init__(self, usage: dict[str, int]) -> None:
+    def __init__(self, usage: dict[str, int], diagnostics: dict[str, Any] | None = None) -> None:
         super().__init__("local model generated an invalid structured response")
         self.usage = usage
+        self.diagnostics = diagnostics or {}
 
 
 def verify_model_files(root: Path, manifest: dict[str, str]) -> str:
@@ -41,7 +46,10 @@ def verify_model_files(root: Path, manifest: dict[str, str]) -> str:
 class LocalQwenDecisionProvider:
     kind = "local_model"
 
-    def __init__(self, model_dir: Path, manifest: dict[str, str], *, device: str = "cuda"):
+    def __init__(self, model_dir: Path, manifest: dict[str, str], *, device: str = "cuda",
+                 private_response_dir: Path | None = None):
+        self.private_response_dir = (validate_private_directory(private_response_dir)
+                                     if private_response_dir is not None else None)
         self.model_sha256 = verify_model_files(model_dir, manifest)
         from .torch_compat import ensure_torch_pytree_compat
 
@@ -80,6 +88,7 @@ class LocalQwenDecisionProvider:
         length = int(inputs.input_ids.shape[1])
         if length > budget.max_input_tokens_per_call:
             raise ValueError("input token budget exceeded; no silent evidence truncation")
+        generation_started = time.perf_counter()
         with self._torch.inference_mode():
             output = self.model.generate(
                 **inputs, max_new_tokens=budget.max_output_tokens_per_call,
@@ -87,12 +96,35 @@ class LocalQwenDecisionProvider:
             )
         generated = output[0][length:]
         usage = {"input_tokens": length, "output_tokens": len(generated)}
+        generation_elapsed_ms = (time.perf_counter() - generation_started) * 1000
+        eos_ids = getattr(getattr(self.model, "generation_config", None), "eos_token_id", None)
+        eos_values = [eos_ids] if isinstance(eos_ids, int) else eos_ids
+        eos_observed = (bool(len(generated) and int(generated[-1]) in eos_values)
+                        if isinstance(eos_values, (list, tuple)) else None)
         try:
-            parsed = json.loads(self.tokenizer.decode(generated, skip_special_tokens=True).strip())
-            decision = AgentDecision.model_validate(parsed)
+            raw = self.tokenizer.decode(generated, skip_special_tokens=True)
         except (ValueError, TypeError) as exc:
-            raise GeneratedResponseError(usage) from exc
-        return {"decision": decision.model_dump(), "usage": usage}
+            raise GeneratedResponseError(usage, {"category": "decode_error"}) from exc
+        diagnostics = response_diagnostics(
+            raw, output_tokens=len(generated), max_new_tokens=budget.max_output_tokens_per_call,
+            eos_observed=eos_observed, generation_elapsed_ms=generation_elapsed_ms,
+            private_dir=self.private_response_dir,
+        )
+        try:
+            parsed = json.loads(raw.strip())
+        except json.JSONDecodeError as exc:
+            raise GeneratedResponseError(usage, {**diagnostics, "category": "json_decode",
+                                         "line": exc.lineno, "column": exc.colno}) from exc
+        try:
+            decision = AgentDecision.model_validate(parsed)
+        except ValidationError as exc:
+            raise GeneratedResponseError(usage, {
+                **diagnostics, "category": "schema_validation",
+                "errors": schema_error_locations(exc.errors(include_url=False, include_context=False,
+                                                               include_input=False)),
+            }) from exc
+        return {"decision": decision.model_dump(), "usage": usage,
+                "diagnostics": {**diagnostics, "category": "validated"}}
 
 
 def preflight_local_dependencies(model_dirs: list[Path]) -> dict[str, Any]:

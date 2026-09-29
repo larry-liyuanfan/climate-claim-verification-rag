@@ -2,8 +2,11 @@
 
 2026-09-29: [budgeted evidence-driven Agent CPU package](docs/BUDGET_AGENT_CPU_HANDOFF_20260929.md)
 adds a source/constraint ledger, bounded rewrite/rerank decisions, cited-answer
-validation and fixed-chain comparison runners. Real local-model execution remains
-pending resource release; the CPU heuristic pilot is **not** a new RAG quality result.
+validation and fixed-chain comparison runners. The [first real-model pilot](docs/BUDGET_AGENT_GPU_PILOT_20260929.md)
+loaded both4B models and generated9 responses, but **all9 failed structured-response
+validation** before any accepted action. It is a negative integration result, not
+a RAG quality gain. Minimal CPU-tested diagnostics are prepared; no canary or
+full evaluation is released. The CPU heuristic control also remains a negative result.
 
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter

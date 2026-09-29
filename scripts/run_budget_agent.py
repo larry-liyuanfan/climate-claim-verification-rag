@@ -122,7 +122,16 @@ def main() -> int:
         if not args.model_dir or not args.model_manifest:
             raise ValueError("local generation requires model and complete SHA manifest")
         manifest = json.loads(args.model_manifest.read_text())
-        provider = LocalQwenDecisionProvider(args.model_dir, manifest)
+        private_path = os.environ.get("CLIMATE_PRIVATE_RESPONSE_DIR")
+        if private_path:
+            private_dir = Path(private_path)
+            private_root = Path("/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/runs")
+            if not private_dir.is_absolute() or not private_dir.resolve().is_relative_to(private_root):
+                raise ValueError("private model responses must stay in Spartan Climate runs")
+        provider = LocalQwenDecisionProvider(
+            args.model_dir, manifest,
+            private_response_dir=Path(private_path) if private_path else None,
+        )
         model_hash = provider.model_sha256
     reranker: Reranker = DeterministicFeatureReranker()
     if args.reranker_dir:
