@@ -126,11 +126,17 @@ needed for CPU. Read only the known 5,240-document public `evidence.jsonl`, SHA
 ```powershell
 $protocolSha = (Get-FileHash configs/budget_agent_vnext_20260929.json -Algorithm SHA256).Hash.ToLower()
 .\.venv\Scripts\python.exe scripts/run_budget_agent.py --evidence E:/Project/climate-claim-verification-rag/data/climate-fever-20260825/evidence.jsonl --protocol configs/budget_agent_vnext_20260929.json --expected-protocol-sha256 $protocolSha --phase pilot --provider heuristic --output artifacts/budget-agent-pilot-20260929.json
-.\.venv\Scripts\python.exe scripts/score_budget_agent.py --run artifacts/budget-agent-pilot-20260929.json --output artifacts/budget-agent-pilot-score-20260929.json
+.\.venv\Scripts\python.exe scripts/score_budget_agent.py --run artifacts/budget-agent-pilot-20260929.json --protocol configs/budget_agent_vnext_20260929.json --expected-protocol-sha256 $protocolSha --phase pilot --output artifacts/budget-agent-pilot-score-20260929.json
 .\.venv\Scripts\python.exe -m pytest tests/test_budget_agent.py tests/test_budget_agent_scoring.py tests/test_langchain_evidence.py tests/test_agent_evidence_packet.py -q
 ```
 
 ## Resource request — NOT a submission
+
+The scorer was subsequently hardened without changing inference or rerunning
+real outcomes. See the [offline scoring contract](BUDGET_AGENT_SCORING_AUDIT_20260929.md)
+for complete phase matrices, frozen gold identities, partial-token accounting
+and separate model-abstention/controller-failure categories. Earlier measured
+scores above remain historical records, not recomputed results.
 
 Read-only SSH preflight on 2026-09-29 found project filesystem 467G total, 171G
 used, 297G available; **499,372 / 500,000 inodes used, only 628 free**. Scoped

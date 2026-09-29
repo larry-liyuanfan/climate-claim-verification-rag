@@ -14,6 +14,11 @@ confirmation pilot31520350 is now separately released/submitted; its initial
 state is PENDING/Priority, with no result yet. Full evaluation is not released.
 The CPU heuristic control remains negative.
 
+The [offline scoring audit](docs/BUDGET_AGENT_SCORING_AUDIT_20260929.md) now requires
+complete frozen task/route matrices and gold identities, preserves partial token
+accounting, and separates model abstention from controller rejection/failure.
+This is scorer-only correctness work, not a new inference or quality result.
+
 > 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
 > storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter
 > loader is repaired and real checkpoint/output-effect checks passed on Spartan.
