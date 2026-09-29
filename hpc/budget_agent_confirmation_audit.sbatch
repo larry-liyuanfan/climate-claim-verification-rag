@@ -46,6 +46,6 @@ with tarfile.open(overlay) as bundle:
 assert count == 5
 PY
 export CLIMATE_SCORE_TREE="${CLIMATE_AUDIT_TMP}/source"
-export PYTHONPATH="${CLIMATE_AUDIT_TMP}/site:${CLIMATE_SCORE_TREE}/src"
+export PYTHONPATH="${CLIMATE_AUDIT_TMP}/site:${CLIMATE_SCORE_TREE}/src${PYTHONPATH:+:${PYTHONPATH}}"
 umask 077
 python /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/audit_budget_confirmation_31520350.py

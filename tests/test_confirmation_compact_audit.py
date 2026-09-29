@@ -4,6 +4,14 @@ import json
 from pathlib import Path
 
 
+def test_cpu_wrapper_preserves_module_dependency_path():
+    wrapper = (Path(__file__).resolve().parents[1]
+               / "hpc/budget_agent_confirmation_audit.sbatch").read_text()
+    assert 'src${PYTHONPATH:+:${PYTHONPATH}}' in wrapper
+    assert '#SBATCH --cpus-per-task=1' in wrapper
+    assert '#SBATCH --gres' not in wrapper
+
+
 def test_compact_row_excludes_prose_and_source_text():
     spec = importlib.util.spec_from_file_location("audit", Path(__file__).resolve().parents[1]
                                                 / "scripts/audit_budget_confirmation_31520350.py")
