@@ -273,3 +273,15 @@ confirmation pilot. No new job has been submitted, no full evaluation is
 released, and no career/resume files were changed. A passing protocol pilot
 would still not establish semantic entailment, citation completeness, independent
 benchmark improvement or an online SLA.
+
+Frozen CPU-tested repair: `72eaa90567e3603a3b940edffbb21b684bf1d1ba`;
+1,361,920-byte source tar SHA
+`ad533a3b14a81ab658049d6261cfc22848ebd792f3333e9f635d327d034d4cb1`.
+Static system-prompt SHA (Pydantic2.13.5):
+`6b0163a4ef9da624e35dffb51fff34913ccb8a90db395c8dfec68bbe409febaa`.
+The [new readiness receipt](verified-runs/budget-agent-protocol-readiness-20260929.json)
+records unchanged controller AST/decide path outside the system-message assignment,
+schema/operator/input identities and negative-result boundaries. The66 tests
+also passed from a clean Git archive with source-import origin checked; the
+compact canary audit reproduced identical structured evidence. This archive
+has not been uploaded to Spartan. Waiting for a separate confirmation release.
