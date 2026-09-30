@@ -1,0 +1,28 @@
+{
+  "schema_version": "component-two-attempt-resource-closeout-v1",
+  "execution_source_git": "81917f2c9a1b2060bd84a0688bd65a40b1c4e134",
+  "application_status": "stopped_no_semantic_effect_claim",
+  "attempts": [
+    {"job": "31729507", "state": "FAILED", "exit_code": "1:0", "source_git": "79f069d2eb4c8db3b82b152fa8a698b5ae3230ad", "allocated_a100": 1, "elapsed_seconds": 81, "batch_total_cpu_seconds": 68.866, "batch_maxrss_kib": 9675684, "model_calls": 0, "input_tokens": 0, "output_tokens": 0},
+    {"job": "31734906", "state": "COMPLETED", "exit_code": "0:0", "start": "2026-10-01T01:45:16+10:00", "end": "2026-10-01T01:46:52+10:00", "allocated_a100": 1, "elapsed_seconds": 96, "batch_total_cpu_seconds": 85.444, "batch_maxrss_kib": 10346536, "extern_elapsed_seconds": 97, "model_calls": 1, "input_tokens": 277, "output_tokens": 15, "model_load_ms": 15100.12111067772, "generation_ms": 1085.5423938483, "slot_elapsed_ms": 1089.0493541955948, "gpu_peak_allocated_bytes": 8173072384, "operator_elapsed_seconds": 90.44989061355591}
+  ],
+  "cumulative": {"allocated_a100_job_seconds": 177, "batch_total_cpu_seconds": 154.310, "model_calls": 1, "input_tokens": 277, "output_tokens": 15, "unknown_cost_attempts": 0},
+  "formal_diagnostics": {"planned": 33, "attempted": 0, "screening": 12, "relation": 12, "oracle_rationale": 9, "schema_failed": 0, "quality_metrics": null},
+  "preflight": {"planned": 4, "attempted": 1, "technical_valid": 1, "semantic_match": 0, "unattempted": 3},
+  "hashes": {
+    "compact": "5e21126d04dff703a3b5a294d207048e1b8254118b87c956d7bdb3f3349fac57",
+    "worker_identity": "f5efe10472c923b45c366dc51a3221943281f57b344261ac287bfbaa1a1d421b",
+    "worker_finished": "ad5263b25948786cb58d534f9b3c8c7f6ceeca70c0f2b3e55b565d19fec8c889",
+    "inference_exited": "453ce6ae649915d296296ad33af9ae43678145a6881816218763a319a5e797d0",
+    "operator_status": "391a95cf25905da5c865afee7a99382bf0e15ef85b37da666a80f41f59c7f33b",
+    "physical_closeout": "cfb2ca61d48a8bb79eeedc7ec7ed386a2a57247e2cfff71ac41e7f821b6208f8",
+    "branch_cpu_probe": "9b18b85350b0fe784b07cf0fef8408c2e9f7d259db979451ae0bfe86c666b0c7"
+  },
+  "new_gpu_jobs_this_closeout": 0,
+  "new_model_calls_this_closeout": 0,
+  "cpu_synthetic_probe_passes": 2,
+  "old_artifacts_mutated": false,
+  "real_claims_targets_raw_exported": false,
+  "resume_modified": false,
+  "not_agent_improvement": true
+}

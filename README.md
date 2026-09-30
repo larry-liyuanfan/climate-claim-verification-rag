@@ -1,13 +1,15 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-## Latest component diagnostic: r2 submitted, pending resources
+## Latest component diagnostic: stopped at semantic preflight
 
-After separate exact-hash authorization, one infrastructure retry **31734906**
-was submitted from execution source `81917f2` (not the later documentation HEAD).
-The [submission receipt](docs/verified-runs/scifact-component-submission-31734906.json)
-records **PENDING (Resources)** at 2026-10-01 01:39:24 +10:00. Scheduler start
-time is only a forecast. No model-quality result is available; no duplicate job,
-new data or retry loop was created.
+Job **31734906** completed at the scheduler level, but the application stopped:
+one synthetic response was technically valid `abstain`, whereas the fixture
+expected `select [1]`. All **33 formal diagnostics were unattempted**, not model
+failures or zero accuracy. The [terminal report](docs/SCIFACT_COMPONENT_CLOSEOUT_31734906.md)
+preserves physical hashes, **277 input / 15 output tokens**, and both jobs' total
+**177 allocated GPU-job seconds**. Real-tokenizer CPU checks show the tested
+active and abstention paths are reachable; the cause of model abstention is not
+established. No model/Agent improvement or independent-test result is claimed.
 
 ### Predecessor failure and validated CPU repair
 
