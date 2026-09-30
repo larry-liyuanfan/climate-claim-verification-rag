@@ -1,5 +1,17 @@
 # Evidence and claim boundaries
 
+## 2026-10-01 Stage A CPU component contract
+
+[Implementation/limits](SCIFACT_COMPONENT_PREPARATION_20261001.md): separate
+screening/relation/oracle-rationale inputs and schemas; actual-visible source
+reconstruction; full-abstract budget gate; OR-alternative/first3/overselection
+scoring; metadata-preserving failure denominators and single-attempt cost journal.
+The targeted fixture suite and scripted CLI examples establish software contracts,
+not grounding quality. No real model calls, new TRAIN partition, official dev/test
+consumption, model training, Slurm submission or resume promotion is included.
+Real preparation/clean reproduction status belongs to the versioned receipt;
+passing synthetic cases does not establish real token-budget coverage.
+
 ## 2026-09-30 semantic comparison: completed negative Agent result
 
 [Report](SCIFACT_SEMANTIC_CLOSEOUT_20260930.md) and

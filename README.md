@@ -1,5 +1,15 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+## Latest implementation: component diagnosis, CPU-only
+
+The [Stage A preparation contract](docs/SCIFACT_COMPONENT_PREPARATION_20261001.md)
+separates document screening, document relation and oracle-conditioned rationale
+selection on the same twelve already-consumed claims. Full abstracts, independent
+schemas, alternative-aware scoring, source/prompt identities and durable failure
+costs are implemented and fixture-tested. No real component model evaluation,
+new training/split or Agent improvement is claimed; the real provider remains
+disabled pending a separate exact-hash release.
+
 ## Latest bounded diagnosis: completed, not Agent improvement
 
 The [semantic-policy closeout](docs/SCIFACT_SEMANTIC_CLOSEOUT_20260930.md) verifies
