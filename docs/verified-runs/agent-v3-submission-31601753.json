@@ -1,0 +1,28 @@
+{
+  "schema_version": "sentence-v3-submission-receipt",
+  "release_id": "climate-sentence-v3-20260930-pilot-r1",
+  "source_git": "e6d1ee159516bf7a24e86e9a06b26745abf4a42d",
+  "source_archive_sha256": "bd718a1650f63648267d6da9ba247423363adf7636ada6e63c8c6db33df60681",
+  "protocol_sha256": "9e0ccfaf32979cb9e93bbda059bf9d094f1c2a85f190041548472a60f1492d07",
+  "grammar_bundle_sha256": "36ed51e0a9a71ded058cc0e7290a78a7f5f638b91bff517d49ad6ea83c70e410",
+  "submission_guard_sha256": "01ba334191a74dea93fe8481f28432ca6b331396f6305c2603aadcf704aafd6f",
+  "coordinator_exact_release_verified": true,
+  "real_job_id": "31601753",
+  "job_name": "climate-agent-sentence-v3",
+  "test_only_identifier_not_submitted_job": "31601752",
+  "submit_time_spartan_local": "2026-09-30T14:09:14",
+  "state_at_first_check": "PENDING",
+  "reason_at_first_check": "Resources",
+  "start_time_at_first_check": null,
+  "requested_resources_scontrol_verified": {
+    "gpu": "A100:1", "cpus": 8, "ram_gib": 32, "scratch_gib": 30,
+    "walltime_minutes": 60, "qos": "normal", "requeue": false,
+    "partition": "gpu-a100,gpu-a100-short"
+  },
+  "work_directory_and_source_command_verified": true,
+  "submission_lock_and_input_sha_receipt_verified": true,
+  "scope": {"synthetic_runtime_checks": 4, "consumed_authored_tasks": 6, "routes": 4, "development_slots": 24},
+  "official_dev_model_runs": 0,
+  "new_quality_evidence": null,
+  "boundary": "Submission is not runtime completion or Agent quality. No new training, old-test consumption, SciFact dev evaluation, deployment or generalization claim. Keep one queued job; no automatic retry or priority changes."
+}

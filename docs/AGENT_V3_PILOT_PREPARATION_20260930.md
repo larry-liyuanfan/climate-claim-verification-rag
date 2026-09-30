@@ -1,5 +1,11 @@
 # Sentence-ID v3 development pilot — preparation, not execution
 
+Subsequent status: the reviewed final source `e6d1ee1` was separately released and
+submitted exactly once as [job31601753](verified-runs/agent-v3-submission-31601753.json).
+Initial state was PENDING/Resources with no start estimate. The
+[preparation receipt](verified-runs/agent-v3-preparation-e6d1ee1.json) records the
+preceding non-submitting checks; neither receipt is a model-quality result.
+
 CPU core commit: `35f192047bcead5d23bd7d4ae2e5d3d83608e51b`, CI
 [36666084118](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36666084118)
 passed383 tests with1 optional Torch skip. Clean git-archive targeted reproduction
