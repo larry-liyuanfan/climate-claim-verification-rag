@@ -43,6 +43,8 @@ def release_check(args: Any, purpose: str) -> dict[str, Any]:
     require(release["purpose"] == purpose and release["config_sha256"] == config_sha()
             and release["data_manifest_sha256"] == args.data_sha
             and release["output"] == str(args.output.resolve()), "release_identity")
+    if purpose.startswith("evaluate_"):
+        require(release["partition"] == args.partition, "release_partition_mismatch")
     source = Path(__file__).resolve().parents[1]
     require((source / "SOURCE_REVISION").read_text().strip() == release["source_git"], "execution_source")
     require(bool(os.environ.get("SLURM_JOB_ID")) and bool(os.environ.get("CUDA_VISIBLE_DEVICES")),
@@ -184,9 +186,8 @@ def evaluate(args: Any) -> None:
     manifest, corpus = load_bundle(args.bundle, args.data_sha)
     require(args.partition in {"tune", "validation"}, "partition")
     if args.partition == "validation":
-        gate = json.loads(checked(args.gate, release["tune_gate_sha256"]))
-        require(gate["passed"] is True and gate["data_manifest_sha256"] == args.data_sha
-                and gate["adapter_training_sha256"] == release["adapter_training_sha256"], "closed_validation_gate")
+        from run_scifact_grounding_validation_operator import verify_frozen_gate
+        verify_frozen_gate(args.gate, release)
     training = json.loads(checked(args.adapter / "complete.json", release["adapter_training_sha256"]))
     require(training["data_manifest_sha256"] == args.data_sha
             and training["config_sha256"] == config_sha(), "trained_adapter_identity")

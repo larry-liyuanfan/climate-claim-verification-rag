@@ -1,6 +1,7 @@
 """Exactly one tune-only pair; CPU preparation is not execution authority."""
 from __future__ import annotations
 
+from collections.abc import Callable
 import json
 import os
 from pathlib import Path
@@ -31,8 +32,9 @@ def fixed_tune_release(release: dict[str, Any]) -> None:
 
 
 def score_after_exit(source: Path, output: Path, bundle: Path, release_sha: str,
-                     process_returncode: int, allocation: Path) -> int:
+                     process_returncode: int, allocation: Path, *, partition: str = 'tune') -> int:
     """Never launch scorer before both inference processes have exited/reaped."""
+    require(partition in {'tune', 'validation'}, 'fixed_evaluation_partition')
     proof = output.with_name(output.name + '-execution') / 'worker-exit.json'
     exit_proof = json.loads(proof.read_bytes())
     require(exit_proof['child_reaped'] is True and exit_proof['release_sha256'] == release_sha
@@ -48,6 +50,7 @@ def score_after_exit(source: Path, output: Path, bundle: Path, release_sha: str,
                            for arm in ('base', 'adapted'))
         require(0 <= reservations <= 24, 'interrupted_reservation_cap')
         durable(allocation / 'cost-audit-pending.json', {
+            'partition': partition,
             'planned_slots': 24, 'durable_reservations': reservations,
             'unreserved_slots': 24 - reservations, 'cost_audit_pending': True,
             'known_cost_totals': None, 'unknown_cost': True,
@@ -58,16 +61,17 @@ def score_after_exit(source: Path, output: Path, bundle: Path, release_sha: str,
     require(sha(terminated) == exit_proof['terminated_sha256'], 'termination_hash_changed')
     durable(allocation / 'before-scoring.json', {'inference_parent_exited': True,
         'child_reaped': True, 'worker_exit_sha256': sha(proof), 'termination_sha256': sha(terminated),
-        'inference_returncode': process_returncode, 'partition': 'tune', 'started_unix': time.time()})
+        'inference_returncode': process_returncode, 'partition': partition, 'started_unix': time.time()})
     command = [sys.executable, str(source / 'scripts/run_scifact_grounding_candidate.py'),
-        'score', '--partition', 'tune', '--bundle', str(bundle), '--data-sha', DATA_SHA,
+        'score', '--partition', partition, '--bundle', str(bundle), '--data-sha', DATA_SHA,
         '--output', str(output)]
     with (allocation / 'score.log').open('xb') as log:
         scored = subprocess.run(command, stdout=log, stderr=log, check=False, timeout=150)
     return scored.returncode
 
 
-def main() -> None:
+def run_pair(partition: str, validate_release: Callable[[dict[str, Any]], None]) -> None:
+    require(partition in {'tune', 'validation'}, 'fixed_evaluation_partition')
     require(os.name == 'posix' and bool(os.environ.get('SLURM_JOB_ID'))
             and bool(os.environ.get('CUDA_VISIBLE_DEVICES')), 'allocated_gpu_required')
     source = Path(__file__).resolve().parents[1]
@@ -77,13 +81,14 @@ def main() -> None:
     release_sha = os.environ['CLIMATE_GROUNDING_RELEASE_SHA']
     require(sha(release_path) == release_sha, 'release_hash')
     release = json.loads(release_path.read_bytes())
-    fixed_tune_release(release)
+    validate_release(release)
+    require(release['partition'] == partition, 'entrypoint_partition_mismatch')
     require((source / 'SOURCE_REVISION').read_text().strip() == release['source_git']
             == os.environ['CLIMATE_SOURCE_GIT'], 'source_identity')
     require(release['source_archive_sha256'] == os.environ['CLIMATE_SOURCE_SHA256']
-            and sha(source / 'hpc/scifact_grounding_tune.sbatch') == release['wrapper_sha256'],
+            and sha(source / f'hpc/scifact_grounding_{partition}.sbatch') == release['wrapper_sha256'],
             'source_wrapper_identity')
-    output = ROOT / 'runs/scifact-grounding-tune-20261001-v1'
+    output = ROOT / f'runs/scifact-grounding-{partition}-20261001-v1'
     require(release['output'] == str(output) and not output.exists(), 'fixed_unused_output')
     allocation = output.with_name(output.name + '-allocation')
     allocation.mkdir(mode=0o700)
@@ -95,8 +100,8 @@ def main() -> None:
     durable(allocation / 'runtime-observed.json', observed)
     durable(allocation / 'started.json', {'source_git': release['source_git'],
         'release_sha256': release_sha, 'job_id': os.environ['SLURM_JOB_ID'],
-        'started_unix': time.time(), 'partition': 'tune', 'max_calls': 24,
-        'training': False, 'validation': False, 'warmup_calls': 0})
+        'started_unix': time.time(), 'partition': partition, 'max_calls': 24,
+        'training': False, 'validation': partition == 'validation', 'warmup_calls': 0})
     from run_budget_agent_full_operator import ARCHIVES
     from run_scifact_component_operator import generator_only
     filename, digest = ARCHIVES['input']
@@ -104,21 +109,29 @@ def main() -> None:
     generator_only(ROOT / 'envs' / filename, work / 'input', digest)
     bundle = ROOT / 'posthoc/scifact-grounding-candidate-40d84a377bd1'
     command = [sys.executable, str(source / 'scripts/run_scifact_grounding_candidate.py'),
-        'evaluate', '--partition', 'tune', '--bundle', str(bundle), '--data-sha', DATA_SHA,
+        'evaluate', '--partition', partition, '--bundle', str(bundle), '--data-sha', DATA_SHA,
         '--output', str(output), '--adapter', str(adapter),
         '--model', str(work / 'input/models/generator/model'),
         '--model-manifest', str(work / 'input/models/generator/model_manifest.json'),
         '--release', str(release_path), '--release-sha', release_sha]
+    if partition == 'validation':
+        command.extend(['--gate', str(ROOT / 'runs/scifact-grounding-tune-20261001-v1/gate.json')])
     # run() reaps this parent; its own durable proof attests its inference child.
     completed = subprocess.run(command, check=False)
     durable(allocation / 'inference-parent-exited.json', {'returncode': completed.returncode,
         'reaped': True, 'ended_unix': time.time()})
     # Even a nonzero partial inference can receive a cost audit, never a replay.
-    score_code = score_after_exit(source, output, bundle, release_sha, completed.returncode, allocation)
+    score_code = score_after_exit(source, output, bundle, release_sha, completed.returncode,
+                                  allocation, partition=partition)
     durable(allocation / 'ended.json', {'inference_returncode': completed.returncode,
         'score_returncode': score_code, 'ended_unix': time.time(), 'no_automatic_retry': True,
-        'validation_launched': False})
+        'partition': partition, 'validation_launched': partition == 'validation',
+        'further_execution_authorized': False, 'scientific_acceptance_not_inferred': True})
     raise SystemExit(completed.returncode or score_code)
+
+
+def main() -> None:
+    run_pair('tune', fixed_tune_release)
 
 
 if __name__ == '__main__':

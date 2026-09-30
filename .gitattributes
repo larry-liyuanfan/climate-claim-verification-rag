@@ -76,3 +76,5 @@ scripts/run_scifact_grounding_train_operator.py text eol=lf
 hpc/scifact_grounding_tune.sbatch text eol=lf
 scripts/run_scifact_grounding_tune_operator.py text eol=lf
 scripts/replay_scifact_selected_read.py text eol=lf
+hpc/scifact_grounding_validation.sbatch text eol=lf
+scripts/run_scifact_grounding_validation_operator.py text eol=lf

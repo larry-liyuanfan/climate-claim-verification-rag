@@ -475,3 +475,35 @@ Scope remains gold-preparation-seen TRAIN-internal grounding on the restricted
 restricted-1.2M retrieval gain, independent test, external generalization,
 tool-use/Agent benefit or resume-ready headline. The separately frozen validation
 pair requires another exact-hash release; gate success alone does not execute it.
+
+## Validation-only CPU package
+
+The new `run_scifact_grounding_validation_operator.py` is a thin entrypoint over
+the existing evaluator, adapter restoration, runtime checks, parent/child reap
+proof and post-exit scorer. Tune still hard-codes `partition=tune`; validation
+hard-codes `partition=validation`. The direct evaluator also rejects a release
+whose partition disagrees with its command. The old submitted source and assets
+remain unchanged.
+
+Before extraction or model work, validation binds the physical tune gate and
+score hashes above, their internal score link, passed/data/training identities,
+24-call handoff and the original count condition including zero stop-required
+and unknown records. It uses the already frozen twelve validation inputs and
+same checkpoint/tokenizer/config/runtime. There is no new label inspection,
+selection, prompt, budget, model change or checkpoint choice.
+
+Only the output and partition are new: `runs/scifact-grounding-validation-20261001-v1`.
+The proposed cap remains 24 calls (12 base then 12 adapted), no warmup/training,
+one A100 / four CPUs / 32 GiB RAM / 30 GiB scratch / 30-minute allocation and
+25-minute worker. Complete partial summaries retain failures and costs; missing
+termination/summary remains cost-audit-pending. Validation writes a final score,
+**not a new tune gate**, and no path automatically authorizes another stage.
+The fixture checks include cross-partition release, incorrect physical gate or
+score, changed link/next-call count, final incomplete response, unknown partial
+costs and the absence of a new gate after validation scoring.
+
+This section is CPU implementation/preparation only. The new release stays
+`DRAFT_NOT_AUTHORIZED`; actual validation submission or model calls require the
+coordinator's next exact-source/hash release. Its eventual result can only test
+whether this small frozen TRAIN-internal signal repeats, not establish Agent
+tool-use benefit or independent external-test generalization.

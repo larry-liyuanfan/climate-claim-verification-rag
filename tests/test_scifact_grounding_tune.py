@@ -35,8 +35,9 @@ def test_release_is_tune_only_and_checkpoint_fixed(key: str, value: object) -> N
 @pytest.mark.parametrize('reaped,worker_code,parent_code,allowed', [
     (False,0,0,False),(True,0,0,True),(True,1,1,True),
     (True,-9,247,True),(True,1,0,False)])
+@pytest.mark.parametrize('partition', ['tune', 'validation'])
 def test_cpu_scorer_runs_only_after_matching_reaped_exit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
-        reaped: bool, worker_code: int, parent_code: int, allowed: bool) -> None:
+        reaped: bool, worker_code: int, parent_code: int, allowed: bool, partition: str) -> None:
     output = tmp_path/'run'
     execution = tmp_path/'run-execution'
     allocation = tmp_path/'run-allocation'
@@ -50,16 +51,16 @@ def test_cpu_scorer_runs_only_after_matching_reaped_exit(tmp_path: Path, monkeyp
     calls = []
     def run(command, **kwargs):
         assert (allocation/'before-scoring.json').is_file()
-        assert command[2] == 'score' and command[3:5] == ['--partition','tune']
+        assert command[2] == 'score' and command[3:5] == ['--partition',partition]
         calls.append(command)
         return SimpleNamespace(returncode=0)
     monkeypatch.setattr(operator.subprocess,'run',run)
     if allowed:
-        assert operator.score_after_exit(tmp_path,output,tmp_path,'release',parent_code,allocation) == 0
+        assert operator.score_after_exit(tmp_path,output,tmp_path,'release',parent_code,allocation,partition=partition) == 0
         assert len(calls) == 1
     else:
         with pytest.raises(ValueError,match='paired_inference_exit_required'):
-            operator.score_after_exit(tmp_path,output,tmp_path,'release',parent_code,allocation)
+            operator.score_after_exit(tmp_path,output,tmp_path,'release',parent_code,allocation,partition=partition)
         assert calls == []
 
 
@@ -122,8 +123,9 @@ def test_existing_evaluator_uses_same_model_and_inputs_no_extra_calls(tmp_path: 
 
 
 @pytest.mark.parametrize('termination_exists', [False, True])
+@pytest.mark.parametrize('partition', ['tune', 'validation'])
 def test_interrupted_summary_is_cost_pending_not_zero_or_scored(tmp_path: Path,
-        monkeypatch: pytest.MonkeyPatch, termination_exists: bool) -> None:
+        monkeypatch: pytest.MonkeyPatch, termination_exists: bool, partition: str) -> None:
     output = tmp_path/'run'
     execution = tmp_path/'run-execution'
     allocation = tmp_path/'run-allocation'
@@ -143,9 +145,10 @@ def test_interrupted_summary_is_cost_pending_not_zero_or_scored(tmp_path: Path,
     def forbidden(*args, **kwargs):
         pytest.fail('must not launch quality scorer for unreconciled raw costs')
     monkeypatch.setattr(operator.subprocess, 'run', forbidden)
-    assert operator.score_after_exit(tmp_path,output,tmp_path,'release',1,allocation) == 2
+    assert operator.score_after_exit(tmp_path,output,tmp_path,'release',1,allocation,partition=partition) == 2
     pending = json.loads((allocation/'cost-audit-pending.json').read_bytes())
     assert pending['planned_slots'] == 24 and pending['durable_reservations'] == 1
+    assert pending['partition'] == partition
     assert pending['unreserved_slots'] == 23 and pending['known_cost_totals'] is None
     assert pending['cost_audit_pending'] and pending['unknown_cost']
     assert not pending['quality_scored'] and not pending['validation_gate_open']
@@ -154,8 +157,9 @@ def test_interrupted_summary_is_cost_pending_not_zero_or_scored(tmp_path: Path,
 
 
 @pytest.mark.parametrize('last_failure', ['parse', 'incomplete'])
+@pytest.mark.parametrize('partition', ['tune', 'validation'])
 def test_last_slot_stop_blocks_gate_despite_semantic_gain(tmp_path: Path,
-        monkeypatch: pytest.MonkeyPatch, last_failure: str) -> None:
+        monkeypatch: pytest.MonkeyPatch, last_failure: str, partition: str) -> None:
     from climate_rag.scifact_grounding import GoldClaim, Rationale
     from climate_rag.scifact_grounding_eval import evaluate_arm
     from climate_rag.scifact_semantic_contract import encoded, sha, write_once
@@ -167,10 +171,10 @@ def test_last_slot_stop_blocks_gate_despite_semantic_gain(tmp_path: Path,
     (bundle/'inference').mkdir(parents=True)
     (bundle/'scoring').mkdir()
     output.mkdir()
-    write_once(bundle/'inference/tune.json',rows)
-    write_once(bundle/'scoring/tune.json',gold)
-    manifest = {'files': {'inference/tune.json':sha(encoded(rows)),
-                          'scoring/tune.json':sha(encoded(gold))}}
+    write_once(bundle/f'inference/{partition}.json',rows)
+    write_once(bundle/f'scoring/{partition}.json',gold)
+    manifest = {'files': {f'inference/{partition}.json':sha(encoded(rows)),
+                          f'scoring/{partition}.json':sha(encoded(gold))}}
     monkeypatch.setattr(entry,'load_bundle',lambda *args: (manifest,corpus))
     class Base(Provider):
         def generate(self,*args):
@@ -191,16 +195,19 @@ def test_last_slot_stop_blocks_gate_despite_semantic_gain(tmp_path: Path,
     for arm, provider in [('base',Base()),('adapted',Adapted())]:
         result = evaluate_arm(rows,corpus,provider,output/arm,arm)
         assert result['attempts'] == 12
-    entry.terminate_inference(output,'tune','data','adapter')
+    entry.terminate_inference(output,partition,'data','adapter')
     execution = output.with_name('output-execution')
     execution.mkdir()
     write_once(execution/'worker-exit.json',{'child_reaped':True,'returncode':0,
         'terminated_sha256':sha((output/'inference-terminated.json').read_bytes())})
-    entry.score(SimpleNamespace(bundle=bundle,output=output,data_sha='data',partition='tune'))
+    entry.score(SimpleNamespace(bundle=bundle,output=output,data_sha='data',partition=partition))
     scored = json.loads((output/'score.json').read_bytes())
     assert scored['base']['correctly_rationalized_documents'] == 0
     assert scored['adapted']['correctly_rationalized_documents'] == 11
     assert scored['base']['planned_unsuccessful'] == scored['adapted']['planned_unsuccessful'] == 1
     assert scored['base']['stop_required'] == 0
     assert scored['adapted']['stop_required'] == (last_failure == 'incomplete')
-    assert json.loads((output/'gate.json').read_bytes())['passed'] is (last_failure == 'parse')
+    if partition == 'tune':
+        assert json.loads((output/'gate.json').read_bytes())['passed'] is (last_failure == 'parse')
+    else:
+        assert not (output/'gate.json').exists()
