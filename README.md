@@ -12,11 +12,18 @@ Separately, the [original SciFact CPU preparation](docs/SCIFACT_GROUNDED_PROTOCO
 preserves sentence rationales, quarantines train/dev source-family overlap and
 cross-checks a new scorer against the official reference. No SciFact model
 evaluation has been run or released; its300 dev claims are not a new test claim.
+The [cross-dataset CPU identity audit](docs/CROSS_DATASET_IDENTITY_AUDIT_20260930.md)
+found no matches or graph connections to consumed Climate tracks under fixed
+lexical/source rules. Missing source mappings remain unknown; this is not proof
+of independence, and no old test text or labels were reopened.
 
 A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
 adds explicit candidate reading, actual-visible-sentence citation constraints,
 budgeted prompt assembly and opt-in grammar decoding. Fixtures/tokenizer smoke
-are not model-quality evidence; no v3 GPU or external-dev run has been released.
+are not model-quality evidence. The [single development job31601753](docs/AGENT_V3_PILOT_PREPARATION_20260930.md)
+is submitted on frozen code `e6d1ee1` and was still pending at14:23+10;
+it runs only synthetic preflight and already-consumed authored prompts.
+External-dev evaluation is not released; no new model-quality result exists yet.
 
 2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
 completed in job **31543304**, but did **not** demonstrate Agent quality: all

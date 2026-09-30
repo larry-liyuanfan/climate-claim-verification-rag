@@ -52,5 +52,26 @@ data is committed. `tests/test_cross_identity.py` covers namespace collision,
 graph transitivity, fixed thresholds, deterministic ordering, gold-field
 invariance and the archive-member allowlist.
 
-Results will be appended from the once-executed frozen code and compact artifact;
-this protocol does not predeclare a positive or negative overlap result.
+## Once-executed CPU result
+
+Frozen code `544a3f759e67af49b4a9f71c1718802015e90f11`, clean source checkout;
+[compact result](verified-runs/cross-dataset-identity-20260930.json) SHA-256
+`01e461344b3d044d1c313c681f5745ed123ad34ee9f78b3ceea9965e8805dd1b`.
+All five denominators matched: 300 / 1,075 / 230 / 154 / 11 claims, and
+5,183 / 5,240 documents. Found **zero direct target claim matches, zero cross-
+namespace document matches, and zero SciFact dev claims connected to consumed
+tracks** under this specific identity rule. No dev row was removed or reselected.
+
+The full graph contains 206 claim-text edges, four document-variant edges and
+334 components; its largest component has 1,374 claims. These are all-track
+identity-graph counts, not retrieval scores. Broad public article associations
+are deliberately conservative and must not be confused with positive rationale
+labels or the narrower historical split grouping. Restricted source mapping and
+authored source mapping remain unknown; this is **not independence certification**.
+
+No model was run, no old test text/labels were opened, and this result does not
+release SciFact dev for evaluation. Seven focused fixtures passed both locally
+and from a clean Git archive. CI run `36668742278` passed 399 tests (one optional
+Torch skip),
+Ruff, 44-module mypy and tracked secret/PII scan. Private affected-ID and source-map
+files remain ignored locally; only their hashes are included in the compact.
