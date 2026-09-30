@@ -210,4 +210,5 @@ def advancement(base: Mapping[str, Any], adapted: Mapping[str, Any]) -> bool:
     return bool(adapted["correctly_rationalized_documents"] > base["correctly_rationalized_documents"]
                 and adapted["nei_false_evidence"] <= base["nei_false_evidence"]
                 and adapted["planned_unsuccessful"] <= base["planned_unsuccessful"]
-                and base["unknown_usage"] == adapted["unknown_usage"] == 0)
+                and base["unknown_usage"] == adapted["unknown_usage"] == 0
+                and base["stop_required"] == adapted["stop_required"] == 0)

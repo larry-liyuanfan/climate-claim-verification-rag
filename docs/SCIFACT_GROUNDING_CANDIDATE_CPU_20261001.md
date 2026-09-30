@@ -337,3 +337,49 @@ physical responses, and apply the existing preregistered count gate. The
 explicit limitations. This is a CPU planning proposal only: **no tune/validation
 calls or additional GPU submission are authorized or performed here**. Validation
 would require both the gate and another separate exact-hash release.
+
+## Tune-only execution package (CPU preparation, not a model result)
+
+`hpc/scifact_grounding_tune.sbatch` and
+`scripts/run_scifact_grounding_tune_operator.py` package the existing evaluator,
+not another evaluation framework. The wrapper is explicitly selected when
+packaging; the generic packager's legacy diagnostic wrapper is not valid for
+this package. Draft authorization remains `DRAFT_NOT_AUTHORIZED`.
+
+The fixed training receipt and adapter hashes are
+`f5e6a865ec09cb67a520e36ba4646fb297a381383d4d0357208488ef6e9168a0` and
+`dd1974a26549b3337824252a9c38773873acce72427f92e656835bf9d71935d4`.
+The [supplementary binding](verified-runs/scifact-grounding-shape-source-binding-31757970.json)
+links that adapter to the original remote shape-audit bytes without replacing
+the original receipt or rerunning training. Prepared data/config/runtime remain
+unchanged. The fixed unused output is `runs/scifact-grounding-tune-20261001-v1`.
+
+The resource ceiling remains one A100, four CPUs, 32 GiB host RAM, 30 GiB local
+scratch and 30 minutes allocation, with a 25-minute inference worker cap. These
+are bounded evaluation caps, **not measured inference latency**. Model extraction
+and loading are allocation-only; runtime imports/hash checks do not load weights.
+Twelve frozen inputs are evaluated once with the same restored CausalLM in
+adapter-disabled and adapter-enabled states: at most 24 real calls, no warmup,
+new training, sample substitution, checkpoint selection or validation call.
+
+The operator first waits for/reaps the inference parent and verifies its durable
+child-exit receipt. Only then does it launch the existing separate CPU scorer,
+which reconciles physical responses and costs before applying the count gate.
+Failed/unattempted slots remain in the two twelve-slot planned denominators.
+Both arms must have zero `stop_required` records: even an otherwise improving
+24-attempt/exit-zero run cannot pass if its final adapted response is incomplete,
+over budget or has a non-parse failure. The original parse-failure comparison
+rule is unchanged; paired fixtures distinguish these two cases.
+
+A hard kill with no termination receipt, or a reserved call without a complete
+arm summary, produces `cost-audit-pending.json`: physical file hashes, durable
+reservation count, full 24-slot denominator, unknown costs and null cost totals.
+This is **not a completed cost or quality audit**, never a zero-cost assertion,
+and does not run the scorer, open validation or authorize replay. Complete
+partial summaries still use the existing lower-bound cost audit. Any remaining
+unreconciled failure requires a separate manual closeout, not automatic retry.
+
+This twelve-query, 58-document TRAIN-internal tune experiment has gold visible
+during preparation and all gold visible for its answerable queries. It cannot
+establish independent test generalization, full-corpus retrieval or autonomous
+Agent benefit. No resume or shared career materials are changed by this package.

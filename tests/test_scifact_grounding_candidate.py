@@ -262,7 +262,7 @@ def test_paid_response_persistence_failure_retains_cost(tmp_path: Path, corpus: 
 def test_count_gate(corpus: dict[int, Abstract]) -> None:
     base = {"input_identity": "same", "claims": 12, "attempts": 12,
             "correctly_rationalized_documents": 1, "nei_false_evidence": 0,
-            "planned_unsuccessful": 0, "unknown_usage": 0}
+            "planned_unsuccessful": 0, "unknown_usage": 0, "stop_required": 0}
     assert advancement(base, base | {"correctly_rationalized_documents": 2})
     assert not advancement(base, base | {"correctly_rationalized_documents": 2, "nei_false_evidence": 1})
     assert not advancement(base, base)

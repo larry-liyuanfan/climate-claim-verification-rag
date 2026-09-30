@@ -1,0 +1,11 @@
+{
+  "job_id": "31757970",
+  "source_git": "631aae70000ca4940c8225e046669dc85b1731e4",
+  "adapter_model_safetensors_sha256": "dd1974a26549b3337824252a9c38773873acce72427f92e656835bf9d71935d4",
+  "remote_shape_audit_bytes_sha256": "3fc54232b20e598aa89b0c21515b62cc51b3993db855b488382d5e2b5d3cb7b5",
+  "shape_audit_relative_path": "posthoc/grounding-training-closeout-31757970/shape-audit.json",
+  "adapter_relative_path": "runs/scifact-grounding-training-20261001-v1/final/adapter_model.safetensors",
+  "original_receipts_preserved": true,
+  "training_or_data_rerun": false,
+  "purpose": "Bind the existing shape inspection to the already verified physical adapter; no new training or generation"
+}

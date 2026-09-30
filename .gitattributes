@@ -73,3 +73,5 @@ tests/test_bounded_scifact_runtime.py text eol=lf
 tests/test_bounded_scifact_release.py text eol=lf
 hpc/scifact_grounding_train.sbatch text eol=lf
 scripts/run_scifact_grounding_train_operator.py text eol=lf
+hpc/scifact_grounding_tune.sbatch text eol=lf
+scripts/run_scifact_grounding_tune_operator.py text eol=lf
