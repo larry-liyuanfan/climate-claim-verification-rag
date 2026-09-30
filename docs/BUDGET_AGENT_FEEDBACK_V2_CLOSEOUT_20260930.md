@@ -65,6 +65,8 @@ request timings, not online SLA, stable production percentiles or an A/B test.
 - Private run SHA:`2e1445d88e64f69fa3a0472fdd678e6f1e490669fd531f8e502ce4f48d45df2b`.
 - `scripts/diagnose_feedback_pilot.py` reproduces the content-free failure shapes
   from that private run and its hash-matched raw files; it never exports text.
+- [Reproduced private-file diagnosis](verified-runs/budget-agent-feedback-v2-diagnostics-31587302.json)
+  SHA:`48839e1c48448d124910d55366fbd3470fb362e0a854be0a552bf5da8ad4d0b2`.
 
 Decision: **do not release a full external comparison**. A separately reviewed
 v3 development contract may address output length, redundant examples and

@@ -28,3 +28,7 @@ docs/verified-runs/budget-agent-protocol-readiness-20260929.json text eol=lf
 docs/verified-runs/budget-agent-protocol-confirm-submission-20260929.json text eol=lf
 docs/verified-runs/budget-agent-protocol-confirm-31520350.json text eol=lf
 docs/verified-runs/budget-agent-full-31543304.json text eol=lf
+docs/verified-runs/budget-agent-feedback-v2-31587302.json text eol=lf
+docs/verified-runs/budget-agent-feedback-v2-diagnostics-31587302.json text eol=lf
+docs/verified-runs/scifact-original-preparation-20260930.json text eol=lf
+scripts/diagnose_feedback_pilot.py text eol=lf

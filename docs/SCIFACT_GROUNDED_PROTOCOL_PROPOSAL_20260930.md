@@ -114,3 +114,10 @@ python scripts/crosscheck_scifact_reference.py --reference-dir data/scifact-orig
 Preparation refuses an existing output directory. Preserve its manifest/hashes;
 do not overwrite it to hide changed split eligibility. This is CPU engineering
 preparation, not a new model-quality result or current-resume bullet.
+
+Validation at source08fab05131ac3f0d65dc49914efb0b6260792cc7: the full local
+suite passed348 tests with2 optional Torch/LightGBM skips before two final
+regressions; all21 targeted tests (including both added regressions) then passed
+from a clean Git archive. Ruff, mypy40 modules and tracked secret/PII scan passed.
+CI run36663907857 on that exact source passed; the official-reference129 fixture
+matrix crosscheck is additional CPU parity evidence, never model accuracy.
