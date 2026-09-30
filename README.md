@@ -24,6 +24,11 @@ remain unreleased. Synthetic contract tests are not model-quality evidence.
 The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
 recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
 synthetic fixtures, no real-data quality result or external-dev release.
+The [eligible-train diagnostic preparation](docs/SCIFACT_TRAIN_DIAGNOSTIC_CPU_20260930.md)
+audits actual packed visibility, then freezes12 component-distinct train cases
+across four opportunity strata. Inference/gold bundles are separate;48 future
+slots are prepared with0 model generations. This is biased train diagnosis,
+not a new benchmark result or authorization to evaluate the300-dev split.
 
 A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
 adds explicit candidate reading, actual-visible-sentence citation constraints,

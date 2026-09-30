@@ -125,5 +125,52 @@ Synthetic tests cover per-document versus whole-claim coverage, alternatives OR,
 first3 bounds, unclassified pack failures, NEI, maximal deterministic component
 matching, real-controller packing probes, failed/rejected tool proposals,
 provenance mapping, raw-cost persistence, exact scoring matrices and untracked
-source refusal. Frozen source/actual train sampling receipts will be appended
-after these checks pass; no selected-set or model metric is prewritten here.
+source refusal, aggregate/attempt-cost reconciliation and unknown-usage lower
+bounds. Clean archive of source `d0e2339cb9711d4b46211d88c561d2f80bd39b3c`
+passed all22 focused tests. Full CI
+[36673677403](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36673677403)
+passed484 tests /1 optional skip, Ruff, mypy53 source files and tracked privacy
+scan; companion36673682247 also passed. Local/remote `bash -n` passed.
+
+### One frozen CPU sampling run
+
+The source was clean and runtime import path checked before the only sampling
+run. No model weights or real model generations were used; the real cached
+tokenizer counted full prompts for531 eligible claims and legal read probes.
+
+| Eligible-train category | Claims | Distinct eligible components | Selected |
+|---|---:|---:|---:|
+| Initial per-document opportunity |286|188|3|
+| Top20 per-document read opportunity |13|12|3|
+| No gold document in Top20 |17|14|3|
+| Original NEI |214|135|3|
+| Gold present but not packable within contract |1|not a selection stratum|0|
+
+The final12 cases come from12 distinct original components; all four shortfalls
+are0, yielding a frozen48-slot order. Component counts above are **within each
+stratum** and must not be summed as globally disjoint. These are train-data
+opportunity counts, not model accuracy, tool-use results, or benchmark coverage.
+No parameter, threshold, label, query or corpus was changed to obtain the quotas.
+
+Content-free receipts:
+
+- [Preparation manifest](verified-runs/scifact-train-diagnostic-preparation-20260930.json),
+  SHA `dceda481dba4966b32cfb0234449977cf224d5bceeaeb55f3eb5790aba364b8e`.
+- [Bundle receipt](verified-runs/scifact-train-diagnostic-bundles-20260930.json),
+  SHA `897fb4ec63fbf5cfe0d51911d803bdef386ba3494de8fa81902df02e7a6f615c`.
+- Protocol `306e8a61eef6fb279c56ccfc2b496281df9cc8710e194d2272e6978a23dbe802`.
+- Inference-only tar8,304,640 bytes:
+  `92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca`.
+- Scoring-only tar40,960 bytes:
+  `174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444`.
+- Exact Git source tar with `SOURCE_REVISION`:
+  `a0979ba67d24e20a7b47a324b645e4fb4f3ea67cc4be5dcfd233fbf499e38c53`.
+- Sbatch wrapper:
+  `351ab5f7ef1f8e1762d99400c6db5cc47500ac30227e5a00c3551f0affc41ca4`.
+
+Only content-free manifests are public; selection IDs, gold, witnesses, original
+corpus and full sampling audit are excluded from Git. `sbatch --test-only`
+accepted the proposed wrapper/resource shape. The displayed simulation ID31618509
+and predicted2026-10-05 start are **not a submitted job or guaranteed start**.
+At this closeout there is **no new GPU job**. Release of the frozen inference
+bundle still requires the coordinator's separate review/authorization.
