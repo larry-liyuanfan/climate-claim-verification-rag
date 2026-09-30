@@ -36,9 +36,14 @@ reconstructed all three original scripted-read states exactly, including physica
 prompt hashes and **1,868 / 1,648 / 2,528** input tokens. CPU readiness passed;
 Torch and POSIX imports were verified on Spartan. This is preparation, not model
 quality: **zero model calls during CPU preparation**. A separate exact release
-then authorized three calls only; job **31781591** was submitted once and was
-queued at the submission check. No result, validation consumption, autonomous-read
-success or new training is claimed.
+then authorized three calls only; job **31781591 completed**. Its
+[physical closeout](docs/SCIFACT_READ_CONDITIONAL_CLOSEOUT_31781591.md) found correct
+document labels in 3/3 answers but complete rationales in only **1/3** (FIT 0/1,
+not-direct-FIT 1/2). Both failures selected no annotated rationale sentence,
+despite a complete single-sentence alternative being visible. These documents
+were selected by the scripted/oracle read, **not by model tool use**. This is
+limited conditional grounding capacity, not retrieval or autonomous Agent gain;
+the original negative regression remains unchanged. No validation was consumed.
 
 ## Latest component diagnostic: complete, with grounding errors
 

@@ -99,6 +99,16 @@ augmentation would need its own frozen replay and alias/source consistency test.
 
 ## Decision after the existing three-call job
 
+**Observed update, without new implementation authorization:** the
+[completed three-call audit](SCIFACT_READ_CONDITIONAL_CLOSEOUT_31781591.md)
+falls into the limited-success branch: one complete answer, two wrong-rationale
+sentences. Every case had a reachable singleton alternative. Therefore the two
+failures are not demonstrated multi-sentence truncation or merely missing the
+rest of a partially correct rationale. Prioritize sentence/evidence discrimination
+and justified abstention in the actual packed state; retain complete-rationale
+tests as safeguards, not as an asserted explanation for this particular failure.
+This does not authorize preparing new data, modifying the teacher or training.
+
 - **All three conditional answers fail:** prioritize relation/rationale grounding
   and justified abstention in real packed contexts before action imitation.
   `read` supervision cannot repair an inability to use the evidence once visible.

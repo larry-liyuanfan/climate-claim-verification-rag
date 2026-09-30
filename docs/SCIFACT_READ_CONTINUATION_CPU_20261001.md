@@ -11,11 +11,13 @@ Agent behavior, generalization, or an independent test. Keep one FIT-overlap
 case plus two not-direct-FIT cases. Do not select new cases or witnesses.
 
 CPU preparation passed. A subsequent separate exact release authorized one
-three-call job, **31781591**, submitted once and queued at the submission check.
-No result is available at this checkpoint. Repairs, warmup, training and
-validation execution remain unauthorized. The prior 48-slot regression and
-its negative score remain unchanged. The DRAFT/CPU sections below preserve
-their original pre-submission status; see the submission receipt at the end.
+three-call job, **31781591**, submitted once and now completed. The
+[terminal closeout](SCIFACT_READ_CONDITIONAL_CLOSEOUT_31781591.md) reports 3/3
+document labels but only 1/3 complete rationales after scripted read, with
+zero model tool execution. Repairs, warmup, training and validation execution
+remain unauthorized. The prior 48-slot regression and its negative score are
+unchanged. The DRAFT/CPU/submission sections below preserve their historical
+checkpoint status; they are not the current scheduler state.
 
 ## Reconstruct the actual input, not a similar prompt
 
@@ -171,7 +173,8 @@ Initial scheduler state was `PENDING (Resources)`, priority 13,418. The raw
 estimated start was `2026-10-01T06:45:29`; its scheduler timezone was not
 independently established, and it is not a start guarantee. No pending-job
 cancellation, duplicate submission, new monitoring automation or additional
-model experiment was created. Terminal scoring and physical audit remain pending.
+model experiment was created. Terminal scoring and physical audit were pending
+at that submission checkpoint; both have since completed in the terminal report.
 
 The bounded queue-time [observation-supervision proposal](SCIFACT_OBSERVATION_SUPERVISION_PROPOSAL_20261001.md)
 maps the existing training-context mismatch to specific modules and tests. It
