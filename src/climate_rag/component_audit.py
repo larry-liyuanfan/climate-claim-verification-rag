@@ -125,7 +125,10 @@ def reconcile(slot: dict[str, Any], root: Path, phase: str) -> dict[str, Any]:
 
 
 def aggregate(slots: list[dict[str, Any]], targets: list[dict[str, Any]], records: list[dict[str, Any]],
-              preflight: list[dict[str, Any]]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+              preflight: list[dict[str, Any]], *, preflight_policy: str = "semantic-exact-v1"
+              ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    require(preflight_policy in {"semantic-exact-v1", "technical-preflight-semantic-measurement-v1"},
+            "unknown_preflight_policy")
     require(len(slots) == len(targets) == len(records) == 33, "audit_matrix")
     require([r["slot"] for r in slots] == [r["slot"] for r in targets] == [r["slot"] for r in records]
             == list(range(33)), "audit_slot_order")
@@ -156,7 +159,9 @@ def aggregate(slots: list[dict[str, Any]], targets: list[dict[str, Any]], record
             require(record["status"] in {"not_attempted_after_stop", "preparation_gap"} and not record["attempted"], "preflight_after_stop")
         passed = record["status"] == "valid" and record.get("prediction") == expected
         preflight_passed += passed
-        stopped = stopped or not passed
+        ready = (passed if preflight_policy == "semantic-exact-v1" else
+                 record["status"] == "valid" and record["usage_known"] and complete_usage(record["usage"], {}))
+        stopped = stopped or not ready
     for record in records:
         if stopped:
             require(record["status"] in {"not_attempted_after_stop", "preparation_gap"} and not record["attempted"], "diagnostic_after_stop")
@@ -188,4 +193,9 @@ def aggregate(slots: list[dict[str, Any]], targets: list[dict[str, Any]], record
         "elapsed_ms_sum": sum(r.get("elapsed_ms", 0) for r in all_records),
         "scoring_targets_loaded_only_after_inference_exit": True, "official_dev_read": False,
         "raw_exported": False, "retry_calls": 0, "not_Agent_improvement": True}
+    if preflight_policy != "semantic-exact-v1":
+        summary["preflight_policy"] = preflight_policy
+        summary["preflight_semantic_matches"] = summary.pop("preflight_passed")
+        summary["preflight_technical_ready"] = sum(r["status"] == "valid" and r["usage_known"]
+            and complete_usage(r["usage"], {}) for r in preflight)
     return summary, rows

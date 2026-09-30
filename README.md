@@ -11,6 +11,11 @@ preserves physical hashes, **277 input / 15 output tokens**, and both jobs' tota
 active and abstention paths are reachable; the cause of model abstention is not
 established. No model/Agent improvement or independent-test result is claimed.
 
+A [separate CPU-prepared continuation](docs/SCIFACT_COMPONENT_CONTINUATION_CPU_20261001.md)
+keeps that negative result immutable, separates technical readiness from semantic
+measurement and references the one paid response without repeating it. It allows
+at most 36 new calls only after a separate release; no new model result is claimed.
+
 ### Predecessor failure and validated CPU repair
 
 Job **31729507 failed before provider construction**: canonical JSON persistence
