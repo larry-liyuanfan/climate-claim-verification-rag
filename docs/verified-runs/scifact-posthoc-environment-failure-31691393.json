@@ -1,0 +1,48 @@
+{
+  "schema_version": "scifact-posthoc-environment-failure-v1",
+  "execution_jobs": [
+    31686182,
+    31686183
+  ],
+  "execution_jobs_modified": false,
+  "execution_source_git": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+  "posthoc_audit_git": "a347233b88c103cb23c76845527278f960a48406",
+  "posthoc_script_sha256": "1d18a54e883fc2c5e7a70af25fc6c469b38abcd11144b451c01f86451981fde9",
+  "posthoc_source_tar_sha256": "bee2d9a9af76bdbbe9625f08cdc5f13f1d3ea0816ad4973825ef1a371fc30619",
+  "infra_wrapper_sha256": "8de99426cf8bfc32291810ae09c43fb0543be244403dbeeaf89c283378c31122",
+  "audit_allocation": {
+    "job_id": 31691393,
+    "gpu": 0,
+    "cpus": 1,
+    "memory": "4G",
+    "walltime_cap": "00:05:00",
+    "state": "FAILED",
+    "exit_code": "1:0",
+    "elapsed_seconds": 9,
+    "total_cpu": "00:02.318",
+    "step_maxrss_kib": 117960
+  },
+  "failure": {
+    "stage": "import-only environment version preflight before audit main",
+    "type": "ModuleNotFoundError",
+    "module": "numpy",
+    "cause": "Infra wrapper replaced the module-provided PYTHONPATH with overlay/source only.",
+    "official_run_or_gold_read": false,
+    "compact_generated": false,
+    "model_calls": 0
+  },
+  "preserved": {
+    "log": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/logs/scifact-posthoc-a347233-31691393.out",
+    "output_directory": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/posthoc/scifact-pair-audit-a347233",
+    "no_deletion_or_overwrite": true
+  },
+  "local_validation": {
+    "new_synthetic_tests": 25,
+    "existing_release_tests": 5,
+    "passed": 30,
+    "ruff": "passed",
+    "script_strict_mypy_follow_imports_silent": "passed"
+  },
+  "retry_submitted": false,
+  "next_action": "Coordinator decision required before one infrastructure-only CPU retry; use frozen runtime package and import-only preflight. Do not change audit algorithms, inference models, protocol or samples."
+}
