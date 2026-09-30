@@ -1,0 +1,61 @@
+{
+  "actual_generation_envelope": "bare_gap_false_no_G_adapter",
+  "boundary": "gold_preparation_seen_selected_TRAIN_oracle_read_opportunity_not_Agent_or_test_gain",
+  "budget": {
+    "candidate_k": 20,
+    "context_k": 5,
+    "max_calls": 5,
+    "max_input_tokens": 8192,
+    "max_output_tokens": 512,
+    "max_repairs": 2,
+    "max_tools": 5,
+    "timeout_seconds": 120.0
+  },
+  "candidate_orders_unchanged": 12,
+  "corpus_sha256": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+  "elapsed_seconds": 13.171725298045203,
+  "final_eligible_gold_docs": 6,
+  "fixture_history_not_model_trajectory": true,
+  "fixture_responses": 15,
+  "full_531_probe": false,
+  "initial_complete_first3_eligible_claims": 3,
+  "initial_eligible_gold_docs": 3,
+  "initial_visible_preview_identities_unchanged": 12,
+  "input_archive_sha256": "c4907db623b644c9c883a807f07597f87746595da7fc6435714452304e50a44d",
+  "maxrss_kib": 278084,
+  "model_calls": 0,
+  "official_dev_test_read": false,
+  "opportunity_changes": {
+    "gold_absent_top20->gold_absent_top20": 3,
+    "initial_doc_opportunity->initial_doc_opportunity": 3,
+    "nei->nei": 3,
+    "top20_doc_replenishable->top20_doc_replenishable_by_original_witness": 3
+  },
+  "original_read_witnesses_newly_reachable": 3,
+  "original_read_witnesses_with_complete_first3_rationale": 3,
+  "packing": "existing_CommonPacking_max_bare_empty_G_active_not_pure_bare_counting",
+  "private_artifact_sha256": {
+    "diagnosis.json": "a0e95cd626430a365599579948d6f5ea22630f457c6fe3c4a968fc52cc6cebd0",
+    "states-before-gold.json": "5a49b53aa6ab7790231b224b5966f3e8e6f2fff1856219c1c177af16ded714b8"
+  },
+  "reranker_calls": 0,
+  "rewrite_opportunity": "unknown_not_probed",
+  "scripted_read_events": 3,
+  "selected_inputs_sha256": {
+    "current-opportunity.json": "65e91ff669fa1163a479b3594735fc8e8a0899823b5ebeaa90a9c3709edcdc4b",
+    "selected-before-probe.json": "118d57233b1205f294d7090b6820d658f447ba09263fe8179bdf8e66497338a8",
+    "selected-gold.json": "0725cd9529c5c6c3b25afa25e6c0e6964a68cab9f989dfca0e87ffa0f5698dcb",
+    "selected-inference.json": "0ac620a9b3e10ed80aac3724689e4d23830450b440d2dc8d35f2ed7f79657e44"
+  },
+  "selected_queries": 12,
+  "selection_or_witness_search": false,
+  "source_archive_sha256": "08a44fb8a5f94bc7599a76de1313f0a6d5498810819254ffa5a58335dd409584",
+  "source_git": "dcbe368c1c0208c4c7d5323d99b290873a897110",
+  "tokenizer_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "training": false
+}
