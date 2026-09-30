@@ -5,6 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
 #SBATCH --time=00:10:00
+#SBATCH --no-requeue
 set -euo pipefail
 umask 077
 : "${SLURM_JOB_ID:?CPU allocation required}"
