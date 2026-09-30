@@ -15,7 +15,7 @@ scripts/score_budget_agent_feedback.py text eol=lf
 hpc/submit_climate_full_20260930_r1.sh text eol=lf
 hpc/submit_climate_full_20260930_r2.sh text eol=lf
 configs/budget_agent_assets_20260929.json text eol=lf
-SOURCE_REVISION export-subst
+SOURCE_REVISION export-subst text eol=lf
 docs/verified-runs/budget-agent-cpu-score-20260929.json text eol=lf
 docs/verified-runs/budget-agent-validation-selection-20260929.json text eol=lf
 docs/verified-runs/budget-agent-inputs-manifest-20260929.json text eol=lf
@@ -45,3 +45,7 @@ tests/test_sentence_agent_v3_pilot.py text eol=lf
 hpc/agent_v3_grammar.lock text eol=lf
 hpc/agent_sentence_v3_pilot.sbatch text eol=lf
 hpc/submit_climate_sentence_v3.sh text eol=lf
+hpc/scifact_train_diagnostic.sbatch text eol=lf
+scripts/run_scifact_train_operator.py text eol=lf
+scripts/package_scifact_source.py text eol=lf
+tests/test_scifact_source_package.py text eol=lf

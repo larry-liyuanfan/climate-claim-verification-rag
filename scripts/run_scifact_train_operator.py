@@ -14,6 +14,20 @@ from run_budget_agent_full_operator import (
 from run_sentence_agent_v3_operator import v3_runtime_environment
 
 RELEASE = "climate-scifact-train-diagnostic-20260930-r1"
+ATTEMPT_ID = "climate-scifact-train-diagnostic-20260930-r2"
+INFRA_RETRY = 1
+
+
+def create_attempt_result(root, environ):
+    """Keep the frozen experiment identity separate from an exclusive retry path."""
+    if (environ.get("CLIMATE_SCIFACT_TRAIN_RELEASE") != RELEASE
+            or environ.get("CLIMATE_SCIFACT_ATTEMPT_ID") != ATTEMPT_ID
+            or environ.get("CLIMATE_SCIFACT_INFRA_RETRY") != str(INFRA_RETRY)):
+        raise ValueError("unapproved experiment/attempt identity")
+    result = root / "runs" / ATTEMPT_ID
+    result.mkdir(mode=0o700)
+    return result, {"release_id": RELEASE, "attempt_id": ATTEMPT_ID,
+                    "infra_retry": INFRA_RETRY}
 
 
 def extract_exact(archive, target, expected_sha, names):
@@ -37,10 +51,9 @@ def main():
         raise ValueError("isolated scratch required")
     if (source / "SOURCE_REVISION").read_text().strip() != os.environ["CLIMATE_SOURCE_GIT"]:
         raise ValueError("source revision mismatch")
-    result = ROOT / "runs" / RELEASE
-    result.mkdir(mode=0o700)
+    result, identity = create_attempt_result(ROOT, os.environ)
     status_path = result / "operator-status.json"
-    state = {"release_id": RELEASE, "source_git": os.environ["CLIMATE_SOURCE_GIT"],
+    state = {**identity, "source_git": os.environ["CLIMATE_SOURCE_GIT"],
              "source_archive_sha256": os.environ["CLIMATE_SOURCE_SHA256"],
              "job_id": os.environ["SLURM_JOB_ID"], "status": "running",
              "started_unix": time.time(), "train_gold_extracted": False,

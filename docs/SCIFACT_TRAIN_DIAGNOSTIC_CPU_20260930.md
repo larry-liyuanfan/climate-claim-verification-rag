@@ -1,5 +1,10 @@
 # Eligible SciFact train diagnostic — CPU preparation, no GPU release
 
+Historical preparation scope below is preserved. The separately released job
+31620529 subsequently failed at its source-archive guard, before model loading.
+See the [startup repair](SCIFACT_STARTUP_REPAIR_20260930.md); its r2 attempt retains
+the frozen r1 experiment/data identity and needs a separate coordinator release.
+
 This is a deliberately **biased train diagnostic**, not a benchmark score,
 independent test, or resume improvement. It follows the negative/limited
 [v3 authored pilot](AGENT_V3_PILOT_CLOSEOUT_20260930.md). Its purpose is to

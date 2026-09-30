@@ -23,6 +23,7 @@ jobs:
         run: |
           python -m ruff check src scripts tests
           python -m mypy src/climate_rag
+          python -m mypy scripts/package_scifact_source.py
       - name: Run full test suite
         run: python -m pytest -q
       - name: Scan tracked text for secrets and PII

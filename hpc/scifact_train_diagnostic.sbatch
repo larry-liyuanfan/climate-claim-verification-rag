@@ -14,6 +14,7 @@
 #SBATCH --signal=B:USR1@90
 set -euo pipefail
 umask 077
+trap 'code=$?; printf "startup_error line=%s exit=%s\n" "$LINENO" "$code" >&2' ERR
 : "${SLURM_JOB_ID:?allocated job required}"
 : "${CLIMATE_SOURCE_TAR:?}"
 : "${CLIMATE_SOURCE_SHA256:?}"
@@ -26,6 +27,8 @@ umask 077
 : "${CLIMATE_SCORING_SHA256:?}"
 : "${CLIMATE_DIAGNOSTIC_PROTOCOL_SHA256:?}"
 test "${CLIMATE_SCIFACT_TRAIN_RELEASE:-}" = climate-scifact-train-diagnostic-20260930-r1
+test "${CLIMATE_SCIFACT_ATTEMPT_ID:-}" = climate-scifact-train-diagnostic-20260930-r2
+test "${CLIMATE_SCIFACT_INFRA_RETRY:-}" = 1
 ROOT=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2
 for CLIMATE_ASSET in "$CLIMATE_SOURCE_TAR" "$CLIMATE_GRAMMAR_TAR" "$CLIMATE_INFERENCE_TAR" "$CLIMATE_SCORING_TAR"; do
   case "$(readlink -f "$CLIMATE_ASSET")" in "${ROOT}/envs/"*) ;; *) exit 90 ;; esac
@@ -34,8 +37,12 @@ test "$(sha256sum "$CLIMATE_SOURCE_TAR" | cut -d' ' -f1)" = "$CLIMATE_SOURCE_SHA
 test "$(sha256sum "$CLIMATE_GRAMMAR_TAR" | cut -d' ' -f1)" = "$CLIMATE_GRAMMAR_SHA256"
 test "$(sha256sum "$CLIMATE_INFERENCE_TAR" | cut -d' ' -f1)" = "$CLIMATE_INFERENCE_SHA256"
 test "$(sha256sum "$CLIMATE_SCORING_TAR" | cut -d' ' -f1)" = "$CLIMATE_SCORING_SHA256"
-test "$(tar -xOf "$CLIMATE_SOURCE_TAR" SOURCE_REVISION | tr -d '\r\n')" = "$CLIMATE_SOURCE_GIT"
+# BEGIN SOURCE_ARCHIVE_GUARD
+test "$(tar -tf "$CLIMATE_SOURCE_TAR" | grep -cx 'SOURCE_REVISION')" -eq 1
+test "$(tar -xOf "$CLIMATE_SOURCE_TAR" SOURCE_REVISION | wc -c)" -eq 41
+test "$(tar -xOf "$CLIMATE_SOURCE_TAR" SOURCE_REVISION)" = "$CLIMATE_SOURCE_GIT"
 test "$(sha256sum "$0" | cut -d' ' -f1)" = "$(tar -xOf "$CLIMATE_SOURCE_TAR" hpc/scifact_train_diagnostic.sbatch | sha256sum | cut -d' ' -f1)"
+# END SOURCE_ARCHIVE_GUARD
 module purge
 module load GCC/11.3.0 OpenMPI/4.1.4 PyTorch/2.1.2-CUDA-12.2.0
 CLIMATE_SCRATCH_PARENT="${SLURM_TMPDIR:-${TMPDIR:-}}"
