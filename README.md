@@ -12,6 +12,13 @@ with no gaps. All claims already had an initial complete witness; **zero natural
 read examples** arose. It is grounding-data readiness, not Agent-policy
 readiness, and no subsequent training or held-out evaluation was launched.
 
+The [metadata-only pool audit](docs/SCIFACT_POOL_METADATA_AUDIT_20261001.md)
+shows why this is not a model improvement: the one matched saved read case moves
+from rank 7 / preview-only in the full corpus to rank 1 / citable in the FIT
+pool, with identical source/sentence hashes. Pool membership and BM25 statistics
+changed together. Unowned documents are not proven safe background; no pool
+expansion, extra TRAIN cohort or new training has been released.
+
 [Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
 protocol-bound consumption ledger, whole-component/source-family separation,
 official alternative-aware targets, and a single-config LoRA training / paired
