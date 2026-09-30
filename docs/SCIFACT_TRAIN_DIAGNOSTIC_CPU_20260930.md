@@ -1,4 +1,4 @@
-# Eligible SciFact train diagnostic — CPU preparation, no GPU release
+# Eligible SciFact train diagnostic — frozen CPU preparation and separate GPU release
 
 This is a deliberately **biased train diagnostic**, not a benchmark score,
 independent test, or resume improvement. It follows the negative/limited
@@ -183,5 +183,48 @@ Only content-free manifests are public; selection IDs, gold, witnesses, original
 corpus and full sampling audit are excluded from Git. `sbatch --test-only`
 accepted the proposed wrapper/resource shape. The displayed simulation ID31618509
 and predicted2026-10-05 start are **not a submitted job or guaranteed start**.
-At this closeout there is **no new GPU job**. Release of the frozen inference
-bundle still requires the coordinator's separate review/authorization.
+At the CPU closeout there was **no new GPU job**. The subsequent, separately
+authorized release is recorded below; preparation counts are not model results.
+
+## Separate GPU release: 31620529, awaiting execution
+
+After independent review of the frozen selection, validation and LF archive,
+the coordinator authorized exactly one diagnostic job. `sbatch --test-only`
+was repeated immediately before submission (simulation ID31620528, **not a
+second job**). Actual job31620529 was submitted at2026-09-30 15:39:24+10, with
+the frozen source `d0e2339cb9711d4b46211d88c561d2f80bd39b3c` and the exact
+source/inference/scoring/protocol/wrapper hashes above. An exclusive release
+lock was created before submission; no existing job was cancelled or changed.
+
+At15:43:45+10 the job was **PENDING / Priority**, priority13357
+(Age26 + FairShare13330 + JobSize1; Site/QOS0). `squeue --start` estimated
+2026-10-01 08:50+10; this scheduler estimate is not a promised start. Resource
+limits remain1 A100,8 CPUs,32 GiB RAM,30 GiB local scratch and2 hours,
+normal QOS, Nice0, no requeue. There are no diagnostic model results yet.
+See the [submission receipt](verified-runs/scifact-train-submission-31620529.json).
+
+The job must pass a separate synthetic real-provider preflight before its frozen
+12-train-case /48-slot matrix. No dev/test, policy changes, expanded matrix,
+automatic retry, or repeat inference is authorized. Pending jobs are not
+cancelled/replaced for speculative scheduling gains.
+
+Result audit additionally separates private response-attachment and grammar-log
+`truncated`, `dropped_bytes` and `io_failed` totals. Their shared128-file /1 MiB
+diagnostic quota does not alter returned model text or quality/cost accounting.
+If attachments are truncated, report that limitation and use durable controller
+results/attempt usage and available original text; `slot-*-raw.json` contains the
+pre-conversion controller result, **not a backup of the model-response text**.
+Do not claim all raw responses were preserved or are recoverable. True I/O failure
+is separately fail-closed; quota truncation and I/O failure are not interchangeable.
+This audit requirement does not change the frozen provider or quota and does not
+authorize a rerun.
+
+Count receipts exactly once from `run.json` at
+`runs[*].result.generation_attempts[*].diagnostics`, and separately from
+`runtime-preflight.json` at `records[*].diagnostics`. Do not double-count per-slot
+files or preflight embedded in scoring output. For each attachment kind, retain
+receipt coverage, missing-receipt count, truncated/I/O-failure counts and
+attempted/stored/dropped byte sums. Missing receipts are unknown, not zero. Use
+phase/slot/attempt/kind identity, not content hashes: two distinct attempts can
+produce identical text. Count affected attempts/slots by set union across kinds.
+Both phases share the private root quota; receipt count is not stored-file count.
