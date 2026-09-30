@@ -138,13 +138,25 @@ not pretraining. Architecture/rank/optimizer and a resource estimate require a
 separate freeze and measured shape/pilot before release, not guessed walltime.
 No official SciFact-finetuned checkpoint may serve as an allegedly untouched base.
 
-Compare base/adapter using the **same fixed candidate full contexts**. Tuning
-may select one predeclared abstention threshold; only then run both on the twelve
+Compare base/adapter using the **same claim and identical fixed candidate full
+texts**, without supplying the gold relation, answer or gold evidence markers.
+Both models must independently output document relations and cited sentence IDs;
+gold is available only to the separate evaluator after inference. This is a
+non-oracle joint grounding comparison. Stage A's correct-relation-conditioned
+rationale scores remain diagnostic only and cannot substitute for this outcome.
+Tuning may select one predeclared abstention threshold; only then run both on the twelve
 frozen TRAIN-validation claims once (24 calls). Including tuning, the comparison
 cap is 48 calls. Report document relation Macro-F1/confusion, official document
 and sentence counts, alternative completion/first3 credit, unjudged extras, NEI
 false evidence/coverage and token/latency cost. Do not describe zero-output
 failures as abstention or use tool-call rate as the objective.
+
+Any separately authorized later four-route Agent comparison must use the **same
+frozen generator and adapter state across all four routes**. Do not compare an
+adaptive route using the new adapter against historical base-generator baselines;
+that would confound grounding adaptation with Agent policy. This clarification
+does not authorize that comparison, Stage B data preparation, a split, training
+or new evaluation, and does not change the running Stage A release or its source.
 
 Preregister count-based advancement before running: more correctly rationalized
 documents with no extra NEI false evidence, no additional invalid/failed outputs,
