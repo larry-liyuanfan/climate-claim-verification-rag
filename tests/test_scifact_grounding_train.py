@@ -28,14 +28,22 @@ def test_runtime_file_tampering_fails_before_model_import(tmp_path: Path, monkey
     manifest = deps / 'runtime-files.json'
     manifest.write_text(json.dumps({'envs/deps/site/package.py': operator.sha(site / 'package.py')}))
     info = {'status': 'imports_verified', 'stderr_empty': True, 'dependency_errors': [],
-            'runtime_files_sha256': operator.sha(manifest)}
+            'runtime_files_sha256': operator.sha(manifest), 'versions': {'torch': 'fixture'},
+            'python': 'fixture', 'os_name': 'posix', 'torch': 'fixture',
+            'module_files': {'torch': 'expected-module/torch.py'}}
     receipt = deps / 'final-receipt.json'
     receipt.write_text(json.dumps(info))
-    release = {'runtime_receipt_sha256': operator.sha(receipt), 'runtime_files_sha256': operator.sha(manifest)}
+    release = {'runtime_receipt_sha256': operator.sha(receipt), 'runtime_files_sha256': operator.sha(manifest),
+               'python_executable': 'module/python'}
     monkeypatch.setattr(operator, 'ROOT', tmp_path)
     monkeypatch.setattr(operator, 'DEPS', deps)
     monkeypatch.setattr(operator, 'SITES', [site])
+    monkeypatch.setattr(operator, 'import_observation', lambda _: dict(info, python_executable='module/python'))
     operator.runtime_check(release)
+    monkeypatch.setattr(operator, 'import_observation', lambda _: dict(info, python_executable='module/python',
+        module_files={'torch': 'unexpected-module/torch.py'}))
+    with pytest.raises(ValueError, match='runtime_actual_import_changed'):
+        operator.runtime_check(release)
     (site / 'package.py').write_bytes(b'changed')
     with pytest.raises(ValueError, match='runtime_files_changed'):
         operator.runtime_check(release)

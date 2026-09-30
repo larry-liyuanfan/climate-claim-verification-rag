@@ -238,6 +238,11 @@ and the exact once-only 24-step schedule. They are not real-model training.
 the release hash. `scripts/run_scifact_grounding_train_operator.py` rejects
 drafts, verifies the runtime tree, reserves one fixed allocation directory,
 extracts only the frozen generator in allocated scratch and launches `train`.
+Before loading weights it imports the actual runtime after the Torch pytree
+shim, compares Python executable/version, package versions and module source
+paths with the frozen receipt, and persists the observation. A fixture rejects
+changed import origins even when dependency files remain unchanged. Torch, CUDA,
+extension and Triton caches point into allocated scratch, not home.
 It never invokes tune, validation or an answer generator. The draft uses
 `authorization: DRAFT_NOT_AUTHORIZED`; exact hashes require coordinator review
 and a separate release. CPU `sbatch --test-only` is scheduling validation only,

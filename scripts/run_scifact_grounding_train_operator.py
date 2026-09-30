@@ -29,7 +29,25 @@ def require(value: bool, message: str) -> None:
         raise ValueError(message)
 
 
-def runtime_check(release: dict[str, Any]) -> None:
+def import_observation(names: list[str]) -> dict[str, Any]:
+    import importlib.metadata as md
+    import platform
+    from climate_rag.torch_compat import ensure_torch_pytree_compat
+    ensure_torch_pytree_compat()
+    import torch
+    import peft
+    import accelerate
+    import transformers
+    import safetensors
+    return {'python': platform.python_version(), 'os_name': os.name,
+        'torch': torch.__version__, 'python_executable': sys.executable,
+        'versions': {n: md.version(n) for n in names},
+        'module_files': {m.__name__: m.__file__ for m in
+                         (torch, peft, accelerate, transformers, safetensors)},
+        'model_loaded': False, 'generation_calls': 0}
+
+
+def runtime_check(release: dict[str, Any]) -> dict[str, Any]:
     receipt = DEPS / 'final-receipt.json'
     manifest = DEPS / 'runtime-files.json'
     require(sha(receipt) == release['runtime_receipt_sha256'], 'runtime_receipt_hash')
@@ -43,6 +61,11 @@ def runtime_check(release: dict[str, Any]) -> None:
               for p in site.rglob('*') if p.is_file()}
     require(not any(p.is_symlink() for site in SITES for p in site.rglob('*'))
             and actual == expected, 'runtime_files_changed')
+    observed = import_observation(list(info['versions']))
+    require(observed['python_executable'] == release['python_executable'], 'runtime_interpreter_changed')
+    require(all(observed[k] == info[k] for k in ('python', 'os_name', 'torch', 'versions', 'module_files')),
+            'runtime_actual_import_changed')
+    return observed
 
 
 def main() -> None:
@@ -67,11 +90,12 @@ def main() -> None:
     require(release['output'] == str(output) and not output.exists(), 'fixed_unused_output')
     allocation = output.with_name(output.name + '-allocation')
     allocation.mkdir(mode=0o700)
-    runtime_check(release)
+    observed = runtime_check(release)
     # Heavy extraction/model work happens only inside the GPU allocation.
     from climate_rag.component_execution import durable
     from run_budget_agent_full_operator import ARCHIVES
     from run_scifact_component_operator import generator_only
+    durable(allocation / 'runtime-observed.json', observed)
     durable(allocation / 'started.json', {'source_git': release['source_git'],
         'release_sha256': release_sha, 'job_id': os.environ['SLURM_JOB_ID'],
         'started_unix': time.time(), 'training_only': True})
