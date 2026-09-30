@@ -171,6 +171,15 @@ checks passed. The harness repair changes no runtime candidate/controller code.
 No real queries were read, no model weights were loaded, and no GPU job was
 submitted by either CPU smoke attempt. Real HF/weight usefulness remains untested.
 
+Final source`b39770bc3bf82b23c072f4849e7fe65660dea2b5` passes Linux CI
+[36677343963](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36677343963):
+**513 passed /1 optional Torch skip**, Ruff, mypy56 files and tracked privacy scan.
+Companion36677339997 also passed. A second fresh LF Git archive of this source
+passed29 focused tests (ZIP SHA
+`bf10080763381a43599e90069c8d5175b331fb4eec2033a18f765df630665943`).
+The [validation receipt](verified-runs/evidence-gap-candidate-validation-20260930.json)
+separates final code/CI identity from the earlier unchanged-tokenizer smoke.
+
 ## Stop/release rule
 
 The frozen train diagnostic must first show at least one auditable, naturally
