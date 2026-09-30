@@ -163,10 +163,21 @@ Content-free receipts:
   `92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca`.
 - Scoring-only tar40,960 bytes:
   `174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444`.
-- Exact Git source tar with `SOURCE_REVISION`:
-  `a0979ba67d24e20a7b47a324b645e4fb4f3ea67cc4be5dcfd233fbf499e38c53`.
+- Exact **LF** Git source tar with `SOURCE_REVISION`,2,181,120 bytes:
+  `0903d8d2533198a7c3921d2ca4ef887aa5cf331aa695fa99083262ccff8f6794`.
 - Sbatch wrapper:
   `351ab5f7ef1f8e1762d99400c6db5cc47500ac30227e5a00c3551f0affc41ca4`.
+
+Pre-release review caught Windows newline conversion in the initial source tar
+`a0979ba67d24e20a7b47a324b645e4fb4f3ea67cc4be5dcfd233fbf499e38c53`:
+its CRLF wrapper would fail the byte-level equality guard against the uploaded LF
+wrapper. That tar is retained **superseded, not for execution**. Re-exporting the
+same commit with `git -c core.autocrlf=false -c core.eol=lf archive` fixed packaging
+without any source, sample, protocol, inference or scoring change. All317 regular
+source members match their frozen Git blobs byte-for-byte; `SOURCE_REVISION`
+matches separately. The tar wrapper matches the local/uploaded LF wrapper. All22
+focused tests also pass from a fresh LF-tar extraction. See the
+[byte-audit receipt](verified-runs/scifact-train-source-lf-20260930.json).
 
 Only content-free manifests are public; selection IDs, gold, witnesses, original
 corpus and full sampling audit are excluded from Git. `sbatch --test-only`

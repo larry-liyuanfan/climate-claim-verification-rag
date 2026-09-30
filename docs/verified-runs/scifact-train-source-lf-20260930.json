@@ -1,0 +1,18 @@
+{
+  "schema_version": "scifact-train-source-byte-audit-v1",
+  "source_git": "d0e2339cb9711d4b46211d88c561d2f80bd39b3c",
+  "archive_export_options": ["core.autocrlf=false", "core.eol=lf", "SOURCE_REVISION=<source_git>"],
+  "source_tar_sha256": "0903d8d2533198a7c3921d2ca4ef887aa5cf331aa695fa99083262ccff8f6794",
+  "source_tar_bytes": 2181120,
+  "exact_git_blob_members": 317,
+  "source_revision_verified": true,
+  "comparison": "Every regular source member compared byte-for-byte with git cat-file blob <source_git>:<path>; SOURCE_REVISION checked separately.",
+  "wrapper_sha256": "351ab5f7ef1f8e1762d99400c6db5cc47500ac30227e5a00c3551f0affc41ca4",
+  "wrapper_matches_local_bytes": true,
+  "clean_lf_archive_focused_tests_passed": 22,
+  "superseded_crlf_archive_sha256": "a0979ba67d24e20a7b47a324b645e4fb4f3ea67cc4be5dcfd233fbf499e38c53",
+  "old_archive_retained_not_for_execution": true,
+  "sampling_rerun": false,
+  "inference_or_scoring_bundles_changed": false,
+  "job_submitted": false
+}
