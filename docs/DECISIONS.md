@@ -1,5 +1,21 @@
 # Decision log
 
+## D11 — Separate completed Agent execution from demonstrated quality
+
+The frozen full comparison31543304 completed96 validation and24 authored slots,
+but no answer passed mechanical checks. Schema failures consumed90.77% of output
+tokens; no adaptive rewrite/rerank executed. Keep the original failure-gated
+scores and include failed-output cost instead of counting every final
+`abstained` status as correct model abstention. All frozen paired evidence
+intervals include zero. Posthoc retained-context statistics explain evidence
+suppression but cannot replace the frozen score or establish Agent quality.
+
+Decision: do not promote, deploy or automatically retry. Earlier restricted
+LoRA development and public retrieval tradeoffs remain separate search evidence;
+the consumed test stays closed. This package is an auditable negative
+integration/contract case, not a successful autonomous Agent. See the
+[full closeout, cases and replay](BUDGET_AGENT_FULL_CLOSEOUT_20260930.md).
+
 ## D10 — Select a practical latency route from measured requests
 
 Public-validation job `31364586` completed on 2026-09-27 using the frozen

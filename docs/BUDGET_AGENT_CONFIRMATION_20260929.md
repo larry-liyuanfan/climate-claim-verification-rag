@@ -1,5 +1,10 @@
 # Frozen protocol confirmation: negative result, auditable execution
 
+Historical pilot only. The later [full comparison31543304](BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
+completed120 slots with0 accepted answers; its result supersedes this pilot as
+the current Agent-quality evidence. This file and its original compact remain
+unchanged below for provenance, not as a selected success headline.
+
 Job31520350 completed, but the explicit action/query prompt did not solve model
 contract compliance:2 of9 responses passed structural and mechanical citation /
 number checks;7 failed schema validation. This is not semantic accuracy, a

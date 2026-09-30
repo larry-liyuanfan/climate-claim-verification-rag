@@ -1,0 +1,76 @@
+{
+  "schema_version": "climate-budget-agent-full-resource-audit-v1",
+  "scope": "completed frozen comparison; CPU receipt closeout only",
+  "compact": {
+    "path": "docs/verified-runs/budget-agent-full-31543304.json",
+    "sha256": "0094b372d98144d90fe9c09c4998bca29dda9d189cc482753aa50f363a86082f",
+    "bytes": 51090
+  },
+  "resource_source": "sacct job and .batch step records; TotalCPU is actual .batch accounting, not CPUTimeRAW",
+  "jobs": [
+    {
+      "id": "31542525",
+      "release": "climate-full-72eaa90-20260930-r1",
+      "state": "FAILED",
+      "exit_code": "1:0",
+      "start": "2026-09-30T02:02:42+10:00",
+      "end": "2026-09-30T02:03:21+10:00",
+      "elapsed_seconds": 39,
+      "batch_total_cpu_seconds": 34.931,
+      "batch_max_rss_kib": 15854940,
+      "inference_started": false,
+      "boundary": "runtime prefix preparation failure, not model inference"
+    },
+    {
+      "id": "31543304",
+      "release": "climate-full-72eaa90-20260930-r2",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "partition": "gpu-a100-short",
+      "start": "2026-09-30T02:35:27+10:00",
+      "end": "2026-09-30T02:47:08+10:00",
+      "elapsed_seconds": 701,
+      "batch_total_cpu_seconds": 678.950,
+      "batch_max_rss_kib": 18176444,
+      "allocated_gpu_count": 1,
+      "allocated_cpu_count": 8,
+      "allocated_memory_gib": 32,
+      "cpu_time_raw_reserved_seconds": 5608,
+      "operator_elapsed_seconds": 696.4349319934845,
+      "gpu_memory_peak": null
+    }
+  ],
+  "combined_r1_r2": {
+    "gpu_allocation_seconds": 740,
+    "gpu_allocation_hours": 0.20555555555555555,
+    "actual_batch_cpu_seconds": 713.881,
+    "reserved_cpu_seconds": 5920,
+    "currency_cost": null,
+    "boundary": "includes failed preparation; allocated GPU time is not GPU-kernel utilization or a currency estimate"
+  },
+  "publication_validation": {
+    "clean_source_git": "af97ab2f81204ec047fc020378857928b387f796",
+    "method": "fresh git archive extraction; no editable source import for the standalone audit",
+    "python": "3.12.14",
+    "targeted_tests": 10,
+    "targeted_tests_passed": 10,
+    "targeted_tests_seconds": 0.08,
+    "targeted_ruff": "passed",
+    "unchanged_full_local_suite_rerun": false,
+    "boundary": "audit contract fixtures only; publication CI covers normal full tests/source mypy after push"
+  },
+  "audit": {
+    "git": "af97ab2f81204ec047fc020378857928b387f796",
+    "script": "scripts/audit_budget_agent_full.py",
+    "script_sha256": "0de5c3f06bccc66b68576036b48f73374ccc244fd9a62161e1e8d6c774f73def",
+    "python": "3.9.25",
+    "elapsed_seconds": 0.22,
+    "max_rss_kib": 24576,
+    "scope": "small existing JSON/source receipts only; no dataset/model computation or new Slurm job",
+    "frozen_scoring_recomputed": false,
+    "posthoc_diagnostic_statistics_computed": true,
+    "inference_repeated": false,
+    "raw_responses_or_prediction_rows_downloaded": false,
+    "input_model_bundle_rehashed": false
+  }
+}

@@ -1,5 +1,17 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
+completed in job **31543304**, but did **not** demonstrate Agent quality: all
+120 task/route slots ran; **0 answers passed mechanical checks**, 105 outputs
+failed schema validation, 14 were model-requested abstentions and one was
+rejected for an inexact quote. No model-directed rewrite/rerank executed.
+Validation retrieval-effect intervals include zero. The original frozen scores,
+failed-output token costs and five sanitized cases are retained in the
+[content-free compact](docs/verified-runs/budget-agent-full-31543304.json).
+This repeated validation/authored-task comparison is separate from the earlier
+restricted LoRA development gains and public search tradeoffs below. It does
+not reopen frozen test, justify deployment or support an autonomous-Agent claim.
+
 2026-09-29: [budgeted evidence-driven Agent CPU package](docs/BUDGET_AGENT_CPU_HANDOFF_20260929.md)
 adds a source/constraint ledger, bounded rewrite/rerank decisions, cited-answer
 validation and fixed-chain comparison runners. The [first real-model pilot](docs/BUDGET_AGENT_GPU_PILOT_20260929.md)
@@ -15,7 +27,9 @@ contract**. None was a valid model-requested abstention; no adaptive rewrite or
 rerank executed. This is a negative protocol-compliance result, not semantic
 accuracy or Agent-quality improvement. A frozen-protocol offline comparison is
 technically interpretable with failures retained, but remains separately gated
-on coordinator release and a free GPU slot. The CPU heuristic control remains negative.
+on coordinator release. That full comparison has since completed with the
+negative result above; the pilot's 2/9 is not its success rate. The CPU heuristic
+control remains negative.
 
 The [offline scoring audit](docs/BUDGET_AGENT_SCORING_AUDIT_20260929.md) now requires
 complete frozen task/route matrices and gold identities, preserves partial token
@@ -34,8 +48,10 @@ identify a `./lib/...` tar-prefix mismatch, not a model/scoring failure.
 A subsequent explicit coordinator release authorized exactly one repair rerun:
 **31543304**, initially PENDING/Resources with no scheduled start; see the
 [r2 submission receipt](docs/verified-runs/budget-agent-full-r2-submission-20260930.json).
-No automatic retry or extra experiment is authorized.
-There are no full-comparison results yet. The operator shares one read-only
+No automatic retry or extra experiment is authorized. Job31543304 subsequently
+completed in701s, exit0:0; final results and resource accounting are in the
+[closeout](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md). Initial submission
+receipts remain historical snapshots. The operator shares one read-only
 input/model extraction across separate frozen validation and authored-vNext
 processes, with phase-specific receipts and fail-closed scoring.
 

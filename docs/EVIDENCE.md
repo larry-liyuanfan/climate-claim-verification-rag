@@ -1,5 +1,29 @@
 # Evidence and claim boundaries
 
+## 2026-09-30 frozen Agent comparison: completed, negative quality result
+
+Job31543304 completed the frozen96-slot validation and24-slot authored-vNext
+matrices using the5,240-document public corpus, BM25 and optional fixed4B
+reranking; dense retrieval was disabled. This is neither the1,208,827-document
+LoRA experiment nor a new frozen-test evaluation. All120 generated responses
+have recorded token usage:0 mechanically accepted answers,105 schema failures,
+14 genuine model abstentions and1 exact-quote rejection. There were no legal
+model-requested rewrite/rerank actions or adaptive extra tool executions.
+
+The frozen scorer's failure-gated delivered-evidence metrics use24 evidence
+claims; label delivery uses23 non-DISPUTED decisive labels. Fixed-rerank versus
+fixed-retrieval Recall@5 delta is0.0694 with a5,000-sample95% interval containing
+zero; adaptive delta0.0417 also includes zero. Semantic supportability remains
+unmeasured, not100% because zero answers were emitted. Authored-task quality
+metrics remain null. Posthoc context diagnostics cannot replace these scores.
+
+All192,026 input and21,361 output generation tokens, including failures, count.
+The local artifact is content-free; original model responses and per-row
+predictions remain private on Spartan. See the [full closeout](BUDGET_AGENT_FULL_CLOSEOUT_20260930.md),
+[compact aggregate](verified-runs/budget-agent-full-31543304.json) and
+[resource/audit receipt](verified-runs/budget-agent-full-resources-20260930.json).
+No current resume was edited or independent-test/online-Agent benefit inferred.
+
 ## 2026-09-27 correction: ranking depth, integrity and timing
 
 This notice supersedes historical field labels, not the immutable run artifacts.

@@ -13,7 +13,9 @@ passed test-only and submitted exactly one job31543304. See the
 [actual submission receipt](verified-runs/budget-agent-full-r2-submission-20260930.json).
 Initial state at02:22:46+10:00 was PENDING/Resources with StartTimeUnknown.
 The preparation-only commands below are historical handoff, **not permission to
-execute again**: the r2 submission lock is now consumed. No results yet.
+execute again**: the r2 submission lock is now consumed. Later, r2 completed;
+the [full negative result](BUDGET_AGENT_FULL_CLOSEOUT_20260930.md) records120
+executed slots and0 accepted answers. The r1 failure evidence below is retained.
 
 ## Observed failure and cause
 
