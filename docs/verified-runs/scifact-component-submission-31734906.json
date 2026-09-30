@@ -1,0 +1,81 @@
+{
+  "schema_version": "scifact-component-infrastructure-retry-submission-v1",
+  "status": "submitted_pending_not_model_result",
+  "job_id": "31734906",
+  "release_id": "scifact-component-single-attempt-20261001-r2",
+  "logical_release": "scifact-component-single-attempt-20261001-v1",
+  "infra_retry": 1,
+  "prior_job": "31729507",
+  "prior_generation_calls": 0,
+  "prior_allocated_gpu_seconds": 81,
+  "prior_release_preserved": true,
+  "execution_source_git": "81917f2c9a1b2060bd84a0688bd65a40b1c4e134",
+  "documentation_head_at_submission": "52331b4dce5b1a9717618d66bc891fb0d0981642",
+  "preparation_source_git": "426ff7343fb30e1ffcde4dfa4a43f1c00c210cfb",
+  "source_archive_sha256": "a393a8e21c53542a851feae480ea42d7c331d7e91d1ce7e85b7a386fbe848a5e",
+  "source_archive_bytes": 3143680,
+  "source_members": {"original_git_blobs": 414, "substituted_source_revision": 1, "regular_files_total": 415, "directories": 13},
+  "wrapper_sha256": "b665d38ef32ba04d6de8a8bed5b21c4bb0688d0bae225f9f7abade0e93299153",
+  "protocol_sha256": "2ce563ccc34efbd5ee1a21cf12fa47fafd063c853c629996909cb37e7247ca1e",
+  "slots_sha256": "84524e2a837aacab5824e5562a61d827ef02b1832dd9ab9f383ae73caa309ac9",
+  "targets_sha256": "a6d38d3fe9d72e6beb0b16836e650e4519d2016e31b63ed1d79e05999b665d9a",
+  "remote_stage_relative_to_project_root": "envs/component-execution-a393a8e21c53542a851feae480ea42d7c331d7e91d1ce7e85b7a386fbe848a5e",
+  "pre_submission": {
+    "account_queue_empty": true,
+    "logical_release_history": "only predecessor 31729507 FAILED 1:0",
+    "r2_attempt_and_result_absent": true,
+    "stage_created_exclusively": true,
+    "predecessor_log_and_status_exact_hash_verified": true,
+    "predecessor_model_stage_markers_absent": true,
+    "remote_archive_wrapper_and_frozen_input_hashes_verified": true,
+    "project_df_available_bytes": 294742130688,
+    "project_quota_kib": {"used": 201850640, "soft": 488636416, "hard": 489684992},
+    "project_file_quota": {"used": 513929, "soft": 1000000, "hard": 1000000},
+    "home_quota_full": true,
+    "home_data_or_dependencies_written": false,
+    "partition_reported_tmp_disk_mb": 1400000,
+    "actual_node_scratch": "not_allocated_yet_operator_checks_capacity_on_node"
+  },
+  "resources": {
+    "gpu": "A100:1", "cpus": 8, "memory": "32G", "scratch": "30G", "walltime": "01:40:00",
+    "partitions": ["gpu-a100", "gpu-a100-short"], "qos": "normal", "nice": 0, "requeue": 0
+  },
+  "unchanged_scope": {
+    "preflight_calls_max": 4, "planned_diagnostic_slots": 33, "total_attempts_max": 37,
+    "screening_slots": 12, "relation_slots": 12, "oracle_rationale_slots": 9,
+    "input_tokens": 8192, "output_tokens": 512, "slot_seconds": 120,
+    "warmup_calls": 0, "attempts_per_slot": 1, "decoding": "greedy_nonthinking",
+    "frozen_screening_gold_coverage": "6/9, not a model screening accuracy",
+    "new_data_train_dev_test": false
+  },
+  "receipts": {
+    "test-only.json": {
+      "sha256": "ff5bf7c50df52b9021f6241e6878ff732c7f14821cd131384609bc91e321d8aa", "bytes": 3046,
+      "returncode": 0, "checked_at_utc": "2026-09-30T15:37:54.600749+00:00",
+      "forecast_only_job_number": "31734555", "forecast_start_cluster_local": "2026-10-05T15:05:54",
+      "job_submitted": false
+    },
+    "submission-attempt.json": {
+      "sha256": "7bd78b20c749bf4ad6f1afd962ac99a7b15e3a68e9dd4da3780e0b6a24b91c49", "bytes": 1628,
+      "durable_before_sbatch": true, "submission_attempts": 1
+    },
+    "submission-receipt.json": {
+      "sha256": "032b98cdea4bd6b0cd057235cd0a37e338208cbfc4a677bf271f906cd1365b2f", "bytes": 1688,
+      "submitted_at_utc": "2026-09-30T15:38:53.907305+00:00",
+      "returncode": 0, "stdout": "31734906\n", "stderr": "", "job_id": "31734906"
+    }
+  },
+  "queue_snapshot": {
+    "checked_at": "2026-10-01T01:39:24+10:00", "state": "PENDING", "reason": "Resources",
+    "elapsed": "00:00:00", "scheduler_forecast_start": "2026-10-01T02:22:43+10:00",
+    "forecast_not_guaranteed": true, "priority": 13408, "priority_age": 0,
+    "priority_fairshare": 13407, "priority_jobsize": 2, "restarts": 0
+  },
+  "submission_attempts_this_release": 1,
+  "automatic_retry": false,
+  "new_polling_task_created": false,
+  "credentials_or_reset_changed": false,
+  "other_projects_modified": false,
+  "resume_modified": false,
+  "results_available": false
+}

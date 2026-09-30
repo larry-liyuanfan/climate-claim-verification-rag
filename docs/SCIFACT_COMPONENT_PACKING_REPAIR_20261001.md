@@ -72,8 +72,9 @@ Python 3.14 tar-extraction deprecation warning remains.
 
 Prepared source: `81917f2c9a1b2060bd84a0688bd65a40b1c4e134`.
 Its [validation receipt](verified-runs/scifact-component-repair-validation-20261001.json)
-binds the exact archive/wrapper and CPU results. The packager checks all 415 Git
-blobs/modes, 13 directories, one expanded revision marker and actual shell guard.
+binds the exact archive/wrapper and CPU results. The packager checks 414 original
+Git blobs plus one substituted `SOURCE_REVISION` (415 regular files total), their
+modes, 13 directories and the actual shell guard.
 An initial ordinary Windows `git archive` was rejected for byte/mode mismatch;
 only the packager's verified LF archive was transferred or used.
 
