@@ -507,3 +507,29 @@ This section is CPU implementation/preparation only. The new release stays
 coordinator's next exact-source/hash release. Its eventual result can only test
 whether this small frozen TRAIN-internal signal repeats, not establish Agent
 tool-use benefit or independent external-test generalization.
+
+## Posthoc structure and exposure correction (2026-10-01)
+
+The original tune gate and score are retained without modification. The
+[physical metadata-only audit](verified-runs/scifact-grounding-structure-20261001.json)
+(`b81dc4cc50f0b390a2ea08d68bd49daccbb95f4520a2ecab4cb65c3c8d7bcd1e`)
+finds that all 96 FIT records contain one document and target alias `c1`.
+All 12 adapted tune outputs are single-document `c1` answers (6 SUPPORTS,
+6 REFUTES); sentence indices vary, so this is not fixed first-sentence copying.
+This suggests alias/top-1 convergence, not demonstrated multi-document selection
+or autonomous tool use. The original correctness/F1 improvement remains valid
+under its original restricted-pool tune definition, not a broader Agent claim.
+
+Contrary to an earlier coordination-summary assumption, FIT selection permits
+historically consumed TRAIN components. Physical FIT/old-selection intersection
+is **one exact claim and one component**, within the three historic read
+opportunities: one trained, two not directly trained. All twelve were previously
+exposed regression queries; neither subgroup is held out. Existing tune and
+validation isolation is unchanged. No gold/scorer/model was rerun for this audit.
+
+Validation-only source `ce34e16` is preserved as DRAFT, with 69 related tests
+passing (one existing tiny-PEFT fixture warning), Ruff and strict mypy passing.
+No remote validation test-only, submission or inference was performed. Its
+unconsumed twelve-query validation is reserved. Next authorized work is CPU-only
+packaging of the old twelve-query, four-route regression with the same active
+adapter in every route; actual execution requires a subsequent exact release.

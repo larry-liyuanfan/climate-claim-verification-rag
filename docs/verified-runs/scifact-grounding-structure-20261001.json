@@ -1,0 +1,128 @@
+{
+  "data_manifest_sha256": "28de2c5d1d531aabdb757ccb45db0b91232a54ac7089ac7dc5ebf42e65ba3b2f",
+  "fit_and_overlap": {
+    "component_overlap": 1,
+    "context_document_counts": {
+      "1": 96
+    },
+    "exact_claim_overlap": 1,
+    "fit_claims": 48,
+    "fit_components": 48,
+    "fit_records": 96,
+    "old_selected_claims": 12,
+    "overlap_by_legacy_stratum": {
+      "gold_absent_top20": {
+        "fit_component": 0,
+        "fit_exact": 0,
+        "selected": 3
+      },
+      "initial_doc_opportunity": {
+        "fit_component": 0,
+        "fit_exact": 0,
+        "selected": 3
+      },
+      "nei": {
+        "fit_component": 0,
+        "fit_exact": 0,
+        "selected": 3
+      },
+      "top20_doc_replenishable": {
+        "fit_component": 1,
+        "fit_exact": 1,
+        "selected": 3
+      }
+    },
+    "target_actions": {
+      "answer": 96
+    },
+    "target_relation_counts": {
+      "REFUTES": 51,
+      "SUPPORTS": 45
+    },
+    "target_source_aliases": {
+      "c1": 96
+    }
+  },
+  "fit_sha256": "70e40db85b0e51292ee1235be6bb708272846a0fcd4be2d123cfb4f2238d15a5",
+  "gold_loaded": false,
+  "interpretation": [
+    "Single-document c1 supervision and c1-only tune predictions suggest alias/top1 convergence, not demonstrated multi-document selection.",
+    "Sentence indices vary; this is not simply copying the first sentence.",
+    "The three historic read witnesses split into one FIT-overlap and two non-direct-FIT-overlap queries; all remain exposed regression inputs.",
+    "Retain all twelve queries and all four routes; tune/validation grouping is unchanged."
+  ],
+  "new_model_calls": 0,
+  "original_gate_modified": false,
+  "scope": "posthoc_existing_train_internal_artifacts_not_new_experiment",
+  "scorer_rerun": false,
+  "script_sha256": "cdc4121437c13c163374974fb3db517619a07faaa87dfe2c6df6a14a6e037e5f",
+  "selection_sha256": "118d57233b1205f294d7090b6820d658f447ba09263fe8179bdf8e66497338a8",
+  "tune_responses": {
+    "adapted": {
+      "actions": {
+        "answer": 12
+      },
+      "documents_per_response": {
+        "1": 12
+      },
+      "queries": 12,
+      "relations": {
+        "REFUTES": 6,
+        "SUPPORTS": 6
+      },
+      "response_manifest_sha256": "fab6431b50941b71b94059a80b12cddcc5a0aa86641a9b800d378a9c94d4d287",
+      "sentence_index_counts": {
+        "0": 1,
+        "1": 1,
+        "3": 2,
+        "4": 2,
+        "5": 1,
+        "10": 1,
+        "11": 1,
+        "12": 2,
+        "14": 1
+      },
+      "source_aliases": {
+        "c1": 12
+      }
+    },
+    "base": {
+      "actions": {
+        "answer": 12
+      },
+      "documents_per_response": {
+        "1": 1,
+        "3": 5,
+        "4": 5,
+        "5": 1
+      },
+      "queries": 12,
+      "relations": {
+        "REFUTES": 22,
+        "SUPPORTS": 19
+      },
+      "response_manifest_sha256": "44a111271b144d5a4112dd67bd1d5c0d9c279acd836ac0cd9472a2095294163f",
+      "sentence_index_counts": {
+        "0": 35,
+        "1": 35,
+        "2": 35,
+        "3": 32,
+        "4": 28,
+        "5": 13,
+        "6": 12,
+        "7": 10,
+        "8": 2,
+        "9": 4,
+        "10": 3,
+        "11": 2
+      },
+      "source_aliases": {
+        "c1": 12,
+        "c2": 11,
+        "c3": 10,
+        "c4": 6,
+        "c5": 2
+      }
+    }
+  }
+}

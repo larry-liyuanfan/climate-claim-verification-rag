@@ -1,6 +1,6 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-## Grounding adaptation candidate: training complete, quality not evaluated
+## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
 [Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
 protocol-bound consumption ledger, whole-component/source-family separation,
@@ -12,9 +12,18 @@ pools contain only 58 source-partitioned documents; this is a controlled groundi
 experiment, **not a full-corpus retrieval result or an independent test**.
 One separately authorized run, **31757970**, completed 96 records / 24 updates
 and one final LoRA checkpoint; its 144 tensors passed finite/shape/hash audits.
-This demonstrates a bounded training workflow, **not improved grounding quality**.
-No paired evaluation, answer generation, external dev/test result or Agent
-improvement is claimed. Historical negative results below are unchanged.
+The separately released 12-query tune pair completed: correctly rationalized
+documents increased **1 to 4**, but NEI false evidence stayed **4/4**. A
+[physical posthoc audit](docs/verified-runs/scifact-grounding-structure-20261001.json)
+found single-document `c1` targets in every FIT record and `c1`-only adapted tune
+answers. This controlled TRAIN-internal signal does **not** establish multi-document
+selection, retrieval or autonomous tool use. The original gate and negative
+findings remain unchanged; the frozen validation has **not** been called.
+
+[The next four-route regression package](docs/SCIFACT_ADAPTER_REGRESSION_CPU_20261001.md)
+keeps the same active adapter across 48 slots over twelve previously exposed
+queries, including one FIT-overlap query. It is **CPU-prepared/DRAFT**, not a new
+model result; a separate exact release is required before execution.
 
 ## Latest component diagnostic: complete, with grounding errors
 
