@@ -201,3 +201,8 @@ only the corrected `r2` helper ran. Source, model, prompts, selected queries,
 budgets and evaluation contracts were unchanged. This is a submission handoff,
 not final inference/preflight/quality evidence. The coordinator owns subsequent
 status and result verification; no new polling task or resume update was created.
+
+Both released jobs subsequently completed. The
+[formal result closeout](SCIFACT_SEMANTIC_CLOSEOUT_20260930.md) preserves the
+negative Agent finding and replaces the submission snapshot as the current
+result reference; historical CPU/release receipts remain unchanged.

@@ -1,5 +1,20 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+## Latest bounded diagnosis: completed, not Agent improvement
+
+The [semantic-policy closeout](docs/SCIFACT_SEMANTIC_CLOSEOUT_20260930.md) verifies
+both completed jobs and all 96 TRAIN slots. Both adaptive policies made zero
+tool proposals/executions. Correctly rationalized adaptive documents stayed at
+one; F1 .0444 → .0513 reflects fewer predictions, not newly discovered evidence.
+The [compact](docs/verified-runs/scifact-semantic-pair-closeout-31706518-31706520.json)
+retains 32 independently matched official metric groups, real token/resource
+cost and visible-evidence failure layers. No independent-test or Agent benefit
+is claimed. The [next-step proposal](docs/SCIFACT_GROUNDING_FEASIBILITY_20260930.md)
+prioritizes document/relation/rationale grounding diagnosis; no new model job,
+training or resume change is authorized by that document.
+
+### Earlier preparation/submission checkpoints (historical)
+
 The [semantic-policy CPU preparation](docs/SCIFACT_SEMANTIC_POLICY_CPU_20260930.md)
 completed in job **31698106** with zero model calls. It excludes all 23 eligible
 IDs in the 12 previously consumed components, then fixes twelve train questions
@@ -18,9 +33,9 @@ if summary persistence also fails, durable cost is unavailable/unknown, not zero
 **CPU preparation only**: zero model calls, zero submitted jobs and no new quality result.
 
 After a separate exact-hash release, the [serial comparison submission](docs/verified-runs/scifact-semantic-pair-submission-31706518-31706520.json)
-created jobs **31706518 → afterok → 31706520**. The submission snapshot shows the
-first running and the second waiting on its dependency. This is not a completed
-comparison or a model-quality claim; no dev/test execution was authorized.
+created jobs **31706518 → afterok → 31706520**. Its historical snapshot showed the
+first running and the second waiting on its dependency. Both subsequently
+completed as recorded in the closeout above; no dev/test execution was authorized.
 
 The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
 adds generation-time uniqueness/total-budget enforcement, actual preview hashes,

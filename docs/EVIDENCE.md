@@ -1,5 +1,38 @@
 # Evidence and claim boundaries
 
+## 2026-09-30 semantic comparison: completed negative Agent result
+
+[Report](SCIFACT_SEMANTIC_CLOSEOUT_20260930.md) and
+[compact](verified-runs/scifact-semantic-pair-closeout-31706518-31706520.json)
+bind execution `99cd9ff`, both completed jobs, 96 selected TRAIN slots and a
+separate `2182f61` stdlib collector. All 32 official metric groups match
+independent count/P/R/F1 arithmetic; durable rows, physical wire multiplicities
+and token sums agree. Frozen scoring executed `physical/audit_slot(gap=True)`;
+the CPU collector did not rerun a model or the full Pydantic scorer.
+
+Adaptive old/new rationalized credit is **1/36/9 → 1/30/9** (correct/predicted/
+relevant), F1 .044444 → .051282, with two label-correct documents in both.
+Strict whole-answer 1 → 2 comes from valid NEI abstention 1 → 2, not more correct
+evidence. Raw tools and actual model tool events are zero for both. Fixed-rerank
+rationalized 2/34/9 → 3/34/9 occurs with label-correct 4 → 3: retain that tradeoff,
+do not advertise it as Agent discovery. Complete first3-eligible rationales are
+actually visible for three adaptive / six fixed-rerank gold documents per policy;
+wrong relations, missed documents and late rationale placement remain.
+
+Both jobs completed `0:0` in 629/627 s, batch MaxRSS 18,541,472/18,489,180 KiB;
+each made 48 TRAIN + four real synthetic preflight calls, with zero unknown cost,
+repair or termination failure. Token ledgers and offline timing scopes remain in
+the report. No API financial saving, online SLA, independent test, causal Agent
+benefit or resume improvement is supported.
+
+Cumulative exposure leaves **491 claims / 301 components** after excluding
+24 consumed components and 40 eligible member claims, out of 531/325. All 531
+already had gold-aware preparation exposure. No new selection was made. The
+[CPU-only feasibility plan](SCIFACT_GROUNDING_FEASIBILITY_20260930.md) proposes
+33 oracle-conditioned diagnostic calls on already-consumed claims, then at most
+one grounding candidate if separately released and justified; no action-SFT or
+prompt-sweep escalation is authorized. Original score/run/archive/locks and
+earlier restricted/public/fixture evidence remain unchanged.
 ## 2026-09-30 semantic-policy CPU preparation: no model-quality result
 
 At frozen source `779e49883570371ce6223cb2b4a8619df5924d3b`, the sole CPU
