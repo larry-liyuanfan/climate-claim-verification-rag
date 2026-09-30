@@ -105,5 +105,21 @@
     "other_project_jobs_modified": false,
     "automatic_retry": false
   },
+  "startup_stage_check": {
+    "observed_utc": "2026-09-30T11:12:20Z",
+    "job_id": 31686182,
+    "status": "running",
+    "stage": "synthetic_preflight_then_train_inference",
+    "source_git": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+    "source_archive_sha256": "dbc3ef071b4144934f568fa728a51ac3f07e770c0a9acf3a83e17861279a7bbb",
+    "pair_protocol_sha256": "4cc5033928a0833ee99ad64ecd5a7b10c7a1fde7ac4f219d6334d2349d9daaf6",
+    "archives_recorded_after_hash_check": ["input", "runtime", "overlay", "grammar"],
+    "official_dev_read": false,
+    "train_gold_extracted": false,
+    "stdout_tail_empty": true,
+    "inference_log_bytes": 1562,
+    "preflight_completion_not_yet_inspected": true,
+    "scope": "One coordinator-requested startup-stage check; no row-level response or interim quality inspection."
+  },
   "next_action": "Retain exact frozen source and collect both complete 48-slot runs, physical raw/cost receipts and original paired score under the existing protocol; on failure preserve artifacts and diagnose without automatic resubmission."
 }
