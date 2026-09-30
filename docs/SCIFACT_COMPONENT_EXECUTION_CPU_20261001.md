@@ -1,5 +1,10 @@
 # Component provider/operator: CPU preparation, not model results
 
+Subsequent event: the separate exact-hash release submitted job **31729507**
+once; [receipt](verified-runs/scifact-component-submission-31729507.json).
+Its first snapshot is PENDING (Resources), no confirmed start. The remainder
+of this page describes the earlier CPU preparation, not a real-model result.
+
 ## What changed
 
 This package connects the frozen Stage A inputs to a versioned component

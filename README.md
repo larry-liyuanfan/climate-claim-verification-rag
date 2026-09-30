@@ -1,13 +1,22 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-## Latest implementation: component diagnosis, CPU-only
+## Latest component diagnostic: submitted, awaiting resources
+
+After a separate exact-hash release, job **31729507** was submitted once with
+source `79f069d`: [submission receipt](docs/verified-runs/scifact-component-submission-31729507.json).
+First snapshot: **PENDING (Resources)**, no confirmed start time. The bound is
+four real synthetic preflights plus 33 diagnostic slots, not new training or
+dev/test evaluation. No model result or Agent improvement is available yet.
+
+### Validated CPU preparation (historical checkpoint)
 
 The [versioned provider/operator](docs/SCIFACT_COMPONENT_EXECUTION_CPU_20261001.md)
 now connects these frozen inputs to a single-attempt 4+33 call plan, private
 wire/cost journaling and a separate post-exit scorer. A local decoder compatibility
 fix restores tested legal numeric-array paths without changing the original
 prompt/schema; invalid IDs still fail the canonical contract, with no retry.
-This remains **CPU preparation**, not a component model result or GPU release.
+Those checks establish **CPU preparation**, not a component model result. The
+subsequent single-job release above does not turn software tests into accuracy.
 
 The [Stage A preparation contract](docs/SCIFACT_COMPONENT_PREPARATION_20261001.md)
 separates document screening, document relation and oracle-conditioned rationale
@@ -17,8 +26,8 @@ costs are implemented: 52 targeted tests pass in an exact-source clean checkout.
 Real-tokenizer preparation fits all 33 inputs; frozen screening candidates cover
 6/9 gold documents, with the remaining three recorded as candidate gaps.
 No real component model evaluation,
-new training/split or Agent improvement is claimed; the real provider remains
-disabled pending a separate exact-hash release.
+new training/split or Agent improvement is claimed. The real provider is only
+enabled within the separately released single-attempt job above.
 
 ## Latest bounded diagnosis: completed, not Agent improvement
 

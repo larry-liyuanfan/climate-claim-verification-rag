@@ -1,0 +1,159 @@
+{
+  "schema_version": "scifact-component-single-gpu-submission-v1",
+  "status": "submitted_pending_not_model_result",
+  "job_id": "31729507",
+  "release_id": "scifact-component-single-attempt-20261001-v1",
+  "execution_source_git": "79f069d2eb4c8db3b82b152fa8a698b5ae3230ad",
+  "preparation_source_git": "426ff7343fb30e1ffcde4dfa4a43f1c00c210cfb",
+  "source_archive_sha256": "b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19",
+  "source_archive_bytes": 3112960,
+  "wrapper_sha256": "bf3cdca362fdf6a22f7ab8e7ef6fc6bc29f3af2d046878251ff10cf762323d3b",
+  "protocol_sha256": "2ce563ccc34efbd5ee1a21cf12fa47fafd063c853c629996909cb37e7247ca1e",
+  "slots_sha256": "84524e2a837aacab5824e5562a61d827ef02b1832dd9ab9f383ae73caa309ac9",
+  "targets_sha256": "a6d38d3fe9d72e6beb0b16836e650e4519d2016e31b63ed1d79e05999b665d9a",
+  "model_manifest_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+  "tokenizer_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "validation_scope": {
+    "source_wrapper_and_frozen_input_hashes": "verified_at_submission",
+    "full_model_runtime_hashes": "frozen_values_checked_by_operator_on_compute_node_not_revalidated_by_login_hash_sweep"
+  },
+  "pre_submission": {
+    "ssh_identity_verified": true,
+    "own_queue_empty": true,
+    "release_root_absent": true,
+    "stage_directory_created_exclusively": true,
+    "project_df_available_bytes": 294758907904,
+    "project_quota": {
+      "used_KB": 201824720,
+      "quota_KB": 488636416,
+      "hard_limit_KB": 489684992,
+      "files_used": 513475,
+      "files_quota": 1000000,
+      "files_hard_limit": 1000000
+    },
+    "home_quota_full": true,
+    "home_data_or_dependencies_written": false,
+    "scratch_request": "30G",
+    "partition_reported_tmp_disk_MB": 1400000,
+    "actual_node_scratch": "not_allocated_yet_operator_prechecks_capacity"
+  },
+  "resources": {
+    "gpu": "A100:1",
+    "cpus": 8,
+    "memory": "32G",
+    "scratch": "30G",
+    "walltime": "01:40:00",
+    "partitions": [
+      "gpu-a100",
+      "gpu-a100-short"
+    ],
+    "qos": "normal",
+    "nice": 0,
+    "requeue": 0
+  },
+  "runtime": {
+    "module_stack": [
+      "GCC/11.3.0",
+      "OpenMPI/4.1.4",
+      "PyTorch/2.1.2-CUDA-12.2.0"
+    ],
+    "decoding": "greedy_nonthinking",
+    "input_tokens": 8192,
+    "output_tokens": 512,
+    "slot_seconds": 120,
+    "preflight_max_calls": 4,
+    "planned_diagnostic_calls": 33,
+    "total_max_attempts": 37,
+    "attempts_per_slot": 1,
+    "online_api_calls": 0
+  },
+  "first_status": {
+    "checked_at": "2026-10-01T01:10:48+10:00",
+    "state": "PENDING",
+    "reason": "Resources",
+    "expected_start": null,
+    "elapsed": "00:00:00",
+    "priority": 13408,
+    "priority_age": 0,
+    "priority_fairshare": 13407,
+    "priority_jobsize": 2
+  },
+  "test_only_note": "Test-only job number is a forecast, not a submitted job; forecast start is not a confirmed ETA.",
+  "submission_attempts": 1,
+  "automatic_retry": false,
+  "new_monitor_created": false,
+  "resume_modified": false,
+  "results_available": false,
+  "receipts": {
+    "test-only.json": {
+      "sha256": "06ad692110882327b493b4d669a467a19c464ffceb9c7c28b884eb7d7206f22b",
+      "bytes": 2517,
+      "receipt": {
+        "command": [
+          "sbatch",
+          "--test-only",
+          "--parsable",
+          "--chdir=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19",
+          "--output=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/slurm-%j.out",
+          "--export=ALL,CLIMATE_COMPONENT_RELEASE=scifact-component-single-attempt-20261001-v1,CLIMATE_SOURCE_TAR=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/source.tar,CLIMATE_SOURCE_SHA256=b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19,CLIMATE_SOURCE_GIT=79f069d2eb4c8db3b82b152fa8a698b5ae3230ad",
+          "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/scifact_components.sbatch"
+        ],
+        "shell_command": "sbatch --test-only --parsable --chdir=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19 --output=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/slurm-%j.out --export=ALL,CLIMATE_COMPONENT_RELEASE=scifact-component-single-attempt-20261001-v1,CLIMATE_SOURCE_TAR=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/source.tar,CLIMATE_SOURCE_SHA256=b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19,CLIMATE_SOURCE_GIT=79f069d2eb4c8db3b82b152fa8a698b5ae3230ad /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/scifact_components.sbatch",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "sbatch: Job 31729369 to start at 2026-10-06T07:37:56 a using 8 processors on nodes spartan-gpgpu111 in partition gpu-a100\n",
+        "source_sha256": "b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19",
+        "wrapper_sha256": "bf3cdca362fdf6a22f7ab8e7ef6fc6bc29f3af2d046878251ff10cf762323d3b",
+        "model_calls": 0,
+        "job_submitted": false
+      }
+    },
+    "submission-attempt.json": {
+      "sha256": "4ba2748af16b9b3c975886e09501212bf513d11de5233dcb568f3a92592c78c5",
+      "bytes": 2288,
+      "receipt": {
+        "release": "scifact-component-single-attempt-20261001-v1",
+        "submitted_at_utc": "2026-09-30T15:10:39.473763+00:00",
+        "command": [
+          "sbatch",
+          "--parsable",
+          "--chdir=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19",
+          "--output=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/slurm-%j.out",
+          "--export=ALL,CLIMATE_COMPONENT_RELEASE=scifact-component-single-attempt-20261001-v1,CLIMATE_SOURCE_TAR=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/source.tar,CLIMATE_SOURCE_SHA256=b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19,CLIMATE_SOURCE_GIT=79f069d2eb4c8db3b82b152fa8a698b5ae3230ad",
+          "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/scifact_components.sbatch"
+        ],
+        "shell_command": "sbatch --parsable --chdir=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19 --output=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/slurm-%j.out --export=ALL,CLIMATE_COMPONENT_RELEASE=scifact-component-single-attempt-20261001-v1,CLIMATE_SOURCE_TAR=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/source.tar,CLIMATE_SOURCE_SHA256=b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19,CLIMATE_SOURCE_GIT=79f069d2eb4c8db3b82b152fa8a698b5ae3230ad /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/scifact_components.sbatch",
+        "submission_attempts": 1,
+        "status": "entering_sbatch_no_automatic_retry"
+      }
+    },
+    "submission-receipt.json": {
+      "sha256": "3eef50230e58b7bb8e627651d55709ec9b5350f9060631d226115cca94d89102",
+      "bytes": 2348,
+      "receipt": {
+        "release": "scifact-component-single-attempt-20261001-v1",
+        "submitted_at_utc": "2026-09-30T15:10:39.473763+00:00",
+        "command": [
+          "sbatch",
+          "--parsable",
+          "--chdir=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19",
+          "--output=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/slurm-%j.out",
+          "--export=ALL,CLIMATE_COMPONENT_RELEASE=scifact-component-single-attempt-20261001-v1,CLIMATE_SOURCE_TAR=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/source.tar,CLIMATE_SOURCE_SHA256=b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19,CLIMATE_SOURCE_GIT=79f069d2eb4c8db3b82b152fa8a698b5ae3230ad",
+          "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/scifact_components.sbatch"
+        ],
+        "shell_command": "sbatch --parsable --chdir=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19 --output=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/slurm-%j.out --export=ALL,CLIMATE_COMPONENT_RELEASE=scifact-component-single-attempt-20261001-v1,CLIMATE_SOURCE_TAR=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/source.tar,CLIMATE_SOURCE_SHA256=b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19,CLIMATE_SOURCE_GIT=79f069d2eb4c8db3b82b152fa8a698b5ae3230ad /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/component-execution-b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19/scifact_components.sbatch",
+        "submission_attempts": 1,
+        "status": "submitted",
+        "returncode": 0,
+        "stdout": "31729507\n",
+        "stderr": "",
+        "job_id": "31729507"
+      }
+    }
+  }
+}

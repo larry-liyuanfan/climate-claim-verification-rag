@@ -1,5 +1,17 @@
 # Evidence and claim boundaries
 
+## 2026-10-01 separately released component diagnostic submission
+
+[Receipt](verified-runs/scifact-component-submission-31729507.json): exactly one
+job **31729507**, source `79f069d`, archive `b46a1866...`, unchanged Stage A
+protocol/33 inputs/targets/model identities. Scheduling test passed; first real
+snapshot is **PENDING (Resources)** with no confirmed start. Requested one A100,
+8 CPU, 32 GiB RAM, 30 GiB scratch, 100 minutes, normal QoS/Nice 0/no-requeue.
+The fixed release was absent before submission and now has a one-attempt
+submission journal. No new monitor, cancellation, re-submission or other-project
+mutation. This is a submission receipt, **not model results or resume evidence
+of improved quality**. Raw data/gold/predictions must remain on Spartan.
+
 ## 2026-10-01 component provider/operator CPU package
 
 [Implementation and boundaries](SCIFACT_COMPONENT_EXECUTION_CPU_20261001.md):
