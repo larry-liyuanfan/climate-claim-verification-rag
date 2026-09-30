@@ -84,13 +84,14 @@ def test_budget_violation_is_reported_not_hidden():
     assert checks["tool_calls"] == checks["row_elapsed_over_120s"] == 1
 
 
-def test_case_summaries_are_bounded_anonymous_and_content_free():
+def test_case_summaries_are_bounded_and_content_free():
     rows = [row(task=str(i), route=s) for i in range(3) for s in audit.STRATEGIES]
     result = audit.select_cases({"validation": rows, "vnext": copy.deepcopy(rows)})
     assert len(result) == 2
-    assert len({x["private_locator_sha256"] for x in result}) == 2
+    assert len({x["case_id"] for x in result}) == 2
     rendered = json.dumps(result)
     assert "PRIVATE" not in rendered and "private_id" not in rendered and '"task_id"' not in rendered
+    assert "claim_sha256" not in rendered and "private_locator_sha256" not in rendered
 
 
 def test_unapproved_action_fails_closed_in_case_export():

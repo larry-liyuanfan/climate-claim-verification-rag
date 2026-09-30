@@ -100,7 +100,7 @@ def row_summary(row: dict) -> dict:
 
 
 def aggregate_rows(rows: list[dict], gold: dict | None, payloads: dict[str, bytes]) -> dict:
-    """Additional counter/latency diagnostics only; no new task-quality scoring."""
+    """Descriptive counters/context diagnostics; never rescore the frozen outputs."""
     actions, stages, diagnostics, schema_errors, attachments = (Counter() for _ in range(5))
     outcomes: dict[str, list[dict]] = defaultdict(list)
     generation_ms = retrieval_ms = rerank_ms = 0.0
@@ -195,7 +195,11 @@ def aggregate_rows(rows: list[dict], gold: dict | None, payloads: dict[str, byte
 
 
 def select_cases(phase_rows: dict[str, list[dict]]) -> list[dict]:
-    """At most five anonymous, outcome-stratified real cases, not representative accuracy."""
+    """At most five outcome-stratified case summaries, not representative accuracy.
+
+    Keep task/claim IDs and their enumerable hashes private. The fixed selection
+    predicate and lexicographic tie-break reproduce the mapping in place.
+    """
     groups = {}
     for phase, rows in phase_rows.items():
         for row in rows:
@@ -216,8 +220,6 @@ def select_cases(phase_rows: dict[str, list[dict]]) -> list[dict]:
         used.add(key)
         selected.append({"case_id": name, "phase": key[0], "eligible_remaining_groups": len(matches),
                          "selection": "first task ID in lexical order, unused group",
-                         "private_locator_sha256": sha((key[0] + ":" + key[1]).encode()),
-                         "claim_sha256": sha(group["adaptive"]["claim_text"].encode()),
                          "routes": {route: row_summary(group[route]) for route in STRATEGIES}})
     return selected
 
@@ -308,7 +310,8 @@ def build(root: Path, archive: Path) -> dict:
             "operator_elapsed_seconds": state["elapsed_seconds"], "input_extractions": 1,
             "gpu_memory_peak": state["gpu_memory_peak"], "gold_label_counts": dict(Counter(x["label"] for x in gold.values())),
             "phases": phases, "case_summaries": select_cases(all_rows),
-            "scoring_recomputed": False, "inference_repeated": False, "raw_text_or_prediction_rows_exported": False,
+            "frozen_scoring_recomputed": False, "posthoc_diagnostic_statistics_computed": True,
+            "inference_repeated": False, "raw_text_or_prediction_rows_exported": False,
             "boundary": "Repeated validation and authored tasks kept separate. Delivered evidence is failure-gated, not initial retrieval. Parsed actions are not executed tools. Mechanical checks are not semantic support. Case summaries are selected examples, not additional quality metrics."}
 
 
