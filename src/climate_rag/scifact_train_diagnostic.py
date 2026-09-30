@@ -10,7 +10,7 @@ import copy
 import hashlib
 import json
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Collection, Mapping, Sequence
 from typing import Any
 
 from .agent_v3 import Source, V3Budget
@@ -164,14 +164,18 @@ def classify_opportunity(
 def select_component_distinct(
     rows: Sequence[Mapping[str, Any]], components: Mapping[int, str],
     quota: int = 3,
+    *, excluded_components: Collection[str] = (),
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Deterministic maximum bipartite matching, not order-dependent greedy fill."""
     if quota != 3 or len({r["id"] for r in rows}) != len(rows):
         raise ValueError("fixed quota or duplicate claim IDs")
     slots = [(s, i) for s in STRATA for i in range(quota)]
+    excluded = frozenset(excluded_components)
     options: dict[str, dict[str, Mapping[str, Any]]] = {s: {} for s in STRATA}
     for row in sorted(rows, key=lambda r: (rank_key(r["id"]), r["id"])):
         component = components[row["id"]]
+        if component in excluded:
+            continue
         if row["stratum"] in STRATA:
             options[row["stratum"]].setdefault(component, row)
     occupied: dict[str, tuple[str, int]] = {}

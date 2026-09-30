@@ -90,6 +90,13 @@ def run_bounded_slot(claim_id: int, claim: str, route: str, arm: str,
                   visible_attempts=traced.visible_attempts)
     if backend.gap:
         result["candidate_wire_audit"] = copy.deepcopy(provider.records)
+    return finalize_bounded_slot(claim_id, route, arm, result, traced.visible_attempts, corpus, persist_raw)
+
+
+def finalize_bounded_slot(claim_id: int, route: str, arm: str, result: dict[str, Any],
+                          visible_attempts: list[dict[str, Any]], corpus: Any,
+                          persist_raw: Any = None) -> dict[str, Any]:
+    """Shared unchanged event linkage, durable cost, and fail-closed export."""
     if persist_raw is not None:
         persist_raw(result)  # durable full cost/response references before auxiliary export
     remaining = [i for i, e in enumerate(result["events"]) if e.get("model_selected")]
@@ -109,7 +116,7 @@ def run_bounded_slot(claim_id: int, claim: str, route: str, arm: str,
             "actual_event_index": event_index,
             "actual_event_status": result["events"][event_index]["status"] if event_index is not None else None,
             "next_attempt_index": i + 1 if next_attempt is not None else None,
-            "next_feedback": traced.visible_attempts[i + 1]["feedback"] if next_attempt is not None else None,
+            "next_feedback": visible_attempts[i + 1]["feedback"] if next_attempt is not None else None,
             "next_strict_action": next_attempt.get("action") if next_attempt is not None else None,
             "next_strict_status": next_attempt["status"] if next_attempt is not None else None})
     result.update(decision_execution_audit=audit, trace_unlinked_events=remaining,
@@ -118,8 +125,8 @@ def run_bounded_slot(claim_id: int, claim: str, route: str, arm: str,
                                      "proposal_status": row["strict_status"],
                                      "subsequent_model_attempt": row["next_attempt_index"]}
                                     for row in audit if row["strict_action"] in {"read", "rewrite", "rerank"}],
-                  initial_context_identity=(traced.visible_attempts[0]["actual_observation"]
-                                            if traced.visible_attempts else None))
+                  initial_context_identity=(visible_attempts[0]["actual_observation"]
+                                            if visible_attempts else None))
     try:
         converted = to_original_prediction(claim_id, result, corpus)
     except Exception as exc:
