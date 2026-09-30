@@ -24,6 +24,7 @@ def posix_probe(work: Path) -> dict[str, Any]:
     require(os.name == "posix", "requires_real_posix_not_emulation")
     work.mkdir(mode=0o700)
     private = work / "private"
+    private.mkdir(mode=0o700)
     sink = PrivateDiagnosticStore(private).sink("response", 64)
     sink.write("explicit synthetic probe")
     require(stat.S_IMODE(sink.path.stat().st_mode) == 0o600, "owner_only")
