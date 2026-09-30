@@ -2,7 +2,7 @@
 
 ## Decision and scientific boundary
 
-Status: **One exact-hash regression released and submitted as job 31773502**.
+Status: **Job 31773502 completed and physically audited; negative Agent result**.
 The original CPU package and DRAFT below remain unchanged historical receipts;
 the separate submission record is at the end of this document. Preserve
 validation entrypoint/source `ce34e16` without calling its twelve frozen
@@ -189,3 +189,49 @@ All original 48-slot, 168-generator, 36-rerank and 720-requested-pair limits
 remain, including zero extra smoke/warmup. No new training, validation, dev/test,
 automatic retry, or scheduler override is authorized. Quality and cost closeout
 remain pending; no resume metric is added merely because submission succeeded.
+
+### Completed physical closeout
+
+Job 31773502 completed `0:0`, elapsed 201 seconds, TotalCPU 183.559 seconds,
+MaxRSS 17,338,364 KiB. [Compact physical evidence](verified-runs/scifact-adapter-regression-closeout-31773502.json)
+binds the original score `1d75e03a...c84b7` and run `7ebffe6e...daade`.
+195 indexed physical files were rehashed; all 48 raw slot records and physical
+wire audits match. All 144 restored adapter tensors and 72 active unmerged
+layers were verified. Exit/reap precedes cost persistence and scoring. The
+closeout did not load gold, rescore, call a model, or alter the original results.
+Remote compact SHA: `73cd7561391c090f5ddb1569b12e0db9f45554d73fd37c767aa3e5f352e4e8d4`.
+
+| Route (12 slots each) | Correct rationalized docs / 9 relevant | Document F1 | Strict whole-answer slots |
+|---|---:|---:|---:|
+| Fixed retrieval | 1 | 0.09524 | 1 |
+| Fixed rerank | 4 | 0.38095 | 4 |
+| Deterministic extra | 3 | 0.28571 | 3 |
+| Adaptive | 1 | 0.10000 | 2 |
+
+Adaptive's two strict slots include **one valid NEI abstention**, not two correct
+documents. Its twelve `slots_with_tool_opportunity` mean **menus offered tools**;
+only three frozen cases had independently established read-replenishable evidence.
+Adaptive made zero tool proposals, executions or new-evidence closure chains.
+It returned eleven answers and one abstention. Its three read-opportunity cases
+all failed; fixed rerank was correct for 1/1 FIT-overlap and 1/2 not-direct-FIT
+cases. Both groups are exposed TRAIN-internal regression inputs.
+
+All 48 calls have known usage: 172,572 input / 1,376 output tokens; 24 completed
+rerank operations, 480 requested pairs. Reranker tokens remain unmeasured, not
+zero. No warmup or repair calls occurred. Timing is this bounded sequential
+experiment, not an online SLA.
+
+A separate read-only aggregation of the already stored physical responses
+found **47 nonempty outputs, each one document and one sentence**. Fixed
+retrieval chose visible rank one nine times and rank two three times; adaptive
+did so eight and three times. Fixed rerank and deterministic extra each chose
+the first visible document 12/12 times, with multiple original aliases
+(`c0/c1/c2/c6/c12/c17`, depending on route). Thus the earlier tune's literal
+`c1`-only behavior must not be generalized to this regression. The observed
+behavior is narrow output structure and visible-order dependence, not proof of
+a universal alias lock or a causal explanation.
+
+Conclusion: fixed rerank improves this exposed diagnostic's evidence output;
+the adapter still has not demonstrated autonomous tool selection. Preserve
+negative NEI/gold-absent/read-opportunity cases. No validation launch, retraining,
+new model call, or resume claim is authorized by this closeout.

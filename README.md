@@ -20,10 +20,20 @@ answers. This controlled TRAIN-internal signal does **not** establish multi-docu
 selection, retrieval or autonomous tool use. The original gate and negative
 findings remain unchanged; the frozen validation has **not** been called.
 
-[The next four-route regression package](docs/SCIFACT_ADAPTER_REGRESSION_CPU_20261001.md)
-keeps the same active adapter across 48 slots over twelve previously exposed
-queries, including one FIT-overlap query. It is **CPU-prepared/DRAFT**, not a new
-model result; a separate exact release is required before execution.
+[The four-route regression](docs/SCIFACT_ADAPTER_REGRESSION_CPU_20261001.md)
+completed job **31773502**: same active adapter, 48 slots / 48 calls over twelve
+previously exposed TRAIN queries, including one FIT-overlap query. Correctly
+rationalized documents were **1 / 4 / 3 / 1** for fixed retrieval / fixed rerank /
+deterministic extra / adaptive. Adaptive offered tools in all twelve slots but
+made **zero tool proposals or executions**. One valid NEI abstention is separate
+from the one correct document. All 47 nonempty outputs selected one document
+and one sentence; this regression is **not** literal-`c1`-only. Fixed rerank and
+deterministic extra always selected the first actually visible document.
+This is a retained negative Agent result, not an independent-test improvement.
+
+[A three-state conditional continuation DRAFT](docs/SCIFACT_READ_CONTINUATION_CPU_20261001.md)
+tests preparation of the original scripted-read witnesses only. No new model
+calls, validation consumption, autonomous-read claim or training is authorized.
 
 ## Latest component diagnostic: complete, with grounding errors
 

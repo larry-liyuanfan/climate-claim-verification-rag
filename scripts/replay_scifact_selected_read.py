@@ -10,7 +10,7 @@ from pathlib import Path
 import tarfile
 import time
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Callable
 
 from climate_rag.agent_v3 import V3Budget
 from climate_rag.local_bounded_scifact_provider import observation_identity
@@ -76,7 +76,9 @@ def fixed_read(review: dict[str, Any], candidates: list[int]) -> list[str]:
 
 
 def replay(claim: dict[str, Any], review: dict[str, Any], retrieve: Any,
-           corpus: Any, tokenizer: Any) -> dict[str, Any]:
+           corpus: Any, tokenizer: Any,
+           capture: Callable[[list[dict[str, Any]], list[dict[str, Any]]], None] | None = None,
+           ) -> dict[str, Any]:
     candidates = list(retrieve(claim['claim'], 20))
     candidate_ids = [int(s.source_id) for s in candidates]
     read_ids = fixed_read(review, candidate_ids)
@@ -104,6 +106,9 @@ def replay(claim: dict[str, Any], review: dict[str, Any], retrieve: Any,
             'prompt_sha256':sha(prompt.encode()), 'prompt_tokens':provider.count_prompt(observation,schema),
             'identity':observation_identity(observation),'visible':visible})
     old = review['current_opportunity'][OLD_G]
+    if capture is not None:
+        # Preserve nested insertion order: the renderer does NOT sort JSON keys.
+        capture(copy.deepcopy(provider.observations), copy.deepcopy(provider.schemas))
     return {'claim_id':claim['id'],'legacy_stratum':review['legacy_stratum'],
         'candidate_doc_ids':candidate_ids,
         'ordered_candidates': [{'doc_id':int(s.source_id),'source_sha256':s.text_sha256} for s in candidates],
