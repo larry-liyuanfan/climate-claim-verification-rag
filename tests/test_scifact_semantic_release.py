@@ -147,6 +147,40 @@ def test_preflight_journal_failure_stops_before_any_model_call():
     assert calls == []
 
 
+@pytest.mark.parametrize("summary_fails", [False, True])
+def test_completed_journal_failure_retains_known_cost_and_never_retries(tmp_path, monkeypatch, summary_fails):
+    from climate_rag.scifact_bounded_smoke import bounded_runtime_smoke
+    calls = []
+    def generate(*args):
+        calls.append(args)
+        return {"raw": "{}", "usage": {"input_tokens": 10, "output_tokens": 17}, "diagnostics": {}}
+    inner = types.SimpleNamespace(gap=False, count_prompt=lambda *a: 10, generate=generate)
+    outer = types.SimpleNamespace(policy=c.POLICIES[0], gap=True, wire_protocol=ex.CANDIDATE_PROTOCOL, kind="fixture")
+    monkeypatch.setattr(ex, "bounded_runtime_smoke", lambda b, *, persist_case:
+                        bounded_runtime_smoke(inner, persist_case=persist_case))
+    original = ex.write_once
+    def write(path, value):
+        if path.name.endswith("-completed.json") or (summary_fails and path.name == "runtime-preflight.json"):
+            raise OSError("synthetic write failure")
+        original(path, value)
+    monkeypatch.setattr(ex, "write_once", write)
+    if summary_fails:
+        with pytest.raises(ex.PreflightPersistenceError, match="not_persisted") as captured:
+            ex.preflight(outer, outer.policy, tmp_path, GIT, SOURCE)
+        report = captured.value.partial_report
+        assert report["summary_persisted"] is False
+    else:
+        with pytest.raises(ValueError, match="preflight_failed"):
+            ex.preflight(outer, outer.policy, tmp_path, GIT, SOURCE)
+        report = json.loads((tmp_path / "runtime-preflight.json").read_bytes())
+    assert len(calls) == report["attempted_calls"] == 1
+    assert report["records"][0]["usage"] == {"input_tokens": 10, "output_tokens": 17}
+    assert report["status"] == "failed" and report["case_journal_complete"] is False
+    assert report["journal_failure"]["phase"] == "completed"
+    assert (tmp_path / "preflight-01-started.json").exists()
+    assert not (tmp_path / "preflight-02-started.json").exists()
+
+
 def completed_fixture(root, monkeypatch):
     p, _ = protocol(monkeypatch)
     policy = c.POLICIES[0]

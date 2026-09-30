@@ -144,3 +144,22 @@ and scoring archives stay there. Only hashes/counts were downloaded. **This
 execution-entry package submitted zero Slurm jobs and made zero model calls**;
 the earlier CPU preparation job is separately recorded as 31698106. No GPU
 release, new monitor, scientific success claim or resume change follows.
+
+## Preflight completion-journal repair before release
+
+A subsequent independent review found a cost-retention gap: failure to write a
+completed-case journal already stopped further calls, but discarded the returned
+usage before the wrapper could save it. The minimal repair returns a **failed
+partial report** immediately, including the exact known usage. The wrapper tries
+one summary write, then stops; it never retries the model. If that write also
+fails, `PreflightPersistenceError.partial_report` preserves known in-memory costs
+and explicitly records `summary_persisted=false`. Missing durable cost is unknown,
+not zero. No-callback historical behavior and started-journal fail-fast remain.
+
+Five focused preflight tests passed, including completion-write failure with
+both successful and failed summary persistence (synthetic 10 input / 17 output
+tokens, exactly one model-stub call). Ruff and strict mypy on the two changed
+source files passed. This supersedes the earlier execution freeze **for release**,
+not its CPU evidence; preparation source, selected samples, both prompts, budgets
+and original artifacts remain unchanged. The revised execution/package identities
+are recorded in the repair handoff, with no new model call or allocation.

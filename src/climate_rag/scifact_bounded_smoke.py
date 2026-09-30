@@ -11,6 +11,14 @@ from .scifact_runtime_smoke import smoke_cases
 from .scifact_terminal import parse_action
 
 
+def _smoke_report(records: list[dict[str, Any]]) -> dict[str, Any]:
+    return {"schema_version": "scifact-bounded-synthetic-smoke-v1", "records": records,
+            "status": "passed" if all(r["passed"] for r in records) else "failed",
+            "attempted_calls": sum(r["provider_generate_attempted"] for r in records),
+            "official_data_read": False, "quality_evaluation": False,
+            "scope": "forced synthetic protocol checks, not autonomous model tool selection"}
+
+
 def bounded_runtime_smoke(backend: Any, *, persist_case: Callable[[int, str, dict[str, Any]], None] | None = None) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
     for case in smoke_cases():
@@ -59,9 +67,13 @@ def bounded_runtime_smoke(backend: Any, *, persist_case: Callable[[int, str, dic
             record["failure"] = type(exc).__name__
         records.append(record)
         if persist_case is not None:
-            persist_case(len(records) - 1, "completed", dict(record))
-    return {"schema_version": "scifact-bounded-synthetic-smoke-v1", "records": records,
-            "status": "passed" if all(r["passed"] for r in records) else "failed",
-            "attempted_calls": sum(r["provider_generate_attempted"] for r in records),
-            "official_data_read": False, "quality_evaluation": False,
-            "scope": "forced synthetic protocol checks, not autonomous model tool selection"}
+            try:
+                persist_case(len(records) - 1, "completed", dict(record))
+            except Exception as exc:
+                # The response/usage already exists. Return it before stopping,
+                # allowing the caller one summary write, never another model call.
+                return _smoke_report(records) | {"status": "failed",
+                    "journal_failure": {"case_index": len(records) - 1, "phase": "completed",
+                                        "exception_type": type(exc).__name__},
+                    "case_journal_complete": False}
+    return _smoke_report(records)

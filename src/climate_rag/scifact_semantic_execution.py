@@ -14,6 +14,14 @@ from .scifact_semantic_policy import policy_sha
 from .scifact_semantic_runtime import run_semantic_slot
 
 
+class PreflightPersistenceError(RuntimeError):
+    """In-memory known costs survive; absence of durable totals is not zero."""
+
+    def __init__(self, report: dict[str, Any]) -> None:
+        super().__init__("preflight_summary_not_persisted: known costs remain in partial_report; missing costs are unknown, not zero")
+        self.partial_report = report | {"summary_persisted": False}
+
+
 def provider_binding(backend: Any, policy: str) -> dict[str, Any]:
     if (policy not in POLICIES or backend.policy != policy or backend.gap is not True
             or backend.wire_protocol != CANDIDATE_PROTOCOL or policy_sha(policy) != PROMPTS[policy]):
@@ -29,7 +37,10 @@ def preflight(backend: Any, policy: str, out: Path, source_git: str, protocol_sh
         write_once(out / f"preflight-{index + 1:02d}-{phase}.json", identity | {"record": record})
 
     report = bounded_runtime_smoke(backend, persist_case=persist) | identity
-    write_once(out / "runtime-preflight.json", report)
+    try:
+        write_once(out / "runtime-preflight.json", report)
+    except Exception as exc:
+        raise PreflightPersistenceError(report) from exc
     provider_binding(backend, policy)
     if report["status"] != "passed" or report["attempted_calls"] != 4:
         raise ValueError("semantic_synthetic_preflight_failed")
