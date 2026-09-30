@@ -19,6 +19,10 @@ pool, with identical source/sentence hashes. Pool membership and BM25 statistics
 changed together. Unowned documents are not proven safe background; no pool
 expansion, extra TRAIN cohort or new training has been released.
 
+A separate [claim-group-mean optimizer contract](docs/SCIFACT_CLAIM_GROUP_MEAN_20261001.md)
+passes synthetic CPU gradient/AdamW checks while preserving historical v2 `/48`.
+It is an interface validation, not a new trainer, adapter or Agent-quality result.
+
 [Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
 protocol-bound consumption ledger, whole-component/source-family separation,
 official alternative-aware targets, and a single-config LoRA training / paired

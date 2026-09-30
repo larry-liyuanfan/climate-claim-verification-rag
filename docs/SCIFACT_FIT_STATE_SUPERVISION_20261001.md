@@ -73,6 +73,11 @@ state construction, not DAgger or evidence of autonomous useful tool selection.
 
 ## Weights, loss and caps
 
+Historical v2 contract is preserved below. A separately versioned
+[prospective claim-group-mean interface](SCIFACT_CLAIM_GROUP_MEAN_20261001.md)
+now has synthetic CPU AdamW/gradient validation; it does not retroactively change
+these artifacts or authorize training.
+
 Maximum 192 decision records, four per claim; those are ceilings, not targets.
 One claim has mass 1, divided before tokenisation over its trajectory,
 alternative targets and decision states. Duplicating the read frame for two
