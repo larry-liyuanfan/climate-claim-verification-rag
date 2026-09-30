@@ -31,6 +31,10 @@ and completion hashes, then independently reconciles private physical receipts,
 strict parsing, decoder, packing and cost. Extra predecessor attempt directories,
 hidden reservations, symlinks and any mismatched hash fail closed. The worker
 performs this and all frozen packing checks **before provider construction**.
+Both old and new physical trees use an exact small layout allowlist: orphan
+response/failure/private-generation files are rejected even without a `started`
+record. Initialized input, wire and an empty pre-call private directory remain
+valid zero-call failure evidence.
 
 The new fixed release is
 `scifact-component-technical-continuation-20261001-v1`. It writes only a carry

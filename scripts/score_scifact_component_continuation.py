@@ -8,7 +8,7 @@ from typing import Any
 
 from climate_rag.component_audit import aggregate, reconcile
 from climate_rag.component_continuation import (
-    POLICY, RELEASE, PREVIOUS_RELEASE, cost_partition, load_carried, measurement, policy_identity,
+    POLICY, RELEASE, PREVIOUS_RELEASE, audit_physical_layout, cost_partition, load_carried, measurement, policy_identity,
 )
 from climate_rag.component_execution import SLOTS_SHA, TARGETS_SHA, durable, frozen_slots
 from climate_rag.component_preflight import preflight_cases
@@ -30,6 +30,8 @@ def score_run(result: Path, slots_path: Path, target_path: Path, exit_sha: str) 
     inference = result / "inference"
     require(not (inference / "preflight-00").exists() and not (inference / "preflight-00").is_symlink(),
             "duplicate_carried_slot")
+    audit_physical_layout(inference, {f"preflight-{i:02d}" for i in (1, 2, 3)} |
+        {f"diagnostic-{i:02d}" for i in range(33)}, {"carried-reference.json", "run.json"})
     if (inference / "carried-reference.json").exists():
         require(json.loads((inference / "carried-reference.json").read_bytes()) == carried["reference"], "carried_reference")
     else:

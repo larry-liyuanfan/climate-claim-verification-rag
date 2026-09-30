@@ -51,6 +51,38 @@ def policy_identity() -> dict[str, Any]:
     return {"version": POLICY, "sha256": sha(encoded(spec))}
 
 
+def audit_physical_layout(root: Path, slot_names: set[str], root_files: set[str]) -> None:
+    """Reject orphan generation artifacts, including those without reservations."""
+    require(not root.is_symlink(), "inference_symlink")
+    if not root.exists():
+        return  # A failure before the inference directory was created.
+    require(root.is_dir(), "inference_directory")
+    for child in root.iterdir():
+        require(not child.is_symlink(), "inference_symlink")
+        if child.name in root_files:
+            require(child.is_file(), "inference_root_file")
+            continue
+        require(child.name in slot_names and child.is_dir(), "unexpected_inference_artifact")
+        allowed = {"initialized.json", "wire.json", "started.json", "response.json",
+                   "failure.json", "completed.json", "private"}
+        private_files = []
+        for item in child.iterdir():
+            require(not item.is_symlink() and item.name in allowed, "unexpected_slot_artifact")
+            if item.name == "private":
+                require(item.is_dir(), "private_directory")
+                private_files = list(item.iterdir())
+                require(all(not p.is_symlink() and p.is_file() and
+                    (p.name.endswith("-response.txt") or p.name.endswith("-grammar.txt"))
+                    for p in private_files), "unexpected_private_artifact")
+                require(all(sum(p.name.endswith(f"-{kind}.txt") for p in private_files) <= 1
+                    for kind in ("response", "grammar")), "duplicate_private_artifact")
+            else:
+                require(item.is_file(), "slot_regular_file")
+        if not (child / "started.json").exists():
+            require(not (child / "response.json").exists() and not (child / "failure.json").exists()
+                    and not private_files, "orphan_generation_without_reservation")
+
+
 def load_carried(prior: Path, tokenizer: Any = None) -> dict[str, Any]:
     from .component_audit import reconcile
     require(prior.name == PREVIOUS_RELEASE and not prior.is_symlink(), "fixed_predecessor_path")
@@ -72,6 +104,7 @@ def load_carried(prior: Path, tokenizer: Any = None) -> dict[str, Any]:
         and all(not r["attempted"] and r["status"] == "not_attempted_after_stop"
                 for r in run["preflight"][1:] + run["diagnostic"]), "carried_attempt_history")
     inference = prior / "inference"
+    audit_physical_layout(inference, {"preflight-00"}, {"run.json"})
     require({p.name for p in inference.iterdir()} == {"preflight-00", "run.json"}
         and all(not p.is_symlink() for p in inference.rglob("*"))
         and {p.relative_to(inference).as_posix() for p in inference.rglob("started.json")}

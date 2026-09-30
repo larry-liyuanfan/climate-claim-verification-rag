@@ -142,13 +142,17 @@ def test_each_predecessor_file_hash_is_mandatory(predecessor, name):
         cont.load_carried(prior)
 
 
-@pytest.mark.parametrize("tamper", ["hidden_started", "hidden_response", "raw", "archive", "packing"])
+@pytest.mark.parametrize("tamper", ["hidden_started", "hidden_response", "nested_response", "raw", "archive", "packing"])
 def test_independent_physical_predecessor_checks(predecessor, tamper):
     root, prior, _, _ = predecessor
     if tamper.startswith("hidden"):
         hidden = prior / "inference/diagnostic-32"
         hidden.mkdir()
         (hidden / ("started.json" if tamper == "hidden_started" else "response.json")).write_text("{}")
+    elif tamper == "nested_response":
+        hidden = prior / "inference/preflight-00/orphan"
+        hidden.mkdir()
+        (hidden / "response.json").write_text("{}")
     elif tamper == "raw":
         (prior / "inference/preflight-00/private/synthetic-response.txt").write_text("tampered")
     elif tamper == "archive":
@@ -204,7 +208,8 @@ def scoring_files(root, slots, targets, monkeypatch):
     return scorer, slots_path, target_path
 
 
-@pytest.mark.parametrize("tamper", [None, "duplicate", "hidden", "cost", "policy", "exit", "carried"])
+@pytest.mark.parametrize("tamper", [None, "duplicate", "hidden", "cost", "policy", "exit", "carried",
+                                  "root_response", "unreserved_response"])
 def test_independent_scorer_agrees_or_rejects_tamper(predecessor, monkeypatch, tamper):
     root, prior, slots, targets = predecessor
     result = root / "runs" / cont.RELEASE
@@ -233,6 +238,11 @@ def test_independent_scorer_agrees_or_rejects_tamper(predecessor, monkeypatch, t
     elif tamper == "cost":
         report["cost_partition"]["new"]["attempted"] = 0
         (result / "inference/run.json").write_bytes(encoded(report))
+    elif tamper == "root_response":
+        (result / "inference/other").mkdir()
+        (result / "inference/other/response.json").write_text("{}")
+    elif tamper == "unreserved_response":
+        (result / "inference/diagnostic-32/started.json").unlink()
     if tamper:
         with pytest.raises((ContractError, ValueError)):
             scorer.score_run(result, slots_path, target_path, sha(encoded(marker)))
@@ -243,6 +253,21 @@ def test_independent_scorer_agrees_or_rejects_tamper(predecessor, monkeypatch, t
         assert summary["new_attempted"] == 36 and summary["cumulative_attempted"] == 37
         assert summary["semantic_measurements"][0]["semantic_match"] is False
         assert summary["original_protocol_completed"] is False
+
+
+@pytest.mark.parametrize("orphan", [None, "response.json", "failure.json", "private/orphan-response.txt"])
+def test_layout_preserves_pre_call_failure_but_rejects_orphan_output(tmp_path, orphan):
+    root = tmp_path / "inference"
+    slot = root / "preflight-01"
+    (slot / "private").mkdir(parents=True)
+    (slot / "initialized.json").write_text("{}")
+    (slot / "wire.json").write_text("{}")
+    if orphan is not None:
+        (slot / orphan).write_text("{}")
+        with pytest.raises(ContractError, match="orphan_generation_without_reservation"):
+            cont.audit_physical_layout(root, {"preflight-01"}, {"run.json"})
+    else:
+        cont.audit_physical_layout(root, {"preflight-01"}, {"run.json"})
 
 
 def test_bad_predecessor_checked_before_constructor(tmp_path, monkeypatch):
