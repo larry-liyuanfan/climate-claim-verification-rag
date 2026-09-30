@@ -122,6 +122,47 @@ absolute private directory, with a regression test; the failed output directory
 is retained and a separate rerun directory is used. This is a CPU harness repair,
 not a changed model policy or repeated data evaluation.
 
+### Verified CPU receipt and an explicit cost tradeoff
+
+The repaired smoke passed on clean source
+`ba387c3d7f6ba802012c45dc49235b405fd5ac3c`; its
+[public synthetic-only receipt](verified-runs/evidence-gap-candidate-cpu-20260930.json)
+has canonical LF SHA`c9538a9dbcb8a109d17dfa6f06df4a46ec0d377a973c86cc5fd50bcb50aad694`.
+The original Windows-generated report has CRLF SHA
+`b1ce2a2986a940b71d501851dc499257e58d6af4c9852ba35dc809389c17a5d7`;
+the copies were compared and differ only in newlines, not values.
+All three fresh A/B/A paths accepted the ordered mixed-label wire, and each
+rejected decision-first, skipped gap, cross-document SID and stale alias. The
+constructor-only regression control wrongly accepted early decision on all three,
+confirming why the post-construction ordering flag is necessary. Each valid
+fixture has1065 prompt tokens and106 scripted wire tokens; these are encoded
+fixture lengths, not generations, cost savings or throughput.
+
+The additional template demonstrably **displaces evidence** at a fixed2048-token
+synthetic input cap; it is not free reasoning or an extra budget:
+
+| Synthetic routes | Old visible sentences | Candidate visible sentences | Old / candidate packed input tokens |
+|---|---:|---:|---:|
+| Fixed retrieval, fixed rerank, deterministic extra |11|8|2012 /2017|
+| Adaptive |10|7|2026 /2034|
+
+The scripted abstention wire expands from14 to41 output tokens. These comparisons
+measure prompt/serialization overhead only, not model behavior. The nearly equal
+input token totals reflect budget saturation with different retained context,
+**not** negligible overhead. No budget, template, fixture or threshold was changed
+to conceal this tradeoff.
+
+Validation:28 focused tests passed before the harness fix; the repaired source
+passes29 focused tests, including the private-directory regression, both in the
+working source and a fresh LF-exported Git archive. Source archive ZIP SHA:
+`a4bb726aa998d891800bbba102b53c0cb7ca025d6ffe16236ce3cf2620cd70bf`;
+the fresh process imported from its extracted`src`, not the editable working tree.
+The pre-harness full local suite passed511 tests with2 environment skips
+(Torch unavailable and POSIX-only ownership/symlink check); Ruff and mypy56-source
+checks passed. The harness repair changes no runtime candidate/controller code.
+No real queries were read, no model weights were loaded, and no GPU job was
+submitted by either CPU smoke attempt. Real HF/weight usefulness remains untested.
+
 ## Stop/release rule
 
 The frozen train diagnostic must first show at least one auditable, naturally
