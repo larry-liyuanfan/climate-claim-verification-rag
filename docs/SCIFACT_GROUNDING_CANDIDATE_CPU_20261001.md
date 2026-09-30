@@ -426,3 +426,52 @@ and adapted states, at most 24 model calls within the frozen resource ceiling.
 Training, warmup, validation, official dev/test reads and resume changes remain
 unauthorized. Submission/pending state does not establish grounding improvement;
 quality and cost must be audited only after both inference processes exit.
+
+## Tune closeout: positive grounding signal, unresolved NEI failure
+
+Job **31763176** completed `0:0` in 142 allocation seconds, with batch MaxRSS
+9,318,380 KiB and Slurm TotalCPU 123.542 seconds. The CPU closeout verified frozen
+source/release/data/checkpoint/runtime identities, 144 equal restored adapter
+tensors, both twelve-call denominators and all 49 physical files per arm against
+the original arm summaries. Existing frozen `audit_arm`/scorer results were
+reused; no model, gold, training or scorer rerun occurred. Worker exit/reap,
+parent exit/reap, before-scoring receipt, physical score mtime and final allocation
+receipt are ordered consistently. [Compact closeout](verified-runs/scifact-grounding-tune-closeout-31763176.json)
+has physical SHA `1a2c0b0f678958b4bbd3418dbe833f23f537d8d017673e51d6b4983102250ea5`.
+
+| Fixed twelve-query tune result | Base | Adapted |
+|---|---:|---:|
+| Correct first3-rationalized documents / relevant documents | 1 / 9 | 4 / 9 |
+| Predicted documents | 41 | 12 |
+| Abstract-rationalized F1 | 0.0400 | 0.3810 |
+| Correct label-only documents | 5 | 7 |
+| Complete rationale at any output position | 3 | 4 |
+| NEI claims with false evidence / NEI claims | 4 / 4 | 4 / 4 |
+| Valid NEI abstentions | 0 | 0 |
+| Input / output tokens, including every attempt | 39,400 / 1,844 | 39,400 / 347 |
+| Sum of call elapsed times | 57.945 s | 15.220 s |
+| Unknown / stop-required / planned-unsuccessful | 0 / 0 / 0 | 0 / 0 / 0 |
+
+The preregistered **count** gate passed, but this is not evidence that all F1
+change comes from reasoning: F1 is `2*1/(41+9)` versus `2*4/(12+9)`, so reducing
+excess predicted documents matters. Any-position complete rationale increased
+3→4 whereas first3 credit increased 1→4; placement/selection matters too.
+Label-only 5→7 mixes document selection and relation classification. All four
+NEI cases still hallucinate evidence under the benchmark annotation: abstention
+has not improved. Unjudged extra documents are not independently human-verified
+false statements. Base ran first, output lengths differ, and call sums exclude
+some staging/load overhead; these are not online SLA or causal latency results.
+
+Consumption entry: **12 distinct frozen tune inputs, 24 physical calls**, not
+24 distinct claims. Shared arm input identity is
+`4e05451cc152ef5adb04b2662539d0e9ffc3cb32572aa29caa6503a5a223d169`.
+No additional warmup, validation, official dev/test, sample substitution or retry
+was consumed. Physical score/gate SHA are respectively
+`232255d657d35e546f3d64480724f02aa5914c528176b998c8f4465377119803` /
+`60bcc9ec34a1d5f33f6f665d3cf57d5c81c80ab8cdf2785f8a1b443680ae3d7a`.
+
+Scope remains gold-preparation-seen TRAIN-internal grounding on the restricted
+58-document pool, with all answerable gold already visible. It is not a
+restricted-1.2M retrieval gain, independent test, external generalization,
+tool-use/Agent benefit or resume-ready headline. The separately frozen validation
+pair requires another exact-hash release; gate success alone does not execute it.

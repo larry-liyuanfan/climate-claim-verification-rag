@@ -1,0 +1,168 @@
+{
+  "actual_calls": 24,
+  "adapter_model_sha256": "dd1974a26549b3337824252a9c38773873acce72427f92e656835bf9d71935d4",
+  "adapter_tensors_equal": 144,
+  "adapter_training_sha256": "f5e6a865ec09cb67a520e36ba4646fb297a381383d4d0357208488ef6e9168a0",
+  "allocation_elapsed_seconds": 142,
+  "arms": {
+    "adapted": {
+      "attempts": 12,
+      "claims": 12,
+      "complete_alternative_any_position": 4,
+      "complete_sha256": "ad4dc447ba4d50dfdf5fa44a67d8c3365fd164a86ef92cb952f81a5189b91799",
+      "correctly_rationalized_documents": 4,
+      "cost_including_failures": {
+        "elapsed_ms": 15220.390385016799,
+        "input_tokens_known_lower_bound": 39400,
+        "output_tokens_known_lower_bound": 347,
+        "totals_are_lower_bounds": false
+      },
+      "exact_alternative": 4,
+      "input_identity": "4e05451cc152ef5adb04b2662539d0e9ffc3cb32572aa29caa6503a5a223d169",
+      "nei_false_evidence": 4,
+      "not_attempted": 0,
+      "official_metrics": {
+        "abstract_label_only": {
+          "correct": 7,
+          "f1": 0.6666666666666666,
+          "precision": 0.5833333333333334,
+          "predicted": 12,
+          "recall": 0.7777777777777778,
+          "relevant": 9
+        },
+        "abstract_rationalized": {
+          "correct": 4,
+          "f1": 0.380952380952381,
+          "precision": 0.3333333333333333,
+          "predicted": 12,
+          "recall": 0.4444444444444444,
+          "relevant": 9
+        },
+        "sentence_label": {
+          "correct": 4,
+          "f1": 0.27586206896551724,
+          "precision": 0.3333333333333333,
+          "predicted": 12,
+          "recall": 0.23529411764705882,
+          "relevant": 17
+        },
+        "sentence_selection": {
+          "correct": 5,
+          "f1": 0.3448275862068966,
+          "precision": 0.4166666666666667,
+          "predicted": 12,
+          "recall": 0.29411764705882354,
+          "relevant": 17
+        }
+      },
+      "physical_file_count": 49,
+      "planned_unsuccessful": 0,
+      "stop_required": 0,
+      "unjudged_extra_documents_not_human_false": 4,
+      "unknown_usage": 0,
+      "valid_nei_abstention": 0
+    },
+    "base": {
+      "attempts": 12,
+      "claims": 12,
+      "complete_alternative_any_position": 3,
+      "complete_sha256": "a3a5ca96365b1eef12bb5102a15aab422912070a0cef29266877999c9be2c652",
+      "correctly_rationalized_documents": 1,
+      "cost_including_failures": {
+        "elapsed_ms": 57945.15119865537,
+        "input_tokens_known_lower_bound": 39400,
+        "output_tokens_known_lower_bound": 1844,
+        "totals_are_lower_bounds": false
+      },
+      "exact_alternative": 1,
+      "input_identity": "4e05451cc152ef5adb04b2662539d0e9ffc3cb32572aa29caa6503a5a223d169",
+      "nei_false_evidence": 4,
+      "not_attempted": 0,
+      "official_metrics": {
+        "abstract_label_only": {
+          "correct": 5,
+          "f1": 0.2,
+          "precision": 0.12195121951219512,
+          "predicted": 41,
+          "recall": 0.5555555555555556,
+          "relevant": 9
+        },
+        "abstract_rationalized": {
+          "correct": 1,
+          "f1": 0.04,
+          "precision": 0.024390243902439025,
+          "predicted": 41,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "sentence_label": {
+          "correct": 3,
+          "f1": 0.026315789473684206,
+          "precision": 0.014218009478672985,
+          "predicted": 211,
+          "recall": 0.17647058823529413,
+          "relevant": 17
+        },
+        "sentence_selection": {
+          "correct": 9,
+          "f1": 0.07894736842105263,
+          "precision": 0.04265402843601896,
+          "predicted": 211,
+          "recall": 0.5294117647058824,
+          "relevant": 17
+        }
+      },
+      "physical_file_count": 49,
+      "planned_unsuccessful": 0,
+      "stop_required": 0,
+      "unjudged_extra_documents_not_human_false": 32,
+      "unknown_usage": 0,
+      "valid_nei_abstention": 0
+    }
+  },
+  "batch_maxrss": "9318380K",
+  "closeout_script_sha256": "09f7c0e0f5b07cd716083b8fac764e1025f91874aa78d695c7df6ff8e3aced25",
+  "config_sha256": "0e63b57b59c5dcf322dcfd620b881edc30b7e71a3ea61bcc9a3def869bcb85f2",
+  "data_manifest_sha256": "28de2c5d1d531aabdb757ccb45db0b91232a54ac7089ac7dc5ebf42e65ba3b2f",
+  "frozen_tune_count_gate_passed": true,
+  "identity_and_reaped_before_scoring_verified": true,
+  "job_id": "31763176",
+  "limitations": [
+    "TRAIN-internal twelve-query restricted-pool grounding tune; gold preparation seen",
+    "all answerable gold visible; not retrieval/tool-use or independent test improvement",
+    "NEI false evidence remains four of four; no valid NEI abstentions",
+    "label count mixes evidence selection and relation; first3 ordering and fewer predictions contribute",
+    "per-arm sequential call time is not online SLA or causal latency comparison"
+  ],
+  "metadata_sha256": {
+    "runs/scifact-grounding-tune-20261001-v1-allocation/before-scoring.json": "3d92005cc5a332c68e05762b8a6d7315c09a0841651faf9496c016d60a470e62",
+    "runs/scifact-grounding-tune-20261001-v1-allocation/ended.json": "21ed02b0837286aefc362e19f70cf254940be8a4851b87ff90262ac7ccdb8450",
+    "runs/scifact-grounding-tune-20261001-v1-allocation/inference-parent-exited.json": "b0baa579f331ac27d647a3d4441e278f9aa81ff0b22083a272a9c48213efb30e",
+    "runs/scifact-grounding-tune-20261001-v1-allocation/runtime-observed.json": "a426580a2f65bd6afaead52d45158814e1ce395c16e0a458abf549c74df08bc3",
+    "runs/scifact-grounding-tune-20261001-v1-allocation/started.json": "2c24b108c44031021115252fe9081b6a316d1ae90a03d28f32dc50dcd868490e",
+    "runs/scifact-grounding-tune-20261001-v1-execution/worker-exit.json": "f35f299e070f623d10376c943a136bc7059ffa6dfbca9278c13a20c49321f0a2",
+    "runs/scifact-grounding-tune-20261001-v1/adapter-integrity.json": "d3e606d82c6e29d472e4b8c55d90283ef4fbf222fd309b355569f8bf03313a5f",
+    "runs/scifact-grounding-tune-20261001-v1/gate.json": "60bcc9ec34a1d5f33f6f665d3cf57d5c81c80ab8cdf2785f8a1b443680ae3d7a",
+    "runs/scifact-grounding-tune-20261001-v1/inference-terminated.json": "88740f6de3f7476d651fb103b0bcb54cc61bf0a8f6488b3e4e514d9c6d31dab1",
+    "runs/scifact-grounding-tune-20261001-v1/score.json": "232255d657d35e546f3d64480724f02aa5914c528176b998c8f4465377119803"
+  },
+  "new_model_calls": 0,
+  "official_dev_test_read": false,
+  "order": "base_first_then_adapted_not_latency_randomized",
+  "physical_audit_rerun": false,
+  "physical_raw_usage_hashes_match_existing_audit": true,
+  "planned_calls": 24,
+  "release_authorized_sha256": "562bf8282f2eb6b7eced4edc31e6b4be2b615480614213863ec3666f14a7ca34",
+  "runtime_files_sha256": "8d231f4980e0bf94fe26273074588a0f6c0ea67646117871fd97443ad1142697",
+  "runtime_receipt_sha256": "9878d3e4d45735828b4260d87656fd2827481663266a875725bfe7abab7d390a",
+  "scorer_rerun": false,
+  "slurm_exit_code": "0:0",
+  "slurm_state": "COMPLETED",
+  "slurm_total_cpu": "02:03.542",
+  "source_archive_sha256": "a2b7594d75906b9008810626d2e7813d1a9b60ba92af50fa4dc8ee267a741b01",
+  "source_git": "d9924d2e9b8db5cce5949569a494c258434770aa",
+  "training_rerun": false,
+  "validation_executed": false,
+  "worker_elapsed_seconds": 96.43266248703003,
+  "wrapper_sha256": "05c6ae027cc335646860f787d735bf241772059f2ef501a32f1040e696be92bf"
+}
