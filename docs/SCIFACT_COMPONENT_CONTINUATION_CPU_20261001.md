@@ -83,3 +83,27 @@ source reproduction and the real-artifact probe must be attached to the release
 receipt before separate coordinator review. The wrapper cannot be submitted on
 the strength of this document alone. No new semantic result or resume claim is
 created by CPU validation.
+
+## Verified closeout
+
+[Validation receipt](verified-runs/scifact-component-continuation-validation-20261001.json):
+42 new + 91 relevant existing tests, **133 passed locally and 133 from the clean
+archive**. Ruff and strict mypy (six source files), shell syntax, exact Git
+blob/mode/archive and LF shell guard checks pass. The later final-source change
+only adds the probe's owner-only directory creation; archive comparison proves
+all 431 other files identical, so the unaffected suite was not repeated.
+
+Final execution source: `a104115ecc370223617ee3238fb7e5b24af526ea`;
+archive `ad9ebf177ca03cf5bf8e44c38ee4fa3aa2e28c92af0b0178672bdc8d160be0e1`.
+The [actual Spartan probe](verified-runs/scifact-component-continuation-cpu-probe-20261001.json)
+ran from that clean source: **33/33 real frozen packing matches**, four synthetic
+packings, physical r2 carry reconciliation, owner permissions, symlink rejection,
+directory fsync and actual normal/interrupted child-group reaping all pass.
+The carried semantic result remains **false**. Initial import-path and probe-only
+directory failures are recorded, not hidden; their artifacts were not overwritten.
+
+Torch was already available: local `2.7.1+cpu`, Spartan module `2.1.2`. POSIX is
+provided by Spartan Linux, not by a pip package. `USE_TORCH=0` intentionally makes
+the tokenizer-only probe report model backends unavailable; it does not mean the
+installed Torch is missing. No dependency reinstall, model-weight loading,
+new model call, GPU submission, real scoring-target read or resume edit occurred.

@@ -1,0 +1,82 @@
+{
+  "schema": "component-continuation-cpu-validation-v1",
+  "status": "cpu_verified_pending_separate_release",
+  "execution_source": "a104115ecc370223617ee3238fb7e5b24af526ea",
+  "source_archive_sha256": "ad9ebf177ca03cf5bf8e44c38ee4fa3aa2e28c92af0b0178672bdc8d160be0e1",
+  "source_archive_bytes": 3297280,
+  "source_regular_files": 433,
+  "source_directories": 13,
+  "source_revision_members": 1,
+  "source_revision_bytes": 41,
+  "exact_git_blobs_and_modes": true,
+  "normalized_archive_members_unique": true,
+  "wrapper": "hpc/scifact_component_continuation.sbatch",
+  "wrapper_sha256": "28a4498de8fc2d59fc660e84f0d5a43eba51db157d3616277af6f17aa63c89bc",
+  "lf_shell_guard_passed": true,
+  "bash_syntax_passed": true,
+  "policy_sha256": "8c21a3a7e8b6fdee400c95f1117195a2733c6b344c01f0ca7321428ebd29c798",
+  "regression": {
+    "source": "d42404355b0aa3be46d5103a969965c9f5720ef6",
+    "test_files": [
+      "tests/test_component_continuation.py",
+      "tests/test_component_execution.py",
+      "tests/test_scifact_components.py"
+    ],
+    "new_tests": 42,
+    "relevant_existing_tests": 91,
+    "local_passed": 133,
+    "clean_archive_passed": 133,
+    "skipped": 0,
+    "local_seconds": 21.37,
+    "clean_seconds": 22.30,
+    "warning": "existing Python tarfile future-default deprecation in generator staging test",
+    "final_source_equivalence": {
+      "unchanged_archive_files": 431,
+      "changed_files": ["SOURCE_REVISION", "scripts/probe_component_continuation.py"],
+      "only_code_change": "create owner-only private directory in POSIX probe",
+      "production_and_test_blobs_unchanged": true,
+      "unchanged_suite_not_repeated_after_probe_only_fix": true
+    }
+  },
+  "static_checks": {
+    "ruff_passed": true,
+    "strict_mypy_files_passed": 6,
+    "probe_only_fix_ruff_and_mypy_rechecked": true,
+    "tracked_secret_pii_scan_passed": true,
+    "read_only_review_passed": true,
+    "orphan_artifact_incremental_review_passed": true
+  },
+  "spartan_final_clean_source_probe": {
+    "artifact": "scifact-component-continuation-cpu-probe-20261001.json",
+    "sha256": "5e5ff08022a41ee984aa885abbf5da15058ebb0482dde3fd9aac11511bf4b93f",
+    "python": "3.10.4",
+    "frozen_real_packing_matches": 33,
+    "synthetic_packings": 4,
+    "physical_predecessor_reconciled": true,
+    "carried_technical_ready": true,
+    "carried_semantic_match": false,
+    "owner_only_and_symlink_refusal": true,
+    "directory_fsync": true,
+    "real_normal_child_reaped": true,
+    "real_interrupted_process_group_reaped": true,
+    "normal_returncode": 0,
+    "interrupted_returncode": -15
+  },
+  "preserved_preparation_failures": [
+    "Initial test invocation omitted scripts PYTHONPATH: 8 import failures; corrected environment, no semantic change.",
+    "First d424043 Linux probe reached carry and all packing checks but missed private mkdir; failed before child-process checks. Original stage/log retained; one-line fix verified in final clean source."
+  ],
+  "environment": {
+    "local_torch": "2.7.1+cpu",
+    "spartan_torch_import_verified": "2.1.2",
+    "spartan_posix_verified": true,
+    "tokenizer_probe_USE_TORCH": "0",
+    "new_dependency_installations": 0
+  },
+  "model_calls_this_package": 0,
+  "new_gpu_jobs": 0,
+  "scoring_targets_read_by_real_probe": false,
+  "old_artifacts_modified": false,
+  "new_model_quality_claim": false,
+  "resume_modified": false
+}
