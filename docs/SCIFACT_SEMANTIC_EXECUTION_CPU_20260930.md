@@ -183,3 +183,21 @@ and produced fresh exclusive inference/scoring bundles. Only the content-free
 receipt was downloaded. Remote source/wrapper hashes match local copies and
 Bash syntax passes. The `44b0424` files are retained as superseded/unreleased;
 no model calls, allocations, new monitor or resume changes were made.
+
+## Separately authorized serial GPU submission
+
+After the CPU repair handoff was pushed, the coordinator separately released
+the exact `99cd9ff` source/wrapper and both new bundle identities for one bounded
+comparison. The [submission receipt](verified-runs/scifact-semantic-pair-submission-31706518-31706520.json)
+records **31706518 → afterok → 31706520**, each with one A100, eight CPU,
+32 GiB, two hours and no requeue. The first was running at the single submission
+snapshot; the second was pending dependency. Test-only's October 6 estimate was
+superseded by the actual September 30 start, not treated as a guaranteed schedule.
+
+The submission script used a retained exclusive release lock, independently
+checked scheduler command exit codes and never retried `sbatch`. An initial
+unexecuted helper with a read-only query-status guard weakness was retained;
+only the corrected `r2` helper ran. Source, model, prompts, selected queries,
+budgets and evaluation contracts were unchanged. This is a submission handoff,
+not final inference/preflight/quality evidence. The coordinator owns subsequent
+status and result verification; no new polling task or resume update was created.

@@ -5,8 +5,8 @@ completed in job **31698106** with zero model calls. It excludes all 23 eligible
 IDs in the 12 previously consumed components, then fixes twelve train questions
 for a fresh original-G/semantic-policy comparison with equal initial contexts.
 This verifies exposure accounting and packing contracts, **not model improvement**;
-all 531 eligible questions already had gold-aware preparation exposure. No GPU
-comparison or dev/test release follows, and the negative F/G result below remains.
+all 531 eligible questions already had gold-aware preparation exposure. CPU
+success alone did not authorize GPU or dev/test execution; the negative F/G result remains.
 
 The subsequent [semantic execution handoff](docs/SCIFACT_SEMANTIC_EXECUTION_CPU_20260930.md)
 freezes separate inference/scoring bundles and fresh two-policy entrypoints with
@@ -16,6 +16,11 @@ policy-bound preflights and serial predecessor checks are implemented. The
 completion-journal failure retains known usage in a failed summary and stops;
 if summary persistence also fails, durable cost is unavailable/unknown, not zero. This is
 **CPU preparation only**: zero model calls, zero submitted jobs and no new quality result.
+
+After a separate exact-hash release, the [serial comparison submission](docs/verified-runs/scifact-semantic-pair-submission-31706518-31706520.json)
+created jobs **31706518 → afterok → 31706520**. The submission snapshot shows the
+first running and the second waiting on its dependency. This is not a completed
+comparison or a model-quality claim; no dev/test execution was authorized.
 
 The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
 adds generation-time uniqueness/total-budget enforcement, actual preview hashes,

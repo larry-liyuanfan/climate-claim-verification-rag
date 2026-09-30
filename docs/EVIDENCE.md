@@ -14,8 +14,8 @@ initial contexts and unchanged opportunity strata; no reselection occurred.
 
 All 531 eligible queries were already exposed to legacy gold-aware preparation.
 The twelve selected train questions are not an independent test. Model calls
-are zero, dev/test is unopened, and a fresh two-arm 96-slot model comparison
-remains unreleased. Sixty-four targeted tests and clean-archive reproduction,
+were zero and dev/test was unopened in this CPU preparation; the fresh two-arm
+96-slot model comparison was then unreleased. Sixty-four targeted tests and clean-archive reproduction,
 Ruff and six-file strict mypy passed. Neither fixture tool use nor schema success
 demonstrates real model behavior. The frozen F/G negative result below remains
 unchanged; no current-resume or Agent-quality promotion is supported.
@@ -39,6 +39,15 @@ exists only in process memory; after process exit durable cost is unavailable/
 unknown, never zero. The [repair handoff](verified-runs/scifact-semantic-execution-repair-99cd9ff.json)
 pins the replacement source and private bundle identities. Old artifacts remain
 historical CPU evidence, not an alternative release candidate.
+
+After the coordinator's separate exact-hash release, the sole submission created
+jobs **31706518 / 31706520**, with the second `afterok:31706518`. The
+[submission receipt](verified-runs/scifact-semantic-pair-submission-31706518-31706520.json)
+records both real IDs, the retained exclusive lock, test-only admission and actual
+resource requests. At the bounded snapshot the first was running on A100-short,
+the second pending dependency; both request one A100 / eight CPU / 32 GiB / two
+hours without requeue. No model-quality, completed-preflight or completion claim
+follows from submission. No dev/test, automatic retry or new monitor was released.
 
 ## 2026-09-30 bounded grammar and evidence-gap pair: audited negative result
 
