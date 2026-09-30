@@ -160,7 +160,7 @@ def run_five_stage_benchmark(
     config_source = Path(config_path)
     if config_source.suffix.lower() in {".yaml", ".yml"}:
         try:
-            import yaml  # type: ignore[import-untyped]
+            import yaml
         except ImportError as exc:
             raise RuntimeError("PyYAML is required for YAML benchmark configs") from exc
         config = yaml.safe_load(config_source.read_text(encoding="utf-8"))
@@ -186,6 +186,10 @@ def run_five_stage_benchmark(
     fusion_k = int(config.get("fusion_k", 100))
     rerank_k = int(config.get("rerank_k", 50))
     final_k = int(config.get("final_k", 5))
+    if min(recall_k, fusion_k, rerank_k, final_k) <= 0:
+        raise ValueError("retrieval and evidence widths must be positive")
+    # Retain metric ranks independently of the smaller served evidence set.
+    ranking_k = max(50, final_k)
     rerank_source = str(config.get("rerank_source", "ltr"))
     if rerank_source not in {"rrf", "ltr"}:
         raise ValueError("rerank_source must be 'rrf' or 'ltr'")
@@ -251,7 +255,7 @@ def run_five_stage_benchmark(
             profile["name"]: weighted_rank_fuse(
                 rrf_rows,
                 ltr_rows,
-                final_k,
+                ranking_k,
                 k=profile["k"],
                 base_weight=profile["base_weight"],
                 reranker_weight=profile["reranker_weight"],
@@ -264,12 +268,12 @@ def run_five_stage_benchmark(
         reranked_all = reranker.rerank(query, rerank_candidates, len(rerank_candidates))
         rerank_durations.append(time.perf_counter() - rerank_started)
         reranked_pair_count += len(rerank_candidates)
-        reranked = reranked_all[:final_k]
+        reranked = reranked_all[:ranking_k]
         fused_by_profile = {
             profile["name"]: weighted_rank_fuse(
                 rerank_candidates,
                 reranked_all,
-                final_k,
+                ranking_k,
                 k=profile["k"],
                 base_weight=profile["base_weight"],
                 reranker_weight=profile["reranker_weight"],
@@ -306,7 +310,7 @@ def run_five_stage_benchmark(
             predictions[stage][claim_id] = Prediction(
                 claim_id=claim_id,
                 evidence_ids=tuple(
-                    row.evidence_id for row in ranked_rows[:final_k]
+                    row.evidence_id for row in ranked_rows[:ranking_k]
                 ),
             )
     target = Path(output_dir)
@@ -316,13 +320,24 @@ def run_five_stage_benchmark(
     per_system_rows: dict[str, list[dict[str, Any]]] = {}
     long_rows: list[dict[str, Any]] = []
     for stage, stage_predictions in predictions.items():
-        metrics, metric_rows, _ = evaluate_predictions(claims, stage_predictions)
+        metrics, metric_rows, _ = evaluate_predictions(
+            claims, stage_predictions, evidence_k=final_k, evaluate_labels=False,
+        )
         system_metrics[stage] = metrics
         per_system_rows[stage] = metric_rows
         write_json(
-            target / f"predictions_{stage}.json",
+            target / f"rankings_{stage}.json",
             {
                 claim_id: prediction.to_official_dict(claims[claim_id].text)
+                for claim_id, prediction in stage_predictions.items()
+            },
+        )
+        write_json(
+            target / f"predictions_{stage}.json",
+            {
+                claim_id: Prediction(claim_id, prediction.evidence_ids[:final_k]).to_official_dict(
+                    claims[claim_id].text
+                )
                 for claim_id, prediction in stage_predictions.items()
             },
         )
@@ -375,6 +390,14 @@ def run_five_stage_benchmark(
         },
         "claim_count": len(claims),
         "final_k": final_k,
+        "ranking_k": ranking_k,
+        "metric_contract": {
+            "ranking_source": "rankings_<stage>.json (up to ranking_k)",
+            "served_evidence_source": "predictions_<stage>.json (up to final_k)",
+            "evidence_k": final_k,
+            "classification_evaluated": False,
+            "boundary": "stage candidate limits still apply; no synthetic tail or unretrieved gold is added",
+        },
         "stage_contract": {
             "candidate_width": fusion_k,
             "feature_names": list(ranker.feature_names),

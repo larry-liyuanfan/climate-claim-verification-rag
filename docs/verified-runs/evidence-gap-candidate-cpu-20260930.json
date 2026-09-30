@@ -1,0 +1,220 @@
+{
+  "schema_version": "evidence-gap-candidate-cpu-smoke-v1",
+  "source_git": "ba387c3d7f6ba802012c45dc49235b405fd5ac3c",
+  "candidate_protocol": "scifact-evidence-gap-candidate-v1",
+  "status": "passed",
+  "tokenizer_revision": "350135a4de9a3407be836fa238cccc1d61503a85",
+  "tokenizer_files_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "prefix_callback": {
+    "fresh_A_B_A": true,
+    "records": [
+      {
+        "input_tokens": 1065,
+        "scripted_wire_output_tokens": 106,
+        "ordered_mixed_label_wire_accepted": true,
+        "rejected": {
+          "decision_first": true,
+          "skipped_gap": true,
+          "cross_document": true,
+          "stale_alias": true
+        },
+        "constructor_only_config_wrongly_accepts_decision_first": true,
+        "effective_force_json_field_order": true,
+        "effective_alphabet_sha256": "a36fe2552dc1aebc64d17e35a0bbe62d4858ee43826eaf3d493e8adad22b0277"
+      },
+      {
+        "input_tokens": 1065,
+        "scripted_wire_output_tokens": 106,
+        "ordered_mixed_label_wire_accepted": true,
+        "rejected": {
+          "decision_first": true,
+          "skipped_gap": true,
+          "cross_document": true,
+          "stale_alias": true
+        },
+        "constructor_only_config_wrongly_accepts_decision_first": true,
+        "effective_force_json_field_order": true,
+        "effective_alphabet_sha256": "a36fe2552dc1aebc64d17e35a0bbe62d4858ee43826eaf3d493e8adad22b0277"
+      },
+      {
+        "input_tokens": 1065,
+        "scripted_wire_output_tokens": 106,
+        "ordered_mixed_label_wire_accepted": true,
+        "rejected": {
+          "decision_first": true,
+          "skipped_gap": true,
+          "cross_document": true,
+          "stale_alias": true
+        },
+        "constructor_only_config_wrongly_accepts_decision_first": true,
+        "effective_force_json_field_order": true,
+        "effective_alphabet_sha256": "a36fe2552dc1aebc64d17e35a0bbe62d4858ee43826eaf3d493e8adad22b0277"
+      }
+    ],
+    "real_model_generations": 0,
+    "hf_generate_tested": false
+  },
+  "packing": [
+    {
+      "route": "fixed_retrieval",
+      "same_input_cap": 2048,
+      "same_output_cap": 512,
+      "frozen_action_template": {
+        "input_tokens": 2012,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7",
+          "c0:8",
+          "c0:9",
+          "c0:10"
+        ],
+        "visible_sentence_count": 11,
+        "scripted_output_tokens": 14
+      },
+      "candidate": {
+        "input_tokens": 2017,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7"
+        ],
+        "visible_sentence_count": 8,
+        "scripted_output_tokens": 41
+      }
+    },
+    {
+      "route": "fixed_rerank",
+      "same_input_cap": 2048,
+      "same_output_cap": 512,
+      "frozen_action_template": {
+        "input_tokens": 2012,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7",
+          "c0:8",
+          "c0:9",
+          "c0:10"
+        ],
+        "visible_sentence_count": 11,
+        "scripted_output_tokens": 14
+      },
+      "candidate": {
+        "input_tokens": 2017,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7"
+        ],
+        "visible_sentence_count": 8,
+        "scripted_output_tokens": 41
+      }
+    },
+    {
+      "route": "deterministic_extra",
+      "same_input_cap": 2048,
+      "same_output_cap": 512,
+      "frozen_action_template": {
+        "input_tokens": 2012,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7",
+          "c0:8",
+          "c0:9",
+          "c0:10"
+        ],
+        "visible_sentence_count": 11,
+        "scripted_output_tokens": 14
+      },
+      "candidate": {
+        "input_tokens": 2017,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7"
+        ],
+        "visible_sentence_count": 8,
+        "scripted_output_tokens": 41
+      }
+    },
+    {
+      "route": "adaptive",
+      "same_input_cap": 2048,
+      "same_output_cap": 512,
+      "frozen_action_template": {
+        "input_tokens": 2026,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6",
+          "c0:7",
+          "c0:8",
+          "c0:9"
+        ],
+        "visible_sentence_count": 10,
+        "scripted_output_tokens": 14
+      },
+      "candidate": {
+        "input_tokens": 2034,
+        "visible_sentence_ids": [
+          "c0:0",
+          "c0:1",
+          "c0:2",
+          "c0:3",
+          "c0:4",
+          "c0:5",
+          "c0:6"
+        ],
+        "visible_sentence_count": 7,
+        "scripted_output_tokens": 41
+      }
+    }
+  ],
+  "real_queries_read": 0,
+  "real_model_generations": 0,
+  "gpu_jobs_submitted": 0,
+  "real_weights_hf_integration_verified": false,
+  "classification_or_agent_quality_measured": false,
+  "counts_are_scripted_fixture_token_lengths_not_model_performance": true
+}

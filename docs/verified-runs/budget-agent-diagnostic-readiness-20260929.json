@@ -1,0 +1,46 @@
+{
+  "kind": "CPU-validated diagnosis only; real canary not released or submitted",
+  "source_git_sha": "6a764a1b4f9137cf8e8c29abfbc14572c3a1039d",
+  "source_archive_name": "budget-agent-diagnostic-source-6a764a1b4f9137cf8e8c29abfbc14572c3a1039d.tar",
+  "source_archive_bytes": 1310720,
+  "source_archive_sha256": "ecdfc7c05334af64d11adb0f03ead5042f9168e9c182968a51936ee33413ba34",
+  "source_archive_uploaded_to_spartan": false,
+  "operator_path": "hpc/budget_agent_diagnostic_canary.sbatch",
+  "operator_sha256": "c257d8b49a1e2c2112cb209fbca0e86e8ae6ca1989c7c18f4d2f860c15e30dd6",
+  "new_canary_release_id": null,
+  "new_gpu_job_id": null,
+  "canary_submitted": false,
+  "full_evaluation_released": false,
+  "unchanged_inputs": {
+    "bundle_sha256": "563738f0be1f7bf7b99b8de20bcdeab552f7e893166dec260b8f7f1e7951c3c1",
+    "module_runtime_sha256": "2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8",
+    "linux_overlay_sha256": "e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce",
+    "authored_protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+    "models_revisions_budgets_labels_unchanged": true
+  },
+  "checks": {
+    "affected_cpu_tests_passed": 35,
+    "new_diagnostic_test_cases": 13,
+    "ruff_src_scripts_tests": "passed",
+    "mypy_source_files": 37,
+    "mypy": "passed",
+    "canary_bash_syntax": "passed",
+    "tracked_secret_pii_scan": "passed",
+    "ast_comparison_vs_ca9fa53": "system prompt, generate/chat-template arguments, AgentBudget, AgentDecision and CitedStatement unchanged",
+    "clean_git_archive_diagnostic_tests": "13 passed with imports verified from clean archive source",
+    "clean_git_archive_audit": "identical structured pilot summary reproduced without generation or labels"
+  },
+  "private_response_limits": {
+    "per_response_bytes": 32768,
+    "total_bytes": 1048576,
+    "max_files": 32,
+    "posix_directory_mode": "0700",
+    "posix_file_mode": "0600",
+    "allowed_execution_location": "Spartan Climate runs; opt-in; outside public result archive",
+    "raw_text_public_or_career": false
+  },
+  "scope": "Separate JSON syntax from strict schema rejection; preserve usage and bounded content-free diagnostics. No tolerant parser, prompt change, protocol change, model tuning, training or evaluation rerun.",
+  "historical_pilot_root_cause_known": false,
+  "historical_raw_output_recovered": false,
+  "historical_result": "31510619 completed but nine generated decisions rejected; diagnostic preparation is not a fix of an established real-model cause."
+}

@@ -2,6 +2,28 @@
 
 ## 90-second story
 
+I turned a course evidence-retrieval baseline into a controlled search-model
+training and selection case. First, claim-grouped hard negatives and a bounded
+20-step LoRA/InfoNCE adapter improved restricted offline-dev Recall@5 from .279
+to .297 over 1.21 million passages, with positive paired intervals. This was
+task adaptation, not pretraining or independent-test evidence.
+
+Second, I investigated failures instead of just adding components: unretrieved
+gold had distorted LTR features, a loader could miss checkpoint keys, and a
+five-item served output had censored Top-10 metrics. I corrected the contracts,
+checked every restored adapter tensor, and separated ranking depth from served
+evidence count.
+
+Finally, on a separate public validation set, I measured identical candidate
+pools and complete warmed requests. LTR gave .605 Recall@5 at 77.8 ms P95;
+Top-100 4B gave .628 at 9.30 seconds, without a significant Top-5 advantage in
+the paired comparison. Narrowing to Top-20 did not justify its cost either.
+My recommendation is LTR for latency, with 4B optional for slower offline work.
+I kept negative results, sealed the consumed test, and did not turn this into
+an online SLA or a verdict-quality claim.
+
+## Historical extended evidence (separate experiments)
+
 The original course system used BM25 candidate recall, BGE reranking and a
 claim classifier under Colab constraints. My portfolio extension turns that
 baseline into a reproducible multistage search lab: BM25 and dense recall share
@@ -25,7 +47,7 @@ rebuildable 4.95 GB index under project quota; I removed only the incomplete
 file and made index persistence explicit. Replacement job 29465819 then
 completed all 154 official-dev claims against 1,208,827 documents. The adapter
 raised Recall@5 from 0.2793 to 0.2970, MRR from 0.3633 to 0.3869, nDCG from
-0.2994 to 0.3203 and Evidence F1 from 0.07253 to 0.07544; every 5,000-sample
+0.2994 to 0.3203 and Evidence F1@50 from 0.07253 to 0.07544; every 5,000-sample
 paired interval was above zero. It passes my offline dev promotion gate, but I
 still do not call it independent test generalisation or an online A/B result.
 On the fixed 154-claim dev split, RRF improved Recall@5 from
@@ -33,8 +55,10 @@ On the fixed 154-claim dev split, RRF improved Recall@5 from
 regressed because it erased the strong first-stage order. I corrected the
 architecture by fusing cross-encoder rank back with RRF, then gated a BF16 4B
 model on the identical 154-claim/7,700-pair split. Balanced RRF/4B fusion reached
-Recall@5 0.3153, MRR@10 0.3961, nDCG@10 0.2849 and Evidence F1 0.2131; all four
-5,000-sample paired intervals versus RRF were above zero. The full 4B job used a
+Recall@5 0.3153 and Evidence F1@5 0.2131; both 5,000-sample paired intervals
+versus RRF were above zero. A later audit found the downstream Top-10 fields
+had only five stored ranks; I keep those original records but do not present
+them as complete Top-10 metrics. This does not affect the separate Top-50 LoRA run. The full 4B job used a
 20 GB A100 MIG slice and recorded P95 4.82 seconds/query, so I expose it as an
 offline quality profile and keep HNSW+RRF as the latency default. Because model
 size and weights were selected on dev, I do not call this independent test
@@ -70,6 +94,10 @@ generalisation. No public rank is claimed without an official source.
 26. Why was the sampled adapter result insufficient even though Recall, MRR and nDCG intervals were positive?
 27. Which exact conditions let the full-corpus adapter pass, and why is it still only a dev-selection result?
 28. How did the late project-quota failure change the artifact design without weakening the evaluation?
+29. Why can all three profiles lie on a point-estimate Pareto frontier while LTR is still recommended?
+30. Why does a crossing-zero paired interval not prove Top-20 and Top-100 equivalent?
+31. Why can the preserved Top-20 unscored tail not enter Top-5 under these fusion weights?
+32. Why do counted LoRA parameters not establish restored checkpoint integrity?
 
 ## Code evidence map
 
@@ -81,7 +109,9 @@ generalisation. No public rank is claimed without an official source.
 | RRF and learned-fusion feature path | `src/climate_rag/fusion.py` |
 | Hard-negative mining | `src/climate_rag/negatives.py` |
 | Frozen-test, paired-run and train/serve contracts | `src/climate_rag/evaluation_protocol.py`, `configs/public_evaluation_policy.json` |
-| Query taxonomy and quality/latency/memory Pareto | `src/climate_rag/representation_eval.py`, `configs/search_profiles.verified.json` |
+| Query taxonomy and measured quality/latency/memory | `src/climate_rag/representation_eval.py`, `src/climate_rag/search_profile.py`, `docs/verified-runs/search-tradeoffs-20260927.json` (old component-sum config is retired) |
+| Direct saved-profile paired statistics | `scripts/compare_profile_metrics.py`, `scripts/summarize_search_profiles.py` |
+| Verified checkpoint tensors and embedding effect | `src/climate_rag/adapter_integrity.py`, `docs/verified-runs/adapter-integrity-20260927.json` |
 | Claim-grouped InfoNCE data and LoRA runtime | `scripts/prepare_embedding_training.py`, `hpc/train_embedding_lora_pilot.sbatch`, `hpc/adapter_runtime.sh` |
 | Sampled/full adapter promotion gates | `scripts/evaluate_embedding_adapter_gate.py`, `scripts/evaluate_embedding_adapter_full_gate.py`, `src/climate_rag/embedding_adapter_gate.py` |
 | Cross-encoder/Model Studio rerank adapters | `src/climate_rag/rerank.py` |

@@ -1,0 +1,42 @@
+{
+  "release_id": "climate-response-diagnostic-6a764a1-20260929",
+  "kind": "one separately released original authored-pilot diagnostic canary",
+  "job_id": "31519179",
+  "test_only_response_not_allocated": "31519177",
+  "source_git_sha": "6a764a1b4f9137cf8e8c29abfbc14572c3a1039d",
+  "source_archive_sha256": "ecdfc7c05334af64d11adb0f03ead5042f9168e9c182968a51936ee33413ba34",
+  "source_archive_bytes": 1310720,
+  "source_archive_uploaded_and_remote_hash_guard_passed": true,
+  "operator_wrapper_sha256": "c257d8b49a1e2c2112cb209fbca0e86e8ae6ca1989c7c18f4d2f860c15e30dd6",
+  "submission_script_sha256": "c07493b3276f78819a088474a6a73b7619835a7f242073ad36c9aeffbf0fe767",
+  "inputs_changed": false,
+  "phase": "pilot",
+  "tasks": 3,
+  "routes": 3,
+  "max_generation_attempts": 15,
+  "max_new_tokens": 7680,
+  "scheduler_snapshot": {
+    "submit_time": "2026-09-29T16:43:08",
+    "start_time": "2026-09-29T16:43:28",
+    "squeue_state": "CONFIGURING",
+    "sacct_state": "RUNNING",
+    "requeue": 0,
+    "restarts": 0,
+    "allocated_tres": "billing=112,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+    "requested_scratch_gib": 30,
+    "time_limit_seconds": 900,
+    "state_caveat": "Initial asynchronous Slurm snapshot, not terminal result; test-only estimate was not binding."
+  },
+  "spartan_relative_paths": {
+    "source": "envs/budget-agent-diagnostic-source-6a764a1b4f9137cf8e8c29abfbc14572c3a1039d.tar",
+    "wrapper": "envs/budget-agent-diagnostic-canary-6a764a1.sbatch",
+    "submission_script": "envs/submit-climate-response-canary-6a764a1.sh",
+    "result": "runs/budget-agent-diagnostic-canary-6a764a1-20260929.tar.gz",
+    "private_diagnostics": "runs/budget-agent-diagnostic-canary-6a764a1-20260929-private",
+    "log": "runs/slurm-agent-diagnostic-31519179.log"
+  },
+  "private_raw_response_policy": "0700 directory/0600 files; bounded Spartan-only attachments, no recursive download/GitHub/career export",
+  "behavior_fix_authorized": false,
+  "full_evaluation_released": false,
+  "automatic_retry": false
+}

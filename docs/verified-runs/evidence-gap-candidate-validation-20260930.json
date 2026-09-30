@@ -1,0 +1,36 @@
+{
+  "schema_version": "evidence-gap-candidate-validation-v1",
+  "source_git": "b39770bc3bf82b23c072f4849e7fe65660dea2b5",
+  "ci": {
+    "primary_run": 36677343963,
+    "companion_run": 36677339997,
+    "conclusion": "success",
+    "tests_passed": 513,
+    "tests_skipped": 1,
+    "skip_reason": "optional Torch dependency unavailable",
+    "ruff": "passed",
+    "mypy_source_files": 56,
+    "tracked_privacy_scan": "passed"
+  },
+  "fresh_lf_git_archive": {
+    "sha256": "bf10080763381a43599e90069c8d5175b331fb4eec2033a18f765df630665943",
+    "focused_tests_passed": 29,
+    "import_from_extracted_source_verified": true
+  },
+  "cached_tokenizer_smoke": {
+    "source_git": "ba387c3d7f6ba802012c45dc49235b405fd5ac3c",
+    "public_lf_receipt_sha256": "c9538a9dbcb8a109d17dfa6f06df4a46ec0d377a973c86cc5fd50bcb50aad694",
+    "original_windows_receipt_sha256": "b1ce2a2986a940b71d501851dc499257e58d6af4c9852ba35dc809389c17a5d7",
+    "copies_differ_only_in_newlines": true,
+    "subsequent_change": "CPU harness output/private directory mode0700; no provider, parser, callback, template, protocol or tokenizer change.",
+    "not_relabelled_as_new_run": true
+  },
+  "historical_failed_ci": {"run": 36677108364, "failed": 1, "passed": 512, "skipped": 1, "reason": "CPU harness private directory not owner-only on POSIX; strict guard retained and creation fixed."},
+  "frozen_gpu_source_and_package_unchanged": true,
+  "new_gpu_jobs": 0,
+  "real_queries_read": 0,
+  "real_weight_generations": 0,
+  "real_hf_weight_integration_verified": false,
+  "candidate_quality_gain_claimed": false,
+  "automatic_real_data_release": false
+}

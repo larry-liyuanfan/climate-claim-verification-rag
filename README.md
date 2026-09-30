@@ -1,5 +1,116 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+2026-09-30 follow-up: a separately authorized [feedback-v2 development pilot](docs/AGENT_FEEDBACK_V2_DEVELOPMENT_20260930.md)
+adds action-discriminated schemas and charged validation feedback; it is not a
+reinterpretation of the frozen result below. CPU validation and CI passed; the
+single [pilot job31587302](docs/BUDGET_AGENT_FEEDBACK_V2_CLOSEOUT_20260930.md)
+completed18 slots:15 final abstentions,3 repair exhaustions,0 accepted answers
+and0 model-selected tools. This is a negative development result. No new holdout run,
+training, grammar-decoding deployment or current-resume change is implied.
+
+Separately, the [original SciFact CPU preparation](docs/SCIFACT_GROUNDED_PROTOCOL_PROPOSAL_20260930.md)
+preserves sentence rationales, quarantines train/dev source-family overlap and
+cross-checks a new scorer against the official reference. No SciFact model
+evaluation has completed; only the separately authorized train diagnostic below
+is queued. Its300 dev claims remain unreleased, not a new test claim.
+The [cross-dataset CPU identity audit](docs/CROSS_DATASET_IDENTITY_AUDIT_20260930.md)
+found no matches or graph connections to consumed Climate tracks under fixed
+lexical/source rules. Missing source mappings remain unknown; this is not proof
+of independence, and no old test text or labels were reopened.
+The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
+supports document-specific labels and ordered original-sentence references.
+The [local Qwen/LMFE provider](docs/SCIFACT_LOCAL_PROVIDER_CPU_20260930.md) is
+implemented with CPU/mocked-HF validation; real execution is pending in the train
+diagnostic, while dev evaluation remains unreleased. Synthetic tests are not quality evidence.
+The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
+recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
+synthetic fixtures, no real-data quality result or external-dev release.
+The [eligible-train diagnostic preparation](docs/SCIFACT_TRAIN_DIAGNOSTIC_CPU_20260930.md)
+audits actual packed visibility, then freezes12 component-distinct train cases
+across four opportunity strata. Inference/gold bundles are separate;48 future
+slots are prepared with0 model generations. This is biased train diagnosis,
+not a new benchmark result or authorization to evaluate the300-dev split.
+The separately authorized job31620529 is queued; its submission does not imply
+successful inference or quality. In parallel, the isolated
+[evidence-gap decision candidate](docs/EVIDENCE_GAP_CANDIDATE_CPU_20260930.md)
+adds an explicit gap/state wire and visibility feedback, with CPU-only validation.
+It is untrained engineering inspired by Self-RAG/CRAG, not a reproduction or gain.
+It leaves the queued job unchanged and has no automatic real-data release.
+
+A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
+adds explicit candidate reading, actual-visible-sentence citation constraints,
+budgeted prompt assembly and opt-in grammar decoding. Fixtures/tokenizer smoke
+are not model-quality evidence. The [frozen job31601753 closeout](docs/AGENT_V3_PILOT_CLOSEOUT_20260930.md)
+contains 24 complete slots on six already-consumed authored prompts. Mechanical
+answer acceptance was 4/6 retrieval, 5/6 rerank, 6/6 deterministic-extra and 4/6
+adaptive; **adaptive selected zero tools**, and duplicate-reference repairs made
+no progress. An irrelevant empty-query rewrite also produced a mechanically valid
+answer, showing why these counts are not scientific accuracy or Agent gains.
+External-dev evaluation remains unreleased; raw responses stay on Spartan.
+
+2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
+completed in job **31543304**, but did **not** demonstrate Agent quality: all
+120 task/route slots ran; **0 answers passed mechanical checks**, 105 outputs
+failed schema validation, 14 were model-requested abstentions and one was
+rejected for an inexact quote. No model-directed rewrite/rerank executed.
+Validation retrieval-effect intervals include zero. The original frozen scores,
+failed-output token costs and five sanitized cases are retained in the
+[content-free compact](docs/verified-runs/budget-agent-full-31543304.json).
+This repeated validation/authored-task comparison is separate from the earlier
+restricted LoRA development gains and public search tradeoffs below. It does
+not reopen frozen test, justify deployment or support an autonomous-Agent claim.
+
+2026-09-29: [budgeted evidence-driven Agent CPU package](docs/BUDGET_AGENT_CPU_HANDOFF_20260929.md)
+adds a source/constraint ledger, bounded rewrite/rerank decisions, cited-answer
+validation and fixed-chain comparison runners. The [first real-model pilot](docs/BUDGET_AGENT_GPU_PILOT_20260929.md)
+loaded both4B models and generated9 responses, but **all9 failed structured-response
+validation** before any accepted action. It is a negative integration result, not
+a RAG quality gain. A separately released diagnostic canary also rejected9/9;
+in-place replay of the original strings through the frozen validator confirmed
+non-rewrite actions illegally carrying `query`. The minimal model-visible
+cross-field contract repair has now been checked in
+[confirmation31520350](docs/BUDGET_AGENT_CONFIRMATION_20260929.md): **2/9 responses
+passed mechanical answer checks, while7/9 still violated the action/query
+contract**. None was a valid model-requested abstention; no adaptive rewrite or
+rerank executed. This is a negative protocol-compliance result, not semantic
+accuracy or Agent-quality improvement. A frozen-protocol offline comparison is
+technically interpretable with failures retained, but remains separately gated
+on coordinator release. That full comparison has since completed with the
+negative result above; the pilot's 2/9 is not its success rate. The CPU heuristic
+control remains negative.
+
+The [offline scoring audit](docs/BUDGET_AGENT_SCORING_AUDIT_20260929.md) now requires
+complete frozen task/route matrices and gold identities, preserves partial token
+accounting, and separates model abstention from controller rejection/failure.
+The confirmation was scored separately on CPU using frozen208ff93; inference
+remains72eaa90. Original decoded responses stay on Spartan; only the reviewed
+[compact receipt](docs/verified-runs/budget-agent-protocol-confirm-31520350.json)
+is published. Official pilot retrieval/verdict quality is null, not zero.
+
+The [serial full operator](docs/BUDGET_AGENT_FULL_OPERATOR_20260929.md) was separately
+released on2026-09-30 and submitted once as **31542525 (initially PENDING/Priority)**;
+see the [submission receipt](docs/verified-runs/budget-agent-full-submission-20260930.json).
+It failed during runtime preparation after39s; both inference phases remained
+not started. The [CPU diagnosis and minimal repair](docs/BUDGET_AGENT_FULL_FAILURE_20260930.md)
+identify a `./lib/...` tar-prefix mismatch, not a model/scoring failure.
+A subsequent explicit coordinator release authorized exactly one repair rerun:
+**31543304**, initially PENDING/Resources with no scheduled start; see the
+[r2 submission receipt](docs/verified-runs/budget-agent-full-r2-submission-20260930.json).
+No automatic retry or extra experiment is authorized. Job31543304 subsequently
+completed in701s, exit0:0; final results and resource accounting are in the
+[closeout](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md). Initial submission
+receipts remain historical snapshots. The operator shares one read-only
+input/model extraction across separate frozen validation and authored-vNext
+processes, with phase-specific receipts and fail-closed scoring.
+
+> 2026-09-27 audit: public-v2 and restricted five-stage Top-10 metrics were censored by Top-5 prediction
+> storage; base-only downstream Recall@5 and Evidence F1@5 are unaffected. The public adapter
+> loader is repaired and real checkpoint/output-effect checks passed on Spartan.
+> This proves restoration, not better retrieval. The three-route validation
+> profile is complete: LambdaMART is the recommended low-latency candidate;
+> Top-100 4B retains the highest Top-5 point estimates at a much higher cost.
+> See [measured tradeoffs, uncertainty and reproduction](docs/SEARCH_TRADEOFFS_20260927.md).
+
 A reproducible search-and-ranking extension of the **2026 COMP90042 Group 045 team project**. The course system used BM25 candidate retrieval, BGE bi-encoder reranking, and a LoRA-tuned claim classifier. This repository now separates two evidence tracks: a restricted 1.21M-document scale/selection track on Spartan and a public CLIMATE-FEVER external benchmark that can be reproduced without course data.
 
 ```text
@@ -25,8 +136,8 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Lexical retrieval | Deterministic inverted-index BM25 with the course tokenizer and trusted-artifact persistence | Full 1,208,827-document Spartan build verified; retrieval quality evaluation remains separate |
 | Dense retrieval | Deterministic hash smoke encoder; Sentence Transformers adapter with reusable, ID-hashed embeddings | Full 1,208,827-document Qwen3 build verified; a 20-step hard-negative LoRA adapter passed the full-corpus offline official-dev promotion gate; hash mode is not a semantic model |
 | ANN | NumPy exact IP plus FAISS FlatIP, HNSW, and IVF-PQ adapters | Full-corpus fixed-query comparison verified; HNSW retained as the quality-speed default, IVF-PQ rejected by the quality gate |
-| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Fixed-dev RRF improved over BM25; the trained LambdaMART regressed sharply and is not a deployment candidate |
-| Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved all four fixed-dev ranking metrics; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
+| Fusion/LTR | RRF; LightGBM LambdaMART when installed; deterministic linear pairwise fallback | Historical restricted LTR failures remain recorded; the separately trained public Top-100 LTR is the measured low-latency candidate, not a production rollout |
+| Reranking | Configurable 0.6B/4B/8B local Qwen3 model, Alibaba Model Studio adapter, deterministic feature fallback | 0.6B exposed first-stage replacement failure; 4B plus balanced rank fusion improved fixed-dev Recall@5 and Evidence F1@5; an 8B pilot failed the latency/quality Pareto gate, so 4B remains the offline quality profile |
 | Public benchmark | CLIMATE-FEVER adapter, evidence-aware near-duplicate split and frozen-test BM25 baseline | 1,535 claims/7,675 annotations; final test is not used for model selection |
 | Evaluation | Recall@K, hit rate, MRR@10, nDCG@10, evidence P/R/F1, verdict Macro-F1/Accuracy, citation quality, ECE/Brier and paired bootstrap | Retrieval and verification results remain separately labelled |
 | Confidence | Temperature scaling, coverage-risk and selective abstention utilities | Requires provider or classifier confidence |
@@ -34,6 +145,19 @@ The repository does **not** claim an official leaderboard rank. Restricted cours
 | Provenance | Input hashes, Git SHA, environment, metrics, predictions, error cases, report | Generated for every CLI run |
 
 ## Quick start
+
+### Agent-consumable evidence, without claiming an autonomous Agent
+
+The optional **LangChain Core 1.6.5** integration uses a real `BaseRetriever`,
+source-bearing `Document` objects, an LCEL sequence and a Pydantic `StructuredTool`.
+Its manual CPU demo ran against the existing **5,240-document public corpus**;
+it does not repeat frozen-test evaluation or load a verdict model. Source IDs,
+corpus/text hashes and exact text spans survive the adapter; an empty result
+remains `no_evidence`, never a fabricated refutation.
+See [the reproducible application handoff](docs/AGENT_APPLICATION_HANDOFF_20260927.md)
+for commands, cases, framework boundaries and the separately measured search tradeoff.
+
+### Existing retrieval CLI
 
 ```bash
 python -m pip install -e ".[test]"
@@ -69,21 +193,47 @@ test is permanently sealed. Six fixed Qwen3-Embedding-0.6B adapters cover
 100/300 steps, rank 8/16, 4/8 hard negatives and temperatures 0.03/0.05; no more
 than two can reach full validation.
 
-All six 64-query pilots tied the base exactly (Recall@5 `0.53203125`, MRR@10
-`0.53385417`, and zero mean deltas for all four registered metrics). The one
+All six 64-query pilots historically tied the base (Recall@5 `0.53203125`).
+Those ties do not establish adapter ineffectiveness: weight restoration was not
+verified, and historical Top-10 metrics used Top-5 prediction lists. The one
 pre-registered full diagnostic then exposed missing adapter keys and did not
 produce a valid promotion result. No adapter was promoted, no quality retry was
 run, and the SciFact event was not authorised; its qrels were never opened.
+The 2026-09-27 repair subsequently proved checkpoint restoration and output
+changes on fixed label-free probes, not a new quality gain.
 
 The validation-only base closeout compared BM25, base dense Flat/HNSW, fixed
 RRF, Top-100 LambdaMART and the fixed 1:1 RRF/Qwen3-4B fusion. The fusion reached
-Recall@5/MRR@10/nDCG@10/F1 `0.6275/0.6197/0.5525/0.3969` over 126 decisive
-validation claims. These are same-validation selection metrics, not adapter
-gains or independent-test evidence. The complete method, negative result,
+Recall@5/Evidence F1@5 `0.6275/0.3969` over 126 decisive validation claims.
+Historical MRR@10/nDCG@10 and Recall@10 were censored by the Top-5 output and
+are not complete Top-10 estimates. These are same-validation selection metrics,
+not adapter gains or independent-test evidence. The complete method, no-promotion decision,
 archive hashes and truth boundaries are in
 [`docs/PUBLIC_RETRIEVAL_V2.md`](docs/PUBLIC_RETRIEVAL_V2.md).
 The compact record is
 [`docs/verified-runs/climate-public-retrieval-v2-20260904.json`](docs/verified-runs/climate-public-retrieval-v2-20260904.json).
+
+### Measured search-model choice, not just a component list
+
+On the same 5,240 documents and 126 decisive **public validation** queries,
+each route used the same ordered Top-100 BM25/HNSW/RRF pool. Full rankings now
+support genuine Top-10 metrics; evidence F1 is explicitly Top-5.
+
+| Route | Recall@5 | F1@5 | Warm serial E2E P95 | Peak Torch allocated |
+|---|---:|---:|---:|---:|
+| LambdaMART | .6054 | .3828 | 77.8 ms | 2.25 GiB |
+| RRF + 4B Top-20 | .5948 | .3829 | 1.91 s | 10.54 GiB |
+| RRF + 4B Top-100 | .6275 | .3969 | 9.30 s | 11.07 GiB |
+
+**Recommendation:** LTR for latency-sensitive use; keep Top-100 4B as an
+optional offline quality profile. Top-20 did not establish a useful benefit
+over LTR. The 5,000-draw paired Recall@5/F1@5 intervals cross zero for all
+three comparisons; no equivalence or significant reranker win is claimed.
+LTR scoring is CPU-based, but this complete path still encodes queries on GPU.
+These are single-process warmed measurements, not HTTP SLA, billed cost, an
+independent test or an adapter-quality gain. Details, taxonomy, stage timings
+and hashes: [decision report](docs/SEARCH_TRADEOFFS_20260927.md) and
+[compact evidence](docs/verified-runs/search-tradeoffs-20260927.json).
 
 The candidate fixture is intentionally perfect and tests only the scorer: Recall@5, Evidence F1, Accuracy, and H-mean are `1.0`. These are **not** climate fact-checking quality metrics. The deliberately flawed fixture baseline has Recall@5 `0.50`, Evidence F1 `0.50`, Accuracy `0.75`, and H-mean `0.60`. The full representation-training case and two evidence-grounded resume bullets are in [`docs/REPRESENTATION_TRAINING_CASE.md`](docs/REPRESENTATION_TRAINING_CASE.md).
 
@@ -174,12 +324,14 @@ climate-rag audit-stage-contract \
   --output-dir /artifacts/stage-contract-audit
 
 climate-rag build-pareto \
-  --profiles configs/search_profiles.verified.json \
+  --profiles /artifacts/same-query-measured-profiles.json \
   --output-dir /artifacts/search-pareto
 ```
 
 The `configs/stage_contract.*.example.json` files contain labelled fixture
 values only. Promotion requires contracts generated from measured artifacts.
+The old `configs/search_profiles.verified.json` is a retired historical proxy,
+not a measured request-P95 table; the CLI refuses it for new Pareto decisions.
 
 Run the fixed five-stage comparison:
 
@@ -336,11 +488,11 @@ Job `29435589` evaluated 154 restricted dev claims at `final_k=5` using commit `
 
 Against BM25, RRF improved Recall@5 by `0.0988` (paired-bootstrap 95% interval `0.0543–0.1452`) and Evidence F1 by `0.0616` (`0.0360–0.0893`). The first pure Qwen replacement run (`29448904`) regressed, exposing an architectural error: it discarded a strong first-stage order. Job `29452723` preserved that order with 0.6B weighted-rank fusion; its selected 4:1 profile improved Recall@5, MRR and nDCG, but not Evidence F1 with a stable interval.
 
-The aggregate five-stage metrics and exact input/artifact hashes are published in [`docs/verified-runs/five-stage-fixed-dev-20260819.json`](docs/verified-runs/five-stage-fixed-dev-20260819.json). A later audit found that the legacy LTR training builder injected unretrieved gold evidence with zero retrieval features, so the two LTR rows above are retained as failure-forensics evidence, not model-quality evidence. The corrected candidate-supported job `29484697` removed that defect but remained a negative gate: 1,169 train groups/26,626 rows reached `0.9529` train pairwise accuracy, while fixed-dev Recall@5/F1 collapsed to `0.0075/0.0059` versus RRF `0.2709/0.1785`. The compact record is in [`docs/verified-runs/candidate-supported-ltr-gate-20260822.json`](docs/verified-runs/candidate-supported-ltr-gate-20260822.json). Commit `b47e437` then recorded the RRF prior, matched the 100-candidate training and serving widths and predeclared a 4:1 rank-preserving fusion. CPU job `29504398` completed 1,169 groups/120,146 rows and raised fixed-dev MRR@10/nDCG@10 from RRF `0.3446/0.2495` to `0.3648/0.2605`; 5,000-sample paired intervals were `[+0.0032,+0.0390]` and `[+0.0012,+0.0228]`. Recall@5/F1 rose to `0.2801/0.1824`, but their intervals versus RRF crossed zero. CPU feature scoring took P95 `7.80 ms/query`. This is retained as a low-latency rank-position profile, not the main quality profile; see the [compact record](docs/verified-runs/rrf-prior-ltr-fusion-gate-20260822.json). Restricted predictions and candidate lists remain on Spartan.
+The aggregate five-stage metrics and exact input/artifact hashes are published in [`docs/verified-runs/five-stage-fixed-dev-20260819.json`](docs/verified-runs/five-stage-fixed-dev-20260819.json). A later audit found that the legacy LTR training builder injected unretrieved gold evidence with zero retrieval features, so the two LTR rows above are retained as failure-forensics evidence, not model-quality evidence. The corrected candidate-supported job `29484697` removed that defect but remained a negative gate: 1,169 train groups/26,626 rows reached `0.9529` train pairwise accuracy, while fixed-dev Recall@5/F1 collapsed to `0.0075/0.0059` versus RRF `0.2709/0.1785`. The compact record is in [`docs/verified-runs/candidate-supported-ltr-gate-20260822.json`](docs/verified-runs/candidate-supported-ltr-gate-20260822.json). Commit `b47e437` then recorded the RRF prior, matched the 100-candidate training and serving widths and predeclared a 4:1 rank-preserving fusion. CPU job `29504398` completed 1,169 groups/120,146 rows and raised fixed-dev MRR@5 from RRF `0.3446` to `0.3648`, with a 5,000-sample paired interval `[+0.0032,+0.0390]`. The old `mrr@10` field used only five saved ranks and is reinterpreted as MRR@5; old nDCG@10 was also censored and is not retained as a complete Top-10 result. Recall@5/F1 rose to `0.2801/0.1824`, but their intervals versus RRF crossed zero. CPU feature scoring took P95 `7.80 ms/query`. This is retained as a low-latency rank-position profile, not the main quality profile; see the [compact record](docs/verified-runs/rrf-prior-ltr-fusion-gate-20260822.json). Restricted predictions and candidate lists remain on Spartan.
 
-The model-size gate then ran Qwen3-Reranker-4B in BF16 on the identical 154-claim/7,700-pair split. Full job `29453918` completed in `12 min 48 s` on one A100 `1g.20gb` MIG slice (`8 CPU`, `32 GB` request; batch MaxRSS `20,372,008 K`). It recorded P50/P95 `4.20/4.82 s` per query. Pure 4B aggregate metrics rose but paired intervals versus RRF crossed zero. The selected 1:1 RRF/4B rank fusion reached Recall@5 `0.3153`, MRR@10 `0.3961`, nDCG@10 `0.2849`, and Evidence F1 `0.2131`. Comparison job `29455049` measured deltas versus RRF of `+0.0444` Recall@5 (95% interval `0.0163–0.0733`, `p=0.0024`), `+0.0515` MRR (`0.0149–0.0883`), `+0.0354` nDCG (`0.0123–0.0576`), and `+0.0347` Evidence F1 (`0.0165–0.0535`). All values come from 5,000 paired bootstrap samples. Because the fusion weights and model size were selected on this same fixed dev split, these are dev-set model-selection results, not an independent test claim.
+The model-size gate then ran Qwen3-Reranker-4B in BF16 on the identical 154-claim/7,700-pair split. Full job `29453918` completed in `12 min 48 s` on one A100 `1g.20gb` MIG slice (`8 CPU`, `32 GB` request; batch MaxRSS `20,372,008 K`). It recorded P50/P95 `4.20/4.82 s` per query. Pure 4B aggregate metrics rose but paired intervals versus RRF crossed zero. The selected 1:1 RRF/4B rank fusion reached Recall@5 `0.3153` and Evidence F1@5 `0.2131`. Its legacy Top-10 fields used Top-5 predictions; MRR can be interpreted only as MRR@5, while nDCG cannot be relabelled because its ideal denominator used ten. Comparison job `29455049` measured deltas versus RRF of `+0.0444` Recall@5 (95% interval `0.0163–0.0733`, `p=0.0024`), `+0.0515` MRR@5 (`0.0149–0.0883`), and `+0.0347` Evidence F1@5 (`0.0165–0.0535`). All values come from 5,000 paired bootstrap samples. Because the fusion weights and model size were selected on this same fixed dev split, these are dev-set model-selection results, not an independent test claim.
 
-The optional 8B gate was also executed rather than left as a configuration claim. The first attempt (`29456746`) failed before inference because the shared project filesystem lacked room for the weight shards; four incomplete files totalling about 3.2 GB were removed, and commit `53a3782` moved the one-off cache to node-local ephemeral storage. Replacement pilot `29456898` completed in `2 min 19 s` on the same A100 `1g.20gb` MIG shape (batch MaxRSS `29,380,852 K`). On the same eight claims/400 pairs, the best 8B fusion tied 4B on Evidence F1 (`0.3016`) and Recall@5 (`0.4688`), was slightly lower on MRR@10 (`0.5042` vs `0.5104`), and raised P95 latency from `5.13 s` to `8.25 s` (`+60.8%`). The full 8B run was therefore deliberately not submitted. This is a resource-selection gate, not a full-dev 8B quality result; the derived record is in [`docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json`](docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json).
+The optional 8B gate was also executed rather than left as a configuration claim. The first attempt (`29456746`) failed before inference because the shared project filesystem lacked room for the weight shards; four incomplete files totalling about 3.2 GB were removed, and commit `53a3782` moved the one-off cache to node-local ephemeral storage. Replacement pilot `29456898` completed in `2 min 19 s` on the same A100 `1g.20gb` MIG shape (batch MaxRSS `29,380,852 K`). On the same eight claims/400 pairs, the best 8B fusion tied 4B on Evidence F1 (`0.3016`) and Recall@5 (`0.4688`), was slightly lower on the archived truncated reciprocal-rank metric (`0.5042` vs `0.5104`; not claimed as complete MRR@10), and raised P95 latency from `5.13 s` to `8.25 s` (`+60.8%`). The full 8B run was therefore deliberately not submitted. This is a resource-selection gate, not a full-dev 8B quality result; the derived record is in [`docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json`](docs/verified-runs/qwen3-reranker-8b-pilot-20260820.json).
 
 Two RouteLLM-inspired cost-aware gates then tested whether the 4B path could be
 called selectively. Both used deterministic five-fold hash cross-fitting, so a

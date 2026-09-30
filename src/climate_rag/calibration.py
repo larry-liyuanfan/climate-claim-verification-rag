@@ -2,19 +2,21 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from typing import Any
+
 import numpy as np
 
 
-def softmax(logits: np.ndarray, temperature: float = 1.0) -> np.ndarray:
+def softmax(logits: np.ndarray[Any, Any], temperature: float = 1.0) -> np.ndarray[Any, Any]:
     if temperature <= 0:
         raise ValueError("temperature must be positive")
     values = np.asarray(logits, dtype=np.float64) / temperature
     values -= values.max(axis=1, keepdims=True)
     exponentials = np.exp(values)
-    return exponentials / exponentials.sum(axis=1, keepdims=True)
+    return np.asarray(exponentials / exponentials.sum(axis=1, keepdims=True), dtype=np.float64)
 
 
-def negative_log_likelihood(logits: np.ndarray, labels: Sequence[int], temperature: float) -> float:
+def negative_log_likelihood(logits: np.ndarray[Any, Any], labels: Sequence[int], temperature: float) -> float:
     probabilities = softmax(logits, temperature)
     targets = np.asarray(labels, dtype=np.int64)
     if len(probabilities) != len(targets):
@@ -24,7 +26,7 @@ def negative_log_likelihood(logits: np.ndarray, labels: Sequence[int], temperatu
 
 
 def fit_temperature(
-    logits: np.ndarray,
+    logits: np.ndarray[Any, Any],
     labels: Sequence[int],
     *,
     minimum: float = 0.05,
@@ -43,7 +45,7 @@ def fit_temperature(
     }
 
 
-def selective_risk_curve(probabilities: np.ndarray, labels: Sequence[int]) -> list[dict[str, float | int]]:
+def selective_risk_curve(probabilities: np.ndarray[Any, Any], labels: Sequence[int]) -> list[dict[str, float | int]]:
     values = np.asarray(probabilities, dtype=np.float64)
     targets = np.asarray(labels, dtype=np.int64)
     if values.ndim != 2 or len(values) != len(targets):

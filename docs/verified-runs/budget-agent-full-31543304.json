@@ -1,0 +1,1367 @@
+{
+  "audit_script_sha256": "0de5c3f06bccc66b68576036b48f73374ccc244fd9a62161e1e8d6c774f73def",
+  "boundary": "Repeated validation and authored tasks kept separate. Delivered evidence is failure-gated, not initial retrieval. Parsed actions are not executed tools. Mechanical checks are not semantic support. Case summaries are selected examples, not additional quality metrics.",
+  "case_summaries": [
+    {
+      "case_id": "exact_quote_rejection",
+      "eligible_remaining_groups": 1,
+      "phase": "validation",
+      "routes": {
+        "adaptive": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 20,
+          "elapsed_ms": 11486.545905470848,
+          "generated_response_failure": false,
+          "generation_calls": 1,
+          "input_tokens": 1918,
+          "model_calls": 1,
+          "outcome": "controller_rejection",
+          "output_tokens": 439,
+          "parsed_model_actions": [
+            "answer"
+          ],
+          "quote_mismatch_rejected": true,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        },
+        "fixed_rerank": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 4771.875791251659,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1975,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 157,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "retrieval_calls": 1,
+          "tool_calls": 2,
+          "usage_known": true
+        },
+        "fixed_retrieval": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 12345.63916735351,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1911,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 473,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        }
+      },
+      "selection": "first task ID in lexical order, unused group"
+    },
+    {
+      "case_id": "validation_model_abstention",
+      "eligible_remaining_groups": 3,
+      "phase": "validation",
+      "routes": {
+        "adaptive": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 20,
+          "elapsed_ms": 4281.29286877811,
+          "generated_response_failure": false,
+          "generation_calls": 1,
+          "input_tokens": 1828,
+          "model_calls": 1,
+          "outcome": "model_requested_abstention",
+          "output_tokens": 160,
+          "parsed_model_actions": [
+            "abstain"
+          ],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        },
+        "fixed_rerank": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 13551.127756014466,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1798,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 495,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "retrieval_calls": 1,
+          "tool_calls": 2,
+          "usage_known": true
+        },
+        "fixed_retrieval": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 20,
+          "elapsed_ms": 4462.704507634044,
+          "generated_response_failure": false,
+          "generation_calls": 1,
+          "input_tokens": 1821,
+          "model_calls": 1,
+          "outcome": "model_requested_abstention",
+          "output_tokens": 167,
+          "parsed_model_actions": [
+            "abstain"
+          ],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        }
+      },
+      "selection": "first task ID in lexical order, unused group"
+    },
+    {
+      "case_id": "validation_all_routes_schema_failure",
+      "eligible_remaining_groups": 25,
+      "phase": "validation",
+      "routes": {
+        "adaptive": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 2721.1282197386026,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1524,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 101,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        },
+        "fixed_rerank": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 3063.9068000018597,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1514,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 92,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "retrieval_calls": 1,
+          "tool_calls": 2,
+          "usage_known": true
+        },
+        "fixed_retrieval": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 2725.5932968109846,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1520,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 101,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        }
+      },
+      "selection": "first task ID in lexical order, unused group"
+    },
+    {
+      "case_id": "authored_model_abstention",
+      "eligible_remaining_groups": 3,
+      "phase": "vnext",
+      "routes": {
+        "adaptive": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 20,
+          "elapsed_ms": 2644.034583121538,
+          "generated_response_failure": false,
+          "generation_calls": 1,
+          "input_tokens": 1669,
+          "model_calls": 1,
+          "outcome": "model_requested_abstention",
+          "output_tokens": 98,
+          "parsed_model_actions": [
+            "abstain"
+          ],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        },
+        "fixed_rerank": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 20,
+          "elapsed_ms": 3609.9550761282444,
+          "generated_response_failure": false,
+          "generation_calls": 1,
+          "input_tokens": 1742,
+          "model_calls": 1,
+          "outcome": "model_requested_abstention",
+          "output_tokens": 113,
+          "parsed_model_actions": [
+            "abstain"
+          ],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "retrieval_calls": 1,
+          "tool_calls": 2,
+          "usage_known": true
+        },
+        "fixed_retrieval": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 20,
+          "elapsed_ms": 3089.1445726156235,
+          "generated_response_failure": false,
+          "generation_calls": 1,
+          "input_tokens": 1662,
+          "model_calls": 1,
+          "outcome": "model_requested_abstention",
+          "output_tokens": 115,
+          "parsed_model_actions": [
+            "abstain"
+          ],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        }
+      },
+      "selection": "first task ID in lexical order, unused group"
+    },
+    {
+      "case_id": "authored_all_routes_schema_failure",
+      "eligible_remaining_groups": 5,
+      "phase": "vnext",
+      "routes": {
+        "adaptive": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 7610.637806355953,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1505,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 290,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        },
+        "fixed_rerank": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 10696.208842098713,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1564,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 386,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "retrieval_calls": 1,
+          "tool_calls": 2,
+          "usage_known": true
+        },
+        "fixed_retrieval": {
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "elapsed_ms": 8153.829459100962,
+          "generated_response_failure": true,
+          "generation_calls": 1,
+          "input_tokens": 1501,
+          "model_calls": 1,
+          "outcome": "controller_failure",
+          "output_tokens": 290,
+          "parsed_model_actions": [],
+          "quote_mismatch_rejected": false,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "retrieval_calls": 1,
+          "tool_calls": 1,
+          "usage_known": true
+        }
+      },
+      "selection": "first task ID in lexical order, unused group"
+    }
+  ],
+  "frozen_scoring_recomputed": false,
+  "gold_label_counts": {
+    "DISPUTED": 1,
+    "NOT_ENOUGH_INFO": 8,
+    "REFUTES": 6,
+    "SUPPORTS": 17
+  },
+  "gpu_memory_peak": null,
+  "identities": {
+    "archives": {
+      "inference": {
+        "bytes": 1361920,
+        "sha256": "ad533a3b14a81ab658049d6261cfc22848ebd792f3333e9f635d327d034d4cb1"
+      },
+      "input": {
+        "bytes": 16122255360,
+        "sha256": "563738f0be1f7bf7b99b8de20bcdeab552f7e893166dec260b8f7f1e7951c3c1"
+      },
+      "overlay": {
+        "bytes": 12475491,
+        "sha256": "e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce"
+      },
+      "runtime": {
+        "bytes": 348977995,
+        "sha256": "2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8"
+      },
+      "scorer": {
+        "bytes": 1402880,
+        "sha256": "7498d367565eeb59bb7cf724c33f835608a0c9f01da3768d7308700a380c00a1"
+      }
+    },
+    "gold_sha256": "d2dd28422bffacf87ded2153b3bfac4ca9e1edc903e1d4e7a88d3a40f5d2fd8b",
+    "inference_git_sha": "72eaa90567e3603a3b940edffbb21b684bf1d1ba",
+    "model_manifest_files": {
+      "generator": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+      "reranker": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed"
+    },
+    "operator_archive_sha256": "f9aa535d33cd8068c9a747aa8aba431a036b56e55cf0cb7a959daa36132e4d42",
+    "operator_git_sha": "947645b3feed914e30d02dc5dbd05859c4a19667",
+    "operator_script_sha256": "2ec2dd9e9664305c4b870def9df3a6d8ba0fb17b0d8984149e0ac79cac170b75",
+    "scorer_git_sha": "208ff931badff270cbbc9593c8ab54f5c79aec9e",
+    "selection_sha256": "988b6682034a70966c8bbad5ff3c42202933fe85791b97a5f39e4a1b68071bc6",
+    "wrapper_sha256": "c266835b8dc614f221a66269e6f89224f7d7630bc550bbaa3c6f3d774bb56bf9"
+  },
+  "inference_repeated": false,
+  "input_extractions": 1,
+  "job_id": "31543304",
+  "operator_elapsed_seconds": 696.4349319934845,
+  "phases": {
+    "validation": {
+      "budget": {
+        "candidate_k": 20,
+        "context_k": 5,
+        "max_input_tokens_per_call": 8192,
+        "max_model_calls": 3,
+        "max_output_tokens_per_call": 512,
+        "max_tool_calls": 3,
+        "timeout_seconds": 120.0
+      },
+      "execution_manifest": {
+        "dense_file_hashes": null,
+        "model_manifest_sha256": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+        "protocol_sha256": "abfcb61e9e6a54641f025101a4011fa88e07e3697a36f0acd308fa8e86052674",
+        "reranker_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed"
+      },
+      "frozen_score": {
+        "aggregates": {
+          "adaptive": {
+            "answered": 0,
+            "complete_accounting_generation_input_tokens": 51690,
+            "complete_accounting_generation_output_tokens": 5157,
+            "count": 32,
+            "evidence_metrics": {
+              "evidence_f1": 0.031249999999999997,
+              "mrr@10": 0.041666666666666664,
+              "ndcg@10": 0.041666666666666664,
+              "recall@5": 0.041666666666666664
+            },
+            "generation_calls_mean": 1.0,
+            "generation_calls_sum": 32,
+            "generation_token_totals_exact": true,
+            "label_denominator": 23,
+            "latency_ms_p50": 3359.816500917077,
+            "latency_ms_p95": 10687.572360690683,
+            "model_calls_mean": 1.0,
+            "model_calls_sum": 32,
+            "official_decisive_label_accuracy": 0.0,
+            "operational_failures": 28,
+            "outcome_counts": {
+              "controller_failure": 28,
+              "controller_rejection": 1,
+              "model_requested_abstention": 3
+            },
+            "partial_accounting_recorded_input_tokens": 0,
+            "partial_accounting_recorded_output_tokens": 0,
+            "reason_counts": {
+              "answer_validation:quote_not_exact": 1,
+              "model_requested_abstention": 3,
+              "stage_failed": 28
+            },
+            "recorded_generation_input_tokens": 51690,
+            "recorded_generation_output_tokens": 5157,
+            "rerank_calls_mean": 0.0,
+            "rerank_calls_sum": 0,
+            "rerank_candidate_pairs_mean": 0.0,
+            "rerank_candidate_pairs_sum": 0,
+            "retrieval_calls_mean": 1.0,
+            "retrieval_calls_sum": 32,
+            "retrieval_denominator": 24,
+            "status_counts": {
+              "abstained": 32
+            },
+            "tool_calls_mean": 1.0,
+            "tool_calls_sum": 32,
+            "unknown_token_accounting_runs": 0
+          },
+          "fixed_rerank": {
+            "answered": 0,
+            "complete_accounting_generation_input_tokens": 50679,
+            "complete_accounting_generation_output_tokens": 5172,
+            "count": 32,
+            "evidence_metrics": {
+              "evidence_f1": 0.034722222222222224,
+              "mrr@10": 0.05555555555555555,
+              "ndcg@10": 0.0563316268548778,
+              "recall@5": 0.06944444444444443
+            },
+            "generation_calls_mean": 1.0,
+            "generation_calls_sum": 32,
+            "generation_token_totals_exact": true,
+            "label_denominator": 23,
+            "latency_ms_p50": 3995.9965301677585,
+            "latency_ms_p95": 10528.745539486408,
+            "model_calls_mean": 1.0,
+            "model_calls_sum": 32,
+            "official_decisive_label_accuracy": 0.0,
+            "operational_failures": 28,
+            "outcome_counts": {
+              "controller_failure": 28,
+              "model_requested_abstention": 4
+            },
+            "partial_accounting_recorded_input_tokens": 0,
+            "partial_accounting_recorded_output_tokens": 0,
+            "reason_counts": {
+              "model_requested_abstention": 4,
+              "stage_failed": 28
+            },
+            "recorded_generation_input_tokens": 50679,
+            "recorded_generation_output_tokens": 5172,
+            "rerank_calls_mean": 1.0,
+            "rerank_calls_sum": 32,
+            "rerank_candidate_pairs_mean": 20.0,
+            "rerank_candidate_pairs_sum": 640,
+            "retrieval_calls_mean": 1.0,
+            "retrieval_calls_sum": 32,
+            "retrieval_denominator": 24,
+            "status_counts": {
+              "abstained": 32
+            },
+            "tool_calls_mean": 2.0,
+            "tool_calls_sum": 64,
+            "unknown_token_accounting_runs": 0
+          },
+          "fixed_retrieval": {
+            "answered": 0,
+            "complete_accounting_generation_input_tokens": 51485,
+            "complete_accounting_generation_output_tokens": 5002,
+            "count": 32,
+            "evidence_metrics": {
+              "evidence_f1": 0.0,
+              "mrr@10": 0.0,
+              "ndcg@10": 0.0,
+              "recall@5": 0.0
+            },
+            "generation_calls_mean": 1.0,
+            "generation_calls_sum": 32,
+            "generation_token_totals_exact": true,
+            "label_denominator": 23,
+            "latency_ms_p50": 3419.90686673671,
+            "latency_ms_p95": 8821.1330874823,
+            "model_calls_mean": 1.0,
+            "model_calls_sum": 32,
+            "official_decisive_label_accuracy": 0.0,
+            "operational_failures": 30,
+            "outcome_counts": {
+              "controller_failure": 30,
+              "model_requested_abstention": 2
+            },
+            "partial_accounting_recorded_input_tokens": 0,
+            "partial_accounting_recorded_output_tokens": 0,
+            "reason_counts": {
+              "model_requested_abstention": 2,
+              "stage_failed": 30
+            },
+            "recorded_generation_input_tokens": 51485,
+            "recorded_generation_output_tokens": 5002,
+            "rerank_calls_mean": 0.0,
+            "rerank_calls_sum": 0,
+            "rerank_candidate_pairs_mean": 0.0,
+            "rerank_candidate_pairs_sum": 0,
+            "retrieval_calls_mean": 1.0,
+            "retrieval_calls_sum": 32,
+            "retrieval_denominator": 24,
+            "status_counts": {
+              "abstained": 32
+            },
+            "tool_calls_mean": 1.0,
+            "tool_calls_sum": 32,
+            "unknown_token_accounting_runs": 0
+          }
+        },
+        "boundary": "Validation replay only; authored tasks have null official quality. Quote/number checks are not entailment. Partial tokens are lower bounds, not savings. Model prose is excluded; reason_counts contains controller enums or event-grounded abstention categories.",
+        "cost_comparison": {
+          "adaptive": {
+            "generation_token_comparison_available": true,
+            "monetary_cost_comparison_available": false,
+            "monetary_cost_reason": "No currency/GPU/API pricing model; tokens exclude reranker work",
+            "unavailable_reason": null
+          },
+          "fixed_rerank": {
+            "generation_token_comparison_available": true,
+            "monetary_cost_comparison_available": false,
+            "monetary_cost_reason": "No currency/GPU/API pricing model; tokens exclude reranker work",
+            "unavailable_reason": null
+          }
+        },
+        "gold_sha256": "d2dd28422bffacf87ded2153b3bfac4ca9e1edc903e1d4e7a88d3a40f5d2fd8b",
+        "gold_source": {
+          "annotation_kind": "official_CLIMATE_FEVER_evidence_and_label",
+          "archive_sha256": "bef810a9a3a4eb2f4a4a2684e1362b0c02b6a231c56202d9d1b1b7d478eab329",
+          "member_sha256": "1154448777e72e2b14e7e57e71937a5f123e36f63b8b7b2c3ab7ddfe9a449ad5",
+          "split": "repeated_validation_replay"
+        },
+        "inference_source_git_sha": "72eaa90567e3603a3b940edffbb21b684bf1d1ba",
+        "matrix": {
+          "actual_slots": 96,
+          "expected_slots": 96,
+          "task_denominator_per_strategy": 32,
+          "validated": true
+        },
+        "paired_bootstrap": {
+          "adaptive": {
+            "evidence_f1": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.031249999999999997,
+              "ci_lower": 0.0,
+              "ci_upper": 0.09374999999999999,
+              "mean_difference": 0.031249999999999997,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.708
+            },
+            "mrr@10": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.041666666666666664,
+              "ci_lower": 0.0,
+              "ci_upper": 0.125,
+              "mean_difference": 0.041666666666666664,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.708
+            },
+            "ndcg@10": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.041666666666666664,
+              "ci_lower": 0.0,
+              "ci_upper": 0.125,
+              "mean_difference": 0.041666666666666664,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.708
+            },
+            "recall@5": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.041666666666666664,
+              "ci_lower": 0.0,
+              "ci_upper": 0.125,
+              "mean_difference": 0.041666666666666664,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.708
+            }
+          },
+          "fixed_rerank": {
+            "evidence_f1": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.034722222222222224,
+              "ci_lower": 0.0,
+              "ci_upper": 0.09027777777777779,
+              "mean_difference": 0.034722222222222224,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.25
+            },
+            "mrr@10": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.05555555555555555,
+              "ci_lower": 0.0,
+              "ci_upper": 0.15277777777777776,
+              "mean_difference": 0.05555555555555555,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.25
+            },
+            "ndcg@10": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.0563316268548778,
+              "ci_lower": 0.0,
+              "ci_upper": 0.14816154723130007,
+              "mean_difference": 0.0563316268548778,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.25
+            },
+            "recall@5": {
+              "baseline_mean": 0.0,
+              "candidate_mean": 0.06944444444444443,
+              "ci_lower": 0.0,
+              "ci_upper": 0.18055555555555555,
+              "mean_difference": 0.06944444444444443,
+              "pair_count": 24,
+              "samples": 5000,
+              "two_sided_p": 0.25
+            }
+          }
+        },
+        "phase": "validation",
+        "protocol_sha256": "abfcb61e9e6a54641f025101a4011fa88e07e3697a36f0acd308fa8e86052674",
+        "run_sha256": "a07f8ddc283c7f4a6ab8f00e67141f60b8cff9adc0578d52b33465c069577864",
+        "scorer_identity": {
+          "git_sha": "208ff931badff270cbbc9593c8ab54f5c79aec9e",
+          "script_sha256": "758bb04e9d99cdfb298c936de550dc66055a706fbe82bd19e1f5db200ccf3b86",
+          "working_tree_dirty": null
+        },
+        "selection_manifest_sha256": "988b6682034a70966c8bbad5ff3c42202933fe85791b97a5f39e4a1b68071bc6",
+        "semantic_supportability": null
+      },
+      "neural_work_accounting": {
+        "dense_query_attempts": 0,
+        "generation_token_scope": "only autoregressive decision/answer provider; not dense or reranker FLOPs",
+        "reranker_pair_attempts": 640
+      },
+      "private_attachment_files": 32,
+      "prompt_identity": {
+        "pydantic_version": "2.13.5",
+        "schema_json_sha256": "9743f8ba5fcf4364ebc71732ff150d879bd9cd74c95c91a0acf3b913af4535dc",
+        "scope": "UTF-8 static system message; excludes observation and tokenizer chat template",
+        "system_prompt_sha256": "6b0163a4ef9da624e35dffb51fff34913ccb8a90db395c8dfec68bbe409febaa"
+      },
+      "supplemental": {
+        "adaptive": {
+          "budget_violation_counts": {
+            "generation_calls": 0,
+            "output_over_512": 0,
+            "row_elapsed_over_120s": 0,
+            "single_call_input_over_8192": 0,
+            "tool_calls": 0
+          },
+          "completed_event_counts": {
+            "decision": 4,
+            "failure": 28,
+            "retrieve": 32
+          },
+          "cost_by_outcome": {
+            "controller_failure": {
+              "count": 28,
+              "elapsed_ms_sum": 116264.14154656231,
+              "generation_calls": 28,
+              "recorded_input_tokens": 44840,
+              "recorded_output_tokens": 4382,
+              "unknown_usage_rows": 0
+            },
+            "controller_rejection": {
+              "count": 1,
+              "elapsed_ms_sum": 11486.545905470848,
+              "generation_calls": 1,
+              "recorded_input_tokens": 1918,
+              "recorded_output_tokens": 439,
+              "unknown_usage_rows": 0
+            },
+            "model_requested_abstention": {
+              "count": 3,
+              "elapsed_ms_sum": 9029.494812712073,
+              "generation_calls": 3,
+              "recorded_input_tokens": 4932,
+              "recorded_output_tokens": 336,
+              "unknown_usage_rows": 0
+            }
+          },
+          "elapsed_ms_sum": 136780.18226474524,
+          "eos_observed_count": 32,
+          "failure_error_types": {
+            "GeneratedResponseError": 28
+          },
+          "generation_diagnostic_counts": {
+            "schema_validation": 28,
+            "validated": 4
+          },
+          "generation_elapsed_ms_sum": 136386.02789491415,
+          "latency_ms_p50_check": 3359.816500917077,
+          "latency_ms_p95_check": 10687.572360690683,
+          "max_new_tokens_reached_count": 0,
+          "parsed_model_action_counts": {
+            "abstain": 3,
+            "answer": 1
+          },
+          "private_attachment_status_counts": {
+            "saved_owner_only": 10,
+            "skipped_total_limit": 22
+          },
+          "private_failure_field_inspection": {
+            "failure_diagnostic_rows": 28,
+            "scope": "hash-matched retained private JSON only; duplicates can match retained bytes; not frozen-validator replay",
+            "sha_matched_payload_rows": 10,
+            "structural_flag_counts": {
+              "query_on_nonrewrite": 9,
+              "reason_over_500_characters": 1
+            },
+            "unavailable_payload_rows": 18
+          },
+          "rerank_elapsed_ms_sum": 0.0,
+          "retrieval_elapsed_ms_sum": 163.99282217025757,
+          "schema_error_counts": {
+            "reason_string_too_long": 1,
+            "root_value_error": 27
+          },
+          "ungated_retained_context_diagnostic": {
+            "denominator": 24,
+            "mean_gold_recall_at_context5": 0.43194444444444446,
+            "queries_with_context_gold_but_empty_delivered": 12,
+            "queries_with_gold_in_candidate20": 16,
+            "scope": "post-tool/pre-delivery retained snapshot; diagnostic only, never replaces frozen delivered-evidence scores"
+          }
+        },
+        "fixed_rerank": {
+          "budget_violation_counts": {
+            "generation_calls": 0,
+            "output_over_512": 0,
+            "row_elapsed_over_120s": 0,
+            "single_call_input_over_8192": 0,
+            "tool_calls": 0
+          },
+          "completed_event_counts": {
+            "decision": 4,
+            "failure": 28,
+            "rerank": 32,
+            "retrieve": 32
+          },
+          "cost_by_outcome": {
+            "controller_failure": {
+              "count": 28,
+              "elapsed_ms_sum": 142544.0382193774,
+              "generation_calls": 28,
+              "recorded_input_tokens": 44326,
+              "recorded_output_tokens": 4789,
+              "unknown_usage_rows": 0
+            },
+            "model_requested_abstention": {
+              "count": 4,
+              "elapsed_ms_sum": 12610.299948602915,
+              "generation_calls": 4,
+              "recorded_input_tokens": 6353,
+              "recorded_output_tokens": 383,
+              "unknown_usage_rows": 0
+            }
+          },
+          "elapsed_ms_sum": 155154.3381679803,
+          "eos_observed_count": 32,
+          "failure_error_types": {
+            "GeneratedResponseError": 28
+          },
+          "generation_diagnostic_counts": {
+            "schema_validation": 28,
+            "validated": 4
+          },
+          "generation_elapsed_ms_sum": 136682.3556534946,
+          "latency_ms_p50_check": 3995.9965301677585,
+          "latency_ms_p95_check": 10528.745539486408,
+          "max_new_tokens_reached_count": 0,
+          "parsed_model_action_counts": {
+            "abstain": 4
+          },
+          "private_attachment_status_counts": {
+            "saved_owner_only": 11,
+            "skipped_total_limit": 21
+          },
+          "private_failure_field_inspection": {
+            "failure_diagnostic_rows": 28,
+            "scope": "hash-matched retained private JSON only; duplicates can match retained bytes; not frozen-validator replay",
+            "sha_matched_payload_rows": 8,
+            "structural_flag_counts": {
+              "query_on_nonrewrite": 8
+            },
+            "unavailable_payload_rows": 20
+          },
+          "rerank_elapsed_ms_sum": 18078.303208574653,
+          "retrieval_elapsed_ms_sum": 160.01559421420097,
+          "schema_error_counts": {
+            "root_value_error": 28
+          },
+          "ungated_retained_context_diagnostic": {
+            "denominator": 24,
+            "mean_gold_recall_at_context5": 0.44027777777777777,
+            "queries_with_context_gold_but_empty_delivered": 11,
+            "queries_with_gold_in_candidate20": 16,
+            "scope": "post-tool/pre-delivery retained snapshot; diagnostic only, never replaces frozen delivered-evidence scores"
+          }
+        },
+        "fixed_retrieval": {
+          "budget_violation_counts": {
+            "generation_calls": 0,
+            "output_over_512": 0,
+            "row_elapsed_over_120s": 0,
+            "single_call_input_over_8192": 0,
+            "tool_calls": 0
+          },
+          "completed_event_counts": {
+            "decision": 2,
+            "failure": 30,
+            "retrieve": 32
+          },
+          "cost_by_outcome": {
+            "controller_failure": {
+              "count": 30,
+              "elapsed_ms_sum": 125314.64041396976,
+              "generation_calls": 30,
+              "recorded_input_tokens": 47573,
+              "recorded_output_tokens": 4725,
+              "unknown_usage_rows": 0
+            },
+            "model_requested_abstention": {
+              "count": 2,
+              "elapsed_ms_sum": 8154.77441996336,
+              "generation_calls": 2,
+              "recorded_input_tokens": 3912,
+              "recorded_output_tokens": 277,
+              "unknown_usage_rows": 0
+            }
+          },
+          "elapsed_ms_sum": 133469.41483393312,
+          "eos_observed_count": 32,
+          "failure_error_types": {
+            "GeneratedResponseError": 30
+          },
+          "generation_diagnostic_counts": {
+            "schema_validation": 30,
+            "validated": 2
+          },
+          "generation_elapsed_ms_sum": 133036.7426853627,
+          "latency_ms_p50_check": 3419.90686673671,
+          "latency_ms_p95_check": 8821.1330874823,
+          "max_new_tokens_reached_count": 0,
+          "parsed_model_action_counts": {
+            "abstain": 2
+          },
+          "private_attachment_status_counts": {
+            "saved_owner_only": 11,
+            "skipped_total_limit": 21
+          },
+          "private_failure_field_inspection": {
+            "failure_diagnostic_rows": 30,
+            "scope": "hash-matched retained private JSON only; duplicates can match retained bytes; not frozen-validator replay",
+            "sha_matched_payload_rows": 10,
+            "structural_flag_counts": {
+              "query_on_nonrewrite": 10,
+              "reason_over_500_characters": 1
+            },
+            "unavailable_payload_rows": 20
+          },
+          "rerank_elapsed_ms_sum": 0.0,
+          "retrieval_elapsed_ms_sum": 166.72294959425926,
+          "schema_error_counts": {
+            "reason_string_too_long": 1,
+            "root_value_error": 29
+          },
+          "ungated_retained_context_diagnostic": {
+            "denominator": 24,
+            "mean_gold_recall_at_context5": 0.43194444444444446,
+            "queries_with_context_gold_but_empty_delivered": 13,
+            "queries_with_gold_in_candidate20": 16,
+            "scope": "post-tool/pre-delivery retained snapshot; diagnostic only, never replaces frozen delivered-evidence scores"
+          }
+        }
+      }
+    },
+    "vnext": {
+      "budget": {
+        "candidate_k": 20,
+        "context_k": 5,
+        "max_input_tokens_per_call": 8192,
+        "max_model_calls": 3,
+        "max_output_tokens_per_call": 512,
+        "max_tool_calls": 3,
+        "timeout_seconds": 120.0
+      },
+      "execution_manifest": {
+        "dense_file_hashes": null,
+        "model_manifest_sha256": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+        "protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+        "reranker_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed"
+      },
+      "frozen_score": {
+        "aggregates": {
+          "adaptive": {
+            "answered": 0,
+            "complete_accounting_generation_input_tokens": 12634,
+            "complete_accounting_generation_output_tokens": 1791,
+            "count": 8,
+            "evidence_metrics": null,
+            "generation_calls_mean": 1.0,
+            "generation_calls_sum": 8,
+            "generation_token_totals_exact": true,
+            "label_denominator": null,
+            "latency_ms_p50": 5263.36816046387,
+            "latency_ms_p95": 10096.487438306212,
+            "model_calls_mean": 1.0,
+            "model_calls_sum": 8,
+            "official_decisive_label_accuracy": null,
+            "operational_failures": 5,
+            "outcome_counts": {
+              "controller_failure": 5,
+              "model_requested_abstention": 3
+            },
+            "partial_accounting_recorded_input_tokens": 0,
+            "partial_accounting_recorded_output_tokens": 0,
+            "reason_counts": {
+              "model_requested_abstention": 3,
+              "stage_failed": 5
+            },
+            "recorded_generation_input_tokens": 12634,
+            "recorded_generation_output_tokens": 1791,
+            "rerank_calls_mean": 0.0,
+            "rerank_calls_sum": 0,
+            "rerank_candidate_pairs_mean": 0.0,
+            "rerank_candidate_pairs_sum": 0,
+            "retrieval_calls_mean": 1.0,
+            "retrieval_calls_sum": 8,
+            "retrieval_denominator": null,
+            "status_counts": {
+              "abstained": 8
+            },
+            "tool_calls_mean": 1.0,
+            "tool_calls_sum": 8,
+            "unknown_token_accounting_runs": 0
+          },
+          "fixed_rerank": {
+            "answered": 0,
+            "complete_accounting_generation_input_tokens": 12945,
+            "complete_accounting_generation_output_tokens": 2355,
+            "count": 8,
+            "evidence_metrics": null,
+            "generation_calls_mean": 1.0,
+            "generation_calls_sum": 8,
+            "generation_token_totals_exact": true,
+            "label_denominator": null,
+            "latency_ms_p50": 9422.58433997631,
+            "latency_ms_p95": 13029.50415527448,
+            "model_calls_mean": 1.0,
+            "model_calls_sum": 8,
+            "official_decisive_label_accuracy": null,
+            "operational_failures": 7,
+            "outcome_counts": {
+              "controller_failure": 7,
+              "model_requested_abstention": 1
+            },
+            "partial_accounting_recorded_input_tokens": 0,
+            "partial_accounting_recorded_output_tokens": 0,
+            "reason_counts": {
+              "model_requested_abstention": 1,
+              "stage_failed": 7
+            },
+            "recorded_generation_input_tokens": 12945,
+            "recorded_generation_output_tokens": 2355,
+            "rerank_calls_mean": 1.0,
+            "rerank_calls_sum": 8,
+            "rerank_candidate_pairs_mean": 20.0,
+            "rerank_candidate_pairs_sum": 160,
+            "retrieval_calls_mean": 1.0,
+            "retrieval_calls_sum": 8,
+            "retrieval_denominator": null,
+            "status_counts": {
+              "abstained": 8
+            },
+            "tool_calls_mean": 2.0,
+            "tool_calls_sum": 16,
+            "unknown_token_accounting_runs": 0
+          },
+          "fixed_retrieval": {
+            "answered": 0,
+            "complete_accounting_generation_input_tokens": 12593,
+            "complete_accounting_generation_output_tokens": 1884,
+            "count": 8,
+            "evidence_metrics": null,
+            "generation_calls_mean": 1.0,
+            "generation_calls_sum": 8,
+            "generation_token_totals_exact": true,
+            "label_denominator": null,
+            "latency_ms_p50": 5707.622091285884,
+            "latency_ms_p95": 10739.148852881044,
+            "model_calls_mean": 1.0,
+            "model_calls_sum": 8,
+            "official_decisive_label_accuracy": null,
+            "operational_failures": 7,
+            "outcome_counts": {
+              "controller_failure": 7,
+              "model_requested_abstention": 1
+            },
+            "partial_accounting_recorded_input_tokens": 0,
+            "partial_accounting_recorded_output_tokens": 0,
+            "reason_counts": {
+              "model_requested_abstention": 1,
+              "stage_failed": 7
+            },
+            "recorded_generation_input_tokens": 12593,
+            "recorded_generation_output_tokens": 1884,
+            "rerank_calls_mean": 0.0,
+            "rerank_calls_sum": 0,
+            "rerank_candidate_pairs_mean": 0.0,
+            "rerank_candidate_pairs_sum": 0,
+            "retrieval_calls_mean": 1.0,
+            "retrieval_calls_sum": 8,
+            "retrieval_denominator": null,
+            "status_counts": {
+              "abstained": 8
+            },
+            "tool_calls_mean": 1.0,
+            "tool_calls_sum": 8,
+            "unknown_token_accounting_runs": 0
+          }
+        },
+        "boundary": "Validation replay only; authored tasks have null official quality. Quote/number checks are not entailment. Partial tokens are lower bounds, not savings. Model prose is excluded; reason_counts contains controller enums or event-grounded abstention categories.",
+        "cost_comparison": {
+          "adaptive": {
+            "generation_token_comparison_available": true,
+            "monetary_cost_comparison_available": false,
+            "monetary_cost_reason": "No currency/GPU/API pricing model; tokens exclude reranker work",
+            "unavailable_reason": null
+          },
+          "fixed_rerank": {
+            "generation_token_comparison_available": true,
+            "monetary_cost_comparison_available": false,
+            "monetary_cost_reason": "No currency/GPU/API pricing model; tokens exclude reranker work",
+            "unavailable_reason": null
+          }
+        },
+        "gold_sha256": null,
+        "gold_source": null,
+        "inference_source_git_sha": "72eaa90567e3603a3b940edffbb21b684bf1d1ba",
+        "matrix": {
+          "actual_slots": 24,
+          "expected_slots": 24,
+          "task_denominator_per_strategy": 8,
+          "validated": true
+        },
+        "paired_bootstrap": null,
+        "phase": "vnext",
+        "protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+        "run_sha256": "a146eb20d68eeb83a4df2f8c6a698583a6735adcbf769817bb5a5954c563048a",
+        "scorer_identity": {
+          "git_sha": "208ff931badff270cbbc9593c8ab54f5c79aec9e",
+          "script_sha256": "758bb04e9d99cdfb298c936de550dc66055a706fbe82bd19e1f5db200ccf3b86",
+          "working_tree_dirty": null
+        },
+        "selection_manifest_sha256": null,
+        "semantic_supportability": null
+      },
+      "neural_work_accounting": {
+        "dense_query_attempts": 0,
+        "generation_token_scope": "only autoregressive decision/answer provider; not dense or reranker FLOPs",
+        "reranker_pair_attempts": 160
+      },
+      "private_attachment_files": 24,
+      "prompt_identity": {
+        "pydantic_version": "2.13.5",
+        "schema_json_sha256": "9743f8ba5fcf4364ebc71732ff150d879bd9cd74c95c91a0acf3b913af4535dc",
+        "scope": "UTF-8 static system message; excludes observation and tokenizer chat template",
+        "system_prompt_sha256": "6b0163a4ef9da624e35dffb51fff34913ccb8a90db395c8dfec68bbe409febaa"
+      },
+      "supplemental": {
+        "adaptive": {
+          "budget_violation_counts": {
+            "generation_calls": 0,
+            "output_over_512": 0,
+            "row_elapsed_over_120s": 0,
+            "single_call_input_over_8192": 0,
+            "tool_calls": 0
+          },
+          "completed_event_counts": {
+            "decision": 3,
+            "failure": 5,
+            "retrieve": 8
+          },
+          "cost_by_outcome": {
+            "controller_failure": {
+              "count": 5,
+              "elapsed_ms_sum": 38997.41430953145,
+              "generation_calls": 5,
+              "recorded_input_tokens": 7714,
+              "recorded_output_tokens": 1483,
+              "unknown_usage_rows": 0
+            },
+            "model_requested_abstention": {
+              "count": 3,
+              "elapsed_ms_sum": 8269.524596631527,
+              "generation_calls": 3,
+              "recorded_input_tokens": 4920,
+              "recorded_output_tokens": 308,
+              "unknown_usage_rows": 0
+            }
+          },
+          "elapsed_ms_sum": 47266.93890616298,
+          "eos_observed_count": 8,
+          "failure_error_types": {
+            "GeneratedResponseError": 5
+          },
+          "generation_diagnostic_counts": {
+            "schema_validation": 5,
+            "validated": 3
+          },
+          "generation_elapsed_ms_sum": 47168.85470971465,
+          "latency_ms_p50_check": 5263.36816046387,
+          "latency_ms_p95_check": 10096.487438306212,
+          "max_new_tokens_reached_count": 0,
+          "parsed_model_action_counts": {
+            "abstain": 3
+          },
+          "private_attachment_status_counts": {
+            "saved_owner_only": 8
+          },
+          "private_failure_field_inspection": {
+            "failure_diagnostic_rows": 5,
+            "scope": "hash-matched retained private JSON only; duplicates can match retained bytes; not frozen-validator replay",
+            "sha_matched_payload_rows": 5,
+            "structural_flag_counts": {
+              "query_on_nonrewrite": 5
+            },
+            "unavailable_payload_rows": 0
+          },
+          "rerank_elapsed_ms_sum": 0.0,
+          "retrieval_elapsed_ms_sum": 39.79683294892311,
+          "schema_error_counts": {
+            "root_value_error": 5
+          },
+          "ungated_retained_context_diagnostic": null
+        },
+        "fixed_rerank": {
+          "budget_violation_counts": {
+            "generation_calls": 0,
+            "output_over_512": 0,
+            "row_elapsed_over_120s": 0,
+            "single_call_input_over_8192": 0,
+            "tool_calls": 0
+          },
+          "completed_event_counts": {
+            "decision": 1,
+            "failure": 7,
+            "rerank": 8,
+            "retrieve": 8
+          },
+          "cost_by_outcome": {
+            "controller_failure": {
+              "count": 7,
+              "elapsed_ms_sum": 62847.5752659142,
+              "generation_calls": 7,
+              "recorded_input_tokens": 11203,
+              "recorded_output_tokens": 2242,
+              "unknown_usage_rows": 0
+            },
+            "model_requested_abstention": {
+              "count": 1,
+              "elapsed_ms_sum": 3609.9550761282444,
+              "generation_calls": 1,
+              "recorded_input_tokens": 1742,
+              "recorded_output_tokens": 113,
+              "unknown_usage_rows": 0
+            }
+          },
+          "elapsed_ms_sum": 66457.53034204245,
+          "eos_observed_count": 8,
+          "failure_error_types": {
+            "GeneratedResponseError": 7
+          },
+          "generation_diagnostic_counts": {
+            "schema_validation": 7,
+            "validated": 1
+          },
+          "generation_elapsed_ms_sum": 61881.218729540706,
+          "latency_ms_p50_check": 9422.58433997631,
+          "latency_ms_p95_check": 13029.50415527448,
+          "max_new_tokens_reached_count": 0,
+          "parsed_model_action_counts": {
+            "abstain": 1
+          },
+          "private_attachment_status_counts": {
+            "saved_owner_only": 8
+          },
+          "private_failure_field_inspection": {
+            "failure_diagnostic_rows": 7,
+            "scope": "hash-matched retained private JSON only; duplicates can match retained bytes; not frozen-validator replay",
+            "sha_matched_payload_rows": 7,
+            "structural_flag_counts": {
+              "answer_fields_on_nonanswer": 1,
+              "query_on_nonrewrite": 6
+            },
+            "unavailable_payload_rows": 0
+          },
+          "rerank_elapsed_ms_sum": 4477.380821481347,
+          "retrieval_elapsed_ms_sum": 37.271421402692795,
+          "schema_error_counts": {
+            "root_value_error": 7
+          },
+          "ungated_retained_context_diagnostic": null
+        },
+        "fixed_retrieval": {
+          "budget_violation_counts": {
+            "generation_calls": 0,
+            "output_over_512": 0,
+            "row_elapsed_over_120s": 0,
+            "single_call_input_over_8192": 0,
+            "tool_calls": 0
+          },
+          "completed_event_counts": {
+            "decision": 1,
+            "failure": 7,
+            "retrieve": 8
+          },
+          "cost_by_outcome": {
+            "controller_failure": {
+              "count": 7,
+              "elapsed_ms_sum": 47103.54890488088,
+              "generation_calls": 7,
+              "recorded_input_tokens": 10931,
+              "recorded_output_tokens": 1769,
+              "unknown_usage_rows": 0
+            },
+            "model_requested_abstention": {
+              "count": 1,
+              "elapsed_ms_sum": 3089.1445726156235,
+              "generation_calls": 1,
+              "recorded_input_tokens": 1662,
+              "recorded_output_tokens": 115,
+              "unknown_usage_rows": 0
+            }
+          },
+          "elapsed_ms_sum": 50192.693477496505,
+          "eos_observed_count": 8,
+          "failure_error_types": {
+            "GeneratedResponseError": 7
+          },
+          "generation_diagnostic_counts": {
+            "schema_validation": 7,
+            "validated": 1
+          },
+          "generation_elapsed_ms_sum": 50061.615731567144,
+          "latency_ms_p50_check": 5707.622091285884,
+          "latency_ms_p95_check": 10739.148852881044,
+          "max_new_tokens_reached_count": 0,
+          "parsed_model_action_counts": {
+            "abstain": 1
+          },
+          "private_attachment_status_counts": {
+            "saved_owner_only": 8
+          },
+          "private_failure_field_inspection": {
+            "failure_diagnostic_rows": 7,
+            "scope": "hash-matched retained private JSON only; duplicates can match retained bytes; not frozen-validator replay",
+            "sha_matched_payload_rows": 7,
+            "structural_flag_counts": {
+              "query_on_nonrewrite": 7
+            },
+            "unavailable_payload_rows": 0
+          },
+          "rerank_elapsed_ms_sum": 0.0,
+          "retrieval_elapsed_ms_sum": 44.29467208683491,
+          "schema_error_counts": {
+            "root_value_error": 7
+          },
+          "ungated_retained_context_diagnostic": null
+        }
+      }
+    }
+  },
+  "posthoc_diagnostic_statistics_computed": true,
+  "raw_text_or_prediction_rows_exported": false,
+  "release_id": "climate-full-72eaa90-20260930-r2",
+  "schema_version": "1.0",
+  "scorer_archive_line_endings": {
+    "actual_member_sha256": "758bb04e9d99cdfb298c936de550dc66055a706fbe82bd19e1f5db200ccf3b86",
+    "archive_sha256": "7498d367565eeb59bb7cf724c33f835608a0c9f01da3768d7308700a380c00a1",
+    "canonical_git_blob_lf_sha256": "5a3afc492dacb786e67051d9d6900afa671f742a0222149f9cd9a7677e37956b",
+    "crlf_count": 292,
+    "member_bytes": 17097,
+    "only_crlf_normalization_matches_canonical_blob": true
+  },
+  "source_receipts": {
+    "operator-status.json": {
+      "bytes": 16409,
+      "sha256": "4f1e7a0e2e3d2fcf2dc64ddf5d4ac128e65dda59e41af2b880a16a65f9e12f34"
+    },
+    "validation/run.consumed.json": {
+      "bytes": 136,
+      "sha256": "4f247a6b34e87bb7335a216552628b7df65fee2c003cc3c4c384f59b62596153"
+    },
+    "validation/run.json": {
+      "bytes": 441269,
+      "sha256": "a07f8ddc283c7f4a6ab8f00e67141f60b8cff9adc0578d52b33465c069577864"
+    },
+    "validation/score.json": {
+      "bytes": 9201,
+      "sha256": "44327c3eebab55d76c4f9115ad060284a679ce3fa95c51ff5f91ebc44e0ba572"
+    },
+    "vnext/run.consumed.json": {
+      "bytes": 131,
+      "sha256": "fe42f3886debc921d514a947d99f593ce7d5f9dd7674519ea7335e5617cfeb57"
+    },
+    "vnext/run.json": {
+      "bytes": 113146,
+      "sha256": "a146eb20d68eeb83a4df2f8c6a698583a6735adcbf769817bb5a5954c563048a"
+    },
+    "vnext/score.json": {
+      "bytes": 5828,
+      "sha256": "746943c625b6f16821b3c1ae5419e6ad65ee7ad44c7fdab019741c6a2c28063f"
+    }
+  }
+}

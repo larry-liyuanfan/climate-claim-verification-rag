@@ -187,6 +187,7 @@ def evaluate_representation_pair(
     *,
     bootstrap_samples: int = 5_000,
     seed: int = 17,
+    evidence_k: int | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Paired retrieval comparison with deterministic query-taxonomy slices."""
 
@@ -198,10 +199,15 @@ def evaluate_representation_pair(
     if set(baseline) != claim_ids or set(candidate) != claim_ids:
         raise ValueError("base, candidate and claim query sets must match exactly")
     evidence_by_id = {document.evidence_id: document for document in evidence}
-    base_metrics, base_rows, _ = evaluate_predictions(claims, baseline, ks=(5, 10, 50))
-    candidate_metrics, candidate_rows, _ = evaluate_predictions(
-        claims, candidate, ks=(5, 10, 50)
+    base_metrics, base_rows, _ = evaluate_predictions(
+        claims, baseline, ks=(5, 10, 50), evidence_k=evidence_k, evaluate_labels=False
     )
+    candidate_metrics, candidate_rows, _ = evaluate_predictions(
+        claims, candidate, ks=(5, 10, 50), evidence_k=evidence_k, evaluate_labels=False
+    )
+    metric_names: tuple[str, ...] = (*METRICS, "recall@10", "recall@50")
+    if evidence_k is not None:
+        metric_names = (*metric_names, f"evidence_f1@{evidence_k}")
     base_by_id = {str(row["claim_id"]): row for row in base_rows}
     candidate_by_id = {str(row["claim_id"]): row for row in candidate_rows}
     comparisons = {
@@ -211,7 +217,7 @@ def evaluate_representation_pair(
             samples=bootstrap_samples,
             seed=seed,
         )
-        for metric in METRICS
+        for metric in metric_names
     }
     tagged_rows: list[dict[str, Any]] = []
     by_taxonomy: dict[str, list[str]] = defaultdict(list)
@@ -224,11 +230,11 @@ def evaluate_representation_pair(
                 "claim_id": claim_id,
                 "taxonomy": list(labels),
                 "baseline": {
-                    metric: float(base_by_id[claim_id][metric]) for metric in METRICS
+                    metric: float(base_by_id[claim_id][metric]) for metric in metric_names
                 },
                 "candidate": {
                     metric: float(candidate_by_id[claim_id][metric])
-                    for metric in METRICS
+                    for metric in metric_names
                 },
             }
         )
@@ -239,13 +245,13 @@ def evaluate_representation_pair(
             "query_count": len(ids),
             "baseline": {
                 metric: _mean([float(base_by_id[claim_id][metric]) for claim_id in ids])
-                for metric in METRICS
+                for metric in metric_names
             },
             "candidate": {
                 metric: _mean(
                     [float(candidate_by_id[claim_id][metric]) for claim_id in ids]
                 )
-                for metric in METRICS
+                for metric in metric_names
             },
             "mean_delta": {
                 metric: _mean(
@@ -255,7 +261,7 @@ def evaluate_representation_pair(
                         for claim_id in ids
                     ]
                 )
-                for metric in METRICS
+                for metric in metric_names
             },
         }
     return (
@@ -263,8 +269,9 @@ def evaluate_representation_pair(
             "query_count": len(claims),
             "bootstrap_samples": bootstrap_samples,
             "seed": seed,
-            "baseline": {metric: base_metrics[metric] for metric in METRICS},
-            "candidate": {metric: candidate_metrics[metric] for metric in METRICS},
+            "evidence_k": evidence_k,
+            "baseline": {metric: base_metrics[metric] for metric in metric_names},
+            "candidate": {metric: candidate_metrics[metric] for metric in metric_names},
             "paired_bootstrap": comparisons,
             "taxonomy": taxonomy_report,
             "taxonomy_boundary": (

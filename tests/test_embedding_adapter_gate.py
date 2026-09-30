@@ -36,24 +36,14 @@ def test_heldout_query_texts_and_claim_resolution() -> None:
 
 
 def test_sentence_transformer_encoder_loads_adapter(monkeypatch) -> None:
-    calls: list[tuple[object, str, dict[str, str]]] = []
-
-    class FakeParameter:
-        def numel(self) -> int:
-            return 7
+    calls: list[tuple[object, str]] = []
 
     class FakeAutoModel:
         pass
 
-    class FakePeftModel:
-        def named_parameters(self):
-            return [("layers.0.q_proj.lora_A.default.weight", FakeParameter())]
-
-    class FakePeftFactory:
-        @classmethod
-        def from_pretrained(cls, model, path: str, *, key_mapping):
-            calls.append((model, path, key_mapping))
-            return FakePeftModel()
+    def verified_loader(model, path):
+        calls.append((model, path))
+        return model, {"lora_parameter_count": 7, "all_checkpoint_values_match": True}
 
     class FakeTransformerModule:
         def __init__(self) -> None:
@@ -77,12 +67,14 @@ def test_sentence_transformer_encoder_loads_adapter(monkeypatch) -> None:
         "sentence_transformers",
         SimpleNamespace(SentenceTransformer=FakeSentenceTransformer),
     )
-    monkeypatch.setitem(sys.modules, "peft", SimpleNamespace(PeftModel=FakePeftFactory))
+    # Wiring only; real checkpoint restoration is exercised in test_adapter_integrity.
+    monkeypatch.setattr(dense, "load_verified_lora", verified_loader)
     encoder = dense.SentenceTransformerEncoder("base", adapter_path="adapter")
     assert encoder.adapter_path == "adapter"
     assert encoder.adapter_parameter_count == 7
     assert len(calls) == 1
-    assert calls[0][1:] == ("adapter", {r"^model\.": ""})
+    assert calls[0][1] == "adapter"
+    assert encoder.adapter_integrity["all_checkpoint_values_match"]
 
 
 def test_full_corpus_promotion_requires_recall_ci_and_secondary_non_regression() -> None:

@@ -1,0 +1,26 @@
+{
+  "bundles": {
+    "inference": {
+      "bytes": 8304640,
+      "members": [
+        "claims.jsonl",
+        "corpus.jsonl",
+        "protocol.json"
+      ],
+      "sha256": "92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca"
+    },
+    "scoring": {
+      "bytes": 40960,
+      "members": [
+        "gold.jsonl",
+        "manifest.json",
+        "selected-strata.json"
+      ],
+      "sha256": "174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444"
+    }
+  },
+  "job_submitted": false,
+  "preparation_manifest_sha256": "dceda481dba4966b32cfb0234449977cf224d5bceeaeb55f3eb5790aba364b8e",
+  "protocol_sha256": "306e8a61eef6fb279c56ccfc2b496281df9cc8710e194d2272e6978a23dbe802",
+  "schema_version": "scifact-train-diagnostic-bundles-v1"
+}

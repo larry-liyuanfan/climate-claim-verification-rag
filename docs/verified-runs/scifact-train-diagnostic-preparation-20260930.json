@@ -1,0 +1,65 @@
+{
+  "audited_eligible_train": 531,
+  "boundary": "Gold-stratified train opportunity sampling; scripted CPU packing only, no benchmark quality.",
+  "candidate_counts": {
+    "gold_absent_top20": 17,
+    "gold_in_candidates_but_not_packable_within_contract": 1,
+    "initial_doc_opportunity": 286,
+    "nei": 214,
+    "top20_doc_replenishable": 13
+  },
+  "eligible_component_counts": {
+    "gold_absent_top20": 14,
+    "initial_doc_opportunity": 188,
+    "nei": 135,
+    "top20_doc_replenishable": 12
+  },
+  "inference_claim_fields": [
+    "id",
+    "claim"
+  ],
+  "input_sha256": {
+    "gold/claims_train.jsonl": "9e07864a797dd515391fa1c3f3573249b70399f95ff6c740bf536ad11c8aa6ca",
+    "inference/claims_train_eligible.jsonl": "003e0fb7fb6ac8b7f6a6af5949782801cf370d6019d710624b90c3531b8bd914",
+    "inference/corpus.jsonl": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+    "private-group-assignment.json": "6d79861daef5d385878913fe10681dff95df444e6f7b1b76ab7c07f4d4d70a12"
+  },
+  "model_generations": 0,
+  "official_dev_read": false,
+  "output_sha256": {
+    "inference/claims.jsonl": "b38d076b1f22a9c586faf6d2286bac361b8ceb3fcae86349d7283f153749c97a",
+    "inference/corpus.jsonl": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+    "inference/protocol.json": "306e8a61eef6fb279c56ccfc2b496281df9cc8710e194d2272e6978a23dbe802",
+    "private/gold.jsonl": "129eb6f00dce6f8ef60147603c6a348f5eef9e5f61efec6ef3666057a9e861a8",
+    "private/sampling-audit.json": "ce38a8d705296a89f3079c672b535dd05c3d64bd22cf2ffdae60013e138768e9",
+    "private/selected-strata.json": "b26b46a73384dc419cfde8121f8dd6769e8a5cc12c114658a7692fbaae287141"
+  },
+  "preparation_sha256": "3cd6bc1e1c299ece9195098a3853ebb05bb3401507d8b467c1596ba6afb6e138",
+  "release_id": "climate-scifact-train-diagnostic-20260930-r1",
+  "schema_version": "scifact-train-diagnostic-preparation-v1",
+  "selected_counts": {
+    "gold_absent_top20": 3,
+    "initial_doc_opportunity": 3,
+    "nei": 3,
+    "top20_doc_replenishable": 3
+  },
+  "selected_queries": 12,
+  "selection": "fixed-hash maximum component-slot matching",
+  "shortfall": {
+    "gold_absent_top20": 0,
+    "initial_doc_opportunity": 0,
+    "nei": 0,
+    "top20_doc_replenishable": 0
+  },
+  "shortfall_policy": "stop at actual matching; never relax or backfill",
+  "slots": 48,
+  "source_git": "d0e2339cb9711d4b46211d88c561d2f80bd39b3c",
+  "source_worktree_dirty": false,
+  "test_read": false,
+  "tokenizer_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  }
+}

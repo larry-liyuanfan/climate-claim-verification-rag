@@ -1,0 +1,46 @@
+{
+  "protocol": "scifact-evidence-gap-candidate-v1",
+  "status": "CPU_candidate_only_no_real_experiment_release",
+  "frozen_diagnostic_source": "d0e2339cb9711d4b46211d88c561d2f80bd39b3c",
+  "frozen_diagnostic_job_unchanged": 31620529,
+  "hypothesis": "A short explicit evidence-gap self-report carried to the next observation may improve useful tool decisions; untested.",
+  "outer_wire_order": ["evidence_state", "gap_claim_span", "decision"],
+  "gap_constraint": "Empty or at most160 characters, exact contiguous span of controller-normalized immutable claim; post-generation checked.",
+  "evidence_state": {
+    "retrieval_need": ["needed", "not_needed", "uncertain"],
+    "relevance": ["relevant", "irrelevant", "mixed", "unknown"],
+    "support": ["sufficient", "partial", "missing", "conflicting", "unknown"],
+    "semantic_validation": "none; fallible model self-report only"
+  },
+  "actions": ["answer", "abstain", "read", "rewrite", "rerank"],
+  "action_policy": "Same frozen route-specific availability and guards; no state forces an action.",
+  "routes": ["fixed_retrieval", "fixed_rerank", "deterministic_extra", "adaptive"],
+  "future_comparison": "All four routes use the same candidate renderer/envelope and caps; only candidate-internal route contrast is fair. No new-adaptive versus old-fixed gain claim.",
+  "default_budget_unchanged": {
+    "candidate_k": 20, "context_k": 5, "max_calls": 5, "max_repairs": 2,
+    "max_tools": 5, "max_input_tokens": 8192, "max_output_tokens": 512,
+    "timeout_seconds": 120
+  },
+  "packing": "Full candidate schema, history, delta and repair feedback counted before final context. Log actual visible IDs/counts/hashes; they may differ from old template.",
+  "state": "Fresh per claim-and-route; count_prompt pure; history advances only at actual generation boundary.",
+  "delta": "Final current_citable versus preceding model request, never preview/packing probes. Tool completion separately reported; ID changes are not semantic progress.",
+  "wire_audit": "Private quota-bound original wire plus full SHA/attempted-byte receipt reconciliation and unchanged parsed-action projection. No silent repair/dedupe/action substitution.",
+  "cost": "All wire tokens, feedback, invalid/repair attempts, tool/rerank work and latency counted; unknown usage remains a lower bound.",
+  "runtime_requirements": {
+    "jsonschema": "4.23.0 (test/dev extras; not yet verified in frozen Spartan runtime)",
+    "lm-format-enforcer": "0.11.3",
+    "tokenizer_revision": "350135a4de9a3407be836fa238cccc1d61503a85",
+    "weights": "Same frozen Qwen3-4B manifest; not loaded in this CPU package",
+    "grammar": "Candidate-only post-TokenEnforcer in-place force_json_field_order=True; preserve effective tokenizer alphabet and fresh caches"
+  },
+  "future_release_gate_all_required": [
+    "Frozen31620529 completes and accounting/matrix/original-ID/privacy audits pass; otherwise diagnose separately, no candidate auto-run.",
+    "At least one selected real-train case has an independently auditable natural evidence gap: complete alternative rationale absent in actual first observation but reachable by an already legal same-budget tool.",
+    "The frozen adaptive route fails to resolve that gap; inspect proposed actions, executed tool events, subsequent visibility and original rationale metrics, not tool counts or ID novelty alone.",
+    "Record concrete failure mechanism before examining any candidate real-model output; no reselection, tuning/backfill, expanded data, or dev/test access.",
+    "CPU contracts, pinned-tokenizer ordered-prefix and mock-HF tests, source/privacy validation and clean-checkout reproduction pass.",
+    "Coordinator separately approves a fixed all-four-route train diagnostic, actual runtime dependency check and real-weight synthetic preflight with complete cost accounting. Passing this list is not automatic authorization."
+  ],
+  "if_gate_not_met": "Do not release. Preserve negative/inconclusive conclusion and candidate code; no rerun or lowered threshold to manufacture gain.",
+  "not_in_scope": ["new GPU job", "HPC runner/operator", "critic call", "training", "network search", "relaxed rewrite constraints", "test rerun", "resume effectiveness claim"]
+}

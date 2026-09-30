@@ -53,7 +53,7 @@ def _rank_agreement(left: Sequence[str], right: Sequence[str]) -> float:
 
 def agreement_features(
     bm25_ids: Sequence[str], dense_ids: Sequence[str], rrf_ids: Sequence[str]
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     bm25 = tuple(bm25_ids)
     dense = tuple(dense_ids)
     rrf = tuple(rrf_ids)
@@ -74,7 +74,7 @@ def agreement_features(
     return np.asarray(values, dtype=np.float64)
 
 
-def hashed_text_features(text: str, *, dimensions: int = 128) -> np.ndarray:
+def hashed_text_features(text: str, *, dimensions: int = 128) -> np.ndarray[Any, Any]:
     """Return inference-safe scalar and signed-hash unigram/bigram features."""
 
     if dimensions <= 0:
@@ -105,19 +105,19 @@ def hashed_text_features(text: str, *, dimensions: int = 128) -> np.ndarray:
 
 @dataclass(frozen=True)
 class RidgeGainModel:
-    mean: np.ndarray
-    scale: np.ndarray
-    coefficients: np.ndarray
+    mean: np.ndarray[Any, Any]
+    scale: np.ndarray[Any, Any]
+    coefficients: np.ndarray[Any, Any]
 
-    def predict(self, features: np.ndarray) -> np.ndarray:
+    def predict(self, features: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         matrix = np.atleast_2d(np.asarray(features, dtype=np.float64))
         standardized = (matrix - self.mean) / self.scale
         design = np.column_stack((np.ones(len(matrix)), standardized))
-        return design @ self.coefficients
+        return np.asarray(design @ self.coefficients, dtype=np.float64)
 
 
 def fit_ridge_gain_model(
-    features: np.ndarray, gains: np.ndarray, *, regularization: float = 1.0
+    features: np.ndarray[Any, Any], gains: np.ndarray[Any, Any], *, regularization: float = 1.0
 ) -> RidgeGainModel:
     matrix = np.asarray(features, dtype=np.float64)
     target = np.asarray(gains, dtype=np.float64)
@@ -136,8 +136,8 @@ def fit_ridge_gain_model(
 
 
 def select_quality_preserving_threshold(
-    predicted_gains: np.ndarray,
-    observed_gains: np.ndarray,
+    predicted_gains: np.ndarray[Any, Any],
+    observed_gains: np.ndarray[Any, Any],
     *,
     gain_preservation: float = 0.8,
 ) -> float:
@@ -171,13 +171,13 @@ def stable_fold(claim_id: str, fold_count: int) -> int:
 
 def cross_fit_route(
     claim_ids: Sequence[str],
-    features: np.ndarray,
-    gains: np.ndarray,
+    features: np.ndarray[Any, Any],
+    gains: np.ndarray[Any, Any],
     *,
     fold_count: int = 5,
     regularization: float = 1.0,
     gain_preservation: float = 0.8,
-) -> tuple[np.ndarray, np.ndarray, list[dict[str, Any]]]:
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any], list[dict[str, Any]]]:
     identifiers = tuple(claim_ids)
     matrix = np.asarray(features, dtype=np.float64)
     target = np.asarray(gains, dtype=np.float64)

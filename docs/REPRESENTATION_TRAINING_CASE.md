@@ -12,7 +12,7 @@ Two evidence tracks are intentionally separate:
 | Track | Purpose | Allowed claim |
 |---|---|---|
 | Restricted COMP90042 corpus | full-scale indexing, hard-negative task adaptation and fixed 154-claim offline development | model selection on offline dev only |
-| Public CLIMATE-FEVER | reproducible data adapter and the historical BM25 external baseline | no new candidate test result; the frozen test was consumed on 2026-08-25 |
+| Public CLIMATE-FEVER | reproducible data adapter, historical BM25 test baseline and base-only public-v2 validation ranking | no new candidate test result; consumed test sealed; adapter quality remains unestablished |
 | Fixtures | executable schema and failure-path tests | no retrieval-quality claim |
 
 ## Method and reproducible chain
@@ -55,19 +55,33 @@ annotations.
 On the restricted 154-claim offline-dev track, the task-adapted 0.6B encoder was
 paired against the base encoder on the same 1,208,827-document corpus. Recall@5
 rose `0.2793 -> 0.2970`, MRR@10 `0.3633 -> 0.3869`, nDCG@10
-`0.2994 -> 0.3203`, and Evidence F1 `0.07253 -> 0.07544`; all four
+`0.2994 -> 0.3203`, and Evidence F1@50 `0.07253 -> 0.07544`; all four
 5,000-sample paired intervals were above zero. The adapter therefore passed the
 offline-dev promotion gate. This is not an independent-test or online A/B
-result.
+result. The exact `c815070` full-gate entry point retained Top-50 rankings,
+so these MRR@10/nDCG@10 values are not affected by the later public-v2
+Top-5 storage defect. Its F1@50 must not be compared directly with downstream
+F1@5 values.
 
 The downstream ranking case exposed two operating points. HNSW+RRF reached
 Recall@5/Evidence F1 `0.2709/0.1785`. RRF-prior LambdaMART improved
-MRR@10/nDCG@10 `0.3446/0.2495 -> 0.3648/0.2605` at a derived stage-cost P95
-of `23.21 ms/query`, but Recall@5/F1 intervals crossed zero. Balanced
+MRR@5 `0.3446 -> 0.3648` with a positive paired interval. Both historical downstream paths saved only five ranks, so their old MRR@10 is MRR@5 and nDCG@10 is censored (not nDCG@5). Its old `23.21 ms/query`
+cost proxy sums ANN and ranker P95 values; that sum is **not** a measured
+path P95. Recall@5/F1 intervals crossed zero. Balanced
 RRF/Qwen3-Reranker-4B reached the best dev Recall@5/Evidence F1
 `0.3153/0.2131`, while its measured reranker P95 was `4.82 s/query`. Thus LTR
 is retained as a low-latency rank-position profile and 4B as the offline quality
 profile. These timings exclude BM25 and are not an end-to-end SLA.
+
+The separate 2026-09-27 **public validation** comparison closes that timing gap:
+the same 5,240 documents/126 queries/ordered Top-100 pool gave LTR R@5/F1@5
+`.6054/.3828` at **77.8 ms measured E2E P95**, versus Top-100 4B
+`.6275/.3969` at **9.30 s**. Top-20 4B cost 1.91 s without an established
+F1 advantage over LTR. All Top-5 paired intervals cross zero, so LTR is a
+practical latency recommendation, not a statistically proven quality-equivalent
+model. This comparison uses the base encoder, not the restricted LoRA adapter.
+Full metrics, GPU/RSS, taxonomy and direct Top-20/100 intervals are in
+[the measured decision report](SEARCH_TRADEOFFS_20260927.md).
 
 ## Leakage and frozen-test decision
 
@@ -84,9 +98,13 @@ near-document pair between train and test; both annotations are
 does not retroactively turn the baseline into a candidate-selection result, but
 it means the historical partition fails the stricter all-document audit.
 Therefore `configs/public_evaluation_policy.json` marks the test consumed and
-forbids every new candidate evaluation. The validation promotion gate was not
-run in this closeout because no new public-validation representation artifact
-exists. No new frozen-test score was produced.
+forbids every new test-candidate evaluation. At the early 2026-09-03 closeout,
+no new public-validation candidate was available. The later public-v2 cycle
+attempted six pilots and one full diagnostic, but checkpoint integrity failed
+and no adapter was promoted. On 2026-09-27, real checkpoint restoration and
+embedding changes were verified using fixed label-free probes. That repair is
+not a quality gain. New full-ranking profiling compares frozen base/LTR/4B
+routes on validation only; no new frozen-test score was produced.
 
 ## Problem-method-result-trade-off summary
 
@@ -97,9 +115,13 @@ dense retriever; on the same full corpus and 154-query offline-dev set it
 improved all four paired retrieval metrics. I then preserved lexical and dense
 signals through RRF, corrected an unreachable-positive/train-serve mismatch in
 LambdaMART, and compared a millisecond CPU ranker with a 4B cross-encoder. The
-4B path achieved the best quality but cost seconds per query, while LTR improved
-rank-position metrics at far lower stage cost. I kept both operating points and
-retired the already-consumed public test rather than tune against it.
+4B path achieved the highest restricted-dev quality, while LTR improved Top-5
+reciprocal rank at lower stage cost. In a separate public-validation experiment,
+I timed the entire request rather than summing stage percentiles: LTR took
+77.8 ms P95 versus 9.30 s for Top-100 4B, whose small Top-5 gains over LTR were
+uncertain. I recommend LTR for latency and retain 4B as an optional slower
+profile. I also repaired silent adapter-key restoration and censored metrics,
+and kept the consumed test sealed rather than tune against it.
 
 ## Resume bullet candidates
 
@@ -108,11 +130,11 @@ retired the already-consumed public test rather than tune against it.
   offline-dev set, raised Recall@5 `0.279 -> 0.297` and MRR@10
   `0.363 -> 0.387`, with positive 5,000-sample paired intervals across four
   retrieval metrics.
-- Built a leakage-audited BM25+dense/HNSW -> RRF/LambdaMART -> Qwen3-4B
-  ranking pipeline; selected a low-latency LTR profile and an offline quality
-  profile (`0.315` Recall@5, `0.213` Evidence F1), while enforcing exact
-  train/serve candidate contracts and blocking reuse of a consumed public test.
+- Compared same-candidate BM25+dense/HNSW -> RRF/LambdaMART and Qwen3-4B
+  routes on public validation; recommended LTR at `0.605` Recall@5 and
+  `77.8 ms` warm serial E2E P95, retaining slower 4B only as an optional
+  profile while enforcing train/serve contracts and a sealed consumed test.
 
-Both bullets require the qualifiers “offline dev” and “fixed in-memory/stage
-benchmark” when expanded in an interview. They do not claim independent-test
+The first bullet is restricted offline dev; the second is a separate public
+validation, warmed single-process request benchmark. Neither claims independent-test
 generalisation, an online SLA, classification quality or an A/B result.

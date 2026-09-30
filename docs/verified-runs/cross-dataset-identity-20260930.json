@@ -1,0 +1,98 @@
+{
+  "claim_counts": {
+    "authored_consumed": 11,
+    "public_train": 1075,
+    "public_validation": 230,
+    "restricted_fixed_dev": 154,
+    "scifact_dev": 300
+  },
+  "claim_text_edges_all": 206,
+  "connected_components": 334,
+  "cross_namespace_document_pairs": {},
+  "cross_target_components": 0,
+  "direct_target_claim_pairs": {},
+  "document_counts": {
+    "climate_public_doc": 5240,
+    "scifact_doc": 5183
+  },
+  "document_variant_edges_all": 4,
+  "independence_certified": false,
+  "input_sha256": {
+    "consumed_authored_protocol": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+    "public_evidence": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+    "public_split_manifest": "66bf9b2c0157505f504459e7b38285a2aeed0c14770f82c74d1f619a03551f16",
+    "restricted_fixed_dev": "ea9976e861095c5856a13773d15cf149c9b961d4afaf36be2e8b22d2e1ec1fe4",
+    "safe_public_archive": "bef810a9a3a4eb2f4a4a2684e1362b0c02b6a231c56202d9d1b1b7d478eab329",
+    "scifact_gold/claims_dev.jsonl": "9a7b9aac75a0646349e895bef6d73b8a9ab258df6c34444037ed33cfceb64254",
+    "scifact_inference/claims_dev.jsonl": "89ac1cbe47758ad95af56d6032594a815c98f8e7bd935474507fae900e0a2260",
+    "scifact_inference/corpus.jsonl": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+    "scifact_preparation_manifest": "3cd6bc1e1c299ece9195098a3853ebb05bb3401507d8b467c1596ba6afb6e138"
+  },
+  "labels_passed_to_model": false,
+  "labels_used_for_edges": false,
+  "largest_component": 1374,
+  "limitations": [
+    "Lexical matches are identity candidates, not semantic-equivalence judgements; negation may create false positives.",
+    "No labels, scores or model outputs select edges or thresholds; target rows are not removed or reselected.",
+    "Namespace-qualified IDs never match solely because their bare numbers coincide.",
+    "Passages and paper abstracts have different granularity; Jaccard cannot resolve missing bibliographic mappings.",
+    "Missing source provenance and foundation-model pretraining exposure remain unknown."
+  ],
+  "merged_public_claims_opened": false,
+  "model_evaluation_performed": false,
+  "normalization": "NFKC/casefold/whitespace exact; Unicode word token sets for Jaccard",
+  "old_test_claim_text_or_labels_read": false,
+  "only_archive_members_read": {
+    "./data/climate-fever-v2/selection-only/train-claims.json": "9b39f2890759338210cc203d39346134d44544ef95ddebbb2880a04b5fd82ee6",
+    "./data/climate-fever-v2/selection-only/validation-claims.json": "1154448777e72e2b14e7e57e71937a5f123e36f63b8b7b2c3ab7ddfe9a449ad5"
+  },
+  "private_artifact_sha256": {
+    "private-affected-identities.json": "ec12835fe0ec0cb9a8f9707f7295fb6ee4ce1bef536efdb88a7ad74baed1ec59",
+    "private-source-map.json": "977dc8f69283ef5e0530f42cd7923129c2e57ce10883c3722f78db8e420dbb78",
+    "public-train-identity-only.json": "2520fa6f2d2916e98cd684cfd944345affacd778978c0f0673f95c27e46a7014",
+    "public-validation-identity-only.json": "f87bdceb764dc58ab071018d2b689638d8e6514bb6554b0556c651f436ba308e"
+  },
+  "public_source_links": "annotation-associated candidate IDs and linked articles; not original-source metadata",
+  "restricted_gold_evidence_keys_used": false,
+  "schema_version": "cross-dataset-identity-v1",
+  "scifact_gold_containing_file_parsed": true,
+  "scifact_gold_evidence_keys_labels_rationales_used": false,
+  "scifact_identity_fields_used": [
+    "id",
+    "claim",
+    "cited_doc_ids"
+  ],
+  "source_git": "544a3f759e67af49b4a9f71c1718802015e90f11",
+  "source_status_counts": {
+    "authored_consumed": {
+      "unknown": 11
+    },
+    "public_train": {
+      "annotation_associated_candidates_and_articles_not_original_source_metadata": 1075
+    },
+    "public_validation": {
+      "annotation_associated_candidates_and_articles_not_original_source_metadata": 230
+    },
+    "restricted_fixed_dev": {
+      "claim_only_source_unknown_gold_evidence_keys_not_used": 154
+    },
+    "scifact_dev": {
+      "cited_doc_metadata_not_original_claim_paper_origin": 300
+    }
+  },
+  "source_union_links_all": 7795,
+  "source_worktree_dirty": false,
+  "target": "scifact_dev",
+  "target_claims_connected_by_consumed_track": {
+    "authored_consumed": 0,
+    "public_train": 0,
+    "public_validation": 0,
+    "restricted_fixed_dev": 0
+  },
+  "target_claims_connected_to_consumed": 0,
+  "target_unchanged": true,
+  "thresholds": {
+    "claim_token_jaccard": 0.8,
+    "document_token_jaccard": 0.9
+  }
+}
