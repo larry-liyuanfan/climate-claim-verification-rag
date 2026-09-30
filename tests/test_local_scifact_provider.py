@@ -406,7 +406,8 @@ def test_inherits_loader_initialization_and_rejects_environment_override(
 
 def test_generation_parity_except_renderer_env_guard_and_effective_config_receipt():
     old = inspect.getsource(LocalQwenV3Provider.generate)
-    expected = old.replace("render_v3_prompt(", "render_scifact_prompt(")
+    expected = old.replace("render_v3_prompt(self.base.tokenizer, observation, schema)", "self.render(observation, schema)")
+    expected = expected.replace("JsonSchemaParser(schema,", "JsonSchemaParser(self.decoder_schema(schema),")
     expected = expected.replace(
         "        from lmformatenforcer import JsonSchemaParser",
         "        require_clean_grammar_environment()\n        from lmformatenforcer import JsonSchemaParser",

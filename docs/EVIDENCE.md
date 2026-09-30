@@ -1,5 +1,17 @@
 # Evidence and claim boundaries
 
+## 2026-10-01 component provider/operator CPU package
+
+[Implementation and boundaries](SCIFACT_COMPONENT_EXECUTION_CPU_20261001.md):
+real provider adapter and separate worker/scorer/operator are implemented but
+not executed with model weights. The frozen 426ff73 preparation and 33 inputs
+remain unchanged. Numeric-enum decoding is relaxed in a separately hashed copy;
+the original output parser still rejects invalid IDs/duplicates/nonempty abstain.
+Costs, unknown attempts and stopped planned slots remain in all denominators.
+Synthetic grammar/token paths and software fixtures are not quality results.
+The whole-input 6/9 candidate coverage must not be replaced by a valid-output
+subset's pool coverage. No resume promotion or new model/data job follows.
+
 ## 2026-10-01 Stage A CPU component contract
 
 [Implementation/limits](SCIFACT_COMPONENT_PREPARATION_20261001.md): separate

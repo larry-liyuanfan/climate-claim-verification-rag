@@ -2,6 +2,13 @@
 
 ## Latest implementation: component diagnosis, CPU-only
 
+The [versioned provider/operator](docs/SCIFACT_COMPONENT_EXECUTION_CPU_20261001.md)
+now connects these frozen inputs to a single-attempt 4+33 call plan, private
+wire/cost journaling and a separate post-exit scorer. A local decoder compatibility
+fix restores tested legal numeric-array paths without changing the original
+prompt/schema; invalid IDs still fail the canonical contract, with no retry.
+This remains **CPU preparation**, not a component model result or GPU release.
+
 The [Stage A preparation contract](docs/SCIFACT_COMPONENT_PREPARATION_20261001.md)
 separates document screening, document relation and oracle-conditioned rationale
 selection on the same twelve already-consumed claims. Full abstracts, independent

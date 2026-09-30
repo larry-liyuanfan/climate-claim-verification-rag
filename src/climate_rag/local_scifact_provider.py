@@ -1,7 +1,7 @@
 """SciFact-specific Qwen/LMFE provider; serial offline only, never a dev runner.
 
 Inherits verified loading/hash checks/private quotas from frozen v3. Generation
-is a narrow versioned copy because its renderer is hard-coded; parity is tested.
+shares a renderer hook with prompt counting; default SciFact parity is tested.
 """
 
 from __future__ import annotations
@@ -48,10 +48,16 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
         super().__init__(model_dir, manifest, private_dir=private_dir, device=device)
         self.name = self.base.name + ":" + PROTOCOL + ":lmfe0.11.3"
 
+    def render(self, observation: Mapping[str, Any], schema: Mapping[str, Any]) -> str:
+        return render_scifact_prompt(self.base.tokenizer, observation, schema)
+
+    def decoder_schema(self, schema: Mapping[str, Any]) -> dict[str, Any]:
+        return dict(schema)
+
     def count_prompt(
         self, observation: Mapping[str, Any], schema: Mapping[str, Any]
     ) -> int:
-        prompt = render_scifact_prompt(self.base.tokenizer, observation, schema)
+        prompt = self.render(observation, schema)
         return len(self.base.tokenizer.encode(prompt, add_special_tokens=False))
 
     def generate(
@@ -68,11 +74,11 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
         )
 
         begin = time.perf_counter()
-        parser = JsonSchemaParser(schema, config=fixed_grammar_config())
+        parser = JsonSchemaParser(self.decoder_schema(schema), config=fixed_grammar_config())
         prefix_fn = build_transformers_prefix_allowed_tokens_fn(
             self.tokenizer_data, parser
         )
-        prompt = render_scifact_prompt(self.base.tokenizer, observation, schema)
+        prompt = self.render(observation, schema)
         inputs = self.base.tokenizer(
             prompt, return_tensors="pt", add_special_tokens=False
         ).to(self.base.model.device)

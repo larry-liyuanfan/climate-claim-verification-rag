@@ -83,7 +83,7 @@ def localization(relation: dict[str, Any], rationale: dict[str, Any], screening:
 def denominator_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for row in rows:
         require(row.get("component") in {"screening", "relation", "rationale"}, "summary_component")
-        require(row.get("status") in {"valid", "preparation_gap", "schema_failed", "provider_failed"}, "summary_status")
+        require(row.get("status") in {"valid", "preparation_gap", "schema_failed", "provider_failed", "not_attempted_after_stop"}, "summary_status")
         if row["component"] == "relation":
             require(type(row.get("nei_control")) is bool, "relation_stratum_missing")
         if row["status"] == "valid":
@@ -93,6 +93,7 @@ def denominator_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         else:
             require("score" not in row, "failed_row_must_not_have_score")
         require(row["status"] != "preparation_gap" or not row.get("attempted", False), "preparation_gap_attempted")
+        require(row["status"] != "not_attempted_after_stop" or not row.get("attempted", False), "stopped_slot_attempted")
     def summarize(subset: list[dict[str, Any]]) -> dict[str, Any]:
         valid = sum(r["status"] == "valid" for r in subset)
         correct = sum(r["score"]["correct"] for r in subset if r["status"] == "valid")
@@ -100,6 +101,7 @@ def denominator_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "attempted": sum(r.get("attempted", False) for r in subset), "valid": valid,
                 "schema_failed": sum(r["status"] == "schema_failed" for r in subset),
                 "provider_failed": sum(r["status"] == "provider_failed" for r in subset),
+                "not_attempted_after_stop": sum(r["status"] == "not_attempted_after_stop" for r in subset),
                 "explicit_abstention": sum(r["score"]["explicit_abstention"] for r in subset if r["status"] == "valid"),
                 "correct": correct, "accuracy_given_valid": correct / valid if valid else None,
                 "task_success_all_planned": correct / len(subset) if subset else None}
