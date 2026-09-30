@@ -3,9 +3,15 @@
 2026-09-30 follow-up: a separately authorized [feedback-v2 development pilot](docs/AGENT_FEEDBACK_V2_DEVELOPMENT_20260930.md)
 adds action-discriminated schemas and charged validation feedback; it is not a
 reinterpretation of the frozen result below. CPU validation and CI passed; the
-single [pilot job31587302](docs/verified-runs/budget-agent-feedback-v2-submission-20260930.json)
-was submitted and initially pending resources. Real-model results are not yet claimed. No new holdout run,
+single [pilot job31587302](docs/BUDGET_AGENT_FEEDBACK_V2_CLOSEOUT_20260930.md)
+completed18 slots:15 final abstentions,3 repair exhaustions,0 accepted answers
+and0 model-selected tools. This is a negative development result. No new holdout run,
 training, grammar-decoding deployment or current-resume change is implied.
+
+Separately, the [original SciFact CPU preparation](docs/SCIFACT_GROUNDED_PROTOCOL_PROPOSAL_20260930.md)
+preserves sentence rationales, quarantines train/dev source-family overlap and
+cross-checks a new scorer against the official reference. No SciFact model
+evaluation has been run or released; its300 dev claims are not a new test claim.
 
 2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
 completed in job **31543304**, but did **not** demonstrate Agent quality: all
