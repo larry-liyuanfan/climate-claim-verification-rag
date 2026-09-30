@@ -78,5 +78,21 @@ quotas/logs, inherited initialization, environment rejection, generation-source
 parity, default no-model CLI, core token prefix, and count-failure cost retention.
 No real HF model generation, official dev/train data or new Slurm job is used.
 
-Cached-tokenizer smoke results will be recorded separately after this code is
-frozen; CPU fixture pass is not a substitute for future allocated HF verification.
+### Frozen CPU receipts
+
+Implementation SHA `9a426fa968600f8c635dd403e1bc70f8526811f9` was clean at execution.
+The [cached-tokenizer receipt](verified-runs/scifact-provider-tokenizer-smoke-20260930.json)
+records three successful A/B/A paths, each **680 input / 78 output tokens**;
+each same-structure cross-document and stale-document negative was rejected.
+Prefix setup took 1.460 seconds locally (one run, not a throughput benchmark).
+This exercised LMFE core with the real frozen tokenizer, **zero model calls**,
+no weights, and no HF/Torch generation/prefix bridge.
+
+A fresh `git archive` of that SHA passed all 16 provider fixtures. Full CI
+[36671369080](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36671369080)
+passed **462 tests, 1 optional skip**, Ruff, source mypy (49 files), and the
+tracked secret/PII scan; companion CI36671373614 also passed. The CPU evidence
+does not validate arbitrary-input grammar behavior, real-model SciFact output,
+scientific quality, autonomous tool selection, or official dev performance.
+The earlier frozen v3 model run uses a different terminal and remains separately
+reported; its success cannot be substituted for this adapter's allocated HF check.
