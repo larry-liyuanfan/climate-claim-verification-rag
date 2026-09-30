@@ -156,3 +156,21 @@ and its `f6f386...` hash: that is the old `scifact_train_diagnostic.sbatch`, **n
 the submission entry point**. Use only the separately guarded paired wrapper
 `hpc/scifact_bounded_pair.sbatch` / remote `scifact-bounded-pair-8275b87c.sbatch`,
 SHA `8275b87c94c5862f410e6b2318f4c3f5e129b3bbb829a863d614544234ec313a`.
+
+### Subsequent coordinator-authorized GPU submission
+
+The CPU-only statements above describe the completed preparation package.
+A separate [release receipt](verified-runs/scifact-bounded-pair-release-20260930.json)
+was saved before submission. At 2026-09-30 21:09:03 Sydney time, the owner submitted
+exactly two jobs against frozen execution source `b248fe7`: **31686182** (F, 48
+slots), then **31686183** (F+G, 48 slots) with `afterok:31686182`. The [actual
+submission receipt](verified-runs/scifact-bounded-pair-submission-31686182-31686183.json)
+binds source/assets/protocol/wrapper hashes, unique logs and resources. It is
+distinct from the earlier test-only simulation ID.
+
+One bounded check at 21:09:18 Sydney time showed F running on `gpu-a100-short`
+and G pending on its dependency, each requesting 1 A100, 8 CPU, 32G and two hours;
+only F had an allocation. The scheduler selected QoS `normal`, Nice 0, without
+any QoS/Nice override. No other project was modified, no new monitor was created,
+and no interim results were read for tuning. Failures require diagnosis, not
+automatic resubmission. These are submission facts, not model-quality results.

@@ -1,0 +1,62 @@
+{
+  "schema_version": "scifact-bounded-gpu-release-v1",
+  "release_id": "climate-scifact-bounded-gap-pair-20260930-v1",
+  "state": "authorized_not_yet_submitted",
+  "authorized_by": "career coordinator thread 01a0100e-bf1f-7be2-9d33-76dba7418070; explicit GPU RELEASE after CPU acceptance",
+  "execution_source_git": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+  "source_tar_sha256": "dbc3ef071b4144934f568fa728a51ac3f07e770c0a9acf3a83e17861279a7bbb",
+  "paired_wrapper_sha256": "8275b87c94c5862f410e6b2318f4c3f5e129b3bbb829a863d614544234ec313a",
+  "paired_protocol_sha256": "4cc5033928a0833ee99ad64ecd5a7b10c7a1fde7ac4f219d6334d2349d9daaf6",
+  "closeout_receipt": "scifact-bounded-cpu-closeout-20260930.json",
+  "documentation_head_before_release": "6d09a51b4e078549ee653744dc443a7c4b2fe371",
+  "actual_execution_is_not_documentation_head": true,
+  "scope": {
+    "arms": [
+      "format_repaired",
+      "format_repaired_gap"
+    ],
+    "slots_per_arm": 48,
+    "slots_total": 96,
+    "dependency": "G afterok F actual job id",
+    "gpu_per_arm": "A100:1",
+    "cpu_per_arm": 8,
+    "memory_per_arm": "32G",
+    "time_per_arm": "02:00:00",
+    "max_concurrent_allocations_this_package": 1,
+    "model_training": false,
+    "dev300_or_retired_test": false,
+    "inter_arm_changes": false,
+    "additional_models_or_budget": false,
+    "automatic_retry": false,
+    "new_polling_automation": false
+  },
+  "submission_idempotency": {
+    "lock_directory": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/climate-scifact-bounded-gap-pair-20260930-v1.submission-lock",
+    "exclusive_mkdir_required": true,
+    "repeat_on_uncertain_response": false,
+    "recovery": "Inspect exact release comments/stdout paths and Slurm records; retain lock and failed directories."
+  },
+  "quota_snapshot": {
+    "observed_utc": "2026-09-30T11:06:41Z",
+    "exact_name_duplicates": 0,
+    "arm_result_directories": "both absent",
+    "association_query": "punim2936|[login-redacted]||fos,normal,publiccpu,publicgpu|||||",
+    "qos_query": "fos|||||",
+    "interpretation": "Selected association/QoS user limits are blank (not evidence of unrestricted effective capacity); existing unrelated shared-account allocations are preserved and actual scheduler admission remains authoritative.",
+    "shared_account_usage_aggregate_only": {
+      "pending_gpu4": 1,
+      "running_gpu1": 3,
+      "running_gpu4": 3
+    },
+    "filesystem_available": "275G",
+    "filesystem_total": "467G",
+    "qos_or_nice_changed": false
+  },
+  "preserved_boundaries": [
+    "Four real-HF synthetic preflight calls precede official train inference in each frozen runner.",
+    "No inter-arm result-guided edits, sample reselection or model/budget expansion.",
+    "Gold and row-level raw wire remain on Spartan; only reviewed compact reports may be published.",
+    "A submitted job is not a completed experiment or a positive model result.",
+    "Legacy packager wrapper f6f386 is excluded."
+  ]
+}

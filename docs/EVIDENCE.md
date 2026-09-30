@@ -6,10 +6,13 @@
 r2 negative outcome and repairs invalid generation prefixes without rewriting
 answers. It records actual full-sentence/preview hashes, separates proposals
 from executed tools, and refuses incomparable initial contexts. The 96-slot
-F/F+G protocol is CPU-prepared as two serial batches, not submitted. Full CPU
-suite: 587 passed/one Windows POSIX skip; seventeen pinned-tokenizer synthetic
-cases and two exact-token-set differential probes passed. No model-quality,
-Agent benefit, new holdout, online SLA or resume improvement is inferred.
+F/F+G protocol is frozen as two serial batches. Full local CPU suite: 587 passed/
+one Windows POSIX skip; final Linux CI with CPU Torch: 588 passed/zero skips.
+Seventeen pinned-tokenizer synthetic cases and two exact-token-set differential
+probes passed. After separate coordinator release, [jobs 31686182 and 31686183](verified-runs/scifact-bounded-pair-submission-31686182-31686183.json)
+were submitted with an afterok dependency; at 2026-09-30 11:09:18 UTC, F was
+running and G dependency-pending. No completed paired model result, Agent benefit,
+new holdout, online SLA or resume improvement is inferred from this submission.
 
 ## 2026-09-30 SciFact train diagnostic: no Agent-quality promotion
 
