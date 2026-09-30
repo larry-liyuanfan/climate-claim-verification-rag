@@ -5,7 +5,7 @@ import os
 import urllib.error
 import urllib.request
 from collections.abc import Sequence
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from .fusion import build_candidate_features
 from .models import RankedDocument
@@ -135,7 +135,11 @@ class Qwen3CausalLMReranker:
         try:
             import torch
             ensure_torch_pytree_compat()
-            from transformers import AutoModelForCausalLM, AutoTokenizer
+            from transformers import AutoModelForCausalLM
+            if TYPE_CHECKING:
+                from transformers.models.auto.tokenization_auto import AutoTokenizer
+            else:
+                from transformers import AutoTokenizer
         except ImportError as exc:
             raise RuntimeError("torch and transformers>=4.51 are required for Qwen3 reranking") from exc
         self.name = model_name

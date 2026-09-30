@@ -5,7 +5,7 @@ injected parameters is not evidence that a checkpoint was actually restored.
 """
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any
 
 import numpy as np
@@ -55,7 +55,9 @@ def load_verified_lora(auto_model: Any, adapter_path: str) -> tuple[Any, dict[st
     config.inference_mode = True
     # Generic wrapper: the served model is Qwen3Model, not Qwen3ForCausalLM.
     model = PeftModel(auto_model, config)
-    expected = get_peft_model_state_dict(model, save_embedding_layers=False)
+    # PEFT 0.15.2 leaves this callable unannotated; runtime identity is unchanged.
+    get_state: Callable[..., dict[str, Any]] = get_peft_model_state_dict
+    expected = get_state(model, save_embedding_layers=False)
     saved = load_peft_weights(adapter_path, device="cpu")
     aligned, remapped = align_adapter_state(saved, expected)
     for key, value in aligned.items():
@@ -67,7 +69,7 @@ def load_verified_lora(auto_model: Any, adapter_path: str) -> tuple[Any, dict[st
         raise ValueError(
             f"adapter restoration mismatch: {missing_lora}; {loaded.unexpected_keys}"
         )
-    restored = get_peft_model_state_dict(model, save_embedding_layers=False)
+    restored = get_state(model, save_embedding_layers=False)
     if set(restored) != set(aligned):
         raise ValueError("restored adapter key set changed")
     for key, value in restored.items():

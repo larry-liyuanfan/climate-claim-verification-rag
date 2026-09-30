@@ -7,7 +7,7 @@ import importlib.metadata
 import json
 import time
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import ValidationError
 
@@ -121,7 +121,11 @@ class LocalQwenDecisionProvider:
 
         ensure_torch_pytree_compat()
         import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers import AutoModelForCausalLM
+        if TYPE_CHECKING:
+            from transformers.models.auto.tokenization_auto import AutoTokenizer
+        else:
+            from transformers import AutoTokenizer
 
         self._torch = torch
         self.name = "local-qwen:" + self.model_sha256
@@ -195,11 +199,16 @@ def preflight_local_dependencies(model_dirs: list[Path]) -> dict[str, Any]:
 
     ensure_torch_pytree_compat()
     import torch
-    from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+    from transformers import AutoModelForCausalLM
+    if TYPE_CHECKING:
+        from transformers.models.auto.configuration_auto import AutoConfig
+        from transformers.models.auto.tokenization_auto import AutoTokenizer
+    else:
+        from transformers import AutoConfig, AutoTokenizer
 
     # Force Qwen3's lazy Python imports now, not during a later paid allocation.
     from transformers.models.qwen3.modeling_qwen3 import Qwen3ForCausalLM
-    assert Qwen3ForCausalLM and AutoModelForCausalLM
+    assert all((Qwen3ForCausalLM, AutoModelForCausalLM))
     for model_dir in model_dirs:
         config = AutoConfig.from_pretrained(str(model_dir), local_files_only=True, trust_remote_code=False)
         if config.model_type != "qwen3":
