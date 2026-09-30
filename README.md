@@ -1,5 +1,11 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+2026-09-30 follow-up: a separately authorized [feedback-v2 development pilot](docs/AGENT_FEEDBACK_V2_DEVELOPMENT_20260930.md)
+adds action-discriminated schemas and charged validation feedback; it is not a
+reinterpretation of the frozen result below. CPU implementation is under
+validation; real-model pilot results are not yet claimed. No new holdout run,
+training, grammar-decoding deployment or current-resume change is implied.
+
 2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
 completed in job **31543304**, but did **not** demonstrate Agent quality: all
 120 task/route slots ran; **0 answers passed mechanical checks**, 105 outputs

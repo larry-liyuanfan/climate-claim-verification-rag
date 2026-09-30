@@ -13,7 +13,7 @@ from typing import Any
 PRIVATE_RESPONSE_LIMIT_BYTES = 32768
 PRIVATE_TOTAL_LIMIT_BYTES = 1048576
 SAFE_FIELDS = {"action", "reason", "evidence_assessment", "query", "label",
-               "statements", "text", "evidence_id", "quote"}
+               "statements", "text", "evidence_id", "quote", "rewrite", "rerank", "answer", "abstain"}
 
 
 def schema_error_locations(errors: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:

@@ -162,12 +162,25 @@ def main() -> int:
     agent = BudgetedEvidenceAgent(lambda query: tool.invoke({"claim_text": query}),
                                  provider, budget=budget, reranker=reranker)
     runs: list[dict[str, Any]] = []
+    code_sha, dirty = code_identity()
     with tracing_context(enabled=False):
         for task in protocol[args.phase]:
             for strategy in protocol["strategies"]:
+                if (budget.controller_protocol == "feedback-v2"
+                        and isinstance(provider, LocalQwenDecisionProvider) and private_path):
+                    # One bounded owner-only directory per row preserves <=5
+                    # attempts without the historical 32-files-per-study cap.
+                    row_key = hashlib.sha256(json.dumps([task["id"], strategy]).encode()).hexdigest()
+                    row_private = Path(private_path) / row_key
+                    row_private.mkdir(mode=0o700)
+                    provider.private_response_dir = row_private
                 runs.append({"task_id": task["id"], **agent.run(
                     {"claim_text": task["claim_text"]}, strategy=strategy)})
-    code_sha, dirty = code_identity()
+                if budget.controller_protocol == "feedback-v2":
+                    write_json(args.output.with_suffix(".progress.json"), {
+                        "status": "partial_not_resumable", "code_sha": code_sha,
+                        "protocol_sha256": sha(args.protocol), "completed_slots": len(runs),
+                        "expected_slots": len(protocol[args.phase]) * len(protocol["strategies"]), "runs": runs})
     write_json(args.output, {
         "code_sha": code_sha, "working_tree_dirty": dirty,
         "protocol_sha256": sha(args.protocol), "corpus_sha256": sha(args.evidence),
@@ -177,7 +190,8 @@ def main() -> int:
         "dense_enabled": dense is not None, "budget": budget.model_dump(),
         "dense_file_hashes": dense_hashes,
         "execution_manifest": execution,
-        "prompt_identity": agent_prompt_identity() if args.provider == "local-qwen" else None,
+        "prompt_identity": agent_prompt_identity(budget.controller_protocol)
+        if args.provider == "local-qwen" else None,
         "neural_work_accounting": {
             "dense_query_attempts": sum(row["retrieval_calls"] for row in runs) if dense else 0,
             "reranker_pair_attempts": sum(row["rerank_candidate_pairs"] for row in runs)
