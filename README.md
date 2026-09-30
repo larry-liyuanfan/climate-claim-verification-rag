@@ -28,10 +28,13 @@ synthetic fixtures, no real-data quality result or external-dev release.
 A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
 adds explicit candidate reading, actual-visible-sentence citation constraints,
 budgeted prompt assembly and opt-in grammar decoding. Fixtures/tokenizer smoke
-are not model-quality evidence. The [single development job31601753](docs/AGENT_V3_PILOT_PREPARATION_20260930.md)
-is submitted on frozen code `e6d1ee1` and was still pending at14:23+10;
-it runs only synthetic preflight and already-consumed authored prompts.
-External-dev evaluation is not released; no new model-quality result exists yet.
+are not model-quality evidence. The [frozen job31601753 closeout](docs/AGENT_V3_PILOT_CLOSEOUT_20260930.md)
+contains 24 complete slots on six already-consumed authored prompts. Mechanical
+answer acceptance was 4/6 retrieval, 5/6 rerank, 6/6 deterministic-extra and 4/6
+adaptive; **adaptive selected zero tools**, and duplicate-reference repairs made
+no progress. An irrelevant empty-query rewrite also produced a mechanically valid
+answer, showing why these counts are not scientific accuracy or Agent gains.
+External-dev evaluation remains unreleased; raw responses stay on Spartan.
 
 2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
 completed in job **31543304**, but did **not** demonstrate Agent quality: all
