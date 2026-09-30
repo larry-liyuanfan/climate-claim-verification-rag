@@ -11,7 +11,8 @@ training, grammar-decoding deployment or current-resume change is implied.
 Separately, the [original SciFact CPU preparation](docs/SCIFACT_GROUNDED_PROTOCOL_PROPOSAL_20260930.md)
 preserves sentence rationales, quarantines train/dev source-family overlap and
 cross-checks a new scorer against the official reference. No SciFact model
-evaluation has been run or released; its300 dev claims are not a new test claim.
+evaluation has completed; only the separately authorized train diagnostic below
+is queued. Its300 dev claims remain unreleased, not a new test claim.
 The [cross-dataset CPU identity audit](docs/CROSS_DATASET_IDENTITY_AUDIT_20260930.md)
 found no matches or graph connections to consumed Climate tracks under fixed
 lexical/source rules. Missing source mappings remain unknown; this is not proof
@@ -19,8 +20,8 @@ of independence, and no old test text or labels were reopened.
 The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
 supports document-specific labels and ordered original-sentence references.
 The [local Qwen/LMFE provider](docs/SCIFACT_LOCAL_PROVIDER_CPU_20260930.md) is
-implemented with CPU/mocked-HF validation; real model execution and dev evaluation
-remain unreleased. Synthetic contract tests are not model-quality evidence.
+implemented with CPU/mocked-HF validation; real execution is pending in the train
+diagnostic, while dev evaluation remains unreleased. Synthetic tests are not quality evidence.
 The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
 recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
 synthetic fixtures, no real-data quality result or external-dev release.
@@ -29,6 +30,12 @@ audits actual packed visibility, then freezes12 component-distinct train cases
 across four opportunity strata. Inference/gold bundles are separate;48 future
 slots are prepared with0 model generations. This is biased train diagnosis,
 not a new benchmark result or authorization to evaluate the300-dev split.
+The separately authorized job31620529 is queued; its submission does not imply
+successful inference or quality. In parallel, the isolated
+[evidence-gap decision candidate](docs/EVIDENCE_GAP_CANDIDATE_CPU_20260930.md)
+adds an explicit gap/state wire and visibility feedback, with CPU-only validation.
+It is untrained engineering inspired by Self-RAG/CRAG, not a reproduction or gain.
+It leaves the queued job unchanged and has no automatic real-data release.
 
 A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
 adds explicit candidate reading, actual-visible-sentence citation constraints,
