@@ -88,3 +88,26 @@ After complete tests, lint/types, clean-source reproduction and an independent
 review of the new hashes, use `sbatch --test-only` before any submission. Only
 the coordinator may release the new attempt. Preserve the original resource
 shape and experiment configuration; do not add a competing or automatic retry.
+
+## Verified repair package (17:39 +10)
+
+Frozen source `80fcd07faed28890b70096386c5897f0343d3104` passed the 32 new
+synthetic regressions and a clean LF-checkout full run: **515 passed, 2 local
+skips** (optional Torch; POSIX-specific ownership on Windows), Ruff, mypy54,
+shell syntax and tracked secret/PII scan. The clean checkout reused the existing
+validation venv with an explicit checkout `src` path; it was not a fresh dependency
+installation. Its independently repackaged tar was byte-identical. GitHub
+[CI36684713686](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36684713686)
+also passed for that exact source.
+
+New archive SHA256 is `3c3c80d8dbcd3cdfce4bd2a711e0c9a5e23b74fc9c967daf960554f114ee6646`
+(2,201,600 bytes; 321 regular files / 12 directories), wrapper SHA256
+`f6f3868262dadc81d0d6ececa068dbafddf29eb687af27fa6d90f25edf454f2f`.
+Spartan independently passed all archive/path/protocol hashes, marker and wrapper
+guards, and shell syntax. `sbatch --test-only` succeeded at17:39:04+10;
+simulation ID31644047 and estimated start2026-10-06 04:15+10 are **not a submitted
+job or promised schedule**. Neither the r2 lock nor result directory was created.
+The content-free [receipt](verified-runs/scifact-startup-r2-preflight-20260930.json)
+records the exact 13 explicitly set CLIMATE variables; no environment dump,
+dependency installation, sampling or model call was performed. Await coordinator
+review before the first infrastructure retry.

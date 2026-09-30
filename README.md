@@ -17,8 +17,8 @@ training, grammar-decoding deployment or current-resume change is implied.
 
 Separately, the [original SciFact CPU preparation](docs/SCIFACT_GROUNDED_PROTOCOL_PROPOSAL_20260930.md)
 preserves sentence rationales, quarantines train/dev source-family overlap and
-cross-checks a new scorer against the official reference. No SciFact model
-evaluation has been run or released; its300 dev claims are not a new test claim.
+cross-checks a new scorer against the official reference. The train job above
+failed before inference; its300 dev claims remain unreleased, not a new test claim.
 The [cross-dataset CPU identity audit](docs/CROSS_DATASET_IDENTITY_AUDIT_20260930.md)
 found no matches or graph connections to consumed Climate tracks under fixed
 lexical/source rules. Missing source mappings remain unknown; this is not proof
@@ -26,8 +26,8 @@ of independence, and no old test text or labels were reopened.
 The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
 supports document-specific labels and ordered original-sentence references.
 The [local Qwen/LMFE provider](docs/SCIFACT_LOCAL_PROVIDER_CPU_20260930.md) is
-implemented with CPU/mocked-HF validation; real model execution and dev evaluation
-remain unreleased. Synthetic contract tests are not model-quality evidence.
+implemented with CPU/mocked-HF validation; no SciFact model result is available,
+and dev evaluation remains unreleased. Synthetic tests are not model-quality evidence.
 The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
 recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
 synthetic fixtures, no real-data quality result or external-dev release.
