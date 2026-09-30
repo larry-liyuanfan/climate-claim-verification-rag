@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import random
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +22,9 @@ from climate_rag.scifact_grounding_eval import audit_arm, evaluate_arm, score_ar
 from climate_rag.scifact_grounding_sft import (
     CONFIG, advancement, canonical_context, config_sha, require, token_record, training_steps,
 )
-from climate_rag.scifact_semantic_contract import MODEL_SHA, checked, encoded, sha, write_once
+from climate_rag.scifact_semantic_contract import MODEL_SHA, checked, encoded, sha
+from climate_rag.component_execution import durable as write_once
+from climate_rag.torch_compat import ensure_torch_pytree_compat
 
 
 def load_bundle(bundle: Path, digest: str) -> tuple[dict[str, Any], dict[int, Any]]:
@@ -35,6 +39,7 @@ def load_bundle(bundle: Path, digest: str) -> tuple[dict[str, Any], dict[int, An
 def release_check(args: Any, purpose: str) -> dict[str, Any]:
     require(bool(args.release and args.release_sha), "separate_execution_release_required")
     release = json.loads(checked(args.release, args.release_sha))
+    require(release.get("authorization") == "coordinator_exact_hash_release", "draft_not_authorized")
     require(release["purpose"] == purpose and release["config_sha256"] == config_sha()
             and release["data_manifest_sha256"] == args.data_sha
             and release["output"] == str(args.output.resolve()), "release_identity")
@@ -55,6 +60,7 @@ def model_manifest(path: Path) -> dict[str, str]:
 def restore_causal_adapter(base: Any, path: Path) -> tuple[Any, dict[str, Any]]:
     """CausalLM-specific exact tensor restoration; not the dense bare-model loader."""
     import torch
+    ensure_torch_pytree_compat()
     from peft import PeftConfig, PeftModel
     from peft.utils.save_and_load import get_peft_model_state_dict, load_peft_weights
     settings = PeftConfig.from_pretrained(str(path))
@@ -84,6 +90,7 @@ def train(args: Any) -> None:
     write_once(args.output / "started.json", {"config": CONFIG, "data_manifest_sha256": args.data_sha,
                                              "records": len(rows), "expected_steps": expected_steps})
     import torch
+    ensure_torch_pytree_compat()
     from peft import LoraConfig, get_peft_model
     from climate_rag.local_agent_model import LocalQwenDecisionProvider
     torch.manual_seed(CONFIG["seed"])
@@ -105,10 +112,16 @@ def train(args: Any) -> None:
     losses: list[float] = []
     steps = 0
     width = CONFIG["gradient_accumulation"]
+    torch.cuda.synchronize()
+    fit_started = time.perf_counter()
+    first_started = fit_started
     for offset in range(0, len(order), width):
         if steps == CONFIG["max_optimizer_steps"]:
             break
         chunk = order[offset:offset + width]
+        write_once(args.output / f"step-{steps + 1:02d}-started.json", {
+            "planned_record_indices_sha256": sha(encoded(chunk)), "planned_records": len(chunk),
+            "completed_prior_steps": steps, "started_unix": time.time()})
         optimizer.zero_grad(set_to_none=True)
         for index in chunk:
             row = rows[index]
@@ -124,10 +137,30 @@ def train(args: Any) -> None:
             require(bool(torch.isfinite(loss)), "nonfinite_training_loss")
             losses.append(float(loss.detach().cpu()))
             (loss / len(chunk)).backward()
-        torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], 1.0)
+        torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad],
+                                      1.0, error_if_nonfinite=True)
         optimizer.step()
         steps += 1
+        if steps == 1:
+            torch.cuda.synchronize()
+            import resource
+            # POSIX-only runtime; Windows type stubs omit these attributes.
+            posix_resource: Any = resource
+            device = torch.cuda.get_device_properties(model.device)
+            write_once(args.output / "first-step-pilot.json", {
+                "optimizer_steps": steps, "records_seen": len(chunk),
+                "counted_in_full_epoch": True, "optimizer_reinitialized": False,
+                "elapsed_seconds": time.perf_counter() - first_started,
+                "finite_losses": all(math.isfinite(x) for x in losses),
+                "gpu_name": device.name, "gpu_total_memory_bytes": device.total_memory,
+                "gpu_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+                "host_maxrss_kib_linux": posix_resource.getrusage(posix_resource.RUSAGE_SELF).ru_maxrss,
+                "first_group_record_indices_sha256": sha(encoded(chunk)),
+                "remaining_optimizer_steps": expected_steps - steps,
+                "projection_is_not_measured_full_runtime": True,
+            })
     require(steps == expected_steps and len(losses) == len(rows), "one_epoch_step_ceiling")
+    check_finite_adapter(model)
     final = args.output / "final"
     model.save_pretrained(final, safe_serialization=True)
     hashes = {p.name: sha(p.read_bytes()) for p in final.iterdir() if p.is_file()}
@@ -135,8 +168,15 @@ def train(args: Any) -> None:
         "data_manifest_sha256": args.data_sha, "optimizer_steps": steps,
         "records_seen_once": len(losses), "losses": losses,
         "adapter_files": hashes, "checkpoint_policy": "final_only",
+        "fit_elapsed_seconds": time.perf_counter() - fit_started,
         "max_memory_allocated_bytes": torch.cuda.max_memory_allocated(),
         "training_is_not_quality_evidence": True})
+
+
+def check_finite_adapter(model: Any) -> None:
+    import torch
+    require(all(bool(torch.isfinite(p).all()) for p in model.parameters() if p.requires_grad),
+            "nonfinite_final_adapter")
 
 
 def evaluate(args: Any) -> None:
@@ -177,7 +217,7 @@ def evaluate(args: Any) -> None:
 
 def terminate_inference(output: Path, partition: str, data_sha: str, adapter_sha: str) -> None:
     """Preserve partial runs and unattempted arm; no fabricated zero-cost calls."""
-    arms = {}
+    arms: dict[str, dict[str, Any]] = {}
     for arm in ("base", "adapted"):
         path = output / arm / "complete.json"
         root = output / arm
@@ -243,6 +283,7 @@ def main() -> None:
         execution = args.output.with_name(args.output.name + "-execution")
         execution.mkdir(mode=0o700)
         with (execution / "worker.log").open("xb") as log:
+            worker_started = time.time()
             child = subprocess.Popen([sys.executable, *sys.argv, "--worker"], stdout=log, stderr=log)
             try:
                 code = child.wait(timeout=bound)
@@ -251,6 +292,8 @@ def main() -> None:
                 code = child.wait()
         terminated = args.output / "inference-terminated.json"
         write_once(execution / "worker-exit.json", {"child_reaped": True, "returncode": code,
+            "started_unix": worker_started, "ended_unix": time.time(),
+            "job_id": os.environ.get("SLURM_JOB_ID"),
             "terminated_sha256": sha(terminated.read_bytes()) if terminated.exists() else None,
             "release_sha256": args.release_sha, "data_manifest_sha256": args.data_sha})
         if code:

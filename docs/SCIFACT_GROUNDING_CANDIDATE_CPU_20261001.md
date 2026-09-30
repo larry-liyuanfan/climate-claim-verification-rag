@@ -192,3 +192,53 @@ A separately authorized allocation-based shape/timing pilot must establish those
 bounds and account for every real training step; formal walltime should then use
 measured time plus margin. No pilot, job, `sbatch --test-only`, generation or training
 was run by this CPU package. No automatic duplicate training/replay is authorized.
+
+## Follow-up execution readiness (CPU only)
+
+The separately bounded readiness package has now installed and imported the
+Linux overlay on the existing Torch 2.1.2 module. See the
+[installation receipt](verified-runs/scifact-grounding-linux-install-20261001.json),
+[successful import receipt](verified-runs/scifact-grounding-linux-imports-20261001.json)
+and [`hpc/grounding_training_deps.lock`](../hpc/grounding_training_deps.lock).
+PEFT 0.15.2, Accelerate 1.6.0, Transformers 4.51.3, tokenizers 0.21.4,
+safetensors 0.5.3, LMFE 0.11.3 and interegular 0.3.3 import successfully.
+An isolated NumPy 1.24.4 layer resolves the inherited SciPy 1.8.1 warning;
+the final Linux probe has no stderr and no dependency errors. Torch and all
+shared packages are untouched. Qwen3ForCausalLM was imported, not instantiated.
+
+The private final receipt bytes SHA is
+`9878d3e4d45735828b4260d87656fd2827481663266a875725bfe7abab7d390a`.
+Its complete 11,186-file overlay/inherited-site manifest SHA is
+`8d231f4980e0bf94fe26273074588a0f6c0ea67646117871fd97443ad1142697`.
+The actual directory is `envs/grounding-training-deps-20261001` beneath the
+Climate project root. Its ordered `numeric-site` / `site` plus the two reused
+dependency sites are checked file-for-file before allocated model loading.
+The system Torch/SciPy modules are identified by module/version, not claimed
+as fully hashed operating-system images. CPU token preparation remains unchanged.
+
+The new training-only wrapper requests **one A100, four CPUs, 32 GiB host RAM,
+30 GiB job scratch and a 30-minute Slurm cap**; the worker cap is 25 minutes.
+`sinfo` exposes `gpu:A100:4`, 32 CPUs and 514,917 MiB host memory per node in
+the selected partitions, but not GPU memory. No 80-GiB GPU constraint or verified
+GPU size is claimed. These bounds are reviewed resource caps, not measured
+training time. The first real optimizer step on the fixed first four shuffled
+records doubles as the in-allocation pilot: time, GPU identity/capacity/peak,
+host peak and finite losses are recorded, then the SAME optimizer/model state
+continues the remaining 23 steps. There is no separate/repeated pilot, reset,
+extra sample, best-checkpoint selection or evaluation call.
+
+Gradients are clipped with `error_if_nonfinite=True`; all trainable adapter
+parameters must be finite before final saving. Failed/OOM/timeout runs retain
+attempt markers, worker logs and whatever costs/progress are durable; they do
+not produce a success checkpoint/complete receipt or automatically retry. A
+NaN tensor fixture and a 96-record synthetic one-parameter fixture verify refusal
+and the exact once-only 24-step schedule. They are not real-model training.
+
+`hpc/scifact_grounding_train.sbatch` binds source archive/revision/wrapper and
+the release hash. `scripts/run_scifact_grounding_train_operator.py` rejects
+drafts, verifies the runtime tree, reserves one fixed allocation directory,
+extracts only the frozen generator in allocated scratch and launches `train`.
+It never invokes tune, validation or an answer generator. The draft uses
+`authorization: DRAFT_NOT_AUTHORIZED`; exact hashes require coordinator review
+and a separate release. CPU `sbatch --test-only` is scheduling validation only,
+not submission or proof that a job has started. No GPU job is submitted here.
