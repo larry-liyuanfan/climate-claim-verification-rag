@@ -18,7 +18,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install pinned validation dependencies
-        run: python -m pip install "numpy==1.26.4" -e ".[test,serve,ltr,dev,langchain]"
+        run: python -m pip install "numpy==1.26.4" -e ".[test,serve,ltr,dev,langchain,grammar]"
       - name: Lint and source type checks
         run: |
           python -m ruff check src scripts tests

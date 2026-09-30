@@ -13,6 +13,11 @@ preserves sentence rationales, quarantines train/dev source-family overlap and
 cross-checks a new scorer against the official reference. No SciFact model
 evaluation has been run or released; its300 dev claims are not a new test claim.
 
+A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
+adds explicit candidate reading, actual-visible-sentence citation constraints,
+budgeted prompt assembly and opt-in grammar decoding. Fixtures/tokenizer smoke
+are not model-quality evidence; no v3 GPU or external-dev run has been released.
+
 2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
 completed in job **31543304**, but did **not** demonstrate Agent quality: all
 120 task/route slots ran; **0 answers passed mechanical checks**, 105 outputs
