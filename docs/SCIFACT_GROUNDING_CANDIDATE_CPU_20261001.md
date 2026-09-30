@@ -383,3 +383,20 @@ This twelve-query, 58-document TRAIN-internal tune experiment has gold visible
 during preparation and all gold visible for its answerable queries. It cannot
 establish independent test generalization, full-corpus retrieval or autonomous
 Agent benefit. No resume or shared career materials are changed by this package.
+
+Exact source `d9924d2e9b8db5cce5949569a494c258434770aa` passed **340 related
+tests** in a clean Git source export (31.52 s), changed/reused entrypoint Ruff,
+strict mypy on the tune operator and grounding eval/SFT modules, the actual
+tune wrapper's own archive guard, Bash syntax and tracked secret scan.
+Three existing fixture/deprecation warnings are recorded, not suppressed.
+Actual Linux imports and all frozen dependency-file hashes passed with zero
+stderr; training receipt and physical adapter hashes still match.
+See [exact readiness receipt](verified-runs/scifact-grounding-tune-readiness-d9924d2.json).
+
+The project-directory `sbatch --test-only` returned zero. Its displayed
+reservation 31762198 is **not a submitted job**; the scheduler-clock start
+estimate is not a guaranteed ETA. The remote release remains a draft with SHA
+`274dbe6f38098a7bae19badf213470dfe350c4f75be9c5b89008b13f5a6da390`.
+This preparation used no model calls, official dev/test data, training replay,
+or actual GPU submission. Later documentation-only commits do not replace the
+frozen execution source or activate that draft.
