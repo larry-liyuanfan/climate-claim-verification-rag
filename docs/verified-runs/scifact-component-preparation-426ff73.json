@@ -1,0 +1,56 @@
+{
+  "coverage": {
+    "actual_candidate_documents": 60,
+    "components": {
+      "rationale": {
+        "max_input_tokens": 1150,
+        "min_input_tokens": 452,
+        "planned": 9,
+        "prepared": 9,
+        "statuses": {
+          "prepared": 9
+        }
+      },
+      "relation": {
+        "max_input_tokens": 1060,
+        "min_input_tokens": 401,
+        "planned": 12,
+        "prepared": 12,
+        "statuses": {
+          "prepared": 12
+        }
+      },
+      "screening": {
+        "max_input_tokens": 3019,
+        "min_input_tokens": 1844,
+        "planned": 12,
+        "prepared": 12,
+        "statuses": {
+          "prepared": 12
+        }
+      }
+    },
+    "gold_document_pool_coverage": 0.6666666666666666,
+    "gold_documents": 9,
+    "gold_documents_in_actual_pool": 6,
+    "model_calls": 0,
+    "nei_cited_context_controls": 3,
+    "new_claims_selected": 0,
+    "old_context_first3_complete_gold_documents": 6,
+    "requested_without_visible_documents": 0
+  },
+  "gpu_authorized": false,
+  "input_sha256": "84524e2a837aacab5824e5562a61d827ef02b1832dd9ab9f383ae73caa309ac9",
+  "model_calls": 0,
+  "official_dev_read": false,
+  "protocol_sha256": "2ce563ccc34efbd5ee1a21cf12fa47fafd063c853c629996909cb37e7247ca1e",
+  "remaining_train_read": false,
+  "run_sha256": {
+    "scifact-gap-original-v1": "557b7b8ddc7f4e40c1ac1abbe2abd68af37536427f3b106e9e0063e3f6ae746a",
+    "scifact-gap-semantic-policy-v1": "486f1c5866011e926b47fe2848189ce4c121213ab7fc86fc22a2c18ea68403f8"
+  },
+  "score_sha256": "5cee393c8d5c671def659885d12d3f663465cc633e4f6d0eab83c06fde07fa73",
+  "scoring_sha256": "a6d38d3fe9d72e6beb0b16836e650e4519d2016e31b63ed1d79e05999b665d9a",
+  "source_git": "426ff7343fb30e1ffcde4dfa4a43f1c00c210cfb",
+  "status": "CPU_prepared_not_model_evaluated"
+}

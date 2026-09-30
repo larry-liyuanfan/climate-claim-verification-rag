@@ -6,7 +6,10 @@ The [Stage A preparation contract](docs/SCIFACT_COMPONENT_PREPARATION_20261001.m
 separates document screening, document relation and oracle-conditioned rationale
 selection on the same twelve already-consumed claims. Full abstracts, independent
 schemas, alternative-aware scoring, source/prompt identities and durable failure
-costs are implemented and fixture-tested. No real component model evaluation,
+costs are implemented: 52 targeted tests pass in an exact-source clean checkout.
+Real-tokenizer preparation fits all 33 inputs; frozen screening candidates cover
+6/9 gold documents, with the remaining three recorded as candidate gaps.
+No real component model evaluation,
 new training/split or Agent improvement is claimed; the real provider remains
 disabled pending a separate exact-hash release.
 

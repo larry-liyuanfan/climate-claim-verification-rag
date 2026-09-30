@@ -91,7 +91,7 @@ python -m mypy --follow-imports=silent src/climate_rag/scifact_component_*.py sc
 
 The four CLI examples are **scripted synthetic fixtures**, using an explicitly
 labeled character counter, not Qwen tokenization or real-provider preflight.
-The 47-test targeted suite includes an end-to-end frozen-source preparation
+The 52-test targeted suite includes an end-to-end frozen-source preparation
 fixture and never reads real data or runs a model. Historical full-suite counts
 remain historical; they are not promoted to this revision.
 
@@ -112,6 +112,30 @@ exclusive. The public compact contains only explicit source hashes/counts,
 coverage and packing ranges, no identifiers or text. This package's real-input
 preparation state is recorded in the accompanying receipt, not inferred from
 the passing synthetic fixture.
+
+### Verified real-tokenizer preparation (source `426ff73`)
+
+The [compact](verified-runs/scifact-component-preparation-426ff73.json) binds
+source `426ff7343fb30e1ffcde4dfa4a43f1c00c210cfb` and the private frozen protocol
+`2ce563ccc34efbd5ee1a21cf12fa47fafd063c853c629996909cb37e7247ca1e`.
+All **33 planned inputs prepared**: screening 12, relation 12, rationale 9.
+Real complete-prompt token ranges are **1844–3019**, **401–1060** and
+**452–1150**, respectively. No clipping, replacement or over-budget case occurred.
+The sixty actual candidate-document occurrences cover **6 of 9** annotated gold
+documents; three absent documents are candidate gaps, not model omissions.
+All three official cited-context NEI controls are available. This measures input
+coverage only, not inference accuracy.
+
+The existing frozen runtime was SHA-verified, and only explicitly whitelisted
+tokenizer packages were unpacked into a unique CPU directory (no pip/download,
+shared-environment overwrite, Torch import or model weights). Actual interpreter
+Python 3.10.4; transformers 4.51.3, tokenizers 0.21.4, huggingface_hub 0.36.2,
+Jinja2 3.1.2, numpy 1.26.4, safetensors 0.8.0. The normal transformers warning that
+model frameworks are unavailable is expected under `USE_TORCH=0/USE_TF=0`.
+
+[Validation receipt](verified-runs/scifact-component-validation-20261001.json)
+records the exact source archive, clean-code 52-test reproduction and four
+scripted CLI fixtures. No component real-model evaluation was performed.
 
 ## Future release, hard stop
 

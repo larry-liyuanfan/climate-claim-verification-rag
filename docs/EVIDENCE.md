@@ -12,6 +12,15 @@ consumption, model training, Slurm submission or resume promotion is included.
 Real preparation/clean reproduction status belongs to the versioned receipt;
 passing synthetic cases does not establish real token-budget coverage.
 
+The [real-tokenizer compact](verified-runs/scifact-component-preparation-426ff73.json)
+now verifies 33/33 full-abstract inputs below the 8192-token limit: screening
+1844–3019, relation 401–1060, rationale 452–1150. Candidate gold coverage is 6/9,
+not model recall; all three cited-context NEI controls have usable sources.
+[Receipt](verified-runs/scifact-component-validation-20261001.json): exact source
+`426ff73`, 52 targeted tests in a clean archive, four scripted CLI fixtures,
+Ruff/type/secret checks; zero real model calls. No weights or new dependency
+download/install was needed for tokenizer-only preparation.
+
 ## 2026-09-30 semantic comparison: completed negative Agent result
 
 [Report](SCIFACT_SEMANTIC_CLOSEOUT_20260930.md) and
