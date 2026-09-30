@@ -1,0 +1,31 @@
+{
+  "schema_version": "sentence-id-v3-development-pilot",
+  "release_id": "climate-sentence-v3-20260930-pilot-r1",
+  "study_kind": "previously_consumed_authored_development_not_independent",
+  "official_gold_available": false,
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "document_count": 5240,
+  "budget": {
+    "candidate_k": 20, "context_k": 5, "max_calls": 5, "max_repairs": 2,
+    "max_tools": 5, "max_input_tokens": 8192, "max_output_tokens": 512,
+    "timeout_seconds": 120.0
+  },
+  "routes": ["fixed_retrieval", "fixed_rerank", "deterministic_extra", "adaptive"],
+  "tasks": [
+    {"id": "dev-ice", "claim_text": "Arctic sea ice has declined."},
+    {"id": "dev-multi", "claim_text": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide."},
+    {"id": "dev-empty", "claim_text": "zxqv_nonexistent_term_20260929"},
+    {"id": "dev-sea", "claim_text": "Sea level rise can result from both thermal expansion and melting land ice."},
+    {"id": "dev-number", "claim_text": "Atmospheric carbon dioxide was exactly 800 ppm in 2010."},
+    {"id": "dev-infrared", "claim_text": "The greenhouse effect depends on infrared radiation, not just incoming sunlight."}
+  ],
+  "predeclared": {
+    "primary_control": "adaptive versus fixed_rerank; deterministic_extra is an additional stronger work control",
+    "order": "task order then fixed route order; no shuffle/seed/model selection",
+    "sentence_mapping": "Each existing evidence-only row is one intact passage at sentence index0; no new sentence segmentation or official sentence-gold claim",
+    "preflight": "Synthetic forced read A/B/A plus one-token truncation; separate model cost, no gold or task-quality score",
+    "quality": "Mechanical acceptance and model-selected tool execution only; semantic correctness remains unmeasured until independent review",
+    "cost": "Equal caps, not equal actual cost; include failed generations, unknown output flags and rerank pairs",
+    "promotion": "No automatic promotion to SciFact dev, old frozen tests, production or resume gain"
+  }
+}
