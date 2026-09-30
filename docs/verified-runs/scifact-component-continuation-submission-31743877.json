@@ -1,0 +1,68 @@
+{
+  "schema": "component-technical-continuation-submission-v1",
+  "job_id": "31743877",
+  "release": "scifact-component-technical-continuation-20261001-v1",
+  "policy": "technical-preflight-semantic-measurement-v1",
+  "policy_sha256": "8c21a3a7e8b6fdee400c95f1117195a2733c6b344c01f0ca7321428ebd29c798",
+  "execution_source_git": "a104115ecc370223617ee3238fb7e5b24af526ea",
+  "source_archive_sha256": "ad9ebf177ca03cf5bf8e44c38ee4fa3aa2e28c92af0b0178672bdc8d160be0e1",
+  "wrapper_sha256": "28a4498de8fc2d59fc660e84f0d5a43eba51db157d3616277af6f17aa63c89bc",
+  "documentation_head_at_submission": "c5fb4205b11d3fd41572aae9a83034b0ca7e6ef1",
+  "cpu_probe_sha256": "5e5ff08022a41ee984aa885abbf5da15058ebb0482dde3fd9aac11511bf4b93f",
+  "submitted_utc": "2026-09-30T16:26:52.242071+00:00",
+  "submitted_australia_sydney": "2026-10-01T02:26:52.242071+10:00",
+  "submission_attempts": 1,
+  "test_only": {
+    "returncode": 0,
+    "checked_at_utc": "2026-09-30T16:26:52.176738+00:00",
+    "displayed_hypothetical_id": "31743876",
+    "displayed_start": "2026-10-05T06:37:56",
+    "hypothetical_id_is_not_a_submitted_job": true,
+    "estimate_is_not_guaranteed": true
+  },
+  "pre_submission": {
+    "fixed_run_root_absent": true,
+    "same_name_current_account_queue_empty": true,
+    "same_name_current_account_history_since_2026_10_01_empty": true,
+    "old_r2_physical_carry_reconciled": true,
+    "old_r2_record_sha256": "3a7dde5dd001cd2ae151b6d43e4fbd3fd9b7dfef094899cb595395a5ee6e4a79",
+    "project_df_kib": {"capacity": 489684992, "used": 201883648, "available": 287801344},
+    "project_df_inodes": {"capacity": 1000000, "used": 514869, "available": 485131},
+    "quota_command_boundary": "quota -g and quota -v -g returned 1 without output; project-scoped df capacity was verified instead. No claim of a successful group-quota query or verified soft quota.",
+    "home_quota_full": true,
+    "home_writes_planned": false,
+    "reported_node_tmpdisk_mb": 1400000,
+    "scratch_boundary": "Configured node capacity is not current free space. The allocated worker checks actual scratch capacity before generator extraction."
+  },
+  "resources": {
+    "a100_gpus": 1, "cpus": 8, "memory_gib": 32, "scratch_gib": 30,
+    "walltime_minutes": 100, "partitions": ["gpu-a100", "gpu-a100-short"],
+    "qos": "normal", "nice": 0, "requeue": false
+  },
+  "first_observation": {
+    "observed_at_utc": "2026-09-30T16:27:27.560492+00:00",
+    "state": "PENDING", "reason": "Resources", "priority": 13408,
+    "weighted_fairshare": 13407, "weighted_age": 0, "weighted_job_size": 2,
+    "scheduler_expected_start": "2026-10-01T02:41:52+10:00",
+    "expected_start_not_guaranteed": true,
+    "elapsed_seconds": 0, "model_result_available": false
+  },
+  "remote_receipts_sha256": {
+    "pre-submit-checks.json": "43a17182054996451a8571c3d8ce0c592cbde8200598a742447f353629dbad5c",
+    "test-only.json": "ed88be79017e6e5151edb30f3a6d625c866abe2dabae60413e00225f92bcff3c",
+    "submission-attempt.json": "9cfa3570c2187b1010e0641a97a11e524fedbf317a7e386499a59069a15ff904",
+    "submission-receipt.json": "7011a60b3d23a28f065a790cd2ebb4b6938b0386bb7d0e1720fe7860157d0cfc",
+    "first-observation-31743877.json": "430ad9ba596d02497f2a2f8f7e0297f5131341970e9ecd6f21414f3a16fba8b1"
+  },
+  "carried_model_calls": 1,
+  "carried_semantic_match": false,
+  "carried_tokens": {"input_tokens": 277, "output_tokens": 15},
+  "max_new_model_calls": 36,
+  "max_cumulative_model_calls": 37,
+  "historical_allocated_gpu_job_seconds": 177,
+  "historical_batch_cpu_seconds": 154.310,
+  "automatic_retry": false,
+  "new_monitor_created": false,
+  "model_quality_claim": false,
+  "resume_modified": false
+}

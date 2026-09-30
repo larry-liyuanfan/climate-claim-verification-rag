@@ -16,6 +16,13 @@ keeps that negative result immutable, separates technical readiness from semanti
 measurement and references the one paid response without repeating it. It allows
 at most 36 new calls only after a separate release; no new model result is claimed.
 
+Subsequent authorized submission: [job 31743877](docs/verified-runs/scifact-component-continuation-submission-31743877.json)
+was submitted once on **2026-10-01 02:26:52 Australia/Sydney**, using execution
+source `a104115`, after a successful scheduler test-only check. At **02:27:27** it
+was `PENDING (Resources)`; the then-estimated 02:41:52 start was not guaranteed.
+No new model result is available in this submission snapshot. The one old call
+stays paid and semantically negative; no repeated submission or monitor was created.
+
 ### Predecessor failure and validated CPU repair
 
 Job **31729507 failed before provider construction**: canonical JSON persistence
