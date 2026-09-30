@@ -118,3 +118,29 @@ sbatch --dependency=afterok:"$first" --export=ALL,CLIMATE_SEMANTIC_POLICY=scifac
 CPU validation covers only the new seams and frozen-helper regression tests;
 the unchanged large/model suites are not rerun for this package. Final source,
 package hashes and clean-source targeted validation are recorded in the handoff.
+
+## Final CPU handoff
+
+Execution source is **`44b0424abcfed65e4efdeeaf793f0d47ad92f734`**. The
+[content-free handoff](verified-runs/scifact-semantic-execution-cpu-handoff-20260930.json)
+records source/archive/wrapper identities; the
+[bundle receipt](verified-runs/scifact-semantic-bundles-44b0424.json) pins the
+formal private protocol and both exact member lists. Source archive SHA is
+`3f755fc9e74ec098b3e07dd45f1372669aca8bcb05c5bc9a0a53c622b26ab1ea`;
+formal protocol SHA is
+`d6a2dafe62bff5f9b548027f63a8b34417181a2b9e2c04f9bced8ed2434ba644`.
+
+All **80 targeted cases** passed, including 33 new seams; the same 80 passed
+from the byte-verified clean source archive in 4.02 s. Targeted Ruff, strict
+mypy over nine source files, tracked secret/PII scan and local/remote Bash syntax
+passed. One tarfile future-default warning is retained; it is not a skipped test.
+An initial Windows-CRLF archive failed exact-Git-byte validation and was neither
+uploaded nor run; the published archive uses explicit LF and matches all 376
+Git blobs plus its single expanded revision marker.
+
+Mechanical conversion ran on the existing private preparation files on Spartan;
+it loaded no tokenizer/model and performed no new query analysis. The inference
+and scoring archives stay there. Only hashes/counts were downloaded. **This
+execution-entry package submitted zero Slurm jobs and made zero model calls**;
+the earlier CPU preparation job is separately recorded as 31698106. No GPU
+release, new monitor, scientific success claim or resume change follows.

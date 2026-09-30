@@ -20,6 +20,16 @@ Ruff and six-file strict mypy passed. Neither fixture tool use nor schema succes
 demonstrates real model behavior. The frozen F/G negative result below remains
 unchanged; no current-resume or Agent-quality promotion is supported.
 
+The [follow-on execution freeze](SCIFACT_SEMANTIC_EXECUTION_CPU_20260930.md) at
+`44b0424abcfed65e4efdeeaf793f0d47ad92f734` adds new policy-specific runner/operator/
+scorer entrypoints and exact private inference/scoring bundles. Eighty targeted
+tests pass, including clean-source reproduction; strict mypy checks nine source
+files. New inference is bound to the already-fixed selected-claim hash; scoring
+independently binds original private gold/strata hashes. Both policies use gap
+envelopes, separate preflight costs and full raw-wire audits. Genuine abstentions
+and failure-empty predictions remain distinct. This implementation/package step
+submitted no Slurm job, made no model call and supplies no quality gain or GPU release.
+
 ## 2026-09-30 bounded grammar and evidence-gap pair: audited negative result
 
 [Versioned preparation](SCIFACT_BOUNDED_GAP_CPU_20260930.md) preserves the frozen

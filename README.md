@@ -8,6 +8,12 @@ This verifies exposure accounting and packing contracts, **not model improvement
 all 531 eligible questions already had gold-aware preparation exposure. No GPU
 comparison or dev/test release follows, and the negative F/G result below remains.
 
+The subsequent [semantic execution handoff](docs/SCIFACT_SEMANTIC_EXECUTION_CPU_20260930.md)
+freezes separate inference/scoring bundles and fresh two-policy entrypoints with
+80 passing CPU seam/regression tests. Gold isolation, complete durable cost,
+policy-bound preflights and serial predecessor checks are implemented. This is
+**CPU preparation only**: zero model calls, zero submitted jobs and no new quality result.
+
 The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
 adds generation-time uniqueness/total-budget enforcement, actual preview hashes,
 charged error feedback and a preregistered two-arm comparison. Synthetic CPU

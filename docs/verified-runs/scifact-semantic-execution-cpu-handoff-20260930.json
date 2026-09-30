@@ -1,0 +1,71 @@
+{
+  "schema_version": "scifact-semantic-execution-cpu-handoff-v1",
+  "status": "frozen_cpu_prepared_gpu_not_released",
+  "preparation_source_git": "779e49883570371ce6223cb2b4a8619df5924d3b",
+  "execution_source_git": "44b0424abcfed65e4efdeeaf793f0d47ad92f734",
+  "source_archive": {
+    "spartan_relative_path": "envs/scifact-semantic-execution-44b0424.tar",
+    "sha256": "3f755fc9e74ec098b3e07dd45f1372669aca8bcb05c5bc9a0a53c622b26ab1ea",
+    "bytes": 2764800,
+    "regular_files": 377,
+    "directories": 13,
+    "unchanged_git_blobs": 376,
+    "expanded_source_revision_members": 1,
+    "expanded_source_revision_bytes": 41,
+    "exact_git_blob_modes_and_bytes_verified": true,
+    "first_local_crlf_archive_rejected_not_uploaded_or_executed": true
+  },
+  "wrapper": {
+    "spartan_relative_path": "envs/scifact-semantic-pair-44b0424.sbatch",
+    "sha256": "9ba1f9ee288c901b5243699c7824e0c9b960afad44d88f40b2edf62ae3f7e0bb",
+    "legacy_source_helper_wrapper_sha_field_is_not_this_wrapper": true
+  },
+  "bundles": {
+    "receipt_path": "envs/scifact-semantic-bundles-44b0424/bundle-receipt.json",
+    "receipt_sha256": "f2600b35e03c966e80d2253391d38a3f2be479da83a0ee7d98aca0b203b7a63d",
+    "inference_path": "envs/scifact-semantic-bundles-44b0424/inference.tar",
+    "inference_sha256": "ef668e5b669c6e6af7f86f25c4eef18cbce706c880739b278ae55010cfa6e8c5",
+    "scoring_path": "envs/scifact-semantic-bundles-44b0424/scoring.tar",
+    "scoring_sha256": "0729419cc5cbfaa6617d74e6a9f0210afea577953a13a1d4a36e8586dac17075",
+    "protocol_sha256": "d6a2dafe62bff5f9b548027f63a8b34417181a2b9e2c04f9bced8ed2434ba644",
+    "scoring_manifest_sha256": "80a5d948a7532c10f5fdaf7b303c73b8906ee5024f1f71f08093e3644a6116e3",
+    "exact_inference_members": 3,
+    "exact_scoring_members": 7,
+    "private_bundles_exported": false,
+    "reselection_or_prompt_changes": false
+  },
+  "validation": {
+    "targeted_tests_passed": 80,
+    "new_seam_cases": 33,
+    "clean_frozen_archive_tests_passed": 80,
+    "clean_frozen_archive_seconds": 4.02,
+    "targeted_ruff": "passed",
+    "strict_mypy_source_files": 9,
+    "strict_mypy": "passed",
+    "local_remote_bash_syntax": "passed",
+    "tracked_secret_pii_scan": "passed",
+    "remote_hashes_match": true,
+    "full_model_suite_rerun": false,
+    "nonblocking_warning": "Python 3.12 tarfile future-default notice; frozen execution Python 3.10 uses explicit member guards"
+  },
+  "planned_resources_per_arm_not_submitted": {
+    "a100": 1,
+    "cpus": 8,
+    "mem_gib": 32,
+    "walltime_seconds": 7200,
+    "requeue": false,
+    "second_dependency": "afterok:first_arm"
+  },
+  "this_package_actual_model_calls": 0,
+  "this_package_slurm_jobs_submitted": 0,
+  "gpu_authorized": false,
+  "new_monitor_created": false,
+  "resume_changed": false,
+  "release_requirements": [
+    "coordinator approves exact frozen source and private bundle hashes",
+    "check this-package duplicates and actual resource availability",
+    "sbatch --test-only before submission",
+    "four policy-bound synthetic real-provider preflight calls in each released allocation",
+    "both new inference children exit and predecessor stays identical before gold extraction"
+  ]
+}
