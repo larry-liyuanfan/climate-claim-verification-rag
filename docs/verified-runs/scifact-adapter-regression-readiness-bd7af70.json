@@ -1,0 +1,62 @@
+{
+  "actual_import_probe_sha256": "a79040d9386dfa8d1b9de1701941c3eaa1565c5bb5071da53845760962dceaaa",
+  "cpu_probe": {
+    "checkpoint_files_verified": true,
+    "corpus_documents": 5183,
+    "draft_validated": true,
+    "generation_calls": 0,
+    "gold_loaded": false,
+    "inference_archive_hash_verified": "def10d4030d402ef5294680e0426ba1ed05ac42cb9b1d7bf4e8daa0a328961c9",
+    "model_archive_header_selected_bytes": 16120463404,
+    "model_archive_payload_rehashed": false,
+    "model_payload_verification_at_allocation_before_loading": true,
+    "model_weights_loaded": false,
+    "output_unused": true,
+    "runtime_observed": {
+      "generation_calls": 0,
+      "model_loaded": false,
+      "module_files": {
+        "accelerate": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/accelerate/__init__.py",
+        "peft": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/peft/__init__.py",
+        "safetensors": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/safetensors/__init__.py",
+        "torch": "/apps/easybuild-2022/easybuild/software/MPI/GCC/11.3.0/OpenMPI/4.1.4/PyTorch/2.1.2-CUDA-12.2.0/lib/python3.10/site-packages/torch/__init__.py",
+        "transformers": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/transformers/__init__.py"
+      },
+      "os_name": "posix",
+      "python": "3.10.4",
+      "python_executable": "/apps/easybuild-2022/easybuild/software/Compiler/GCCcore/11.3.0/Python/3.10.4/bin/python",
+      "torch": "2.1.2",
+      "versions": {
+        "accelerate": "1.6.0",
+        "huggingface-hub": "0.36.2",
+        "interegular": "0.3.3",
+        "lm-format-enforcer": "0.11.3",
+        "numpy": "1.24.4",
+        "peft": "0.15.2",
+        "psutil": "5.9.0",
+        "pydantic": "2.13.5",
+        "safetensors": "0.5.3",
+        "scipy": "1.8.1",
+        "tokenizers": "0.21.4",
+        "transformers": "4.51.3"
+      }
+    },
+    "selected_queries": 12,
+    "slots": 48
+  },
+  "cpu_probe_sha256": "6bfbc481d7b63d2af51f573b1c5ee61cb2334839f7de05be810a620cc63b6c52",
+  "frozen_training_and_adapter_hashes_verified": true,
+  "generation_calls": 0,
+  "job_submitted": false,
+  "official_dev_test_read": false,
+  "output_unused": true,
+  "release_draft_sha256": "d66594ef975b6491d0c78f70107f38799a8051eca2be76030f5aa88cd827ff4d",
+  "source_archive_sha256": "a99051e0ece0e9fa7e0a103285f35645a3cf546b2081ebcf7d2be044a98c6f91",
+  "source_git": "bd7af701fcca654383f1907520612f79d5516e3b",
+  "stage_review_sha256": "2c68eb35a884f44cc24be69675a55f7e216d8a41cad1b230a48e25ac65e61697",
+  "test_only_log_sha256": "3bd804fdd9023eaf5182458b2d034e039e9a289c52349711c32bfb01adc112f9",
+  "test_only_output": "sbatch: Job 31771616 to start at 2026-10-05T02:39:03 a using 8 processors on nodes spartan-gpgpu122 in partition gpu-a100\n",
+  "test_only_returncode": 0,
+  "training": false,
+  "wrapper_sha256": "bbc5df196509695b0391583ea5e663a21a234ae1e5147ba605a4aaee6eda885a"
+}

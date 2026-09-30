@@ -85,3 +85,5 @@ scripts/run_scifact_adapter_regression.py text eol=lf
 scripts/run_scifact_adapter_regression_operator.py text eol=lf
 scripts/score_scifact_adapter_regression.py text eol=lf
 src/climate_rag/scifact_adapter_regression.py text eol=lf
+docs/verified-runs/scifact-adapter-regression-readiness-bd7af70.json text eol=lf
+docs/verified-runs/scifact-adapter-regression-source-bd7af70.json text eol=lf

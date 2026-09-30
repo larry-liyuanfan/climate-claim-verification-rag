@@ -118,3 +118,39 @@ Packaging must explicitly choose `hpc/scifact_adapter_regression.sbatch` in
 `package_scifact_source.py`; its legacy default wrapper is not this release.
 Exact export/import/test-only receipts will be appended after CPU preparation.
 No public/private test, resume or shared career material is changed.
+
+### Exact CPU handoff (completed, still DRAFT)
+
+- Execution source: `bd7af701fcca654383f1907520612f79d5516e3b`.
+- Source tar SHA: `a99051e0ece0e9fa7e0a103285f35645a3cf546b2081ebcf7d2be044a98c6f91`.
+- Correct wrapper SHA: `bbc5df196509695b0391583ea5e663a21a234ae1e5147ba605a4aaee6eda885a`.
+- DRAFT release SHA: `d66594ef975b6491d0c78f70107f38799a8051eca2be76030f5aa88cd827ff4d`.
+- Readiness receipt SHA: `d6dc111e9fe63f2f21f992b58ff43a70cdc47173d0af0957e5c6cda3c556abbe`.
+
+[Exact-source receipt](verified-runs/scifact-adapter-regression-source-bd7af70.json)
+verifies 486 regular files, a unique 41-byte SOURCE_REVISION and the actual
+wrapper guard. **Clean exported source** passed 70 related tests in 8.87s,
+Ruff and strict mypy; one tiny-PEFT vocabulary warning remains expected.
+
+[Spartan readiness](verified-runs/scifact-adapter-regression-readiness-bd7af70.json)
+verifies actual Python 3.10.4 / POSIX / Torch 2.1.2 + isolated PEFT runtime imports,
+the frozen checkpoint files and original twelve-query input archive. No gold or
+weights were loaded. Model archive header-selected payload is 16,120,463,404
+bytes; full base/reranker payload hashing remains mandatory inside allocation
+before loading, not represented as already rehashed during this CPU check.
+
+`sbatch --test-only` returned zero. Its simulated Job 31771616 / estimated start
+text is **not an actual submitted job or a guaranteed schedule**. Output was
+unused. The staged files are under:
+
+`/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/adapter-regression-source-bd7af701fcca/`
+
+The proposed output remains:
+
+`/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/runs/scifact-adapter-bare-regression-20261001-v1`
+
+The source tar, `wrapper.sbatch`, `release-draft.json`, CPU probe and readiness
+receipt are available there. No actual sbatch, warmup, training or generation
+occurred in this package. A later documentation-only commit does not replace
+the frozen execution source. Next execution still requires coordinator review
+and a distinct exact-hash authorization receipt.
