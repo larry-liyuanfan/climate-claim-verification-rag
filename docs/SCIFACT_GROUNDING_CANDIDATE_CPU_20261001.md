@@ -269,3 +269,19 @@ clock, not a guaranteed start or a training ETA. Final draft release hash is
 its authorization remains `DRAFT_NOT_AUTHORIZED`. No real training or generation
 was performed. Documentation-only follow-up commits do not replace this frozen
 execution source or change the earlier prepared data.
+
+## Separately authorized training submission
+
+After exact-hash coordinator review, the original draft's sole
+`DRAFT_NOT_AUTHORIZED` string was replaced by `coordinator_exact_hash_release`,
+preserving all other bytes. The separately saved activated file is 1,482 bytes,
+SHA `e00c4f7db57d3c135d7fe74f126d208541d89cda02034118978d812d3393ad81`.
+The original draft remains intact. Job **31757970** was submitted exactly once
+from the project staging directory with explicit `--chdir`; see its
+[submission receipt](verified-runs/scifact-grounding-training-submission-31757970.json).
+First `squeue/sacct` verification confirmed RUNNING on `spartan-gpgpu126`,
+one A100 / four CPUs / 32 GiB RAM, with the original 30-minute cap. This actual
+start supersedes the earlier nonbinding test-only estimate; neither status nor
+a future loss/checkpoint proves improved grounding quality. No evaluation or
+answer-generation calls are authorized by this submission. Prior CPU-only
+receipts remain truthful records of their earlier preparation stage.

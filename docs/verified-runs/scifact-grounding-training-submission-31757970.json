@@ -1,0 +1,41 @@
+{
+  "automatic_retry": false,
+  "generation_authorized": false,
+  "hashes": {
+    "release-authorized.json": "e00c4f7db57d3c135d7fe74f126d208541d89cda02034118978d812d3393ad81",
+    "release-draft.json": "dff04c8a53c8f527bcc939f68963b9527aa467b03866c77e012ec5b8377bde88",
+    "source.tar": "4c9386edbd965a2e88629932cdaad11e9c8b43e90af6f9383b6d7d90a3ca650a",
+    "wrapper.sbatch": "d88db6806c1d725866df303a63dcdd4493de0a74b8c7fc2de148a79e1de6af9a"
+  },
+  "job_id": "31757970",
+  "official_dev_test_read_authorized": false,
+  "optimizer_updates": 24,
+  "output": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/runs/scifact-grounding-training-20261001-v1",
+  "resources": {
+    "cpus": 4,
+    "gpu": "A100:1",
+    "gpu_memory_not_presumed": true,
+    "host_ram_gib": 32,
+    "scratch_gib": 30,
+    "slurm_seconds": 1800
+  },
+  "single_submission": true,
+  "source_git": "631aae70000ca4940c8225e046669dc85b1731e4",
+  "stderr": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-source-631aae70000c/slurm-31757970.err",
+  "stdout": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-source-631aae70000c/slurm-31757970.out",
+  "submitted_unix": 1790790473.7708833,
+  "training_records": 96,
+  "worker_cap_seconds": 1500,
+  "first_observation": {
+    "state": "RUNNING",
+    "node": "spartan-gpgpu126",
+    "allocated": {
+      "cpu": 4,
+      "gpu_a100": 1,
+      "memory": "32G"
+    },
+    "elapsed_seconds": 11,
+    "slurm_walltime_seconds": 1800
+  },
+  "readiness_history_not_training_result": true
+}
