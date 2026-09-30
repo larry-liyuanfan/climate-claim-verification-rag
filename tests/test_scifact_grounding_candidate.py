@@ -200,7 +200,7 @@ def test_partial_entrypoint_score_retains_whole_planned_denominator(tmp_path: Pa
     results = json.loads((output / "score.json").read_bytes())
     assert results["base"]["attempts"] == 1 and results["base"]["not_attempted"] == 11
     assert results["adapted"]["attempts"] == 0 and results["adapted"]["not_attempted"] == 12
-    assert results["base"]["invalid_or_failed"] == results["adapted"]["invalid_or_failed"] == 12
+    assert results["base"]["planned_unsuccessful"] == results["adapted"]["planned_unsuccessful"] == 12
     assert json.loads((output / "gate.json").read_bytes())["passed"] is False
 
 
@@ -211,7 +211,7 @@ def test_bad_usage_preserved_as_unknown_lower_bound(corpus: dict[int, Abstract],
         "claim_id": 0, "status": "failed", "usage_known": False,
         "usage": usage, "elapsed_ms": 2, "prediction": None}]}
     score = score_arm(result, gold, corpus)
-    assert score["invalid_or_failed"] == 12 and score["unknown_usage"] == 1
+    assert score["planned_unsuccessful"] == 12 and score["unknown_usage"] == 1
     assert score["valid_nei_abstention"] == 0
     assert score["cost_including_failures"]["totals_are_lower_bounds"] is True
 
@@ -239,6 +239,7 @@ def test_paid_response_persistence_failure_retains_cost(tmp_path: Path, corpus: 
     original = module.write_once
     def broken(path: Path, value: object) -> None:
         if path.name == "response.json":
+            path.write_bytes(b'{"raw":')
             raise OSError("disk_fixture")
         original(path, value)
     monkeypatch.setattr(module, "write_once", broken)
@@ -249,12 +250,19 @@ def test_paid_response_persistence_failure_retains_cost(tmp_path: Path, corpus: 
     assert first["status"] == "failed" and first["usage_known"] is True
     assert first["usage"]["output_tokens"] == 20
     assert result["attempts"] == 1
+    audited = audit_arm(tmp_path / "disk", rows, corpus)
+    assert audited["physical_files_sha256"]["slot-00/response.json"]
+    score = score_arm(audited, [GoldClaim(i, "Claim", {}, ()) for i in range(12)], corpus)
+    assert score["attempts"] == 1 and score["not_attempted"] == 11
+    assert score["planned_unsuccessful"] == 12 and score["valid_nei_abstention"] == 0
+    assert score["cost_including_failures"]["output_tokens_known_lower_bound"] == 20
+    assert score["cost_including_failures"]["totals_are_lower_bounds"] is False
 
 
 def test_count_gate(corpus: dict[int, Abstract]) -> None:
     base = {"input_identity": "same", "claims": 12, "attempts": 12,
             "correctly_rationalized_documents": 1, "nei_false_evidence": 0,
-            "invalid_or_failed": 0, "unknown_usage": 0}
+            "planned_unsuccessful": 0, "unknown_usage": 0}
     assert advancement(base, base | {"correctly_rationalized_documents": 2})
     assert not advancement(base, base | {"correctly_rationalized_documents": 2, "nei_false_evidence": 1})
     assert not advancement(base, base)

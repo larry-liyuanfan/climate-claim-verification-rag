@@ -1,0 +1,16 @@
+{
+  "complete_git_blob_allowlist": true,
+  "directories": 13,
+  "job_submitted": false,
+  "model_calls": 0,
+  "normalized_members_unique": true,
+  "regular_files": 448,
+  "schema_version": "scifact-source-package-v1",
+  "shell_guard_passed": true,
+  "source_archive_bytes": 3440640,
+  "source_archive_sha256": "0a8832579d9798510bb5fab53421d7892ce50e857478fec4d4ad1c0bb3c90546",
+  "source_git": "40d84a377bd1223de5817a69818ac5f5aa63b384",
+  "source_revision_bytes": 41,
+  "source_revision_members": 1,
+  "wrapper_sha256": "28a4498de8fc2d59fc660e84f0d5a43eba51db157d3616277af6f17aa63c89bc"
+}

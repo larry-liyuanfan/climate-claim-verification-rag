@@ -209,5 +209,5 @@ def advancement(base: Mapping[str, Any], adapted: Mapping[str, Any]) -> bool:
     require(base["attempts"] == adapted["attempts"] == 12, "tune_call_matrix")
     return bool(adapted["correctly_rationalized_documents"] > base["correctly_rationalized_documents"]
                 and adapted["nei_false_evidence"] <= base["nei_false_evidence"]
-                and adapted["invalid_or_failed"] <= base["invalid_or_failed"]
+                and adapted["planned_unsuccessful"] <= base["planned_unsuccessful"]
                 and base["unknown_usage"] == adapted["unknown_usage"] == 0)

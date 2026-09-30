@@ -6,6 +6,10 @@
 protocol-bound consumption ledger, whole-component/source-family separation,
 official alternative-aware targets, and a single-config LoRA training / paired
 non-oracle evaluation entrypoint using the production citation contract.
+Real-tokenizer CPU preparation passed with frozen 48/12/12 TRAIN components,
+96 official alternative-aware fit records and no packing gaps. Both evaluation
+pools contain only 58 source-partitioned documents; this is a controlled grounding
+experiment, **not a full-corpus retrieval result or an independent test**.
 No adapter training, new generation, Slurm submission, dev/test evaluation or
 Agent improvement is claimed. Historical negative results below are unchanged.
 

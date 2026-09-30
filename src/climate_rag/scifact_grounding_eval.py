@@ -128,7 +128,13 @@ def audit_arm(directory: Path, rows: Sequence[Mapping[str, Any]],
                 and start["input_identity"] == record["input_identity"] == sha(encoded(row))
                 and start["attempted"] is True, "audit_slot_identity")
         response_file = slot / "response.json"
-        if response_file.exists():
+        if record.get("persistence_failed"):
+            # A partial physical file is still hash-bound above, but is not a
+            # complete response or quality evidence. Durable failure + usage
+            # are the only cost record; never parse/replay the truncated bytes.
+            require(record["status"] == "failed" and record["prediction"] is None,
+                    "audit_persistence_failure_status")
+        elif response_file.exists():
             response = json.loads(response_file.read_bytes())
             require(record["usage"] == response.get("usage")
                     and record["usage_known"] == complete_usage(response.get("usage"), response.get("diagnostics", {})),
@@ -154,6 +160,8 @@ def audit_arm(directory: Path, rows: Sequence[Mapping[str, Any]],
             failure = json.loads((slot / "failure.json").read_bytes())
             require(failure["usage"] == record["usage"] and failure["usage_known"] == record["usage_known"],
                     "audit_failure_cost")
+            require(failure.get("persistence_failed", False) == record.get("persistence_failed", False),
+                    "audit_failure_persistence_status")
     return dict(result)
 
 
@@ -188,7 +196,7 @@ def score_arm(result: Mapping[str, Any], gold: Sequence[GoldClaim],
     official = score_original(gold, preds)
     return {"input_identity": result["input_identity"], "claims": len(gold),
         "attempts": result["attempts"], "not_attempted": len(gold) - result["attempts"],
-        "invalid_or_failed": failed, "unknown_usage": unknown,
+        "planned_unsuccessful": failed, "unknown_usage": unknown,
         "correctly_rationalized_documents": official["metrics"]["abstract_rationalized"]["correct"],
         "nei_false_evidence": official["separate_diagnostics_not_official_f1"]["nei_claims_with_false_evidence"],
         "valid_nei_abstention": valid_nei_abstention, "complete_alternative_any_position": complete_any,
