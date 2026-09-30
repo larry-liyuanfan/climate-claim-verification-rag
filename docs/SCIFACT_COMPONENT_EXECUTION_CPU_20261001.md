@@ -79,6 +79,14 @@ no weights, tensor inference or model loader is used by this probe.
 
 ## Reproduce software validation
 
+[Frozen validation receipt](verified-runs/scifact-component-execution-validation-20261001.json):
+execution source `79f069d`, exact archive/blob/mode and component shell-guard
+checks passed. Both targeted and clean-source suites: **144 passed, 1 Windows
+POSIX skip**; the Linux microcheck is reported separately. Ruff, strict type
+checks (10 files) and tracked secret/PII scan passed. The
+[tokenizer receipt](verified-runs/scifact-component-tokenizer-20261001.json)
+records all 13 synthetic paths. These are software checks, not model results.
+
 Use the existing project validation environment, `PYTHONPATH=src;scripts` on
 Windows (`src:scripts` on POSIX). No dependency installation is needed here.
 
