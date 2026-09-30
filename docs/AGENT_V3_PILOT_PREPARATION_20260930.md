@@ -69,6 +69,22 @@ The bundle is transferred to Climate's own `envs/` only; binaries are not added
 to Git. Newly generated source archive and exact protocol SHA will be recorded
 after the preparation commit, before scheduling review.
 
+The child environment removes **all** `LMFE_*` settings; the provider additionally
+constructs explicit LMFE0.11.3 parser settings (alphabet from the pinned library,
+12 consecutive whitespaces, unrestricted field order, default max array20).
+Every response/preflight records the effective settings and alphabet hash.
+CPU fixtures poison known and future environment keys to prove isolation.
+Preflight preserves generated usage/diagnostics even if JSON/action parsing fails.
+
+`hpc/submit_climate_sentence_v3.sh` defaults to `--test-only`. A real `--submit`
+additionally requires the coordinator-released ID plus exact source SHA marker,
+an absent result directory and absent submission lock, matching all file hashes,
+and no duplicate Climate release jobs. It clears inherited `SBATCH_*`, applies
+identical explicit resources to test/real submission, then atomically reserves
+the release with `mkdir`, records hash inputs, repeats test-only and submits once.
+The lock stays even after failure; no automatic cancellation, unlock or retry.
+Preparation/test-only prints a scheduler estimate, not an actual submitted job.
+
 CPU tests cover same exposed task list, default-budget drift, A/B/A and EOS,
 exact1-token truncation and budget overrun, complete matrix, private-text
 exclusion, exclusive receipts and static operator invariants. These tests do

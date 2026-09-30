@@ -44,3 +44,4 @@ scripts/run_sentence_agent_v3_operator.py text eol=lf
 tests/test_sentence_agent_v3_pilot.py text eol=lf
 hpc/agent_v3_grammar.lock text eol=lf
 hpc/agent_sentence_v3_pilot.sbatch text eol=lf
+hpc/submit_climate_sentence_v3.sh text eol=lf

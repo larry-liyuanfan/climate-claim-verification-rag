@@ -21,7 +21,7 @@ from climate_rag.agent_v3 import (
 from climate_rag.bm25 import BM25Index
 from climate_rag.io import iter_evidence
 from climate_rag.local_agent_model import verify_model_files
-from climate_rag.local_agent_v3 import LocalQwenV3Provider
+from climate_rag.local_agent_v3 import LocalQwenV3Provider, grammar_config_identity
 from climate_rag.models import RankedDocument
 from climate_rag.rerank import Qwen3CausalLMReranker
 
@@ -66,16 +66,22 @@ def runtime_preflight(provider):
             "preview_only": [{"source_id": source_id}],
             "allowed_actions": ["read"],
         }
+        record = {"max_new_tokens": cap}
         try:
             response = provider.generate(observation, schema, cap, 45)
+            record.update(
+                usage=response["usage"], diagnostics=response.get("diagnostics", {})
+            )
             diagnostics = response["diagnostics"]
-            record = {
-                "input_tokens": response["usage"]["input_tokens"],
-                "output_tokens": response["usage"]["output_tokens"],
-                "expected_input_tokens": provider.count_prompt(observation, schema),
-                "diagnostics": diagnostics,
-                "max_new_tokens": cap,
-            }
+            record.update(
+                {
+                    "input_tokens": response["usage"]["input_tokens"],
+                    "output_tokens": response["usage"]["output_tokens"],
+                    "expected_input_tokens": provider.count_prompt(observation, schema),
+                    "diagnostics": diagnostics,
+                    "max_new_tokens": cap,
+                }
+            )
             if cap == 1:
                 try:
                     json.loads(response["raw"])
@@ -103,12 +109,9 @@ def runtime_preflight(provider):
                 and record["input_tokens"] <= 8192
             )
         except Exception as exc:
-            record = {
-                "passed": False,
-                "exception_type": type(exc).__name__,
-                "usage": getattr(exc, "usage", {}),
-                "diagnostics": getattr(exc, "diagnostics", {}),
-            }
+            record.update(passed=False, exception_type=type(exc).__name__)
+            record.setdefault("usage", getattr(exc, "usage", {}))
+            record.setdefault("diagnostics", getattr(exc, "diagnostics", {}))
         records.append(record)
         if not record["passed"]:
             break
@@ -236,6 +239,7 @@ def main():
     private.mkdir(mode=0o700)
     provider = LocalQwenV3Provider(args.model_dir, model_manifest, private_dir=private)
     preflight = runtime_preflight(provider)
+    preflight["grammar_config"] = grammar_config_identity()
     write_once(out / "runtime-preflight.json", preflight)
     if not preflight["passed"]:
         raise ValueError("real runtime preflight failed; no pilot")

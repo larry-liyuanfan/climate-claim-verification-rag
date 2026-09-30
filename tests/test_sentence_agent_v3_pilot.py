@@ -120,6 +120,45 @@ def test_compact_requires_complete_matrix_and_exports_no_source_text():
             RUNNER.compact_run({**run, "runs": bad_rows}, PROTOCOL)
 
 
+@pytest.mark.parametrize("bad_raw", ["not JSON", '{"action":"shell"}'])
+def test_successful_generation_then_parse_failure_preserves_usage(bad_raw):
+    class BadOutput(Provider):
+        def generate(self, *args):
+            response = super().generate(*args)
+            response["raw"] = bad_raw
+            return response
+
+    report = RUNNER.runtime_preflight(BadOutput())
+    record = report["records"][0]
+    assert not report["passed"]
+    assert record["usage"] == {"input_tokens": 100, "output_tokens": 20}
+    assert record["diagnostics"]["eos_observed"] is True
+    assert bad_raw not in json.dumps(record)
+
+
+def test_lmfe_environment_is_removed_and_effective_config_is_fixed(
+    tmp_path, monkeypatch
+):
+    from climate_rag.local_agent_v3 import grammar_config_identity
+    from run_sentence_agent_v3_operator import v3_runtime_environment
+
+    baseline = grammar_config_identity()
+    for key, value in {
+        "LMFE_STRICT_JSON_FIELD_ORDER": "true",
+        "LMFE_MAX_CONSECUTIVE_WHITESPACES": "999",
+        "LMFE_DEFAULT_ALPHABET": "poison",
+        "LMFE_MAX_JSON_ARRAY_LENGTH": "2",
+        "LMFE_FUTURE_UNKNOWN_OPTION": "poison",
+    }.items():
+        monkeypatch.setenv(key, value)
+    environment = v3_runtime_environment(tmp_path, tmp_path / "source")
+    assert not any(k.startswith("LMFE_") for k in environment)
+    assert grammar_config_identity() == baseline
+    assert baseline["force_json_field_order"] is False
+    assert baseline["max_consecutive_whitespaces"] == 12
+    assert baseline["max_json_array_length"] == 20
+
+
 def test_no_default_budget_drift_or_output_overwrite(tmp_path):
     protocol = copy.deepcopy(PROTOCOL)
     protocol["budget"]["context_k"] = 4
@@ -155,3 +194,18 @@ def test_preparation_operator_is_single_use_stdlib_and_one_gpu():
         "private.mkdir(mode=0o700)"
         in (ROOT / "scripts/run_sentence_agent_v3.py").read_text()
     )
+
+
+def test_submission_guard_is_non_submitting_by_default_and_atomically_reserves():
+    guard = (ROOT / "hpc/submit_climate_sentence_v3.sh").read_text()
+    assert 'MODE="${1:---test-only}"' in guard
+    assert "compgen -A variable SBATCH_" in guard
+    assert "CLIMATE_V3_SUBMIT_AUTHORIZED:-" in guard
+    assert guard.index('mkdir "${LOCK}"') < guard.index("job=$(submit --parsable)")
+    assert guard.index('if test "${MODE}" = --test-only; then') < guard.index(
+        'mkdir "${LOCK}"'
+    )
+    assert "inputs.json" in guard and "CLIMATE_V3_PROTOCOL_SHA256" in guard
+    assert "submit --test-only 2>&1" in guard
+    assert "--qos=normal" in guard and "--no-requeue" in guard
+    assert "rm " not in guard and "scancel" not in guard

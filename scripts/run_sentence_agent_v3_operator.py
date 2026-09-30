@@ -24,6 +24,15 @@ RELEASE = "climate-sentence-v3-20260930-pilot-r1"
 CONFIG = "configs/agent_sentence_v3_pilot_20260930.json"
 
 
+def v3_runtime_environment(work, source):
+    # LMFE has environment-backed dataclass defaults; isolate all present/future knobs.
+    return {
+        key: value
+        for key, value in runtime_environment(work, source).items()
+        if not key.startswith("LMFE_")
+    }
+
+
 def main():
     if (
         not os.environ.get("SLURM_JOB_ID")
@@ -128,7 +137,7 @@ def main():
                 env=dict(os.environ),
                 log=result / f"install-{name}.log",
             )
-        env = runtime_environment(work, source)
+        env = v3_runtime_environment(work, source)
         env.update(CLIMATE_V3_RELEASE=RELEASE, CLIMATE_SOURCE_GIT=state["source_git"])
         inputs = work / "input"
         arguments = json.loads((inputs / "args-pilot.json").read_text())

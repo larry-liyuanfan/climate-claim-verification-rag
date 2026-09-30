@@ -9,6 +9,7 @@ entire prefix on an internal error. It is NOT a concurrent HTTP provider.
 from __future__ import annotations
 
 import importlib.metadata
+import hashlib
 import json
 import logging
 import time
@@ -21,6 +22,31 @@ from .agent_v3 import system_prompt_v3
 from .local_agent_model import LocalQwenDecisionProvider
 from .model_diagnostics import response_diagnostics, validate_private_directory
 from .private_diagnostics_v3 import PrivateDiagnosticStore, PrivateLogHandler
+
+
+def fixed_grammar_config() -> Any:
+    from lmformatenforcer.characterlevelparser import CharacterLevelParserConfig
+    from lmformatenforcer.consts import COMPLETE_ALPHABET
+
+    # Explicit constructor fields bypass LMFE_* environment default factories.
+    return CharacterLevelParserConfig(
+        alphabet=COMPLETE_ALPHABET,
+        max_consecutive_whitespaces=12,
+        force_json_field_order=False,
+        max_json_array_length=20,
+    )
+
+
+def grammar_config_identity() -> dict[str, Any]:
+    config = fixed_grammar_config()
+    return {
+        "lmfe_version": "0.11.3",
+        "alphabet_sha256": hashlib.sha256(config.alphabet.encode()).hexdigest(),
+        "alphabet_characters": len(config.alphabet),
+        "max_consecutive_whitespaces": config.max_consecutive_whitespaces,
+        "force_json_field_order": config.force_json_field_order,
+        "max_json_array_length": config.max_json_array_length,
+    }
 
 
 def render_v3_prompt(
@@ -97,7 +123,7 @@ class LocalQwenV3Provider:
         )
 
         begin = time.perf_counter()
-        parser = JsonSchemaParser(schema)
+        parser = JsonSchemaParser(schema, config=fixed_grammar_config())
         prefix_fn = build_transformers_prefix_allowed_tokens_fn(
             self.tokenizer_data, parser
         )
@@ -172,6 +198,7 @@ class LocalQwenV3Provider:
             ) from exc
         diagnostics["grammar_log_nonempty"] = log_sink.attempted > 0
         diagnostics["grammar"] = "lm-format-enforcer0.11.3/fresh-inline-anyOf"
+        diagnostics["grammar_config"] = grammar_config_identity()
         if diagnostics["grammar_log_nonempty"] or log_sink.io_failed:
             raise ModelResponseValidationError(
                 usage, {**diagnostics, "category": "grammar_backend_error"}
