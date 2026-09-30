@@ -4,8 +4,9 @@ The released SciFact train diagnostic job **31620529** failed before model loadi
 its source tar duplicated `SOURCE_REVISION`, so the exact shell guard rejected it.
 The [startup repair](docs/SCIFACT_STARTUP_REPAIR_20260930.md) validates all archive
 members against Git, tests the actual shell guard, and separates an infrastructure
-attempt from the unchanged experiment identity. No model-quality result or retry
-submission is implied by this repair.
+attempt from the unchanged experiment identity. Separately authorized retry
+[job31645005](docs/verified-runs/scifact-train-r2-submission-31645005.json) was
+PENDING / Priority at17:45+10; no model-quality result is available.
 
 2026-09-30 follow-up: a separately authorized [feedback-v2 development pilot](docs/AGENT_FEEDBACK_V2_DEVELOPMENT_20260930.md)
 adds action-discriminated schemas and charged validation feedback; it is not a

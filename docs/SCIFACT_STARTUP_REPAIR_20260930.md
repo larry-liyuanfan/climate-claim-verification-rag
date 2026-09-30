@@ -45,7 +45,7 @@ per-file hashes alone missed this packaging error.
 - `create_attempt_result` separates the frozen experiment from the exclusive
   output directory; arbitrary attempt IDs, overwrites and changed release IDs fail.
 
-## Experiment unchanged; retry not yet submitted
+## Frozen experiment and preflight identity (before submission)
 
 | Identity | Value |
 |---|---|
@@ -111,3 +111,63 @@ The content-free [receipt](verified-runs/scifact-startup-r2-preflight-20260930.j
 records the exact 13 explicitly set CLIMATE variables; no environment dump,
 dependency installation, sampling or model call was performed. Await coordinator
 review before the first infrastructure retry.
+
+## Separately authorized retry: job31645005
+
+After independent coordinator review and explicit authorization, **one** real
+job31645005 was submitted at **2026-09-30 17:44:27+10**. New test-only simulation
+31645003 was not another job. All13 CLIMATE values and all frozen source/data/model
+identities above were reused without re-exporting source or resampling. The
+exclusive r2 lock was created; original assets and the r1 lock remain untouched.
+
+At17:45:34+10, `sacct` and `squeue` confirmed **PENDING / Priority**, priority13338
+(FairShare13337 + JobSize1, Age0). Estimated start2026-10-01 17:50+10 is not a
+guarantee. Slurm's actual spooled wrapper SHA matched `f6f38682...454f2f`; resources
+remain1 A100/8 CPUs/32 GiB/30 GiB scratch/2h, normal QOS, Nice0 and no requeue.
+See the exact [submission receipt](verified-runs/scifact-train-r2-submission-31645005.json).
+There are no model results or quality gains yet. No automatic further retry or
+dev/test evaluation is authorized.
+
+## User-requested local Torch coverage
+
+The user requested installation of missing local validation dependencies. Only
+this checkout's ignored `.venv-validation` was extended with CPU Torch2.7.1,
+PEFT0.15.2, Transformers4.51.3, Safetensors0.5.3 and Accelerate1.6.0, retaining
+NumPy1.26.4. `pip check` passed. With Hugging Face/Transformers offline, the
+complete suite now gives **516 passed / 1 Windows-only POSIX skip** in41.52s.
+The real tiny Torch/PEFT checkpoint/toggle test executes and passes; it does not
+download model weights or run benchmark inference. See the
+[local validation receipt](verified-runs/local-torch-validation-20260930.json).
+
+POSIX is an operating-system contract, not a missing pip package. Its ownership/
+symlink test passes in the existing Linux CI run above. Windows-specific skipping
+is retained instead of pretending NTFS is POSIX or changing the user's OS/WSL.
+The frozen Spartan runtime, source80fcd07 and submitted job31645005 are unchanged.
+
+Installing these previously optional libraries also exposed8 strict-mypy issues
+at third-party type boundaries. Follow-up source `d7aad104deb64f5b65c203d7c63df350e4569de1`
+adds a local PEFT callable annotation, type-check-only imports for Transformers'
+real definitions (runtime lazy exports unchanged), and an equivalent explicit
+boolean preflight assertion. No global ignores or model changes were added.
+Strict mypy54, Ruff and24 affected-entry/real-dependency regressions pass, with
+independent read-only review; a final offline full run after this correction
+passed516 tests with the same one Windows/POSIX skip (44.19s).
+This follow-up **is not** the source tar of job31645005;
+the already-submitted package remains80fcd07 and was not rebuilt.
+
+Local environment reproduction (use the isolated venv interpreter):
+
+```sh
+python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install peft==0.15.2 transformers==4.51.3 safetensors==0.5.3 accelerate==1.6.0 numpy==1.26.4
+python -m pip check
+```
+
+For the eventual unchanged job closeout, separate absent legal tool opportunity,
+opportunity hidden by actual prompt packing/action constraints, visible opportunity
+with premature stopping, and wrong decisions after useful feedback. Zero calls
+alone do not measure feedback use. Any future evidence-gap package comparison
+must acknowledge its changed visible-context cost; field-specific mechanism
+attribution would need a separately frozen common-context control, not another
+unapproved run. No new training, GPU job or holdout evaluation follows from this
+interpretation guidance.
