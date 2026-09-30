@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from typing import Any
 
 from .agent_protocol import ModelResponseValidationError
@@ -10,16 +11,22 @@ from .scifact_runtime_smoke import smoke_cases
 from .scifact_terminal import parse_action
 
 
-def bounded_runtime_smoke(backend: Any) -> dict[str, Any]:
-    records = []
+def bounded_runtime_smoke(backend: Any, *, persist_case: Callable[[int, str, dict[str, Any]], None] | None = None) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
     for case in smoke_cases():
         provider = GapProviderAdapter(backend) if backend.gap else backend
         record: dict[str, Any] = {"passed": False, "provider_generate_attempted": False}
         cap = case["max_output_tokens"]
         count = None
+        writing_journal = False
         try:
             count = provider.count_prompt(case["observation"], case["schema"])
-            record.update(input_tokens_expected=count, max_output_tokens=cap, provider_generate_attempted=True)
+            record.update(input_tokens_expected=count, max_output_tokens=cap)
+            if persist_case is not None:
+                writing_journal = True
+                persist_case(len(records), "started", dict(record))
+                writing_journal = False
+            record["provider_generate_attempted"] = True
             response = provider.generate(case["observation"], case["schema"], cap, 45)
             record.update(usage=response["usage"], diagnostics=response["diagnostics"])
             if cap == 1:
@@ -47,8 +54,12 @@ def bounded_runtime_smoke(backend: Any) -> dict[str, Any]:
                                      and d.get("reached_max_new_tokens") is True and d.get("eos_observed") is False
                                      and d.get("private_attachment", {}).get("truncated") is False)
         except Exception as exc:
+            if writing_journal:
+                raise
             record["failure"] = type(exc).__name__
         records.append(record)
+        if persist_case is not None:
+            persist_case(len(records) - 1, "completed", dict(record))
     return {"schema_version": "scifact-bounded-synthetic-smoke-v1", "records": records,
             "status": "passed" if all(r["passed"] for r in records) else "failed",
             "attempted_calls": sum(r["provider_generate_attempted"] for r in records),

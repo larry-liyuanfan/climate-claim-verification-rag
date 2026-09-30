@@ -151,12 +151,13 @@ class RecordedBackend:
         return {"raw": self.raw, "usage": a["usage"], "diagnostics": d}
 
 
-def audit_slot(row: dict[str, Any], gold: GoldClaim, corpus: dict[int, Abstract], raw: dict[str, str]) -> dict[str, Any]:
-    result, gap = row["result"], row["arm"] == ARMS[1]
+def audit_slot(row: dict[str, Any], gold: GoldClaim, corpus: dict[int, Abstract], raw: dict[str, str], *, gap: bool | None = None) -> dict[str, Any]:
+    result = row["result"]
+    gap = row["arm"] == ARMS[1] if gap is None else gap
     attempts, traces, events = result["generation_attempts"], result["visible_attempts"], result["events"]
     require(len(attempts) == len(traces) == result["model_calls"], "attempt_trace_count")
     backend = RecordedBackend()
-    adapter = GapProviderAdapter(backend) if gap else None
+    adapter = GapProviderAdapter(cast(Any, backend)) if gap else None
     cursor = 0
     candidates: list[str] = []
     selected: list[str] = []
