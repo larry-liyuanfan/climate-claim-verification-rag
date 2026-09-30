@@ -1,5 +1,13 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [semantic-policy CPU preparation](docs/SCIFACT_SEMANTIC_POLICY_CPU_20260930.md)
+completed in job **31698106** with zero model calls. It excludes all 23 eligible
+IDs in the 12 previously consumed components, then fixes twelve train questions
+for a fresh original-G/semantic-policy comparison with equal initial contexts.
+This verifies exposure accounting and packing contracts, **not model improvement**;
+all 531 eligible questions already had gold-aware preparation exposure. No GPU
+comparison or dev/test release follows, and the negative F/G result below remains.
+
 The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
 adds generation-time uniqueness/total-budget enforcement, actual preview hashes,
 charged error feedback and a preregistered two-arm comparison. Synthetic CPU

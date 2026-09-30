@@ -74,3 +74,42 @@ this batch of questions for positive numbers. No current resume is changed.
 
 Synthetic tests prove contracts only, not that a model understands the policy.
 CPU preparation results, if successfully generated, are recorded separately.
+
+## Completed CPU preparation: 31698106
+
+The sole allocation completed at source
+`779e49883570371ce6223cb2b4a8619df5924d3b`, exit `0:0`, in **123 seconds**,
+with **105.408 CPU seconds** and **1,929,304 KiB batch MaxRSS**. It requested
+one CPU / 4 GiB / ten minutes; `Requeue=0`, `Restarts=0`. No GPU, model inference,
+retry or monitor was used. See the [compact](verified-runs/scifact-semantic-preparation-31698106.json)
+and [resource/package receipt](verified-runs/scifact-semantic-preparation-resources-31698106.json).
+
+The SHA-pinned source archive contains 364 unchanged Git blobs plus one
+41-byte export-substituted `SOURCE_REVISION` marker (365 regular files total).
+Both its exact extracted tree and the thirteen-file private input allowlist
+passed verification. Source/input/wrapper SHA matched locally and on Spartan;
+the six private output hashes were separately rechecked. Only the 3,953-byte
+content-free compact was retrieved and published, with SHA
+`4d73e0196fb64167798b89746020b15aca192ebdb94cf34a36d6bd274d7adadd`.
+
+| CPU preparation observation | Interpretation |
+|---|---|
+| 12 distinct model-consumed IDs, zero uncertain IDs | r2/F/G repeated exposures are deduplicated; failures still consume IDs |
+| 12 excluded components, 23 excluded eligible IDs | Whole-component exclusion precedes matching, not merely removal of old question IDs |
+| 12 selected queries; three in each of four legacy strata | Fixed-hash maximum matching filled the declared quotas; no backfill or relaxed exclusion |
+| 12 selected gold rows parsed; 30 packing probes; zero model calls | Only the selected train questions were re-probed; the 531-query packing pass was not rerun |
+| Equal initial contexts; all legacy/current stratum transitions unchanged | Comparison is mechanically admissible under the declared fixture, not proven effective under a real model history |
+| No official dev, retired test or unlabelled test access | All 531 eligible claims already had legacy gold-aware preparation exposure; this is not independent test evidence |
+
+The fixture only covers the declared uncertain/unknown/empty-gap read/abstain
+history. Its read witnesses cannot establish that a real model will ask to read,
+rewrite or correctly interpret evidence. The prior F/G negative result remains
+unchanged. The private draft holds 48 slots per arm (96 total), requires a fresh
+original-G baseline and the common-packing identity gate, and is **not GPU release**.
+No model-quality score or resume bullet follows from this preparation.
+
+Verification at the frozen source: 64 targeted tests passed, including 25 new
+contract cases; the same 64 passed from a clean extracted Git archive in 2.67 s.
+Targeted Ruff, strict mypy on six source files, shell syntax and tracked-file
+secret/PII checks passed. This package did not rerun the unchanged full suite;
+the earlier 588-pass Linux/Torch result remains explicitly tied to `b248fe7`.

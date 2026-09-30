@@ -1,5 +1,25 @@
 # Evidence and claim boundaries
 
+## 2026-09-30 semantic-policy CPU preparation: no model-quality result
+
+At frozen source `779e49883570371ce6223cb2b4a8619df5924d3b`, the sole CPU
+job31698106 completed in 123 s (105.408 CPU s, 1,929,304 KiB batch MaxRSS).
+The [preparation report](SCIFACT_SEMANTIC_POLICY_CPU_20260930.md),
+[compact](verified-runs/scifact-semantic-preparation-31698106.json) and
+[resource/package receipt](verified-runs/scifact-semantic-preparation-resources-31698106.json)
+retain exact source/input/prompt hashes. Twelve consumed components exclude
+23 eligible IDs before fixed matching; twelve selected questions fill three
+per legacy stratum. Thirty selected-only fixture packing probes confirm equal
+initial contexts and unchanged opportunity strata; no reselection occurred.
+
+All 531 eligible queries were already exposed to legacy gold-aware preparation.
+The twelve selected train questions are not an independent test. Model calls
+are zero, dev/test is unopened, and a fresh two-arm 96-slot model comparison
+remains unreleased. Sixty-four targeted tests and clean-archive reproduction,
+Ruff and six-file strict mypy passed. Neither fixture tool use nor schema success
+demonstrates real model behavior. The frozen F/G negative result below remains
+unchanged; no current-resume or Agent-quality promotion is supported.
+
 ## 2026-09-30 bounded grammar and evidence-gap pair: audited negative result
 
 [Versioned preparation](SCIFACT_BOUNDED_GAP_CPU_20260930.md) preserves the frozen
