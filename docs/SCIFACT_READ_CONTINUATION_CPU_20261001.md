@@ -172,3 +172,7 @@ estimated start was `2026-10-01T06:45:29`; its scheduler timezone was not
 independently established, and it is not a start guarantee. No pending-job
 cancellation, duplicate submission, new monitoring automation or additional
 model experiment was created. Terminal scoring and physical audit remain pending.
+
+The bounded queue-time [observation-supervision proposal](SCIFACT_OBSERVATION_SUPERVISION_PROPOSAL_20261001.md)
+maps the existing training-context mismatch to specific modules and tests. It
+is documentation only, not a change to this job or permission for another run.
