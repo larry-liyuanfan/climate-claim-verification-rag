@@ -119,6 +119,40 @@ reservation, or promised start time**. No actual `sbatch` was issued.
 The scripts `run_scifact_bounded_arm.py`, `run_scifact_bounded_operator.py`, and
 `score_scifact_bounded_pair.py` are prepared inference/orchestration/scoring
 entry points. They are **not evidence of a completed paired experiment**.
-Next release gates are the fixed clean source archive, independent coordinator
-review and explicit GPU release. Training, dev/test evaluation, default-branch
-integration, deployment and current-resume edits are outside this package.
+The fixed clean-source preparation is complete; actual GPU release remains with
+the coordinator. Training, dev/test evaluation, default-branch integration,
+deployment and current-resume edits are outside this package.
+
+### Final CPU closeout
+
+The [compact receipt](verified-runs/scifact-bounded-cpu-closeout-20260930.json)
+freezes execution source `b248fe7f43b175b15b90ec6143538d5dab8e2f35` and tar SHA
+`dbc3ef071b4144934f568fa728a51ac3f07e770c0a9acf3a83e17861279a7bbb`.
+The 2,478,080-byte archive has 348 regular files, 13 directories and exactly
+one 41-byte `SOURCE_REVISION`; all content matches the Git-blob allowlist.
+Its only change from `fd33425` installs CPU Torch/Transformers/PEFT validation
+dependencies in CI. The inference code, frozen protocol and budgets are identical.
+
+- Fresh `fd33425` archive extraction and verified import path: **587 passed,
+  one Windows POSIX skip**, 36.59 seconds, using the existing pinned isolated venv.
+- Final [Linux CI 36705532161](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36705532161):
+  **588 passed, zero skips**, 12.02 seconds, including the POSIX invariant and
+  Torch-dependent checks. Dependency consistency, Ruff, mypy and secret scan pass.
+- Earlier Linux `fd33425` CI was **579 passed / nine missing-Torch skips**;
+  it is a historical result, not retroactively claimed as full coverage.
+- Final source was uploaded to the Climate-only `envs` target in the receipt.
+  Remote source/asset SHA checks, paired-wrapper archive guard and `bash -n` pass.
+  At 2026-09-30 11:02:36 UTC, `sbatch --test-only` returned zero and estimated
+  2026-10-06 06:27:36; its printed **31685002 is a simulation ID, not a submitted
+  job**. The exact-name active queue was empty and both paired run directories
+  were absent. No compute was submitted by this CPU closeout.
+
+The receipt is documentation about the frozen execution commit, not part of that
+commit's self-referential archive. These results establish execution readiness,
+not a completed F/F+G experiment or an improvement in model quality.
+
+The legacy packager also exports `artifacts/bounded-source-b248fe7/wrapper.sbatch`
+and its `f6f386...` hash: that is the old `scifact_train_diagnostic.sbatch`, **not
+the submission entry point**. Use only the separately guarded paired wrapper
+`hpc/scifact_bounded_pair.sbatch` / remote `scifact-bounded-pair-8275b87c.sbatch`,
+SHA `8275b87c94c5862f410e6b2318f4c3f5e129b3bbb829a863d614544234ec313a`.
