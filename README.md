@@ -31,12 +31,14 @@ and one sentence; this regression is **not** literal-`c1`-only. Fixed rerank and
 deterministic extra always selected the first actually visible document.
 This is a retained negative Agent result, not an independent-test improvement.
 
-[A three-state conditional continuation DRAFT](docs/SCIFACT_READ_CONTINUATION_CPU_20261001.md)
+[A three-state conditional continuation](docs/SCIFACT_READ_CONTINUATION_CPU_20261001.md)
 reconstructed all three original scripted-read states exactly, including physical
 prompt hashes and **1,868 / 1,648 / 2,528** input tokens. CPU readiness passed;
 Torch and POSIX imports were verified on Spartan. This is preparation, not model
-quality: **zero new model calls**. No validation consumption, autonomous-read
-claim or training is authorized; the GPU execution release remains separate.
+quality: **zero model calls during CPU preparation**. A separate exact release
+then authorized three calls only; job **31781591** was submitted once and was
+queued at the submission check. No result, validation consumption, autonomous-read
+success or new training is claimed.
 
 ## Latest component diagnostic: complete, with grounding errors
 

@@ -1,4 +1,4 @@
-# Frozen scripted-read conditional continuation — CPU DRAFT
+# Frozen scripted-read conditional continuation — CPU receipt and bounded submission
 
 ## Question and boundary
 
@@ -10,9 +10,12 @@ gold-aware opportunity preparation; success would **not** show autonomous
 Agent behavior, generalization, or an independent test. Keep one FIT-overlap
 case plus two not-direct-FIT cases. Do not select new cases or witnesses.
 
-Status: CPU preparation only. No GPU submission, model call, repair, warmup,
-training or validation execution is permitted without a separate exact release.
-The prior 48-slot regression and its negative score remain unchanged.
+CPU preparation passed. A subsequent separate exact release authorized one
+three-call job, **31781591**, submitted once and queued at the submission check.
+No result is available at this checkpoint. Repairs, warmup, training and
+validation execution remain unauthorized. The prior 48-slot regression and
+its negative score remain unchanged. The DRAFT/CPU sections below preserve
+their original pre-submission status; see the submission receipt at the end.
 
 ## Reconstruct the actual input, not a similar prompt
 
@@ -141,3 +144,31 @@ wrapper already preserves `${PYTHONPATH:+:$PYTHONPATH}`; no installation,
 production-source change or new runtime version was needed. The readiness
 check verifies actual imports and existing manifest hashes, without claiming
 to have rehashed every runtime file again.
+
+## Separate exact release and single submission
+
+The coordinator released only the source/input/resource contract above. The
+original DRAFT was retained. Replacing its unique authorization literal, with
+all other bytes unchanged, produced **5,755 bytes** and SHA
+`6638761114eb51b98b5f8db95121f13ae05c873fdd2c69e9abb5896382ea8d69`.
+No source archive was rebuilt after the evidence-only documentation commit.
+
+The [submission receipt](verified-runs/scifact-read-continuation-submission-31781591.json)
+records the actual job ID **31781591**, distinct from the test-only simulation.
+An exclusive reservation, unused-output check and empty matching-job queue
+preceded `sbatch --test-only`; it passed before a single actual `sbatch` call.
+Inherited `SBATCH_*` overrides were removed (none were present). Slurm confirmed
+normal QoS, Nice 0, no requeue and the exact 1 A100 / 8 CPU / 32 GiB / 30 GiB
+scratch / 900-second resource contract.
+
+The project fileset had 192.8 GiB used against 466/467 GiB soft/hard quota,
+525,019 of 1,000,000 files. This is a fileset quota observation, not filesystem
+free space. The account's home quota was full; the frozen wrapper already
+routes model caches/temporary files to allocated scratch and outputs to the
+project fileset, and no home data was deleted or modified.
+
+Initial scheduler state was `PENDING (Resources)`, priority 13,418. The raw
+estimated start was `2026-10-01T06:45:29`; its scheduler timezone was not
+independently established, and it is not a start guarantee. No pending-job
+cancellation, duplicate submission, new monitoring automation or additional
+model experiment was created. Terminal scoring and physical audit remain pending.
