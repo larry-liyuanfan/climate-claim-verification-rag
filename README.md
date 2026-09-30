@@ -1,5 +1,14 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+## Grounding adaptation candidate: CPU implementation only
+
+[Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
+protocol-bound consumption ledger, whole-component/source-family separation,
+official alternative-aware targets, and a single-config LoRA training / paired
+non-oracle evaluation entrypoint using the production citation contract.
+No adapter training, new generation, Slurm submission, dev/test evaluation or
+Agent improvement is claimed. Historical negative results below are unchanged.
+
 ## Latest component diagnostic: complete, with grounding errors
 
 [Job 31743877 closeout](docs/SCIFACT_COMPONENT_CLOSEOUT_31743877.md): **36 new + one
