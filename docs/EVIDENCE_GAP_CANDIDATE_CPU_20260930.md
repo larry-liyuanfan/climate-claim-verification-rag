@@ -114,6 +114,14 @@ It measures actual final visibility under both templates for four **synthetic**
 routes at the same2048-token fixture cap. Default future caps remain8192/512.
 Successful CPU validation is not a claim about real-model usefulness.
 
+The first cached-tokenizer smoke on source`48922af` stopped during synthetic
+private-directory initialization: the harness supplied a nonexisting relative
+path to the strict private-store contract. It had executed no prefix checks,
+packing cases, real queries or model calls. The harness now creates an exclusive
+absolute private directory, with a regression test; the failed output directory
+is retained and a separate rerun directory is used. This is a CPU harness repair,
+not a changed model policy or repeated data evaluation.
+
 ## Stop/release rule
 
 The frozen train diagnostic must first show at least one auditable, naturally

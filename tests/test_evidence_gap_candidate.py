@@ -6,6 +6,7 @@ import inspect
 import json
 import string
 import types
+from pathlib import Path
 
 import pytest
 from jsonschema import ValidationError as SchemaValidationError
@@ -461,3 +462,16 @@ def test_candidate_grammar_rejects_environment_override(monkeypatch):
     monkeypatch.setenv("LMFE_FORCE_JSON_FIELD_ORDER", "1")
     with pytest.raises(ValueError, match="environment overrides"):
         build_ordered_gap_prefix(object(), {})
+
+
+def test_smoke_creates_exclusive_absolute_private_fixture_directory(
+    tmp_path, monkeypatch
+):
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "scripts"))
+    from smoke_evidence_gap_candidate import ScriptedBackend
+
+    target = tmp_path / "new-parent" / "private"
+    backend = ScriptedBackend(CharTokenizer(), [], target)
+    assert backend.store.root.is_absolute() and target.is_dir()
+    with pytest.raises(FileExistsError):
+        ScriptedBackend(CharTokenizer(), [], target)

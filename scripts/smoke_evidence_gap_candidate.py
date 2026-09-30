@@ -73,6 +73,8 @@ class ScriptedBackend:
         self, tokenizer: Any, responses: list[Any], root: Path, candidate: bool = True
     ):
         self.tokenizer, self.responses = tokenizer, iter(responses)
+        root = root.resolve()
+        root.mkdir(parents=True, exist_ok=False)
         self.store, self.candidate = PrivateDiagnosticStore(root), candidate
 
     def count_text(self, text: str) -> int:
@@ -267,6 +269,7 @@ def main() -> int:
     parser.add_argument("--tokenizer", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    args.output = args.output.resolve()
     repository = Path(__file__).resolve().parents[1]
     status = subprocess.check_output(
         ["git", "status", "--porcelain", "--untracked-files=all"],
