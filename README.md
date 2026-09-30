@@ -3,10 +3,15 @@
 The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
 adds generation-time uniqueness/total-budget enforcement, actual preview hashes,
 charged error feedback and a preregistered two-arm comparison. Synthetic CPU
-checks passed. The coordinator subsequently released the frozen pair: jobs
-**31686182 → afterok → 31686183** were submitted on 2026-09-30; the first bounded
-snapshot showed F running and G dependency-pending. See the [submission receipt](docs/verified-runs/scifact-bounded-pair-submission-31686182-31686183.json).
-**Submission is not a completed paired model result or a quality improvement.**
+checks passed. The released pair **31686182 → afterok → 31686183** completed;
+the [read-only posthoc audit](docs/SCIFACT_BOUNDED_POSTHOC_CLOSEOUT_20260930.md)
+verified all 96 slots, source/wire hashes and independent official score counts.
+All decisions were format-valid, but both adaptive arms selected **zero tools**.
+Adaptive abstract-rationalized F1 was .1000/.1081 (both only 2/9 correct gold
+documents); the gap-aware fixed-retrieval baseline scored .1212. This is a
+**biased 12-claim train diagnostic, not evidence of Agent benefit or a holdout
+improvement**. Tokens and the failed/successful CPU audit allocations are retained;
+no current-resume change or new model run follows.
 
 The [SciFact train diagnostic closeout](docs/SCIFACT_TRAIN_DIAGNOSTIC_CLOSEOUT_20260930.md)
 records completed job **31645005**, all48 slots and independently checked score

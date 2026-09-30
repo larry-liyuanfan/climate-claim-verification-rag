@@ -1,0 +1,57 @@
+{
+  "schema_version": "scifact-posthoc-infra-retry-v1",
+  "infra_retry": 1,
+  "prior_failed_allocation": 31691393,
+  "prior_failure_record_preserved": true,
+  "audit_allocation": {
+    "job_id": 31692980,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 30,
+    "total_cpu_seconds": 22.720,
+    "step_maxrss_kib": 1408252,
+    "cpus": 1,
+    "memory": "4G",
+    "walltime_cap": "00:05:00",
+    "gpus": 0,
+    "model_calls": 0
+  },
+  "unchanged_execution_jobs": [31686182, 31686183],
+  "execution_source_git": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+  "audit_git": "a347233b88c103cb23c76845527278f960a48406",
+  "audit_script_sha256": "1d18a54e883fc2c5e7a70af25fc6c469b38abcd11144b451c01f86451981fde9",
+  "audit_archive_sha256": "bee2d9a9af76bdbbe9625f08cdc5f13f1d3ea0816ad4973825ef1a371fc30619",
+  "wrapper_sha256": "b2238a9cd5250723819bd31a4ff21c3c8c97b4654abaf7c84becf1f6c055ac01",
+  "runtime_archive_sha256": "2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8",
+  "overlay_archive_sha256": "e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce",
+  "environment": {
+    "helper": "v3_runtime_environment",
+    "pythonpath_order": ["overlay-site", "runtime/lib/python3.10/site-packages", "source/src", "preserved module PYTHONPATH"],
+    "python": "3.10.4",
+    "numpy": "1.26.4",
+    "numpy_origin": "frozen runtime",
+    "pydantic": "2.13.5",
+    "pydantic_origin": "frozen overlay",
+    "jsonschema": "4.23.0",
+    "jsonschema_origin": "frozen runtime",
+    "audit_entry_import": "passed"
+  },
+  "checks": {
+    "before_allocation_import_only": "passed",
+    "inside_allocation_import_only": "passed",
+    "local_bash_syntax": "passed",
+    "remote_bash_syntax": "passed",
+    "sbatch_test_only": "passed simulation; not an allocation",
+    "read_only_wrapper_review": "passed",
+    "frozen_audit_algorithm_unchanged": true
+  },
+  "output": {
+    "spartan_relative_path": "posthoc/scifact-pair-audit-a347233-r2/compact.json",
+    "sha256": "94ca7cb2167decab8ae51d8dd9dd07bdc4d3028ac003a79700d62032d9e80abe",
+    "bytes": 34850,
+    "local_hash_matches": true,
+    "raw_or_per_row_exported": false
+  },
+  "status": "audited_compact",
+  "further_retry_or_model_run": "not authorized by this closeout"
+}

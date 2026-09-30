@@ -1,6 +1,6 @@
 # Evidence and claim boundaries
 
-## 2026-09-30 bounded grammar and evidence-gap CPU preparation
+## 2026-09-30 bounded grammar and evidence-gap pair: audited negative result
 
 [Versioned preparation](SCIFACT_BOUNDED_GAP_CPU_20260930.md) preserves the frozen
 r2 negative outcome and repairs invalid generation prefixes without rewriting
@@ -10,9 +10,18 @@ F/F+G protocol is frozen as two serial batches. Full local CPU suite: 587 passed
 one Windows POSIX skip; final Linux CI with CPU Torch: 588 passed/zero skips.
 Seventeen pinned-tokenizer synthetic cases and two exact-token-set differential
 probes passed. After separate coordinator release, [jobs 31686182 and 31686183](verified-runs/scifact-bounded-pair-submission-31686182-31686183.json)
-were submitted with an afterok dependency; at 2026-09-30 11:09:18 UTC, F was
-running and G dependency-pending. No completed paired model result, Agent benefit,
-new holdout, online SLA or resume improvement is inferred from this submission.
+completed 48 slots per arm with identical initial contexts. The [CPU-only
+posthoc audit](SCIFACT_BOUNDED_POSTHOC_CLOSEOUT_20260930.md) and
+[compact](verified-runs/scifact-bounded-pair-posthoc-31692980.json) verify hashes,
+durable slots, full wire, score recomputation and independent official integers.
+All 96 decisions were format-valid, with zero repairs; neither adaptive arm
+proposed or executed a model-selected tool. Adaptive abstract-rationalized F1
+.1000/.1081 reflects the same 2/9 correct gold documents, not a tool benefit;
+gap-aware fixed retrieval scored .1212. Strict whole-answer diagnostics remain
+2/12 per adaptive arm, distinct from official document credit. The biased train
+sample is not independent dev/test. No Agent-quality promotion, online SLA or
+resume improvement is supported. One import-path infrastructure failure and
+its single successful CPU retry remain explicit in the cost ledger.
 
 ## 2026-09-30 SciFact train diagnostic: no Agent-quality promotion
 

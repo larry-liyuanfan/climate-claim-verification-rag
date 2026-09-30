@@ -1,5 +1,95 @@
 # Bounded paired-run posthoc closeout
 
+## Verified result and decision
+
+F (`format_repaired`, job 31686182) and F+G (`format_repaired_gap`, job 31686183)
+both completed with exit `0:0`. The unchanged read-only audit at
+`a347233b88c103cb23c76845527278f960a48406` completed in CPU allocation 31692980.
+The [compact](verified-runs/scifact-bounded-pair-posthoc-31692980.json) SHA is
+`94ca7cb2167decab8ae51d8dd9dd07bdc4d3028ac003a79700d62032d9e80abe`.
+Identity joins, full-wire/grammar receipts, durable 48+48 slots, initial-context
+comparability, score recomputation and 32 independent official metric integer
+triples all passed. Inference source remains `b248fe7`; it was not modified by
+the audit.
+
+All 96 train generation attempts returned valid decisions with no repair. This
+is format compliance, **not semantic correctness**. Both adaptive arms produced
+only answer/abstain decisions: zero raw tool proposals, zero model-selected tool
+events, and consequently zero observed new-evidence-to-correct-answer chains.
+Their fixed initial retrieval events are counted separately, not attributed to
+the model. A zero tool funnel here is not an estimate of success conditional on
+tool execution, because no such execution occurred.
+
+| Route (12 claims each) | F correct / predicted / relevant docs | F abstract-rationalized F1 | F+G correct / predicted / relevant docs | F+G abstract-rationalized F1 |
+|---|---:|---:|---:|---:|
+| Fixed retrieval | 2 / 31 / 9 | .1000 | 2 / 24 / 9 | .1212 |
+| Fixed rerank | 2 / 44 / 9 | .0755 | 2 / 44 / 9 | .0755 |
+| Deterministic extra | 1 / 43 / 9 | .0385 | 2 / 46 / 9 | .0727 |
+| Adaptive | 2 / 31 / 9 | .1000 | 2 / 28 / 9 | .1081 |
+
+The adaptive F1 difference comes from fewer predicted documents, not more
+correctly rationalized gold documents. The conservative strict whole-final-answer
+diagnostic is 2/12 for both adaptive arms (including legal NEI abstention where
+appropriate); it is not official claim accuracy. Neither aggregate is a
+generalization estimate on these biased eligible-train examples.
+
+In F+G adaptive, all 12 initial self-reports said retrieval was not needed;
+nine reported relevant/sufficient and answered, while three reported
+irrelevant/missing and abstained. All three gold-absent-Top-20 cases answered,
+and no top-20-replenishable case triggered a model tool. These are posthoc
+diagnostic cross-tabs, not calibrated evidence-sufficiency labels or causal
+proof. They explain why merely adding a self-report field did not establish
+adaptive retrieval behavior.
+
+Decision: retain this negative result. Do not promote the Agent, release a new
+holdout, claim an online benefit, or change the current resume from this run.
+No further GPU run or policy change is part of this closeout.
+
+## Complete cost accounting
+
+| Scope | Calls | Input tokens | Output tokens | Known generation time |
+|---|---:|---:|---:|---:|
+| F train, all four routes | 48 | 179,780 | 6,867 | 207.583 s |
+| F+G train, all four routes | 48 | 198,260 | 10,401 | 378.244 s |
+| F synthetic preflight | 4 | 2,720 | 238 | 7.083 s |
+| F+G synthetic preflight | 4 | 4,260 | 535 | 22.172 s |
+
+All 104 calls have recorded usage and generation timing; G uses full original
+wire rather than mapped-action length. These are verified stored ledgers, not
+an independent tokenizer recount or invoiced API cost. F and F+G Slurm elapsed
+times are 364/567 seconds, with batch MaxRSS 18,534,620/18,567,812 KiB. GPU
+allocation time is not utilization; overlapping generation, loading, tool,
+question, operator and Slurm durations must not be added together.
+
+CPU audit attempt 31691393 failed before any run/gold read because its wrapper
+discarded module PYTHONPATH (`numpy` became invisible). Preserve its
+[failure receipt](verified-runs/scifact-posthoc-environment-failure-31691393.json),
+9 seconds elapsed, 2.318 CPU seconds and 117,960 KiB step MaxRSS. The separately
+authorized single infrastructure retry 31692980 passed: 30 seconds elapsed,
+22.720 CPU seconds, 1,408,252 KiB step MaxRSS, 1 CPU/4 GiB/5-minute cap, no GPU
+or model calls. No failed compute is omitted from the ledger.
+
+The [r2 wrapper](verified-runs/scifact-posthoc-a347233-r2.sbatch) SHA is
+`b2238a9cd5250723819bd31a4ff21c3c8c97b4654abaf7c84becf1f6c055ac01`.
+It reuses frozen runtime archive `2423a755...` and the existing
+`v3_runtime_environment` ordering: overlay, runtime site-packages, source, then
+module PYTHONPATH. An import-only check before allocation and again inside it
+confirmed Python 3.10.4, NumPy 1.26.4 and jsonschema 4.23.0 from the runtime,
+Pydantic 2.13.5 from the overlay, and the unchanged audit entry. Local/remote
+`bash -n` and `sbatch --test-only` passed. The latter was only a scheduling
+simulation, not an additional allocation. The old log and empty output directory
+are preserved; retry output is exclusively `posthoc/scifact-pair-audit-a347233-r2`.
+
+## Audit design and reproduction
+
+The wrapper's `--imports-only` mode checks dependencies without reading runs,
+gold or model weights. Its default mode requires a CPU allocation and invokes
+the hash-pinned source archive at `a347233`; the reviewed compact is exported
+only after the audit completes. Reproduction requires the private authorized
+Spartan assets, not fixtures substituted for real runs. The existing output
+directory deliberately prevents a repeated execution from overwriting evidence.
+No archive, raw response, gold or per-row record is published with this report.
+
 This is a read-only CPU audit, not a new model experiment. Execution remains
 `b248fe7f43b175b15b90ec6143538d5dab8e2f35`; the audit code commit is recorded
 separately. It writes a new compact file under the Climate `posthoc` directory,
