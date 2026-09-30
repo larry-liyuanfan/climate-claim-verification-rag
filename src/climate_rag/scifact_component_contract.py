@@ -95,11 +95,28 @@ def schema_for(spec: Mapping[str, Any]) -> dict[str, Any]:
     return {"anyOf": [active, abstain]}
 
 
+def authored_input(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Restore Stage A field order after canonical JSON persistence.
+
+    Lists and values are never reordered or repaired. These exact object-key
+    orders are those used by prepare_claim/document before freezing packing.
+    Alphabetically sorting prompt JSON would change the frozen prompt bytes.
+    """
+    validate_input(spec)
+    ordered = {"component": spec["component"], "claim": spec["claim"], "documents": [
+        {"document_id": doc["document_id"], "title": doc["title"], "sentences": [
+            {"sentence_id": sentence["sentence_id"], "text": sentence["text"]}
+            for sentence in doc["sentences"]]} for doc in spec["documents"]]}
+    if spec["component"] == "rationale":
+        ordered["oracle_relation"] = spec["oracle_relation"]
+    return ordered
+
+
 def messages(spec: Mapping[str, Any]) -> list[dict[str, str]]:
     schema = schema_for(spec)
     return [{"role": "system", "content": PROMPTS[spec["component"]] + "\n" +
              json.dumps(schema, ensure_ascii=False, separators=(",", ":"))},
-            {"role": "user", "content": json.dumps(spec, ensure_ascii=False, separators=(",", ":"))}]
+            {"role": "user", "content": json.dumps(authored_input(spec), ensure_ascii=False, separators=(",", ":"))}]
 
 
 def render(tokenizer: Any, spec: Mapping[str, Any]) -> str:

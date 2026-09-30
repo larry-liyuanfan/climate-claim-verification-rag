@@ -18,11 +18,30 @@ from .scifact_component_contract import LIMITS, ContractError, packing, parse, r
 from .scifact_component_runtime import ComponentPersistenceError, known_usage
 from .scifact_semantic_contract import checked, encoded, sha
 
-RELEASE = "scifact-component-single-attempt-20261001-v1"
+RELEASE = "scifact-component-single-attempt-20261001-r2"
+INFRASTRUCTURE_LINEAGE = {
+    "logical_release": "scifact-component-single-attempt-20261001-v1", "infra_retry": 1,
+    "prior_job": "31729507", "prior_source_git": "79f069d2eb4c8db3b82b152fa8a698b5ae3230ad",
+    "prior_source_archive_sha256": "b46a1866f659e193e7078a1ed57f3e805d177a8143be77a818605649194e0b19",
+    "prior_inference_log_sha256": "9e1e88b2973a87ad01ee568e5ba97a1972d97113fc3cb78358a2016f61fd73d3",
+    "prior_operator_status_sha256": "f72d25cb3e431afc48526fe976dc655791dfa7d0eca5d134a800c9ace51c440d",
+    "prior_model_calls": 0, "prior_allocated_gpu_seconds": 81,
+}
 PREPARATION_GIT = "426ff7343fb30e1ffcde4dfa4a43f1c00c210cfb"
 PROTOCOL_SHA = "2ce563ccc34efbd5ee1a21cf12fa47fafd063c853c629996909cb37e7247ca1e"
 SLOTS_SHA = "84524e2a837aacab5824e5562a61d827ef02b1832dd9ab9f383ae73caa309ac9"
 TARGETS_SHA = "a6d38d3fe9d72e6beb0b16836e650e4519d2016e31b63ed1d79e05999b665d9a"
+
+
+def verify_infrastructure_predecessor(runs: Path) -> None:
+    """Bind this one prepared retry to the preserved, pre-model v1 failure."""
+    prior = runs / str(INFRASTRUCTURE_LINEAGE["logical_release"])
+    for name, key in (("inference.log", "prior_inference_log_sha256"),
+                      ("operator-status.json", "prior_operator_status_sha256")):
+        checked(prior / name, str(INFRASTRUCTURE_LINEAGE[key]))
+    require(not prior.is_symlink() and all(not (prior / name).exists() and not (prior / name).is_symlink()
+        for name in ("worker-identity.json", "provider-load-private", "inference", "inference-exited.json")),
+        "predecessor_not_proven_pre_model")
 
 
 def durable(path: Path, value: Any) -> None:

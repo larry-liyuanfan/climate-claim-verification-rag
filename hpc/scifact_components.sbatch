@@ -18,7 +18,7 @@ umask 077
 : "${CLIMATE_SOURCE_TAR:?}"
 : "${CLIMATE_SOURCE_SHA256:?}"
 : "${CLIMATE_SOURCE_GIT:?}"
-test "${CLIMATE_COMPONENT_RELEASE:-}" = scifact-component-single-attempt-20261001-v1
+test "${CLIMATE_COMPONENT_RELEASE:-}" = scifact-component-single-attempt-20261001-r2
 ROOT=/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2
 case "$(readlink -f "$CLIMATE_SOURCE_TAR")" in "${ROOT}/envs/"*) ;; *) exit 90 ;; esac
 test "$(sha256sum "$CLIMATE_SOURCE_TAR" | cut -d' ' -f1)" = "$CLIMATE_SOURCE_SHA256"

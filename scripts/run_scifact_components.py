@@ -7,7 +7,9 @@ import time
 from pathlib import Path
 from typing import Any
 
-from climate_rag.component_execution import PREPARATION_GIT, RELEASE, SLOTS_SHA, durable, execute_matrix, frozen_slots
+from climate_rag.component_execution import (
+    INFRASTRUCTURE_LINEAGE, PREPARATION_GIT, RELEASE, SLOTS_SHA, durable, execute_matrix, frozen_slots,
+)
 from climate_rag.component_preflight import preflight_cases
 from climate_rag.local_component_provider import LocalQwenComponentProvider
 from climate_rag.scifact_component_contract import packing, require
@@ -42,6 +44,7 @@ def main() -> None:
     durable(result / "worker-identity.json", {"release": RELEASE, "source_git": os.environ["CLIMATE_SOURCE_GIT"],
         "source_archive_sha256": os.environ["CLIMATE_SOURCE_SHA256"], "preparation_git": PREPARATION_GIT,
         "slots_sha256": SLOTS_SHA, "model_manifest_sha256": MODEL_SHA, "preflight": preflight,
+        "infrastructure_lineage": INFRASTRUCTURE_LINEAGE,
         "scoring_targets_loaded": False, "started_unix": time.time()})
     private = result / "provider-load-private"
     private.mkdir(mode=0o700)

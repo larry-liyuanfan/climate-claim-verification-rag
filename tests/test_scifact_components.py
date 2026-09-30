@@ -15,7 +15,7 @@ import pytest
 from jsonschema import validate
 
 from climate_rag.scifact_component_contract import (
-    ContractError, packing, parse, protocol, render, schema_for,
+    PROMPTS, ContractError, authored_input, messages, packing, parse, protocol, render, schema_for,
 )
 from climate_rag.scifact_component_preparation import actual_documents, coverage, prepare_claim, source_hash
 from climate_rag.scifact_component_runtime import ComponentPersistenceError, fixture_slot
@@ -52,6 +52,40 @@ def example() -> tuple[dict[int, Any], dict[str, Any], dict[str, Any]]:
 def prepared() -> list[dict[str, Any]]:
     corpus, gold, result = example()
     return prepare_claim(gold, result, corpus, TokenizerFixture())
+
+
+@pytest.mark.parametrize("index", [0, 1, 2])
+def test_persisted_input_restores_original_stage_a_prompt(index: int, tmp_path: Path) -> None:
+    from climate_rag.scifact_semantic_contract import write_once
+    row = prepared()[index]
+    spec = row["input"]
+    # Independent legacy renderer: original insertion order, not the new helper.
+    legacy = [{"role": "system", "content": PROMPTS[spec["component"]] + "\n" +
+               json.dumps(schema_for(spec), ensure_ascii=False, separators=(",", ":"))},
+              {"role": "user", "content": json.dumps(spec, ensure_ascii=False, separators=(",", ":"))}]
+    path = tmp_path / "slot.json"
+    write_once(path, row)
+    reloaded = json.loads(path.read_bytes())
+    assert list(reloaded["input"]) != list(spec)
+    assert list(reloaded["input"]["documents"][0]) != list(spec["documents"][0])
+    before = encoded(reloaded)
+    assert messages(reloaded["input"]) == legacy
+    assert packing(TokenizerFixture(), reloaded["input"]) == row["packing"]
+    assert encoded(reloaded) == before  # no mutation or replacement of expected packing
+    assert authored_input(reloaded["input"]) == spec
+    def reversed_keys(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {k: reversed_keys(v) for k, v in reversed(list(value.items()))}
+        return [reversed_keys(v) for v in value] if isinstance(value, list) else value
+    assert messages(reversed_keys(spec)) == legacy
+    assert packing(TokenizerFixture(), reversed_keys(spec)) == row["packing"]
+
+
+def test_authored_order_rejects_unknown_fields_without_repair() -> None:
+    spec = prepared()[0]["input"]
+    spec["documents"][0]["hidden"] = "unexpected"
+    with pytest.raises(ContractError, match="document_fields"):
+        authored_input(spec)
 
 
 def test_actual_visible_order_full_abstract_not_requested_or_sorted() -> None:

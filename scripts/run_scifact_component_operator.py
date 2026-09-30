@@ -14,7 +14,9 @@ from types import FrameType
 from collections.abc import Callable
 from typing import Any, cast
 
-from climate_rag.component_execution import PROTOCOL_SHA, RELEASE, SLOTS_SHA, TARGETS_SHA, durable
+from climate_rag.component_execution import (
+    INFRASTRUCTURE_LINEAGE, PROTOCOL_SHA, RELEASE, SLOTS_SHA, TARGETS_SHA, durable, verify_infrastructure_predecessor,
+)
 from climate_rag.scifact_component_contract import require
 from climate_rag.scifact_semantic_contract import GRAMMAR_SHA, checked
 from run_budget_agent_full_operator import ARCHIVES, ROOT, atomic_status, digest, execute, read_only_tree, safe_extract
@@ -78,6 +80,7 @@ def main() -> None:
     require((source / "SOURCE_REVISION").read_text().strip() == env0["CLIMATE_SOURCE_GIT"], "source_identity")
     checked(PREP / "protocol.json", PROTOCOL_SHA)
     frozen_input = checked(PREP / "inference/slots.json", SLOTS_SHA)
+    verify_infrastructure_predecessor(ROOT / "runs")
     # The single fixed root reserves the whole release BEFORE any model loading.
     # It must not be deleted or renamed to obtain another 37 attempts.
     result = ROOT / "runs" / RELEASE
@@ -85,7 +88,8 @@ def main() -> None:
     status = result / "operator-status.json"
     state: dict[str, Any] = {"release": RELEASE, "status": "running", "source_git": env0["CLIMATE_SOURCE_GIT"],
              "source_archive_sha256": env0["CLIMATE_SOURCE_SHA256"], "preparation_protocol_sha256": PROTOCOL_SHA,
-             "job_id": env0["SLURM_JOB_ID"], "targets_read": False, "started_unix": time.time()}
+             "job_id": env0["SLURM_JOB_ID"], "targets_read": False, "started_unix": time.time(),
+             "infrastructure_lineage": INFRASTRUCTURE_LINEAGE}
     atomic_status(status, state)
 
     def interrupted(number: int, frame: FrameType | None) -> None:

@@ -26,6 +26,64 @@ def slot(spec=None, i=0):
     return {"slot": i, "input": spec, "packing": packing(TokenizerFixture(), spec)}
 
 
+@pytest.mark.parametrize("mismatch", [True, False])
+def test_worker_all_packing_checks_precede_provider_construction(tmp_path, monkeypatch, mismatch):
+    import run_scifact_components as worker
+    from transformers.models.auto.tokenization_auto import AutoTokenizer
+    source = tmp_path / "source"
+    (source / "scripts").mkdir(parents=True)
+    (source / "SOURCE_REVISION").write_text("a" * 40)
+    root = tmp_path / "project"
+    result = root / "runs" / worker.RELEASE
+    result.mkdir(parents=True)
+    monkeypatch.setattr(worker, "__file__", str(source / "scripts/run_scifact_components.py"))
+    monkeypatch.setattr(worker, "ROOT", root)
+    monkeypatch.setattr(worker, "os", types.SimpleNamespace(name="posix", environ={
+        "SLURM_JOB_ID": "synthetic", "CUDA_VISIBLE_DEVICES": "0", "CLIMATE_COMPONENT_RELEASE": worker.RELEASE,
+        "CLIMATE_SOURCE_GIT": "a" * 40, "CLIMATE_SOURCE_SHA256": "b" * 64,
+        "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "PYTHONHASHSEED": "0"}))
+    monkeypatch.setattr(worker.argparse.ArgumentParser, "parse_args", lambda self:
+        types.SimpleNamespace(slots=tmp_path, model_manifest=tmp_path, model_dir=tmp_path))
+    rows = [slot(i=i) for i in range(33)]
+    if mismatch:
+        rows[-1]["packing"]["prompt_sha256"] = "0" * 64
+    monkeypatch.setattr(worker, "frozen_slots", lambda _: rows)
+    monkeypatch.setattr(worker, "verify_manifest", lambda *args: {})
+    monkeypatch.setattr(AutoTokenizer, "from_pretrained", lambda *args, **kwargs: TokenizerFixture())
+    constructors = []
+    def sentinel(*args, **kwargs):
+        constructors.append(True)
+        raise RuntimeError("stop_before_any_model_loading")
+    monkeypatch.setattr(worker, "LocalQwenComponentProvider", sentinel)
+    with pytest.raises((ContractError, RuntimeError), match=
+                       "frozen_input_packing" if mismatch else "stop_before_any_model_loading"):
+        worker.main()
+    assert len(constructors) == (0 if mismatch else 1)
+    assert (result / "worker-identity.json").exists() is not mismatch
+    assert (result / "provider-load-private").exists() is not mismatch
+    assert not (result / "inference").exists()
+
+
+def test_retry_predecessor_requires_exact_old_failure_and_no_model_marker(tmp_path, monkeypatch):
+    import climate_rag.component_execution as execution
+    prior = tmp_path / str(execution.INFRASTRUCTURE_LINEAGE["logical_release"])
+    prior.mkdir()
+    lineage = dict(execution.INFRASTRUCTURE_LINEAGE)
+    for name, key in (("inference.log", "prior_inference_log_sha256"),
+                      ("operator-status.json", "prior_operator_status_sha256")):
+        payload = ("synthetic " + name).encode()
+        (prior / name).write_bytes(payload)
+        lineage[key] = sha(payload)
+    monkeypatch.setattr(execution, "INFRASTRUCTURE_LINEAGE", lineage)
+    execution.verify_infrastructure_predecessor(tmp_path)
+    (prior / "provider-load-private").mkdir()
+    with pytest.raises(ContractError, match="predecessor_not_proven_pre_model"):
+        execution.verify_infrastructure_predecessor(tmp_path)
+    (prior / "inference.log").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="input_sha_mismatch"):
+        execution.verify_infrastructure_predecessor(tmp_path)
+
+
 class Fake:
     tokenizer = TokenizerFixture()
     def __init__(self, fail_at=-1, wire=None, error=None):
@@ -293,6 +351,7 @@ def test_operator_reserves_once_and_targets_after_child_exit(tmp_path, monkeypat
             events.append("targets_read")
         return b"[]"
     monkeypatch.setattr(operator, "checked", checked)
+    monkeypatch.setattr(operator, "verify_infrastructure_predecessor", lambda runs: None)
     def extract(archive, target, *args, **kwargs):
         target.mkdir()
         return 0
