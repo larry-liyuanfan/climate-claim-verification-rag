@@ -500,3 +500,16 @@ def test_runtime_tar_prefix_and_unselected_python_link_not_extracted(tmp_path: P
     assert receipt["files"] == 1
     assert (tmp_path / "site/tokenizers/__init__.py").read_bytes() == b"x"
     assert not (tmp_path / "site/torch").exists()
+
+
+def test_fixture_cli_nested_output_is_exclusive(tmp_path: Path) -> None:
+    location = Path(__file__).resolve().parents[1] / "scripts/check_scifact_components.py"
+    spec = importlib.util.spec_from_file_location("component_cli_fixture", location)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    output = tmp_path / "new-parent/fixture-run"
+    receipt = module.check(output)
+    assert receipt["valid_fixtures"] == 4 and receipt["model_calls"] == 0
+    with pytest.raises(FileExistsError):
+        module.check(output)

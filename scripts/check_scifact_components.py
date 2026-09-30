@@ -41,7 +41,7 @@ class ScriptedProvider:
 
 
 def check(output: Path) -> dict[str, Any]:
-    output.mkdir(mode=0o700)
+    output.mkdir(mode=0o700, parents=True)
     base = {"claim": "Synthetic compound improves a synthetic endpoint.",
             "documents": [{"document_id": 9000, "title": "Synthetic study, not real evidence",
                            "sentences": [{"sentence_id": 0, "text": "Synthetic endpoint improved in this fixture."},
