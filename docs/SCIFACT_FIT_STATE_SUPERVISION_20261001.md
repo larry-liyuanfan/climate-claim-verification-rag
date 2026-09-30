@@ -2,6 +2,12 @@
 
 ## Status and scope
 
+**Completed CPU job 31789062, exit 0:0.** The original 48 FIT claims yielded
+93 records with mass 1 per claim and no gaps. However, **all 93 targets are
+answers: zero read/abstain supervision arose naturally**. This bundle repairs
+grounding context/weighting but does not teach or demonstrate adaptive tool
+selection. No training or evaluation followed. See the measured closeout below.
+
 This is a **new supervised-data contract**, not a trained model or quality
 improvement. No generation, GPU allocation, training, tune/validation/dev/test
 evaluation or new claim selection is authorised by this entry point. The
@@ -123,3 +129,66 @@ answer/abstain call and cannot establish Agent benefit. A later independently
 reviewed production-agent comparison must distinguish grounding improvement,
 more tool calls, and genuine same-model policy benefit. Reserved IDs and source
 families remain unchanged and unconsumed here.
+
+## Measured single-preparation closeout
+
+Execution source `9bf5fdad2ec9b010cb6a305b3e3462e0c7ac0ab1`; exact archive
+`f4079a80d4e74a8d8f988cc04a7bbb787de7b6b4eb6b6c6c2e3282ab7e78dab9`.
+Source/package verification and test evidence are in
+[the source receipt](verified-runs/scifact-fit-state-source-9bf5fdad2ec9.json).
+The first non-exact archive was rejected before extraction/submission. The
+replacement came from the existing exact-source packager: original Git bytes
+and modes, 510 files, 13 directories and one 41-byte revision marker. The
+legacy packager shell-guard check is not represented as CPU-wrapper execution;
+the CPU wrapper separately passed syntax and hash checks, test-only scheduling,
+and real source-tree verification in the single successful job.
+
+The [byte-preserved compact artifact](verified-runs/scifact-fit-state-31789062.json)
+has SHA `3cfc8acffcb001488ce841310349fa05a806a2216d66336afe331d9cd04e1bde`.
+Its four private artifact hashes were rechecked on Spartan; its content equals
+the successful job's final log record. The
+[closeout receipt](verified-runs/scifact-fit-state-closeout-31789062.json)
+records exact remote paths, accounting and log hash. Neither original gold nor
+actual observation/record text was copied to GitHub or the local checkout.
+
+| Quantity | Measured value and boundary |
+|---|---|
+| Original FIT claims / components | 48 / 48, identities unchanged |
+| Corpus / frozen FIT-family pool | 5,183 / 256 documents; not full-corpus retrieval |
+| Initial complete document witness | 48/48 claims, program audit not model accuracy |
+| Whole-gold coverage in teacher target | 47/48 claims |
+| Records / action distribution | 93 answers; 0 reads; 0 abstentions |
+| Record count per claim | 20/17/5/6 claims have 1/2/3/4 records |
+| Answer document counts | 83 one-doc, 4 two-doc, 6 three-doc records |
+| Rationale lengths | 103 single-sentence and 6 two-sentence document targets |
+| Complete annotations beyond old record cap | 3 claims, not every four-record claim |
+| Alternative-combination cap | 3 claims; complete per-doc rationales not truncated |
+| Claim mass / preparation gaps | 48 at exactly 1; zero gaps |
+| Sequence tokens | 418,425 prompt + 3,028 target = 421,453 total; maximum joint length 6,482 |
+| Historical sequence tokens | 106,927 + 2,791 = 109,718; different contexts/loss and step count |
+| Scripted capture / model calls / updates | 48 fixture responses / 0 / 0 |
+| Slurm Elapsed / TotalCPU | 112 s / 102.249 CPU-s; one CPU, no GPU |
+| Slurm MaxRSS / process ru_maxrss | 249,132 KiB / 257,076 KiB; distinct measurement sources |
+
+Actual cited retrieval ranks are 1/2/3/5, with 89/12/6/2 document targets;
+sentence positions range from 0 to 17. This improves representation of real
+candidate order and multiple documents, but still has substantial top-rank and
+single-sentence concentration. Do not relabel it balanced action supervision.
+
+**Decision:** stop after CPU closeout. Technical data readiness is true, but
+Agent-policy readiness is false. Do not perturb retrieval, hide positives,
+resample claims, add NEI or consume reserved validation to manufacture missing
+read examples. A separately authorised decision is required to change that
+training question. If proceeding strictly as a grounding-only experiment,
+the 421,453 tokens are approximately 3.84 times the old token count and imply
+12 whole-claim optimizer steps rather than 24 record steps. The old measured
+training allocation took 92 seconds / 9,227,040 KiB MaxRSS. Linear token scaling
+alone is not a runtime or memory guarantee because sequence length also changes.
+
+A conditional future budget proposal is one A100 / 4 CPU / 32 GiB / at most
+15 minutes, with a longest-record forward/backward resource preflight inside
+that same allocation and no automatic retry on failure; the preflight update
+must be accounted for, not silently added to the 12-step budget. This is a
+proposal only, pending review of the changed learning-rate/normalisation scale
+and a clear choice to pursue grounding rather than claim unsupported Agent
+benefit. **No GPU job or new checkpoint has been launched.**

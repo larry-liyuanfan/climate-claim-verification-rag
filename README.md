@@ -7,6 +7,10 @@ repairs the training-data contract using the original 48 FIT claims, complete
 official alternative sets, real controller observations and equal per-claim
 loss mass. This CPU preparation is **not a new trained model or quality gain**;
 private annotations remain on Spartan and reserved validation stays untouched.
+Single CPU job 31789062 produced **93 answer records / 48 equal-weight claims**,
+with no gaps. All claims already had an initial complete witness; **zero natural
+read examples** arose. It is grounding-data readiness, not Agent-policy
+readiness, and no subsequent training or held-out evaluation was launched.
 
 [Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
 protocol-bound consumption ledger, whole-component/source-family separation,
