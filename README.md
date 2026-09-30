@@ -2,6 +2,12 @@
 
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
+[FIT-only production-state supervision](docs/SCIFACT_FIT_STATE_SUPERVISION_20261001.md)
+repairs the training-data contract using the original 48 FIT claims, complete
+official alternative sets, real controller observations and equal per-claim
+loss mass. This CPU preparation is **not a new trained model or quality gain**;
+private annotations remain on Spartan and reserved validation stays untouched.
+
 [Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
 protocol-bound consumption ledger, whole-component/source-family separation,
 official alternative-aware targets, and a single-config LoRA training / paired
