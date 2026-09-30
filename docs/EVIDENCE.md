@@ -30,6 +30,16 @@ envelopes, separate preflight costs and full raw-wire audits. Genuine abstention
 and failure-empty predictions remain distinct. This implementation/package step
 submitted no Slurm job, made no model call and supplies no quality gain or GPU release.
 
+The release candidate is superseded by the minimal completion-journal repair
+`99cd9ff707697ea395a9bc067f3ce91395071cdb`, with unchanged preparation, selected
+claims, prompts and budgets. Five focused tests also pass from its exact-byte
+clean archive. Known usage survives in a failed report, and one summary write
+is attempted without another model call. If both writes fail, the partial report
+exists only in process memory; after process exit durable cost is unavailable/
+unknown, never zero. The [repair handoff](verified-runs/scifact-semantic-execution-repair-99cd9ff.json)
+pins the replacement source and private bundle identities. Old artifacts remain
+historical CPU evidence, not an alternative release candidate.
+
 ## 2026-09-30 bounded grammar and evidence-gap pair: audited negative result
 
 [Versioned preparation](SCIFACT_BOUNDED_GAP_CPU_20260930.md) preserves the frozen

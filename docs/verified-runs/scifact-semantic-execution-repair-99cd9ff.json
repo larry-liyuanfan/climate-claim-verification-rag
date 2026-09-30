@@ -1,0 +1,58 @@
+{
+  "schema_version": "scifact-semantic-execution-repair-v1",
+  "status": "frozen_cpu_prepared_gpu_not_released",
+  "preparation_source_git": "779e49883570371ce6223cb2b4a8619df5924d3b",
+  "execution_source_git": "99cd9ff707697ea395a9bc067f3ce91395071cdb",
+  "superseded_execution_source_git": "44b0424abcfed65e4efdeeaf793f0d47ad92f734",
+  "source_archive": {
+    "spartan_relative_path": "envs/scifact-semantic-execution-99cd9ff.tar",
+    "sha256": "b3fa6e96b56e466b2861f0eea4465c0bb94a48f82fb2b3692eb235e4ff5d2a2a",
+    "bytes": 2785280,
+    "regular_files": 379,
+    "directories": 13,
+    "exact_git_blobs": 378,
+    "expanded_revision_marker_bytes": 41,
+    "exact_git_modes_and_bytes_verified": true
+  },
+  "wrapper": {
+    "spartan_relative_path": "envs/scifact-semantic-pair-99cd9ff.sbatch",
+    "sha256": "9ba1f9ee288c901b5243699c7824e0c9b960afad44d88f40b2edf62ae3f7e0bb"
+  },
+  "bundles": {
+    "receipt_path": "envs/scifact-semantic-bundles-99cd9ff/bundle-receipt.json",
+    "receipt_sha256": "f4daf46abb0cd19fb8f2dee26b1ce602f5f8b040f2fe14298ed7c0bd5b955501",
+    "inference_path": "envs/scifact-semantic-bundles-99cd9ff/inference.tar",
+    "inference_sha256": "def10d4030d402ef5294680e0426ba1ed05ac42cb9b1d7bf4e8daa0a328961c9",
+    "scoring_path": "envs/scifact-semantic-bundles-99cd9ff/scoring.tar",
+    "scoring_sha256": "7e2303364b69be920de017179485bbb6f9d0e5d48367717576b3411c92c8ca8e",
+    "protocol_sha256": "5595143cfb6d276184e91f40856efa388ab440dc78527fe7fcffd52c12bb296d",
+    "scoring_manifest_sha256": "9bb6b831360130a11b4bb17621d26a0bf1c5b41110a697c74c6ce6b5e2e8aa04",
+    "private_bundles_exported": false,
+    "reselected": false,
+    "prompts_or_budget_changed": false
+  },
+  "repair_behavior": {
+    "completed_journal_failure": "stop immediately, retain known usage in failed report, attempt summary once",
+    "summary_also_fails": "partial_report retained only in process memory; after child exit durable cost unavailable/unknown, not zero",
+    "model_retry": false,
+    "started_journal_fail_fast_unchanged": true,
+    "no_callback_behavior_unchanged": true
+  },
+  "validation": {
+    "focused_tests_passed": 5,
+    "clean_archive_focused_tests_passed": 5,
+    "clean_archive_seconds": 0.70,
+    "unrelated_cases_deselected": 30,
+    "targeted_ruff": "passed",
+    "changed_source_strict_mypy": "passed",
+    "tracked_secret_pii_scan": "passed",
+    "remote_hashes_and_bash_syntax": "passed",
+    "unchanged_80_case_suite_rerun": false,
+    "historical_80_case_source": "44b0424abcfed65e4efdeeaf793f0d47ad92f734"
+  },
+  "actual_model_calls": 0,
+  "slurm_jobs_submitted": 0,
+  "gpu_authorized": false,
+  "new_monitor_created": false,
+  "resume_changed": false
+}

@@ -119,7 +119,7 @@ CPU validation covers only the new seams and frozen-helper regression tests;
 the unchanged large/model suites are not rerun for this package. Final source,
 package hashes and clean-source targeted validation are recorded in the handoff.
 
-## Final CPU handoff
+## Initial CPU handoff (superseded for release)
 
 Execution source is **`44b0424abcfed65e4efdeeaf793f0d47ad92f734`**. The
 [content-free handoff](verified-runs/scifact-semantic-execution-cpu-handoff-20260930.json)
@@ -155,6 +155,10 @@ one summary write, then stops; it never retries the model. If that write also
 fails, `PreflightPersistenceError.partial_report` preserves known in-memory costs
 and explicitly records `summary_persisted=false`. Missing durable cost is unknown,
 not zero. No-callback historical behavior and started-journal fail-fast remain.
+The exception attribute is **in-memory only**: the CLI does not separately emit
+it, so if both journal and summary writes fail, exact usage is not recoverable
+from the child after exit. Treat that branch's durable total as unavailable/
+unknown; do not claim the exact usage was persisted.
 
 Five focused preflight tests passed, including completion-write failure with
 both successful and failed summary persistence (synthetic 10 input / 17 output
@@ -163,3 +167,19 @@ source files passed. This supersedes the earlier execution freeze **for release*
 not its CPU evidence; preparation source, selected samples, both prompts, budgets
 and original artifacts remain unchanged. The revised execution/package identities
 are recorded in the repair handoff, with no new model call or allocation.
+
+### Replacement freeze
+
+The [repair handoff](verified-runs/scifact-semantic-execution-repair-99cd9ff.json)
+and [bundle receipt](verified-runs/scifact-semantic-bundles-99cd9ff.json) pin
+execution source **`99cd9ff707697ea395a9bc067f3ce91395071cdb`**. Its source archive
+has 378 exact Git blobs plus the 41-byte expanded revision marker; all modes and
+bytes match. The five focused tests also passed from this clean archive in
+0.70 s (30 unrelated cases deselected). The earlier 80-case suite is historical
+evidence at `44b0424`, not a newly rerun full-suite result at this revision.
+
+Spartan mechanical conversion verified the unchanged private preparation hashes
+and produced fresh exclusive inference/scoring bundles. Only the content-free
+receipt was downloaded. Remote source/wrapper hashes match local copies and
+Bash syntax passes. The `44b0424` files are retained as superseded/unreleased;
+no model calls, allocations, new monitor or resume changes were made.

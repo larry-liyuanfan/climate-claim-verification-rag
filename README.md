@@ -10,8 +10,11 @@ comparison or dev/test release follows, and the negative F/G result below remain
 
 The subsequent [semantic execution handoff](docs/SCIFACT_SEMANTIC_EXECUTION_CPU_20260930.md)
 freezes separate inference/scoring bundles and fresh two-policy entrypoints with
-80 passing CPU seam/regression tests. Gold isolation, complete durable cost,
-policy-bound preflights and serial predecessor checks are implemented. This is
+80 passing CPU seam/regression tests. Gold isolation, cost journaling,
+policy-bound preflights and serial predecessor checks are implemented. The
+`99cd9ff` pre-release repair also passes five focused clean-source tests: a
+completion-journal failure retains known usage in a failed summary and stops;
+if summary persistence also fails, durable cost is unavailable/unknown, not zero. This is
 **CPU preparation only**: zero model calls, zero submitted jobs and no new quality result.
 
 The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
