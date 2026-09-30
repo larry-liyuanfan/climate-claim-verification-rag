@@ -2,10 +2,12 @@
 
 ## Decision and scientific boundary
 
-Status: **DRAFT; no GPU submission or real model invocation authorized by this
-package**. Preserve validation entrypoint/source `ce34e16` without calling its
-twelve frozen validation queries. The tune count gate remains unchanged; it is
-not an autonomous-Agent acceptance gate.
+Status: **One exact-hash regression released and submitted as job 31773502**.
+The original CPU package and DRAFT below remain unchanged historical receipts;
+the separate submission record is at the end of this document. Preserve
+validation entrypoint/source `ce34e16` without calling its twelve frozen
+validation queries. The tune count gate remains unchanged; it is not an
+autonomous-Agent acceptance gate.
 
 The [posthoc physical audit](verified-runs/scifact-grounding-structure-20261001.json)
 confirms 96 single-document FIT records, all `answer/c1`; adapted tune outputs
@@ -154,3 +156,36 @@ receipt are available there. No actual sbatch, warmup, training or generation
 occurred in this package. A later documentation-only commit does not replace
 the frozen execution source. Next execution still requires coordinator review
 and a distinct exact-hash authorization receipt.
+
+### Single actual submission (2026-10-01)
+
+The coordinator independently released **only** the old12 four-route regression.
+The sole DRAFT token was replaced in its original bytes, preserving the DRAFT:
+activated release **4532 bytes**, SHA
+`b435fa82002e3dbb96511c73e02339ed5a875e56ad97414dfc03fc315598c6ae`.
+Execution source remains `bd7af701fcca654383f1907520612f79d5516e3b`;
+later receipt/documentation commits are not substituted as execution source.
+
+An exclusive, durable `single-submission/` reservation precedes the only
+`sbatch` invocation. It preserves raw stdout/stderr, response, and receipt.
+Actual `sbatch --parsable` returned **31773502**, exit zero. Receipt SHA:
+`e5df5789d1d1dcf98c4e3a9be2a85b29b448779c936d6338361ab2167d2688f1`.
+Any unknown submission outcome requires reconciliation, not another submission.
+
+First scheduler snapshot: `PENDING (Resources)`, elapsed zero, no estimated
+start (`N/A`). Priority 13408 = fairshare 13407 + job size 1, with age/site/QoS
+zero, in both requested partitions. This is neither a running allocation nor
+an evaluation result. Do not confuse the earlier test-only ID with this job.
+
+The matching job queue was empty and output/authorization/reservation paths
+were unused at precheck. Filesystem available space was 294,440,140,800 bytes;
+this is **not a user quota measurement**. `quota -s` separately reported the
+home NFS volume at its 50 GiB limit. Sources and receipts use project GPFS;
+model/cache/temp use allocation scratch, not home. No home cleanup or global
+environment changes were made. The CPU receipt already verifies working
+Torch 2.1.2 and POSIX; no reinstall was needed.
+
+All original 48-slot, 168-generator, 36-rerank and 720-requested-pair limits
+remain, including zero extra smoke/warmup. No new training, validation, dev/test,
+automatic retry, or scheduler override is authorized. Quality and cost closeout
+remain pending; no resume metric is added merely because submission succeeded.
