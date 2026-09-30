@@ -6,6 +6,7 @@ hpc/budget_agent_preflight.sbatch text eol=lf
 hpc/budget_agent_confirmation_audit.sbatch text eol=lf
 hpc/budget_agent_full.sbatch text eol=lf
 scripts/run_budget_agent_full_operator.py text eol=lf
+scripts/audit_budget_agent_full.py text eol=lf
 hpc/submit_climate_full_20260930_r1.sh text eol=lf
 hpc/submit_climate_full_20260930_r2.sh text eol=lf
 configs/budget_agent_assets_20260929.json text eol=lf
