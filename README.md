@@ -19,6 +19,9 @@ of independence, and no old test text or labels were reopened.
 The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
 supports document-specific labels and ordered original-sentence references.
 Only synthetic contract tests exist; its real model adapter/dev run is not released.
+The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
+recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
+synthetic fixtures, no real-data quality result or external-dev release.
 
 A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
 adds explicit candidate reading, actual-visible-sentence citation constraints,

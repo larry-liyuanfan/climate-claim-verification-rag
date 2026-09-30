@@ -9,6 +9,9 @@ terminal](SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md) supports per-document label
 and exact original sentence IDs with 24 synthetic contract fixtures. Neither
 package runs a model, releases SciFact dev, changes the frozen official-compatible
 scorer or supplies a new resume-quality metric. V3 job31601753 remains separate.
+The [CPU statistical preparation](SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
+adds complete-matrix checks and 5,000 paired component resamples with charged
+failures and unknown-usage boundaries; 23 synthetic fixtures are not dev scores.
 
 ## 2026-09-30 frozen Agent comparison: completed, negative quality result
 
