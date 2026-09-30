@@ -400,3 +400,29 @@ estimate is not a guaranteed ETA. The remote release remains a draft with SHA
 This preparation used no model calls, official dev/test data, training replay,
 or actual GPU submission. Later documentation-only commits do not replace the
 frozen execution source or activate that draft.
+
+## Separately authorized tune submission
+
+After the coordinator's exact-source review, a separate activated release was
+saved by replacing only `DRAFT_NOT_AUTHORIZED` with
+`coordinator_exact_hash_release`; the original draft is unchanged. Activated
+bytes (1,657) match the coordinator's expected SHA
+`562bf8282f2eb6b7eced4edc31e6b4be2b615480614213863ec3666f14a7ca34`.
+One real job, **31763176**, was submitted with explicit project `--chdir` and
+durable exclusive reservation/response/receipt. See the
+[submission and first observation](verified-runs/scifact-grounding-tune-submission-31763176.json).
+
+Pre-submit checks found no same-name job and no occupied output/allocation/
+execution directory. Available project filesystem space was 287,588,352 KiB.
+The account permits the requested GPU QoS; blank displayed resource-limit fields
+were not treated as unlimited quota. No QoS/Nice or other users' jobs changed.
+The first and only bounded observation was **PENDING (Resources)**, start `N/A`;
+the pending `0:0` accounting field is not a successful completion. This is not
+the earlier test-only reservation 31762198. The coordinator owns subsequent
+status follow-up; no new monitor or automatic retry was created.
+
+The authorization covers only the same twelve tune inputs paired across base
+and adapted states, at most 24 model calls within the frozen resource ceiling.
+Training, warmup, validation, official dev/test reads and resume changes remain
+unauthorized. Submission/pending state does not establish grounding improvement;
+quality and cost must be audited only after both inference processes exit.
