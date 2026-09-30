@@ -18,7 +18,9 @@ lexical/source rules. Missing source mappings remain unknown; this is not proof
 of independence, and no old test text or labels were reopened.
 The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
 supports document-specific labels and ordered original-sentence references.
-Only synthetic contract tests exist; its real model adapter/dev run is not released.
+The [local Qwen/LMFE provider](docs/SCIFACT_LOCAL_PROVIDER_CPU_20260930.md) is
+implemented with CPU/mocked-HF validation; real model execution and dev evaluation
+remain unreleased. Synthetic contract tests are not model-quality evidence.
 The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
 recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
 synthetic fixtures, no real-data quality result or external-dev release.

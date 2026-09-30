@@ -61,6 +61,9 @@ that selected sentences support the model's label.
   label prompt and is deliberately rejected. This CPU package releases **no real
   model adapter or dev inference runner**; those require a separately frozen
   runtime review. No production or concurrent-service claim.
+  Subsequent [CPU provider package](SCIFACT_LOCAL_PROVIDER_CPU_20260930.md) supplies
+  the implementation and synthetic-only smoke entry; it still does not authorize
+  real model execution or dev evaluation.
 - CPU reproduction: `python -m pytest tests/test_scifact_terminal.py -q`.
   All data in these fixtures is synthetic. No model, SciFact dev inference/gold,
   restricted data, or old public test file is read by these tests.
