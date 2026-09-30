@@ -85,6 +85,16 @@ silently change its protocol and call the next run a holdout.
 
 ## Resources and one-shot execution
 
+Source `d7d5bf3b2fd79b90f1d47218bbe88adb991910cb` is pinned in the submitted
+archive. CI on that exact commit passed330 tests with1 optional Torch skip,
+Ruff, mypy38 modules and the privacy scan; clean-archive targeted reproduction
+passed35 tests. The one actual allocation request is31587302, submitted at
+2026-09-30T12:55:22+10:00 and initially PENDING/Resources. Test-only31587301
+was a scheduler simulation, not another allocation. The later queue estimate
+was13:06:31+10:00, not a guaranteed start. See the
+[submission receipt](verified-runs/budget-agent-feedback-v2-submission-20260930.json).
+Preflight, model output and quality are not established by submission or CPU CI.
+
 CPU validation before release:328 tests passed,2 optional dependencies skipped
 (Torch and LightGBM absent in this local environment); Ruff and strict mypy on
 38 source modules passed. An additional nonrepairable-decode accounting test

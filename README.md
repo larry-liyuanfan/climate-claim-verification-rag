@@ -2,8 +2,9 @@
 
 2026-09-30 follow-up: a separately authorized [feedback-v2 development pilot](docs/AGENT_FEEDBACK_V2_DEVELOPMENT_20260930.md)
 adds action-discriminated schemas and charged validation feedback; it is not a
-reinterpretation of the frozen result below. CPU implementation is under
-validation; real-model pilot results are not yet claimed. No new holdout run,
+reinterpretation of the frozen result below. CPU validation and CI passed; the
+single [pilot job31587302](docs/verified-runs/budget-agent-feedback-v2-submission-20260930.json)
+was submitted and initially pending resources. Real-model results are not yet claimed. No new holdout run,
 training, grammar-decoding deployment or current-resume change is implied.
 
 2026-09-30: the [frozen full Agent comparison](docs/BUDGET_AGENT_FULL_CLOSEOUT_20260930.md)
