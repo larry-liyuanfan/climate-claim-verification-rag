@@ -226,10 +226,16 @@ def main():
         labels_used_for_edges=False,
         labels_passed_to_model=False,
         source_git=subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=Path(__file__).resolve().parents[1],
+            text=True,
         ).strip(),
         source_worktree_dirty=bool(
-            subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()
+            subprocess.check_output(
+                ["git", "status", "--porcelain"],
+                cwd=Path(__file__).resolve().parents[1],
+                text=True,
+            ).strip()
         ),
     )
     args.output.mkdir(parents=True, mode=0o700)  # unique output, never overwrite
