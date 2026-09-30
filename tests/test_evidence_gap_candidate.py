@@ -4,6 +4,8 @@ import copy
 import hashlib
 import inspect
 import json
+import os
+import stat
 import string
 import types
 from pathlib import Path
@@ -473,5 +475,7 @@ def test_smoke_creates_exclusive_absolute_private_fixture_directory(
     target = tmp_path / "new-parent" / "private"
     backend = ScriptedBackend(CharTokenizer(), [], target)
     assert backend.store.root.is_absolute() and target.is_dir()
+    if os.name == "posix":
+        assert stat.S_IMODE(target.stat().st_mode) & 0o077 == 0
     with pytest.raises(FileExistsError):
         ScriptedBackend(CharTokenizer(), [], target)

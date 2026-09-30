@@ -74,7 +74,7 @@ class ScriptedBackend:
     ):
         self.tokenizer, self.responses = tokenizer, iter(responses)
         root = root.resolve()
-        root.mkdir(parents=True, exist_ok=False)
+        root.mkdir(mode=0o700, parents=True, exist_ok=False)
         self.store, self.candidate = PrivateDiagnosticStore(root), candidate
 
     def count_text(self, text: str) -> int:
@@ -290,7 +290,7 @@ def main() -> int:
     tokenizer = AutoTokenizer.from_pretrained(
         str(args.tokenizer), local_files_only=True, trust_remote_code=False
     )
-    args.output.mkdir(parents=True, exist_ok=False)
+    args.output.mkdir(mode=0o700, parents=True, exist_ok=False)
     data = cpu_tokenizer_data(tokenizer)
 
     class ErrorCounter(logging.Handler):

@@ -122,6 +122,14 @@ absolute private directory, with a regression test; the failed output directory
 is retained and a separate rerun directory is used. This is a CPU harness repair,
 not a changed model policy or repeated data evaluation.
 
+Linux CI36677108364 then caught a second harness portability issue: its new
+private leaf directory used the default mode instead of owner-only permissions.
+The strict private-store check correctly refused it (512 other tests passed).
+Creation now requests0700 for the new output/private directory, with a POSIX
+assertion in the existing regression. No policy, parser, provider or tokenizer
+logic changes; the Windows tokenizer receipt below remains bound to its original
+source rather than being relabelled as a new run.
+
 ### Verified CPU receipt and an explicit cost tradeoff
 
 The repaired smoke passed on clean source
