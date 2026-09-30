@@ -1,5 +1,23 @@
 # Evidence and claim boundaries
 
+## 2026-09-30 SciFact train diagnostic: no Agent-quality promotion
+
+The [r2 closeout](SCIFACT_TRAIN_DIAGNOSTIC_CLOSEOUT_20260930.md) verifies48/48 slots
+on12 gold-stratified eligible-train components, not independent dev/test. Original
+abstract-rationalized F1 is .1053/.0833/.1053/.0952 for fixed retrieval/rerank/
+deterministic-extra/adaptive. All routes correctly rationalized1/9 gold documents;
+adaptive produced no raw or successfully parsed tool intent. Of107 generation
+attempts,87 failed strict validation, mainly cross-document sentence-budget
+violations. These failures and all tokens remain in the accounting. Full gold
+text was visible in several failed slots, so this is not merely a recall miss.
+
+The [compact](verified-runs/scifact-train-r2-closeout-31645005.json) contains only
+counts, hashes and content-free diagnostics, independently checked against the
+frozen score. Gold, raw responses and traces stay on Spartan. Post-tool feedback
+behavior is unobservable, not proven incapable or zero-error; no significance,
+generalization, online SLA or resume benefit is claimed. Job31620529 remains a
+separate pre-inference startup failure. Original300-dev remains unreleased.
+
 ## 2026-09-30 CPU-only identity and terminal compatibility
 
 The [frozen cross-dataset identity audit](CROSS_DATASET_IDENTITY_AUDIT_20260930.md)

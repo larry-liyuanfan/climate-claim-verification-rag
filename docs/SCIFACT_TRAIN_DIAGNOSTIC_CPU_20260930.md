@@ -3,7 +3,10 @@
 Historical preparation scope below is preserved. The separately released job
 31620529 subsequently failed at its source-archive guard, before model loading.
 See the [startup repair](SCIFACT_STARTUP_REPAIR_20260930.md); its r2 attempt retains
-the frozen r1 experiment/data identity and needs a separate coordinator release.
+the frozen r1 experiment/data identity. After separate coordinator release,
+job31645005 completed; the [result closeout](SCIFACT_TRAIN_DIAGNOSTIC_CLOSEOUT_20260930.md)
+preserves its negative train-only findings. The preparation description below
+is historical, not permission for another submission or model run.
 
 This is a deliberately **biased train diagnostic**, not a benchmark score,
 independent test, or resume improvement. It follows the negative/limited

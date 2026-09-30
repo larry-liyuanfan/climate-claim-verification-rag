@@ -1,12 +1,15 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-The released SciFact train diagnostic job **31620529** failed before model loading:
-its source tar duplicated `SOURCE_REVISION`, so the exact shell guard rejected it.
-The [startup repair](docs/SCIFACT_STARTUP_REPAIR_20260930.md) validates all archive
-members against Git, tests the actual shell guard, and separates an infrastructure
-attempt from the unchanged experiment identity. Separately authorized retry
-[job31645005](docs/verified-runs/scifact-train-r2-submission-31645005.json) was
-PENDING / Priority at17:45+10; no model-quality result is available.
+The [SciFact train diagnostic closeout](docs/SCIFACT_TRAIN_DIAGNOSTIC_CLOSEOUT_20260930.md)
+records completed job **31645005**, all48 slots and independently checked score
+counts. This is a **biased12-claim train diagnostic, not a holdout**. All four
+routes correctly rationalized only1/9 gold documents; adaptive selected zero tools
+even after inspecting its unparsed wire outputs. Most failures exceeded the
+cross-document sentence budget. Full evidence was visible in several failed
+cases, so retrieval hits alone do not establish answer quality. No Agent-quality
+promotion, dev/test release or current-resume change follows. The failed startup
+job31620529 and its [source-archive repair](docs/SCIFACT_STARTUP_REPAIR_20260930.md)
+are preserved separately.
 
 2026-09-30 follow-up: a separately authorized [feedback-v2 development pilot](docs/AGENT_FEEDBACK_V2_DEVELOPMENT_20260930.md)
 adds action-discriminated schemas and charged validation feedback; it is not a
@@ -18,8 +21,8 @@ training, grammar-decoding deployment or current-resume change is implied.
 
 Separately, the [original SciFact CPU preparation](docs/SCIFACT_GROUNDED_PROTOCOL_PROPOSAL_20260930.md)
 preserves sentence rationales, quarantines train/dev source-family overlap and
-cross-checks a new scorer against the official reference. The train job above
-failed before inference; its300 dev claims remain unreleased, not a new test claim.
+cross-checks a new scorer against the official reference. The retry above is
+train-only; its300 dev claims remain unreleased, not a new test claim.
 The [cross-dataset CPU identity audit](docs/CROSS_DATASET_IDENTITY_AUDIT_20260930.md)
 found no matches or graph connections to consumed Climate tracks under fixed
 lexical/source rules. Missing source mappings remain unknown; this is not proof
@@ -27,8 +30,9 @@ of independence, and no old test text or labels were reopened.
 The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
 supports document-specific labels and ordered original-sentence references.
 The [local Qwen/LMFE provider](docs/SCIFACT_LOCAL_PROVIDER_CPU_20260930.md) is
-implemented with CPU/mocked-HF validation; no SciFact model result is available,
-and dev evaluation remains unreleased. Synthetic tests are not model-quality evidence.
+implemented with CPU/mocked-HF validation and subsequently exercised in the
+train-only diagnostic above. Dev evaluation remains unreleased; synthetic tests
+are not model-quality evidence.
 The [paired-component statistical preparation](docs/SCIFACT_PAIRED_STATISTICS_CPU_20260930.md)
 recomputes micro F1 and mean costs with 5,000 paired group resamples; it has only
 synthetic fixtures, no real-data quality result or external-dev release.

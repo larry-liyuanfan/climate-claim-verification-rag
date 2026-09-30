@@ -49,3 +49,7 @@ hpc/scifact_train_diagnostic.sbatch text eol=lf
 scripts/run_scifact_train_operator.py text eol=lf
 scripts/package_scifact_source.py text eol=lf
 tests/test_scifact_source_package.py text eol=lf
+scripts/audit_scifact_train_closeout.py text eol=lf
+tests/test_scifact_closeout_audit.py text eol=lf
+docs/verified-runs/scifact-train-r2-closeout-31645005.json text eol=lf
+docs/verified-runs/scifact-train-r2-resources-20260930.json text eol=lf
