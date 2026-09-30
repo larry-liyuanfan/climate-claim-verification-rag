@@ -1,0 +1,36 @@
+{
+  "all_pairs_present": true,
+  "all_shapes_nonempty_2d": true,
+  "audit_script_sha256": "656bc214912b5cef871f379323440a890380a02f07dd8305f56f8468a48cb568",
+  "dtypes": [
+    "F32"
+  ],
+  "job_id": "31757970",
+  "layers": 36,
+  "model_generation_calls": 0,
+  "modules": [
+    "q_proj",
+    "v_proj"
+  ],
+  "rank": 8,
+  "real_base_model_loaded": false,
+  "tensor_count": 144,
+  "uniform_shapes": {
+    "q_proj_A": [
+      8,
+      2560
+    ],
+    "q_proj_B": [
+      4096,
+      8
+    ],
+    "v_proj_A": [
+      8,
+      2560
+    ],
+    "v_proj_B": [
+      1024,
+      8
+    ]
+  }
+}

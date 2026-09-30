@@ -1,4 +1,9 @@
-# One generator-grounding candidate — CPU implementation, not execution release
+# One generator-grounding candidate — prepared, trained, not quality-evaluated
+
+Latest: training job 31757970 completed and passed artifact integrity checks.
+The sections below preserve the earlier CPU-preparation/release boundaries;
+the final section records the separately authorized execution. No evaluation
+or Agent/generalization improvement has been demonstrated.
 
 ## Scope
 
@@ -285,3 +290,50 @@ start supersedes the earlier nonbinding test-only estimate; neither status nor
 a future loss/checkpoint proves improved grounding quality. No evaluation or
 answer-generation calls are authorized by this submission. Prior CPU-only
 receipts remain truthful records of their earlier preparation stage.
+
+## Training closeout: integrity passed, quality unmeasured
+
+[Physical closeout](verified-runs/scifact-grounding-training-closeout-31757970.json)
+and [adapter shape audit](verified-runs/scifact-grounding-adapter-shapes-31757970.json)
+confirm job 31757970 completed with exit `0:0`. All 24 step markers match the
+fixed shuffled once-only 96-record schedule, including the first four-record
+pilot; there is exactly one final checkpoint. Worker exit was reaped with code
+zero, the allocation/runtime/source/release/data/config identities agree, and
+all 96 observed losses and saved adapter tensors are finite.
+
+| Measured item | Result |
+|---|---|
+| Slurm elapsed / allocated GPU-job seconds | 92 s / 92 s (not active GPU kernel time) |
+| Training worker / fit loop elapsed | 46.24 s / 30.32 s |
+| Slurm TotalCPU / batch MaxRSS | 71.958 CPU-seconds / 9,227,040 KiB |
+| Actual GPU | NVIDIA A100 80GB PCIe; 85,095,874,560 reported bytes |
+| Peak Torch allocated memory | 11,987,743,232 bytes |
+| Adapter | 2,949,120 parameters; 144 F32 tensors; 11,815,504-byte safetensors |
+| Architecture checks | 36 layers × q/v × A/B; rank 8; all nonempty 2D pairs |
+| Generation / evaluation / external dev-test | 0 calls / not run / not read |
+
+The adapter safetensors hash is
+`dd1974a26549b3337824252a9c38773873acce72427f92e656835bf9d71935d4`;
+config hash `8a6619efd6a3de8e545953d1e3b5a65d500eaca65110ba446feb51b159a37823`;
+training complete receipt hash
+`f5e6a865ec09cb67a520e36ba4646fb297a381383d4d0357208488ef6e9168a0`.
+All 35 private output files are indexed by manifest hash
+`8c68150f16f7b103705ef4d4a4f88a0dce995a5350c65c712dc6b9550e14bb04`.
+Weights, per-record losses, targets, full logs and physical manifests stay on
+Spartan. Only compact aggregates/hashes are published. Mean training loss is
+not a retrieval/verdict score; this small task-adaptation run is not pretraining,
+an independent test, online A/B evidence or a reason to change resume claims.
+
+### Next bounded proposal — tune-only, not released
+
+Reuse this exact checkpoint with the implemented evaluator: twelve frozen tune
+inputs paired as base-disabled-adapter versus the restored final adapter,
+24 calls total with the same generator, tokenizer, grammar and input packing.
+Restore adapter tensor values exactly before inference; no new training,
+checkpoint selection, data replacement or extra warmup calls. Preserve every
+attempt and cost, including failures. Score only after process exit, reconcile
+physical responses, and apply the existing preregistered count gate. The
+58-document TRAIN-only pool and all-gold-visible answerable queries remain
+explicit limitations. This is a CPU planning proposal only: **no tune/validation
+calls or additional GPU submission are authorized or performed here**. Validation
+would require both the gate and another separate exact-hash release.

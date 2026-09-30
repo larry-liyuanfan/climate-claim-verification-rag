@@ -1,6 +1,6 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-## Grounding adaptation candidate: CPU implementation only
+## Grounding adaptation candidate: training complete, quality not evaluated
 
 [Stage B](docs/SCIFACT_GROUNDING_CANDIDATE_CPU_20261001.md) implements a
 protocol-bound consumption ledger, whole-component/source-family separation,
@@ -10,8 +10,11 @@ Real-tokenizer CPU preparation passed with frozen 48/12/12 TRAIN components,
 96 official alternative-aware fit records and no packing gaps. Both evaluation
 pools contain only 58 source-partitioned documents; this is a controlled grounding
 experiment, **not a full-corpus retrieval result or an independent test**.
-No adapter training, new generation, Slurm submission, dev/test evaluation or
-Agent improvement is claimed. Historical negative results below are unchanged.
+One separately authorized run, **31757970**, completed 96 records / 24 updates
+and one final LoRA checkpoint; its 144 tensors passed finite/shape/hash audits.
+This demonstrates a bounded training workflow, **not improved grounding quality**.
+No paired evaluation, answer generation, external dev/test result or Agent
+improvement is claimed. Historical negative results below are unchanged.
 
 ## Latest component diagnostic: complete, with grounding errors
 
