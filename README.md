@@ -16,6 +16,9 @@ The [cross-dataset CPU identity audit](docs/CROSS_DATASET_IDENTITY_AUDIT_2026093
 found no matches or graph connections to consumed Climate tracks under fixed
 lexical/source rules. Missing source mappings remain unknown; this is not proof
 of independence, and no old test text or labels were reopened.
+The separate [SciFact document-terminal CPU contract](docs/SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md)
+supports document-specific labels and ordered original-sentence references.
+Only synthetic contract tests exist; its real model adapter/dev run is not released.
 
 A separately versioned [sentence-ID v3 CPU package](docs/AGENT_SENTENCE_ID_V3_CPU_20260930.md)
 adds explicit candidate reading, actual-visible-sentence citation constraints,

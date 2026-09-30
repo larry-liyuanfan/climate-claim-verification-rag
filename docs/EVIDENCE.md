@@ -1,5 +1,15 @@
 # Evidence and claim boundaries
 
+## 2026-09-30 CPU-only identity and terminal compatibility
+
+The [frozen cross-dataset identity audit](CROSS_DATASET_IDENTITY_AUDIT_20260930.md)
+reports no target matches/connections under its fixed lexical/source rules;
+missing mappings prevent an independence claim. The separate [SciFact document
+terminal](SCIFACT_DOCUMENT_TERMINAL_CPU_20260930.md) supports per-document labels
+and exact original sentence IDs with 24 synthetic contract fixtures. Neither
+package runs a model, releases SciFact dev, changes the frozen official-compatible
+scorer or supplies a new resume-quality metric. V3 job31601753 remains separate.
+
 ## 2026-09-30 frozen Agent comparison: completed, negative quality result
 
 Job31543304 completed the frozen96-slot validation and24-slot authored-vNext
