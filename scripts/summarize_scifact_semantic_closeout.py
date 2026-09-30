@@ -82,7 +82,7 @@ def route_summary(route: dict[str, Any]) -> dict[str, Any]:
         'tokens': numbers(route['known_tokens_including_failures'], ('input_tokens', 'output_tokens')),
         'latency_and_unknowns': numbers(route, ('whole_question_p50_ms', 'whole_question_p95_ms',
             'unknown_usage_attempts', 'token_totals_are_lower_bounds')),
-        'raw_action_proposals': {a: route['raw_action_proposals'].get(a, 0)
+        'raw_action_proposals': {a + '_count': route['raw_action_proposals'].get(a, 0)
                                  for a in ('answer', 'abstain', 'read', 'rewrite', 'rerank')},
         'chain': numbers(route['chain'], ('model_events', 'execution_success', 'newly_seen_evidence',
             'newly_seen_then_gold_label_complete_rationale', 'strict_whole_final_answer_correct_slots')),
@@ -109,7 +109,7 @@ def visibility_summary(rows: list[Any], gold: dict[int, Any]) -> dict[str, int]:
         for doc, rationales in evidence.items():
             if not any(0 < len(r['sentences']) <= 3 and set(r['sentences']) <= visible.get(doc, set()) for r in rationales):
                 continue
-            counts['gold_documents_with_complete_legal_rationale_visible'] += 1
+            counts['gold_documents_with_complete_first3_eligible_rationale_visible'] += 1
             prediction = predictions.get(doc)
             if prediction is None:
                 counts['visible_gold_document_omitted'] += 1
@@ -122,7 +122,7 @@ def visibility_summary(rows: list[Any], gold: dict[int, Any]) -> dict[str, int]:
                 counts['correct_label_complete_rationale_in_first_three'] += any(
                     set(r['sentences']) <= set(prediction['sentences'][:3]) for r in rationales)
     return {k: counts[k] for k in ('predicted_documents', 'predicted_documents_not_matching_official_gold',
-        'predicted_documents_with_more_than_three_sentences', 'gold_documents_with_complete_legal_rationale_visible',
+        'predicted_documents_with_more_than_three_sentences', 'gold_documents_with_complete_first3_eligible_rationale_visible',
         'visible_gold_document_omitted', 'visible_gold_document_wrong_label', 'visible_gold_document_correct_label',
         'correct_label_complete_rationale_any_predicted_position', 'correct_label_complete_rationale_in_first_three')}
 
@@ -172,7 +172,9 @@ def population_summary(assignment: dict[str, Any], audit: list[Any], ledger: dic
         'remaining_claims': len(remaining), 'remaining_components': len({component[i] for i in remaining}),
         'remaining_gold_label_scope': dict(labels), 'remaining_annotated_claim_document_pairs': documents,
         'remaining_rationale_sets': rationale_sets, 'remaining_rationale_sets_at_most_three_sentences': usable_sets,
-        'remaining_legacy_stratum_claims': dict(Counter(r['stratum'] for r in audit if r['id'] in remaining)),
+        'remaining_legacy_stratum_claims': {s: sum(r['id'] in remaining and
+            (r['stratum'] if r['stratum'] in STRATA else 'unclassified') == s for r in audit)
+            for s in (*STRATA, 'unclassified')},
         'new_selection_performed': False, 'all_eligible_train_had_prior_gold_preparation_exposure': True}
 
 
@@ -272,16 +274,38 @@ def collect() -> dict[str, Any]:
         'claim_verdict_accuracy': None, 'agent_benefit_established': False}
 
 
+def encode_compact(result: dict[str, Any]) -> str:
+    """Reject raw trees and all arrays except the explicit Slurm table."""
+    forbidden = {'claim_id', 'claim', 'evidence', 'answer', 'prediction', 'claim_diagnostics',
+                 'current_opportunity_by_claim', 'sentences', 'documents', 'records'}
+
+    def check(value: Any, path: tuple[str, ...] = ()) -> None:
+        if isinstance(value, dict):
+            require(not forbidden.intersection(value))
+            for key, child in value.items():
+                check(child, path + (key,))
+        elif isinstance(value, list):
+            require(path in {('slurm_fields',), ('slurm_rows',), ('slurm_rows', 'row')})
+            for child in value:
+                if path == ('slurm_rows',):
+                    require(isinstance(child, list))
+                    check(child, path + ('row',))
+                else:
+                    require(isinstance(child, str))
+        else:
+            require(value is None or type(value) in (bool, int, float, str))
+
+    check(result)
+    return json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + '\n'
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output', type=Path, required=True)
     args = p.parse_args()
     require(args.output.resolve().is_relative_to(ROOT / 'posthoc') and not args.output.exists())
     result = collect()
-    text = json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + '\n'
-    # Defense in depth against accidentally exporting a per-item source subtree.
-    require(not any('"' + k + '"' in text for k in ('claim_id', 'claim', 'evidence', 'answer', 'prediction',
-        'claim_diagnostics', 'current_opportunity_by_claim', 'sentences', 'documents', 'records')))
+    text = encode_compact(result)
     with args.output.open('x', encoding='utf-8', newline='\n') as handle:
         handle.write(text)
     print(json.dumps({'status': 'compact_written', 'sha256': sha(text.encode()), 'bytes': len(text.encode())}))
