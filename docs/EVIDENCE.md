@@ -1,5 +1,16 @@
 # Evidence and claim boundaries
 
+## 2026-09-30 bounded grammar and evidence-gap CPU preparation
+
+[Versioned preparation](SCIFACT_BOUNDED_GAP_CPU_20260930.md) preserves the frozen
+r2 negative outcome and repairs invalid generation prefixes without rewriting
+answers. It records actual full-sentence/preview hashes, separates proposals
+from executed tools, and refuses incomparable initial contexts. The 96-slot
+F/F+G protocol is CPU-prepared as two serial batches, not submitted. Full CPU
+suite: 587 passed/one Windows POSIX skip; seventeen pinned-tokenizer synthetic
+cases and two exact-token-set differential probes passed. No model-quality,
+Agent benefit, new holdout, online SLA or resume improvement is inferred.
+
 ## 2026-09-30 SciFact train diagnostic: no Agent-quality promotion
 
 The [r2 closeout](SCIFACT_TRAIN_DIAGNOSTIC_CLOSEOUT_20260930.md) verifies48/48 slots

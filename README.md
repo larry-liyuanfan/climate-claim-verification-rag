@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [bounded generation / evidence-gap CPU preparation](docs/SCIFACT_BOUNDED_GAP_CPU_20260930.md)
+adds generation-time uniqueness/total-budget enforcement, actual preview hashes,
+charged error feedback and a preregistered two-arm comparison. Synthetic CPU
+checks passed; **no new paired model result or GPU release is claimed**.
+
 The [SciFact train diagnostic closeout](docs/SCIFACT_TRAIN_DIAGNOSTIC_CLOSEOUT_20260930.md)
 records completed job **31645005**, all48 slots and independently checked score
 counts. This is a **biased12-claim train diagnostic, not a holdout**. All four
