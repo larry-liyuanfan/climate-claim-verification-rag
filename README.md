@@ -1,6 +1,18 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-## Latest component diagnostic: stopped at semantic preflight
+## Latest component diagnostic: complete, with grounding errors
+
+[Job 31743877 closeout](docs/SCIFACT_COMPONENT_CLOSEOUT_31743877.md): **36 new + one
+carried invocation**, all **33 formal outputs contract-valid**, zero unknown
+costs. Screening selected **54/60** candidate occurrences (all candidates in
+**9/12** inputs), so selecting all six available annotated golds does not establish
+effective discrimination. Gold-document relation was **5/9** correct; rationale
+first3 coverage was **7/9 only when given the correct relation**. The twelve claims
+were already-consumed TRAIN diagnostics, not an independent test or Agent gain.
+Raw/gold remain on Spartan, the old negative preflight is retained, and no new
+training or model calls were performed during physical closeout.
+
+### Earlier r2 diagnostic: stopped at semantic preflight
 
 Job **31734906** completed at the scheduler level, but the application stopped:
 one synthetic response was technically valid `abstain`, whereas the fixture
