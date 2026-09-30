@@ -80,7 +80,64 @@ subgroups are reported separately from scripted read and autonomous success.
 
 Fixtures cover disk roundtrips and prompt-order rejection, every original hash,
 single-call reservations, all three tool proposals without execution, original
-ordered citations, unknown/torn records, and injected stale predictions. The
-real-tokenizer three-state receipt, exact source and release hashes follow only
-after CPU reconstruction succeeds. A mismatch stops preparation rather than
-substituting a near-match input. Current resume and shared career state are not edited.
+ordered citations, unknown/torn records, and injected stale predictions.
+A mismatch stops preparation rather than substituting a near-match input.
+Current resume and shared career state are not edited.
+
+## Verified CPU delivery (2026-10-01)
+
+The real-tokenizer reconstruction succeeded for all **three** frozen second
+states: observation/schema/state/physical-prompt hashes and historical token
+counts match; ordered JSON survives a physical write/read roundtrip. Token
+counts are **1,868 / 1,648 / 2,528**. The predefined split is **one FIT-overlap +
+two not-direct-FIT** cases, all previously exposed TRAIN. Preparation used six
+scripted fixture responses and three scripted reads, **zero model/reranker
+calls**, no gold targets or validation input. MaxRSS was 276,532 KiB for this
+small CPU preparer; it is not a model-serving memory benchmark.
+
+Exact execution source remains `fc4ffd61a7615682911556838c66f47aa33d0293`,
+even when subsequent evidence-only commits update this document. The archive
+was checked against all 498 Git blobs and 13 directories, with one 41-byte
+source marker. Affected tests passed **33/33** locally and in a clean export;
+Ruff, Linux-targeted strict mypy, shell syntax and targeted secret checks passed.
+No unchanged full suite was rerun merely for this evidence-only handoff.
+
+The [redacted readiness receipt](verified-runs/scifact-read-continuation-cpu-20261001.json)
+binds source/archive/wrapper, prepared inputs, ID-only membership, runtime and
+DRAFT hashes. CPU validation accepts the DRAFT as a proposal and **rejects it
+at the execution entrypoint**; the fixed output was unused at that check. No
+`sbatch` submission or model call is part of this CPU delivery.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| Source archive | `727c596ae4a808d9bded5fce9a096a766cc8887280650771b93472f99adfb56e` |
+| Wrapper | `da6de837ce4567c76e408245fcfeff86a002271e76b6d4ea411cde1a8ec3a931` |
+| Preparation compact | `8951722f3bf505fd322a2d886178229138f168b59b3e03a53a6bdaf52a1136ab` |
+| Ordered private inputs | `281313c1910f4775c69d78c6df6582d314a6854c8abb4f8d7c4196c74335a0a4` |
+| Private membership | `02372ea0570c176e3fb1dbcccae02ff189407342d2e684aefc520f7f21ddbf95` |
+| DRAFT release (5,745 bytes) | `2ccab922b735b84f0400edd737e0b05bca5b6d39be5b3698ff797f1e39cfec8e` |
+| Remote CPU readiness | `db7152249404c4da0e63e746fe75db6ee5638ab9f4b86c12edf30f582ea368a4` |
+
+The DRAFT and runtime check live under project-owned
+`envs/read-continuation-source-fc4ffd61a761`; private ordered inputs and their
+compact manifest live under `posthoc/scifact-read-continuation-fc4ffd61a761`.
+Only redacted evidence is committed here, not claim text, IDs, gold or weights.
+
+### Torch versus POSIX: no missing production dependency
+
+Local Windows validation uses the existing `.venv-validation` with
+**Torch 2.7.1+cpu**; a tensor smoke check passed. POSIX `resource` is an
+operating-system interface, not a pip dependency to install on Windows. The
+Linux operator is validated and executed on Spartan, where actual imports
+matched the frozen receipt: **Python 3.10.4, Torch 2.1.2, `os.name=posix`**,
+and `resource.RLIMIT_AS` is available. No model was loaded for this check.
+
+Two distinct diagnostics must not be conflated. Tokenizer-only preparation
+deliberately sets `USE_TORCH=0`, so Transformers can warn that no model backend
+is enabled. Separately, an ad hoc readiness command accidentally replaced the
+module-provided `PYTHONPATH`, making Torch unresolvable. Repeating only that
+failed import check with the module path preserved passed. The frozen Slurm
+wrapper already preserves `${PYTHONPATH:+:$PYTHONPATH}`; no installation,
+production-source change or new runtime version was needed. The readiness
+check verifies actual imports and existing manifest hashes, without claiming
+to have rehashed every runtime file again.
