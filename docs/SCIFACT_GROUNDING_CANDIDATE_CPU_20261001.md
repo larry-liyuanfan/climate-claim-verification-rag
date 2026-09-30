@@ -247,3 +247,25 @@ It never invokes tune, validation or an answer generator. The draft uses
 `authorization: DRAFT_NOT_AUTHORIZED`; exact hashes require coordinator review
 and a separate release. CPU `sbatch --test-only` is scheduling validation only,
 not submission or proof that a job has started. No GPU job is submitted here.
+
+Final execution source `631aae70000ca4940c8225e046669dc85b1731e4` passed
+**154 related tests** in its clean Git-LF export (8.03 s), Ruff, strict mypy,
+Bash syntax, tracked secret scan and the **new training wrapper's own** archive
+guard. The source tar hash is `4c9386edbd965a2e88629932cdaad11e9c8b43e90af6f9383b6d7d90a3ca650a`;
+the actual training wrapper hash is `d88db6806c1d725866df303a63dcdd4493de0a74b8c7fc2de148a79e1de6af9a`.
+The generic packager's legacy default wrapper was not used for scheduling:
+`WRAPPER='hpc/scifact_grounding_train.sbatch'` was explicitly selected for the
+[final source receipt](verified-runs/scifact-grounding-training-source-631aae7.json).
+
+The same source's actual Linux `runtime_check` passed before any model loading.
+See [runtime/dry-run receipt](verified-runs/scifact-grounding-training-readiness-631aae7.json)
+and [final validation](verified-runs/scifact-grounding-training-validation-20261001.json).
+The first dry run warned about the inherited login home working directory; a
+project-directory-only scheduling check with explicit `--chdir` then passed
+without that warning. Both were `--test-only`; the displayed reservation numbers
+are **not submitted jobs**. Scheduler estimated 2026-10-05 07:44:16 in its own
+clock, not a guaranteed start or a training ETA. Final draft release hash is
+`dff04c8a53c8f527bcc939f68963b9527aa467b03866c77e012ec5b8377bde88`;
+its authorization remains `DRAFT_NOT_AUTHORIZED`. No real training or generation
+was performed. Documentation-only follow-up commits do not replace this frozen
+execution source or change the earlier prepared data.
