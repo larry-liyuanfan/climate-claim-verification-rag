@@ -1,9 +1,11 @@
 # Component provider/operator: CPU preparation, not model results
 
 Subsequent event: the separate exact-hash release submitted job **31729507**
-once; [receipt](verified-runs/scifact-component-submission-31729507.json).
-Its first snapshot is PENDING (Resources), no confirmed start. The remainder
-of this page describes the earlier CPU preparation, not a real-model result.
+once; the [submission receipt](verified-runs/scifact-component-submission-31729507.json)
+is historical. It later **failed before provider construction**, with zero model
+calls but 81 allocated GPU-job seconds. See the [failure and CPU repair](SCIFACT_COMPONENT_PACKING_REPAIR_20261001.md).
+The remainder of this page preserves the earlier `79f069d`/v1 preparation
+checkpoint, not the current r2 implementation or a real-model result.
 
 ## What changed
 

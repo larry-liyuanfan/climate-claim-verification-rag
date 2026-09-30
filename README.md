@@ -1,12 +1,21 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-## Latest component diagnostic: submitted, awaiting resources
+## Latest component diagnostic: pre-model failure repaired on CPU
 
-After a separate exact-hash release, job **31729507** was submitted once with
-source `79f069d`: [submission receipt](docs/verified-runs/scifact-component-submission-31729507.json).
-First snapshot: **PENDING (Resources)**, no confirmed start time. The bound is
-four real synthetic preflights plus 33 diagnostic slots, not new training or
-dev/test evaluation. No model result or Agent improvement is available yet.
+Job **31729507 failed before provider construction**: canonical JSON persistence
+reordered input object fields, so runtime prompt hashes no longer matched Stage A.
+The original [submission snapshot](docs/verified-runs/scifact-component-submission-31729507.json)
+is historical; the [failure/repair report](docs/SCIFACT_COMPONENT_PACKING_REPAIR_20261001.md)
+records **zero generation calls but 81 allocated GPU-job seconds**.
+
+Source `81917f2` restores the original authored field order, without changing
+values, document order, frozen expected hashes or budgets. The existing real
+tokenizer verifies **33/33 complete packing identities** on both preparation and
+runtime tokenizer asset paths; four synthetic persistence seams also pass.
+Local and exact-archive clean-source regression each pass **151 tests**, with
+one Windows-only POSIX skip. These are infrastructure checks, not model quality.
+An `r2` execution identity preserves the failed v1 provenance; **no replacement
+GPU job is submitted by this CPU repair**. Separate exact-hash release is required.
 
 ### Validated CPU preparation (historical checkpoint)
 
