@@ -277,3 +277,46 @@ def test_review_regressions_binding_and_failure_denominators(tmp_path, target):
     report = score(tmp_path, bundle, forbidden=True)
     assert report["status"] == "no_quality" and report["planned_route_results"] == 3
     assert report["unscored_route_results"] == 3 and report["physical"]["unique_physical_calls"] == 4
+
+
+def test_preflight_main_never_expands_generation_config(tmp_path, monkeypatch):
+    import types
+    import transformers
+    import preflight_scifact_evidence_bottleneck as preflight
+    from climate_rag import scifact_generation
+    frame, _ = inputs()
+    fake_script = tmp_path/"source/scripts/preflight.py"
+    fake_script.parent.mkdir(parents=True)
+    fake_script.write_text("synthetic_fixture")
+    (fake_script.parent.parent/"SOURCE_REVISION").write_text("a"*40)
+    monkeypatch.setattr(preflight, "__file__", str(fake_script))
+    monkeypatch.setattr(preflight, "ROOT", tmp_path)
+    monkeypatch.setattr(preflight, "os", types.SimpleNamespace(name="posix", environ={"SLURM_JOB_ID": "synthetic"}))
+    monkeypatch.setattr(preflight, "release_fields", lambda r: {"frames_sha256": "b"*64, "selection_sha256": "c"*64})
+    monkeypatch.setattr(preflight.adapter, "check_prepared", lambda *args: ({}, [{"id": i} for i in range(24)]))
+    monkeypatch.setattr(preflight.adapter, "load_frames", lambda *args: [frame]*24)
+    monkeypatch.setattr(preflight, "checked", lambda *args: b'')
+    monkeypatch.setattr(transformers.AutoTokenizer, "from_pretrained", lambda *args, **kw: Backend([]).base.tokenizer)
+    def forbidden():
+        pytest.fail("tokenizer-only entry must not require Torch/config expansion")
+    monkeypatch.setattr(scifact_generation, "expected_defaults", forbidden)
+    monkeypatch.setattr("sys.argv", ["preflight", "--output", str(tmp_path/"receipt.json")])
+    preflight.main()
+    assert json.loads((tmp_path/"receipt.json").read_bytes())["model_calls"] == 0
+    assert not (tmp_path/"model-run-draft.json").exists()
+
+
+def test_local_draft_preserves_failed_job_and_does_not_authorize():
+    from build_scifact_bottleneck_draft import build
+    from climate_rag.scifact_semantic_contract import TOKENIZER_SHA
+    import scifact_evidence_input as adapter
+    fields = {k: "a"*64 for k in adapter.HASH_KEYS}
+    receipt = {"protocol": PROTOCOL, "claims": 24, "overflow_count": 0, "model_calls": 0,
+        "gold_read": False, "tokenizer_sha256": TOKENIZER_SHA, "frames_sha256": "a"*64,
+        "selection_sha256": "a"*64, "frames_identity": "b"*64, "source_git": "c"*40, "job_id": "fixture"}
+    draft = build(receipt, fields, frozen_contract(), "d"*40, "e"*64, "f"*64)
+    assert not draft["model_execution_authorized"] and draft["status"] == "draft_not_authorized"
+    assert draft["source_git"] != draft["tokenizer_executed_source"]
+    assert draft["tokenizer_job_status"].startswith("FAILED") and draft["max_generations"] == 96
+    assert all(draft[k].startswith("/data/") and "\\" not in draft[k]
+               for k in ("source_archive", "prepared", "model_directory", "output"))

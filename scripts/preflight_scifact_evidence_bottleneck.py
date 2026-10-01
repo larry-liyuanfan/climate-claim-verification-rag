@@ -8,13 +8,12 @@ import os
 from pathlib import Path
 from typing import Any
 
-from climate_rag.scifact_evidence_bottleneck import PROTOCOL, ROUTES, inputs, parse_selection, render_prompt, source_rows
-from climate_rag.scifact_generation import frozen_contract
+from climate_rag.scifact_evidence_bottleneck import PROTOCOL, inputs, parse_selection, render_prompt, source_rows
 from climate_rag.scifact_grounding import parse_abstract
 from climate_rag.scifact_natural_contract import require
 from climate_rag.scifact_read_continuation import ordered_write
 from climate_rag.scifact_relation_verifier import RELATION_PROTOCOL
-from climate_rag.scifact_semantic_contract import CORPUS_SHA, MODEL_SHA, TOKENIZER_SHA, checked
+from climate_rag.scifact_semantic_contract import CORPUS_SHA, TOKENIZER_SHA, checked
 from climate_rag.scifact_utility_contract import identity
 from preflight_scifact_relation_verifier import synthetic_assessment
 from run_scifact_evidence_commit_operator import release_fields
@@ -91,18 +90,6 @@ def main() -> None:
         "overflow_count": sum(r["overflow"] for r in rows), "model_calls": 0, "model_weights_loaded": False,
         "gold_read": False, "new_sampling": False, "protected_split_read": False, "training": False}
     ordered_write(args.output, result)
-    draft = {**{k: fields[k] for k in adapter.HASH_KEYS}, "protocol": PROTOCOL,
-        "input_protocol": adapter.PROTOCOL, "scope": adapter.SCOPE, "status": "draft_not_authorized",
-        "model_execution_authorized": False, "source_git": git, "source_archive": str(source.parent / "source.tar"),
-        "source_archive_sha256": os.environ["CLIMATE_SOURCE_SHA"], "frames_identity": identity(frames),
-        "prepared": str(prepared), "model_sha256": MODEL_SHA, "generation_contract": frozen_contract(),
-        "model_directory": str(source.parent / "future-model-input/models/generator/model"),
-        "model_directory_status": "not_extracted_this_CPU_package", "max_generations": 96,
-        "routes": list(ROUTES), "output": str(ROOT / "runs" / (PROTOCOL + "-" + git[:12])),
-        "input_token_cap": 8192, "output_token_cap": 512, "per_stage_seconds": 120,
-        "planned_route_results": 72, "baseline": "archived v2 fixed_top1 and v3 fixed_top1, never rerun",
-        "release_requires": "new coordinator exact-source approval plus bounded parent supervision/exit proof"}
-    ordered_write(args.output.with_name("model-run-draft.json"), draft)
     print(json.dumps({k: v for k, v in result.items() if k != "rows"}))
     require(result["overflow_count"] == 0, "overflow_no_truncation_no_retry")
 

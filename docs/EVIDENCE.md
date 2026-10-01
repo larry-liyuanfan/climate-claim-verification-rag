@@ -9,6 +9,13 @@ route results is a future-run draft ceiling, **not inference authorization**.
 No new quality/resume number, no real gold or protected split reading in this
 CPU package. Preserve v2/v3 results below; component changes are not Agent gains.
 
+Single CPU attempt **31996384** completed 582 tokenizer probes on the frozen 24
+claims, zero overflow (input max 3,836/8,192; synthetic output max 170/512), then
+failed during Torch-dependent draft metadata export. Slurm **FAILED/1:0** is
+preserved. Draft export was separated into a local CPU helper; no second job or
+model call. [Execution receipt](verified-runs/scifact-evidence-bottleneck-cpu-31996384.json)
+keeps the exact executed source distinct from the later local-only repair.
+
 ## 2026-10-02 paired verifier result and CPU-only scoring recovery
 
 [Result/decision report](SCIFACT_PAIRED_VERIFIER_RESULT_20261002.md) and

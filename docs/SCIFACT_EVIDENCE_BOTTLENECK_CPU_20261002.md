@@ -89,10 +89,39 @@ all-visible-sentences B stress prompt. This is a bounded tokenizer envelope,
 not proof covering every possible BPE concatenation or model response. Runtime
 limits still reject any actual overflow.
 
-The emitted `model-run-draft.json` binds exact source/model/tokenizer/input
+The locally built `model-run-draft.json` binds exact source/model/tokenizer/input
 identities and generation contract but has `model_execution_authorized=false`.
 It does not extract weights, reserve another run or submit a GPU job. A new
 exact-source approval and bounded parent supervision/exit receipt are required
 before future real inference. This package stops after CPU preflight/CI receipt.
 
-Actual receipt and source/CI identities are appended only after verification.
+## Actual single CPU attempt and local-only repair
+
+CPU **31996384** remains **FAILED/1:0**, 12 s, TotalCPU 4.097 s, MaxRSS
+238,800K, 2 CPU/8 GiB. Executed source `8e8c1ed480f8003d9872275a1e3d9b30674c9444`;
+archive `448530e98d4762399d19eda07a91d6733923db2298c3ad7401636bd7caefce82`.
+The wrapper checked all 695 source files before running.
+
+The tokenizer stage itself finished and durably wrote all **582 prompt probes**
+on the same 24 claims: maxima A **3,836**, selector **1,369**, B **2,327**, C
+**991**; largest synthetic output including EOS **170**, zero overflow against
+8,192/512. This measures prompt/token envelopes, not model accuracy. Complete
+receipt SHA `04d9338ee67fb57dd3e18da2faf777fb208f37a1621eae8a13ac6f474694f3fa`;
+[compact execution record](verified-runs/scifact-evidence-bottleneck-cpu-31996384.json).
+
+The tail draft exporter then called `frozen_contract()` and its Torch-dependent
+compatibility helper in a tokenizer-only environment without Torch. Local
+validation with Torch had missed that environment boundary. No tokenizer result
+was lost. **No second cluster job, installation or model call was made.**
+The repair removes draft construction from the cluster preflight entirely;
+`build_scifact_bottleneck_draft.py` constructs it in the existing local CPU
+validation environment. It binds the original receipt, verifies unchanged
+model-facing source and probe AST, and records executed-versus-draft source
+separately. Original failed Slurm status is never relabelled COMPLETED.
+
+Local reproduction of the metadata-only draft (requires an exact clean source
+archive produced by the existing packager; no weights or real gold):
+
+```text
+python scripts/build_scifact_bottleneck_draft.py --preflight <original-receipt.json> --preflight-sha 04d9338ee67fb57dd3e18da2faf777fb208f37a1621eae8a13ac6f474694f3fa --source-git <exact-reviewed-commit> --archive <source.tar> --output <new-model-run-draft.json>
+```
