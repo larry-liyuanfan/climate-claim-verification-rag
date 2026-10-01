@@ -17,7 +17,14 @@ shows why this is not a model improvement: the one matched saved read case moves
 from rank 7 / preview-only in the full corpus to rank 1 / citable in the FIT
 pool, with identical source/sentence hashes. Pool membership and BM25 statistics
 changed together. Unowned documents are not proven safe background; no pool
-expansion, extra TRAIN cohort or new training has been released.
+expansion, extra TRAIN cohort or new training was released by that audit.
+
+A separately approved [shared-corpus CPU protocol](docs/SCIFACT_SHARED_CORPUS_PROTOCOL_20261001.md)
+now freezes the original 48 FIT claims and changes only the retrieval pool to
+all 5,183 public documents. It explicitly drops source-family-unseen claims and
+separates indexing, retrieved candidates, prepared-prompt text and supervision
+targets. The one CPU comparison awaits frozen-source review; no model training
+or held-out evaluation is part of this protocol.
 
 A separate [claim-group-mean optimizer contract](docs/SCIFACT_CLAIM_GROUP_MEAN_20261001.md)
 passes synthetic CPU gradient/AdamW checks while preserving historical v2 `/48`.
