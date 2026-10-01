@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from climate_rag.scifact_evidence_commit import CommitState, PROTOCOL, PROTOCOLS, render_prompt
+from climate_rag.scifact_relation_verifier import RELATION_PROTOCOL, QUALIFIERS
 from climate_rag.scifact_natural_contract import require
 from climate_rag.scifact_read_continuation import ordered_write
 from climate_rag.scifact_semantic_contract import TOKENIZER_SHA, checked
@@ -34,8 +35,14 @@ def probe(frame: Any, tokenizer: Any, *, protocol: str = PROTOCOL) -> dict[str, 
         state = CommitState(1, "adaptive", frame, "synthetic-prompt-probe:"+"a"*64, protocol=protocol)
         for index, doc in enumerate(state.order[:2]):
             ids = [s for s in frame["visible"] if s.rsplit(":",1)[0] == doc][:8]
+            decision: dict[str, Any] = {"source_id":doc,"label":"REFUTES","sentence_ids":list(reversed(ids))}
+            if protocol == RELATION_PROTOCOL:
+                decision = {"source_id":doc, "relation":"REFUTES",
+                    "qualifiers":{k:"aligned" for k in QUALIFIERS},
+                    "direct_sentence_ids":list(reversed(ids)), "background_sentence_ids":[],
+                    "minimal_sentence_ids":list(reversed(ids)), "uncertainty":"none"}
             state.accept({"status":status, "physical_attempt_id":f"g{index}",
-                "decision":{"source_id":doc,"label":"REFUTES","sentence_ids":list(reversed(ids))},
+                "decision":decision,
                 "usage":{"input_tokens":8192,"output_tokens":512},
                 "failure":"ModelResponseValidationError" if status == "failed" else None}, doc, "b"*64)
             state.calls = 2*(index+1)

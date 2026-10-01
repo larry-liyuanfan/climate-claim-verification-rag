@@ -10,6 +10,7 @@ from climate_rag.scifact_document_verifier import call_input
 from climate_rag.scifact_evidence_commit import CommitState, ISOLATED_PROTOCOL, PROTOCOL, render_prompt
 from climate_rag.scifact_evidence_commit_runtime import audit_episode
 from climate_rag.scifact_grounding import GoldClaim, Rationale
+from climate_rag.scifact_relation_verifier import RELATION_PROTOCOL
 from climate_rag.scifact_utility_runtime import ledger_cost
 from diagnose_scifact_semantic_input import diagnose_claim, invariant_probe
 import run_scifact_evidence_commit_operator as operator
@@ -108,7 +109,8 @@ def test_versioned_release_pins_existing_data_and_independent_execution_source()
             operator.validate_release(dict(release, **changed))
 
 
-def test_packager_keeps_preparation_identity_separate_without_rewriting_compact(tmp_path, monkeypatch):
+@pytest.mark.parametrize('protocol', [ISOLATED_PROTOCOL, RELATION_PROTOCOL])
+def test_packager_keeps_preparation_identity_separate_without_rewriting_compact(tmp_path, monkeypatch, protocol):
     import package_scifact_evidence_commit as package
     receipt = {'status':'imports_verified', 'dependency_errors':[], 'stderr_empty':True,
         'runtime_files_sha256':operator.FROZEN_FIELDS['runtime_files_sha256'],
@@ -123,7 +125,7 @@ def test_packager_keeps_preparation_identity_separate_without_rewriting_compact(
         'runtime_receipt_sha256' if p == r else 'runtime_observation_sha256'])
     compact = Path(__file__).resolve().parents[1]/'docs/verified-runs/scifact-prospective24-cpu-31953981.json'
     before = compact.read_bytes()
-    release = package.build_release('b'*40, 'c'*64, 'd'*64, r, o, compact, protocol=ISOLATED_PROTOCOL)
+    release = package.build_release('b'*40, 'c'*64, 'd'*64, r, o, compact, protocol=protocol)
     assert release['authorization'] == 'DRAFT_CPU_READY_NOT_AUTHORIZED'
     assert release['source_git'] == 'b'*40 and release['preparation_source_git'].startswith('da2430')
     with pytest.raises(ValueError, match='compact_contract'):
@@ -133,7 +135,7 @@ def test_packager_keeps_preparation_identity_separate_without_rewriting_compact(
     altered = tmp_path/'altered.json'
     altered.write_text(json.dumps(bad))
     with pytest.raises(ValueError, match='frozen_contract'):
-        package.build_release('b'*40, 'c'*64, 'd'*64, r, o, altered, protocol=ISOLATED_PROTOCOL)
+        package.build_release('b'*40, 'c'*64, 'd'*64, r, o, altered, protocol=protocol)
     assert compact.read_bytes() == before
 
 

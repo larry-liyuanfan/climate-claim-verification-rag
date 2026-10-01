@@ -9,6 +9,7 @@ import time
 from typing import Any
 
 from climate_rag.scifact_evidence_commit import ASSEMBLER, PROTOCOL, ISOLATED_PROTOCOL, PROTOCOLS, ARMS, CALL_CAPS
+from climate_rag.scifact_relation_verifier import RELATION_PROTOCOL
 from climate_rag.scifact_mixed_launch import PYTHON_EXECUTABLE, RUNTIME_FILES_SHA, RUNTIME_RECEIPT_SHA
 from climate_rag.scifact_read_continuation import ordered_write
 from prepare_scifact_natural import SELECTION_SHA, prepare
@@ -51,7 +52,7 @@ def release_fields(release: dict[str, Any]) -> dict[str, Any]:
     protocol = release.get("protocol", PROTOCOL)
     require(protocol in PROTOCOLS, "unknown_commit_protocol")
     fields = inputs.frozen_fields(FROZEN_FIELDS) if inputs.prospective(release) else FROZEN_FIELDS
-    if protocol == ISOLATED_PROTOCOL:
+    if protocol in (ISOLATED_PROTOCOL, RELATION_PROTOCOL):
         require(inputs.prospective(release), "isolated_protocol_requires_frozen_prospective_inputs")
         fields = dict(fields, protocol=protocol, attempt_id="semantic-input-v2",
             output=(ROOT / "runs" / (protocol + "-prospective24-v1")).as_posix(),
@@ -66,6 +67,11 @@ def release_fields(release: dict[str, Any]) -> dict[str, Any]:
             claims_sha256="bf5cd947e26ac2b8f83546106fbea673efbf71a84f7a4ea00adb31d40b7a5b7c",
             frames_sha256="e20a5188ba51bbaf940009338ee167d6d07bf4429652eaa06967265f37a4e29c",
             ordered_ids_sha256="41ef532f8c1a49caf81118164c615b5d5df6de04b22a7795baa563e37cad3469")
+        if protocol == RELATION_PROTOCOL:
+            fields.update(attempt_id="relation-rationale-v3",
+                          comparison_protocol=ISOLATED_PROTOCOL,
+                          comparison_status="v2_implemented_not_model_evaluated",
+                          decision_policy_delta="single_generation_relation_rationale_v3")
     return dict(fields)
 
 
@@ -99,7 +105,7 @@ def start_attempt(release: dict[str, Any], release_sha: str, job_id: str) -> dic
 
 
 def output_path(release: Any) -> Path:
-    if release.get("protocol") == ISOLATED_PROTOCOL:
+    if release.get("protocol") in (ISOLATED_PROTOCOL, RELATION_PROTOCOL):
         return Path(release_fields(release)["output"])
     return Path(inputs.OUTPUT) if inputs.prospective(release) else OUTPUT
 

@@ -200,6 +200,7 @@ def model_feedback(feedback: list[Any]) -> list[dict[str, Any]]:
     return [{"source_id": f["provenance"]["source_id"],
              "original_source_id": f["provenance"]["original_source_id"],
              "source_text_sha256": f["provenance"]["source_text_sha256"],
+             **({"assessment": copy.deepcopy(f["assessment"])} if "assessment" in f else {}),
              **{k: copy.deepcopy(f[k]) for k in ("origin", "citable", "status", "judgment", "failure", "physical_attempt_id")}}
             for f in feedback]
 

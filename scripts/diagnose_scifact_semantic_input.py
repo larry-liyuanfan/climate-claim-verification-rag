@@ -30,7 +30,7 @@ RELEASE = ROOT / 'envs/prospective24-source-da243036871f/release.authorized.json
 TOKENIZER = ROOT / 'posthoc/scifact-read-continuation-fc4ffd61a761/tokenizer'
 
 
-def invariant_probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
+def invariant_probe(frame: Any, tokenizer: Any, *, protocol: str = ISOLATED_PROTOCOL) -> dict[str, Any]:
     """Exercise actual renderer/tokenizer, never generate or infer a verdict."""
     counts = []
     comparisons = 0
@@ -38,7 +38,7 @@ def invariant_probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
         expected = None
         for arm in ARMS:
             for calls, tools in ((0, 1), (1, 1), (3, 2), (4, 4)):
-                state = CommitState(1, arm, frame, 'synthetic-invariance', protocol=ISOLATED_PROTOCOL)
+                state = CommitState(1, arm, frame, 'synthetic-invariance', protocol=protocol)
                 # Counters are probe inputs, not a simulated physical receipt.
                 # Include real-shaped synthetic feedback, unrelated to scientific gold.
                 state.accept({'status':'failed', 'physical_attempt_id':'synthetic',
@@ -55,7 +55,7 @@ def invariant_probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
                 require('remaining' not in obs and 'verification_feedback' not in obs,
                         'control_state_leaked')
                 comparisons += 1
-        clean = CommitState(2, 'adaptive', frame, 'different-episode', protocol=ISOLATED_PROTOCOL)
+        clean = CommitState(2, 'adaptive', frame, 'different-episode', protocol=protocol)
         obs, schema = clean.inputs('verify', doc, [])
         prompt = render_prompt(tokenizer, obs, schema)
         require((obs, schema, prompt, tokenizer.encode(prompt, add_special_tokens=False)) == expected,
@@ -66,7 +66,7 @@ def invariant_probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
     changed, _ = old.inputs('verify', frame['document_order'][0], [])
     require(render_prompt(tokenizer, old_obs, old_schema) != render_prompt(tokenizer, changed, old_schema),
             'legacy_behavior_must_remain_reproducible')
-    planner = CommitState(1, 'adaptive', frame, 'planner', protocol=ISOLATED_PROTOCOL)
+    planner = CommitState(1, 'adaptive', frame, 'planner', protocol=protocol)
     p0, _ = planner.inputs('plan', None, planner.order)
     planner.calls, planner.tools = 3, 3
     p1, _ = planner.inputs('plan', None, [])

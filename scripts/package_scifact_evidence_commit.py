@@ -8,7 +8,7 @@ from pathlib import Path
 import tarfile
 from typing import Any
 
-from climate_rag.scifact_evidence_commit import PROTOCOL, ISOLATED_PROTOCOL, PROTOCOLS
+from climate_rag.scifact_evidence_commit import PROTOCOL, PROTOCOLS
 from climate_rag.scifact_read_continuation import ordered_write
 from package_scifact_source import package, run_shell_guard, sha256
 from run_scifact_evidence_commit_operator import FROZEN_FIELDS, WRAPPER, release_fields, validate_release
@@ -18,7 +18,7 @@ import scifact_evidence_input as inputs
 def build_release(revision: str, archive_sha: str, wrapper_sha: str,
                   runtime_receipt: Path, runtime_observation: Path,
                   input_compact: Path | None = None, *, protocol: str = PROTOCOL) -> dict[str, Any]:
-    if protocol not in PROTOCOLS or (protocol == ISOLATED_PROTOCOL and input_compact is None):
+    if protocol not in PROTOCOLS or (protocol != PROTOCOL and input_compact is None):
         raise ValueError("unsupported_protocol_or_missing_frozen_inputs")
     # The original inventory receipt has no interpreter field. The successful
     # FIT24 runtime observation does; bind both instead of inventing a path.
@@ -37,7 +37,7 @@ def build_release(revision: str, archive_sha: str, wrapper_sha: str,
     fields = copy.deepcopy(FROZEN_FIELDS)
     if input_compact is not None:
         prepared = json.loads(input_compact.read_bytes())
-        isolated = protocol == ISOLATED_PROTOCOL
+        isolated = protocol != PROTOCOL
         expected = release_fields({"protocol":protocol, "input_protocol":inputs.PROTOCOL})
         if (prepared['protocol'] != inputs.PROTOCOL or prepared['scope'] != inputs.SCOPE
                 or prepared['source_git'] != (expected['preparation_source_git'] if isolated else revision)

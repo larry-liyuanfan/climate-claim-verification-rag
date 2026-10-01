@@ -19,6 +19,9 @@ from .scifact_document_verifier import (
     render_prompt as verifier_prompt,
 )
 from .scifact_natural_contract import require
+from .scifact_relation_verifier import (
+    RELATION_PROTOCOL, assessment_schema, parse_assessment, project_assessment, render_assessment_prompt,
+)
 from .scifact_semantic_contract import MODEL_SHA
 from .scifact_terminal import action_schema, parse_action, render_answer, to_original_prediction
 from .scifact_terminal import PROTOCOL as TERMINAL
@@ -26,7 +29,7 @@ from .scifact_utility_contract import identity
 
 PROTOCOL = "scifact-evidence-commit-v1-20261002"
 ISOLATED_PROTOCOL = "scifact-evidence-commit-semantic-v2-20261002"
-PROTOCOLS = (PROTOCOL, ISOLATED_PROTOCOL)
+PROTOCOLS = (PROTOCOL, ISOLATED_PROTOCOL, RELATION_PROTOCOL)
 ASSEMBLER = "immutable-verdict-subset-v1"
 ARMS = ("fixed_top1", "fixed_all", "adaptive")
 CALL_CAPS = {"fixed_top1": 1, "fixed_all": 4, "adaptive": 5}
@@ -124,6 +127,8 @@ class VerdictRegistry:
 
 def render_prompt(tokenizer: Any, observation: Any, schema: Any) -> str:
     if observation["stage"] == "verify":
+        if observation.get("protocol") == RELATION_PROTOCOL:
+            return render_assessment_prompt(tokenizer, observation, schema)
         return verifier_prompt(tokenizer, observation, schema)  # Same verifier, not new prompting.
     instruction = (
         "Assess the complete immutable claim using original visible scientific evidence. "
@@ -196,12 +201,14 @@ class CommitState:
     def inputs(self, stage: str, doc: str | None, available: list[str]) -> tuple[Any, Any]:
         if doc is not None:
             obs, schema = old_call_input(self.frame, stage, doc, self.feedback, self.calls, self.tools, [])
-            if self.protocol == ISOLATED_PROTOCOL:
+            if self.protocol in (ISOLATED_PROTOCOL, RELATION_PROTOCOL):
                 require(stage == "verify", "semantic_projection_verify_only")
                 # Explicit semantic allowlist, not fictitious/magnified remaining budget.
                 # Actual counters/deadlines stay in the state, journal and step receipt.
-                obs = {"protocol": ISOLATED_PROTOCOL, **{k: obs[k] for k in
+                obs = {"protocol": self.protocol, **{k: obs[k] for k in
                     ("stage", "immutable_claim", "current_citable", "source")}}
+                if self.protocol == RELATION_PROTOCOL:
+                    schema = assessment_schema(self.frame, doc)
             return obs, schema
         catalog = self.registry.catalog()
         schema = action_schema(["abstain"], [], [], 5)
@@ -221,6 +228,8 @@ class CommitState:
 
     def parse(self, raw: Any, doc: str | None, available: list[str]) -> dict[str, Any]:
         if doc is not None:
+            if self.protocol == RELATION_PROTOCOL:
+                return parse_assessment(raw, self.frame, doc)
             return parse_verdict(raw, self.frame, doc)
         require(isinstance(raw, dict), "commit_action_object_required")
         if raw.get("action") == "verify":
@@ -236,10 +245,18 @@ class CommitState:
         self.calls += 1
         if doc is not None:
             self.tools += 1
-            self.feedback.append(feedback_row(self.frame, doc, step, self.arm == "adaptive"))
+            projected_step = step
+            assessment = None
+            if self.protocol == RELATION_PROTOCOL and step["status"] == "valid":
+                assessment = parse_assessment(step["decision"], self.frame, doc)
+                projected_step = dict(step, decision=project_assessment(assessment))
+            feedback = feedback_row(self.frame, doc, projected_step, self.arm == "adaptive")
+            if assessment is not None:
+                feedback["assessment"] = {"protocol": RELATION_PROTOCOL, **assessment}
+            self.feedback.append(feedback)
             self.pending = None
             if step["status"] == "valid":
-                self.registry.register(doc, step["decision"], step["physical_attempt_id"], verifier_identity)
+                self.registry.register(doc, projected_step["decision"], step["physical_attempt_id"], verifier_identity)
         elif step["status"] == "valid":
             decision = step["decision"]
             if decision["action"] == "verify":
