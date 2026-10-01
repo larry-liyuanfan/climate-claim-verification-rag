@@ -1,5 +1,11 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The new [evidence-bottleneck CPU package](docs/SCIFACT_EVIDENCE_BOTTLENECK_CPU_20261002.md)
+separates evidence-first field order from actual label-input masking. B/C share
+one immutable sentence selection, differing only in full-document visibility;
+physical and independent-deployment costs are separate. This is implemented
+mechanism-test infrastructure, **not a new model result or Agent quality gain**.
+
 The [paired v2/v3 confirmation and CPU recovery](docs/SCIFACT_PAIRED_VERIFIER_RESULT_20261002.md)
 completed **144 slots / 392 model calls** on the same consumed TRAIN24. The
 relation/rationale v3 candidate is **not promoted**: fixed-top1 strict positives

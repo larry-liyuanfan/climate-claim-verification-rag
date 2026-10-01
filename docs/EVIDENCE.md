@@ -1,5 +1,14 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 evidence bottleneck CPU implementation
+
+[Frozen mechanism and reproduction](SCIFACT_EVIDENCE_BOTTLENECK_CPU_20261002.md):
+same consumed TRAIN24/top1, one-response A and shared-selector B/C, only actual
+full-document visibility changes between B/C. Maximum 96 physical calls / 72
+route results is a future-run draft ceiling, **not inference authorization**.
+No new quality/resume number, no real gold or protected split reading in this
+CPU package. Preserve v2/v3 results below; component changes are not Agent gains.
+
 ## 2026-10-02 paired verifier result and CPU-only scoring recovery
 
 [Result/decision report](SCIFACT_PAIRED_VERIFIER_RESULT_20261002.md) and
