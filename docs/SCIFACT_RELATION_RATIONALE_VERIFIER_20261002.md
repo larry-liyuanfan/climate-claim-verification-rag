@@ -104,8 +104,49 @@ object**. Actual runtime prompt/output/deadline guards still apply to all calls.
 The CPU wrapper binds exact source archive, extracted tree and wrapper hash;
 it loads tokenizer assets only and refuses login-node execution.
 
-Execution-source identity, real preflight receipt and clean-archive results will
-be appended after the single authorized CPU run; no pending result is claimed here.
+Execution source is `bc79ad927a1fea357c4cd1f0d0b38c2caf25e01d`.
+The clean exact archive passed **54 tests** and the CLI/Bash entry checks.
+[Exact-source Linux CI](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36894807381)
+passed **1,373 tests**, Ruff, strict checks on 107 source files and secret/PII scan.
+Native Windows whole-source typing sees two pre-existing POSIX `resource` members
+as unavailable; Linux-target typing and the actual Linux CI pass. This is not a
+missing Torch installation or a reason to mutate unrelated POSIX code.
+
+Source archive SHA is
+`3ad274f6397ee8aeff5967d7cd903209da19b3f3cc342d9f160cbe7df91e0ee0`
+(5,498,880 bytes, 674 regular files, unique 41-byte revision marker, exact Git
+blob allowlist). Actual CPU wrapper SHA is
+`5d3275457119379a6262ce75fce364516137c0f9bd70d6a37c7029af2456ce3d`.
+Spartan entry import/help and test-only **31969036** passed before the sole actual
+CPU submission **31969505** (2 CPU / 8 GiB / ten minutes, no GPU/requeue).
+The first status was PENDING / Priority, with no scheduled start, priority 13,450
+(fairshare 13,433, job size 17, age 0). No cancellation or duplicate job followed.
+
+The job then **COMPLETED / `0:0`**, 2026-10-02 **02:55:07–02:57:49 UTC+10**,
+on sapphire. Elapsed **162 s**, TotalCPU **148.698 s**, batch MaxRSS **235,400 K**.
+These resource fields were read from `sacct -j 31969505` (including its batch
+step), not inferred from the token-probe compact.
+The [unmodified redacted preflight artifact](verified-runs/scifact-relation-verifier-cpu-31969505.json)
+has SHA `7e21b603c225374723122763f700f73dacc04f4005cde7784e23e837814cb388`.
+Diagnostic script SHA is
+`aae408938448e992122091e9d31c291202e640a7a295214a6372ad230d046922`.
+
+| Real frozen-frame preflight | Isolated v2 | Structured v3 |
+|---|---:|---:|
+| Same consumed claim frames | 24 | 24 |
+| Prompt-state probes | 8,784 | 8,784 |
+| Maximum prompt tokens | 6,811 | 7,181 |
+| Prompt limit | 8,192 | 8,192 |
+
+Together these are **17,568 prompt-state probes**. For v3, **1,440 arm/counter-state
+checks across 120 document probes**, including reference-state self-checks, plus
+120 clean-history comparisons preserve observation/schema/prompt/token-ID identity.
+Maximum max-cardinality **synthetic** response including EOS was **174 / 512 tokens**;
+the compact reports **zero overflow frames**. These are prescribed feedback/output
+envelopes on real frozen inputs, not generated scientific judgments or a proof
+covering every legal model response. Live runtime guards remain necessary.
+No model weights, gold, new sample or protected split was read; no model calls or
+training occurred. Later documentation commits are not this execution source.
 
 ## Falsifiable same-contract comparison proposal (not run authorization)
 

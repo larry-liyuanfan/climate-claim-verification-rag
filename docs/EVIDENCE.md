@@ -1,5 +1,29 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 structured relation/rationale verifier (CPU readiness only)
+
+[Implementation/comparison proposal](SCIFACT_RELATION_RATIONALE_VERIFIER_20261002.md)
+and [real-frame preflight](verified-runs/scifact-relation-verifier-cpu-31969505.json):
+source `bc79ad927a1fea357c4cd1f0d0b38c2caf25e01d`, CPU **31969505 COMPLETED / 0:0**,
+162 s, TotalCPU 148.698 s, MaxRSS 235,400 K. Versioned v3 produces one typed
+relation/qualifier/direct-versus-background/minimal-evidence/uncertainty assessment;
+projection preserves its ordered evidence under the original scorer and source
+binding. Necessary joint-context sentences remain eligible; comparable numeric
+contradictions can REFUTE and are not forced into incomparable-scope INSUFFICIENT.
+
+Exact-source Linux CI **1,373 passed**, clean-archive **54 passed**. The same 24
+frames produced **8,784 prompt probes per protocol**; maximum v2/v3 input tokens
+**6,811 / 7,181**, against 8,192. New assessment's max-cardinality synthetic output
+was 174 including EOS, against 512; zero observed overflows. New input isolation
+passed 1,440 state checks including references plus 120 clean-history comparisons.
+These are explicit probe configurations, not a proof that every legal response
+fits or that any scientific label improved. No inference/training/new sampling/
+gold/protected split access; no resume promotion. The unchanged five-call adaptive
+controller still visits at most two documents; the three-document case stays in
+the denominator. A 48-call same-input fixed-top1 v2/v3 proposal awaits separate
+runner/release approval; this package does not authorize it.
+Compact SHA `7e21b603c225374723122763f700f73dacc04f4005cde7784e23e837814cb388`.
+
 ## 2026-10-02 semantic-input isolation and error diagnosis (CPU only)
 
 [Report](SCIFACT_SEMANTIC_INPUT_ISOLATION_20261002.md) and

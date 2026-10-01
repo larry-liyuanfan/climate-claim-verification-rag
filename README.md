@@ -1,5 +1,14 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [single-response relation/rationale verifier](docs/SCIFACT_RELATION_RATIONALE_VERIFIER_20261002.md)
+now separates comparable scope, contradictory outcomes, joint direct evidence,
+dispensable background and model-selected minimal citations. Original-score
+projection, source binding and fallible tool feedback are integrated; v1/v2 remain
+available. Exact-source CI passed **1,373 tests**; CPU job **31969505** checked
+17,568 prompt states with zero overflow (v3 maximum **7,181 / 8,192 tokens**).
+This is CPU readiness, not a model-quality gain. No model/gold call occurred;
+the unchanged five-call controller still cannot verify three documents.
+
 The [verifier-input isolation and CPU diagnosis](docs/SCIFACT_SEMANTIC_INPUT_ISOLATION_20261002.md)
 separates scientific evidence from controller budgets without changing the old
 protocol. Whole-chain review preceded CPU job **31963271**: **1,440 arm/counter-state
