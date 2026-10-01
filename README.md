@@ -1,5 +1,15 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [targeted retrieval feedback CPU package](docs/TARGETED_RETRIEVAL_FEEDBACK_CPU_20261002.md)
+separates an immutable verification claim from subquestion/counter-evidence search.
+It connects **five routes** (including an upfront fixed-multiquery control) to
+the unchanged **32 consumed CLIMATE validation claims / 5,240 evidence records**.
+Real tool feedback and previously displayed full sentences are retained; capacity
+failures, rejected responses and physical generator/reranker costs remain visible.
+Only synthetic/CPU validation and metadata identity checks have run in this package.
+The source-bound execution draft is **unauthorized**: no new model result,
+independent test, deployment, or resume gain is claimed.
+
 The [completed evidence-bottleneck result](docs/SCIFACT_BOTTLENECK_RESULT_20261002.md)
 records **72 route slots / 96 calls** from job 32006925, with no technical
 failures. The masked-input C route is **not promoted**: against shared-selection

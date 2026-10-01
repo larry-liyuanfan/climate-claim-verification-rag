@@ -20,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 from .agent_protocol import ModelResponseValidationError
 from .tokenize import NEGATIONS, climate_tokenize
 from .verification import decompose_claim, extract_constraints, normalise_claim
+from . import targeted_query
 
 
 class _Strict(BaseModel):
@@ -136,6 +137,7 @@ def action_schema(
     source_ids: Sequence[str],
     sentence_ids: Sequence[str],
     context_k: int,
+    *, targeted: bool = False,
 ) -> dict[str, Any]:
     """Inline anyOf for LMFE0.11.3; no $ref/discriminator/unsupported regex."""
     branches = []
@@ -169,6 +171,8 @@ def action_schema(
             }
         elif action == "rewrite":
             properties["query"] = {"type": "string", "minLength": 1, "maxLength": 300}
+            if targeted:
+                properties.update(targeted_query.query_fields())
         elif action != "rerank":
             raise ValueError("unknown action")
         branches.append(
@@ -188,7 +192,14 @@ def parse_action(
     visible: Mapping[str, Any],
     candidates: Sequence[str],
     context_k: int,
+    *, targeted: bool = False, seen_queries: Sequence[str] = (),
 ) -> dict[str, Any]:
+    if targeted and isinstance(payload, dict) and payload.get("action") == "rewrite":
+        if "rewrite" not in allowed or set(payload) != {"action", "purpose", "query"}:
+            raise ValueError("disallowed_targeted_query")
+        query = targeted_query.validate_query(
+            {k: payload[k] for k in ("purpose", "query")}, seen_queries)
+        return {"action": "rewrite", **query}
     decision = DECISIONS.validate_python(payload, strict=True).model_dump()
     if decision["action"] not in allowed:
         raise ValueError("disallowed_action")
@@ -263,17 +274,22 @@ class SentenceAgentV3:
         rerank: Callable[[str, Sequence[Source]], Sequence[Source]] | None = None,
         budget: V3Budget | None = None,
         clock: Callable[[], float] = time.monotonic,
+        protocol: str = "sentence-id-v3",
     ):
+        if protocol not in {"sentence-id-v3", targeted_query.PROTOCOL}:
+            raise ValueError("unknown controller protocol")
         self.provider, self.retrieve, self.rerank = provider, retrieve, rerank
         self.budget, self.clock = budget or V3Budget(), clock
+        self.protocol = protocol
 
     def run(self, claim: str, route: str = "adaptive") -> dict[str, Any]:
-        if route not in {
+        targeted = self.protocol == targeted_query.PROTOCOL
+        if route not in ({
             "fixed_retrieval",
             "fixed_rerank",
             "deterministic_extra",
             "adaptive",
-        }:
+        } | ({"fixed_multiquery"} if targeted else set())):
             raise ValueError("unknown route")
         claim = normalise_claim(claim)
         if not claim or len(claim) > 2000:
@@ -293,6 +309,12 @@ class SentenceAgentV3:
         reads: set[tuple[str, ...]] = set()
         answer: dict[str, Any] | None = None
         outcome = "generation_budget_exhausted"
+        seen_queries = [claim]
+        retrieval_rankings: list[list[str]] = []
+        citable_memory: dict[str, Any] = {}
+        planning = targeted and route == "fixed_multiquery"
+        if planning and b.max_calls < 2:
+            raise ValueError("planning_requires_reserved_final_call")
 
         def left() -> float:
             return b.timeout_seconds - (self.clock() - start)
@@ -323,11 +345,15 @@ class SentenceAgentV3:
             ids: list[str] | None = None,
             query: str | None = None,
             model_selected: bool = False,
+            purpose: str | None = None,
+            selection_origin: str | None = None,
         ) -> None:
             nonlocal candidates, selected, tool_calls, rerank_pairs, rewritten, reranked
             if tool_calls >= b.max_tools or left() <= 0:
                 raise RuntimeError("tool_budget_or_deadline")
             before = list(selected)
+            prior_candidates = list(candidates)
+            known_aliases = set(aliases.values())
             tool_calls += 1
             began = self.clock()
             event: dict[str, Any] = {
@@ -341,6 +367,10 @@ class SentenceAgentV3:
                 else None,
             }
             events.append(event)
+            if targeted:
+                event.update(query_purpose=purpose, selection_origin=selection_origin,
+                             before_candidate_ids=prior_candidates,
+                             immutable_claim_sha256=hashlib.sha256(claim.encode()).hexdigest())
             if kind in {"retrieve", "rewrite"}:
                 try:
                     rows = list(self.retrieve(query or claim, b.candidate_k))[
@@ -349,12 +379,19 @@ class SentenceAgentV3:
                 except Exception as exc:
                     raise RuntimeError("retrieval_failure") from exc
                 extra = register(rows)
+                if targeted:
+                    retrieval_rankings.append(extra)
+                    event.update(search_returned_ids=list(extra), search_empty=not extra,
+                                 new_source_ids=[s for s in extra if s not in known_aliases])
                 if kind == "rewrite":
                     rewritten = True
-                    prior_rank = {s: 1 / (60 + i + 1) for i, s in enumerate(candidates)}
-                    for i, s in enumerate(extra):
-                        prior_rank[s] = prior_rank.get(s, 0) + 1 / (60 + i + 1)
-                    candidates = sorted(prior_rank, key=lambda s: (-prior_rank[s], s))[
+                    seen_queries.append(query or claim)
+                    prior_rank: dict[str, float] = {}
+                    rankings = retrieval_rankings if targeted else [candidates, extra]
+                    for ranking in rankings:
+                        for i, s in enumerate(ranking):
+                            prior_rank[s] = prior_rank.get(s, 0) + 1 / (60 + i + 1)
+                    candidates = sorted(prior_rank, key=lambda s: (-prior_rank[s], source(s).source_id if targeted else s))[
                         : b.candidate_k
                     ]
                 else:
@@ -414,25 +451,52 @@ class SentenceAgentV3:
                 "remaining_calls": b.max_calls - len(attempts),
                 "remaining_tools": b.max_tools - tool_calls,
             }
+            if targeted:
+                observation.update(protocol=self.protocol, remaining_queries=targeted_query.MAX_QUERIES-len(seen_queries)+1,
+                                   prior_queries=list(seen_queries[1:]))
+                completed = [e for e in events if e.get("status") == "completed"]
+                observation["tool_feedback"] = ({k: completed[-1].get(k) for k in (
+                    "tool", "query_sha256", "query_purpose", "search_returned_ids", "search_empty",
+                    "new_source_ids", "before_candidate_ids", "candidate_ids", "requested_context")}
+                    if completed else None)
+            if planning:
+                observation["allowed_actions"] = ["plan_queries"]
+                schema = targeted_query.planning_schema()
+                count = self.provider.count_prompt(observation, schema)
+                if count > b.max_input_tokens:
+                    raise ValueError("planning_prompt_exceeds_budget")
+                return observation, schema, {}, count
             visible: dict[str, Any] = {}
             bare = [a for a in allowed if a != "answer"]
-            schema = action_schema(bare, candidates, [], b.context_k)
+            schema = action_schema(bare, candidates, [], b.context_k, targeted=targeted)
+            if targeted and citable_memory:
+                visible.update(citable_memory)
+                observation["current_citable"] = [
+                    {"sentence_id": sid, "text": v["text"]} for sid, v in visible.items()]
+                schema = action_schema(allowed, candidates, list(visible), b.context_k, targeted=True)
             if self.provider.count_prompt(observation, schema) > b.max_input_tokens:
-                raise ValueError("prompt_overhead_exceeds_budget")
+                raise ValueError("retained_context_capacity" if targeted and citable_memory else "prompt_overhead_exceeds_budget")
             for alias in selected:
                 doc = source(alias)
                 for index, sentence in enumerate(doc.sentences):
                     sid = f"{alias}:{index}"
+                    if sid in visible:
+                        continue
                     entry = {"sentence_id": sid, "text": sentence}
                     observation["current_citable"].append(entry)
                     next_schema = action_schema(
-                        allowed, candidates, [*visible, sid], b.context_k
+                        allowed, candidates, [*visible, sid], b.context_k, targeted=targeted
                     )
                     if (
                         self.provider.count_prompt(observation, next_schema)
                         > b.max_input_tokens
                     ):
                         observation["current_citable"].pop()
+                        if targeted:
+                            events.append({"status": "failed", "stage": "context_delivery",
+                                "failure_code": "selected_context_capacity", "omitted_source_id": alias,
+                                "omitted_sentence_index": index, "retained_sentence_count": len(visible)})
+                            raise ValueError("selected_context_capacity")
                         break
                     schema = next_schema
                     visible[sid] = {
@@ -444,7 +508,7 @@ class SentenceAgentV3:
                     }
             if not visible:
                 observation["allowed_actions"] = bare
-                schema = action_schema(bare, candidates, [], b.context_k)
+                schema = action_schema(bare, candidates, [], b.context_k, targeted=targeted)
             # Previews get only remaining capacity, never displace full context.
             for alias in candidates:
                 if alias in selected:
@@ -465,8 +529,13 @@ class SentenceAgentV3:
             return observation, schema, visible, count
 
         try:
-            tool("retrieve")
-            if route == "deterministic_extra":
+            if not planning:
+                tool("retrieve")
+            if targeted and route == "deterministic_extra":
+                for item in targeted_query.deterministic_queries(claim):
+                    tool("rewrite", query=item["query"], purpose=item["purpose"],
+                         selection_origin="deterministic_fixed")
+            elif route == "deterministic_extra":
                 # More retrieval work, not replacement by a lower rank window.
                 extra_query = deterministic_extra_query(claim)
                 if extra_query:
@@ -486,7 +555,7 @@ class SentenceAgentV3:
                 if left() <= 0:
                     outcome = "deadline"
                     break
-                allowed = ["abstain"] + (["answer"] if selected else [])
+                allowed = ["abstain"] + (["answer"] if selected or (targeted and citable_memory) else [])
                 if (
                     route == "adaptive"
                     and len(attempts) + 1 < b.max_calls
@@ -494,7 +563,7 @@ class SentenceAgentV3:
                 ):
                     if candidates:
                         allowed.append("read")
-                    if not rewritten:
+                    if (targeted and len(seen_queries) <= targeted_query.MAX_QUERIES) or (not targeted and not rewritten):
                         allowed.append("rewrite")
                     if candidates and self.rerank is not None and not reranked:
                         allowed.append("rerank")
@@ -535,6 +604,9 @@ class SentenceAgentV3:
                     ),
                 }
                 attempts.append(record)
+                if targeted:
+                    record.update(observation=observation, schema=schema, stage="plan" if planning else "decide")
+                    citable_memory.update(visible)
                 try:
                     response = self.provider.generate(
                         observation, schema, b.max_output_tokens, left()
@@ -556,11 +628,25 @@ class SentenceAgentV3:
                         raise RuntimeError("provider_token_budget_mismatch")
                     if left() <= 0:
                         raise RuntimeError("deadline_after_generation")
-                    decision = parse_action(
-                        json.loads(raw), allowed, visible, candidates, b.context_k
-                    )
+                    payload = targeted_query.decode(raw) if targeted else json.loads(raw)
+                    decision = (targeted_query.validate_plan(payload, seen_queries) if planning else
+                        parse_action(payload, allowed, visible, candidates, b.context_k,
+                                     targeted=targeted, seen_queries=seen_queries))
                     record.update(status="valid_decision", action=decision["action"])
+                    if targeted:
+                        record["decision"] = decision
                     feedback = None
+                    if planning:
+                        # The plan is frozen before the first retrieval; subsequent
+                        # results cannot change its queries or fixed execution order.
+                        planning = False
+                        tool("retrieve")
+                        for item in decision["queries"]:
+                            tool("rewrite", query=item["query"], purpose=item["purpose"],
+                                 model_selected=True, selection_origin="model_upfront_fixed")
+                        tool("rerank", selection_origin="controller_fixed")
+                        feedback = "fixed_plan_completed: judge the original claim using returned evidence"
+                        continue
                     if decision["action"] == "abstain":
                         outcome = "model_abstention:" + decision["reason"]
                         break
@@ -575,9 +661,10 @@ class SentenceAgentV3:
                         break
                     if decision["action"] == "rewrite":
                         query = normalise_claim(decision["query"])
-                        if not valid_search_query(claim, query):
+                        if not targeted and not valid_search_query(claim, query):
                             raise ValueError("rewrite_constraint_or_loop")
-                        tool("rewrite", query=query, model_selected=True)
+                        tool("rewrite", query=query, model_selected=True,
+                             purpose=decision.get("purpose"), selection_origin="model_feedback" if targeted else None)
                     else:
                         if decision["action"] == "read" and (
                             tuple(decision["source_ids"]) in reads
@@ -635,10 +722,12 @@ class SentenceAgentV3:
                         elapsed_ms=(self.clock() - event.pop("started")) * 1000,
                     )
             events.append({"failure_type": type(exc).__name__})
+            if targeted:
+                events[-1]["failure_code"] = str(exc)[:160]
             if attempts and attempts[-1]["status"] in {"pending", "response_received"}:
                 attempts[-1]["status"] = "terminal_failure"
         return {
-            "protocol": "sentence-id-v3",
+            "protocol": self.protocol,
             "route": route,
             "provider": self.provider.name,
             "provider_kind": self.provider.kind,
@@ -662,4 +751,11 @@ class SentenceAgentV3:
             "budget": b.model_dump(),
             "equal_caps_not_equal_actual_cost": True,
             "unknown_usage_attempts": sum(not a["usage_known"] for a in attempts),
+            **({"immutable_claim_sha256": hashlib.sha256(claim.encode()).hexdigest(),
+                "search_queries_sha256": [hashlib.sha256(q.encode()).hexdigest() for q in seen_queries],
+                "retained_read_sentence_count": len(citable_memory),
+                "delivered_evidence_ids": ([] if outcome.startswith("controller_failure") or "deadline" in outcome
+                                           else [source(s).source_id for s in candidates]),
+                "visible_source_ids": {s: source(s).source_id for s in aliases.values()},
+                "packing": "retain_previously_displayed_full_sentences_then_add_new_no_gold_selection"} if targeted else {}),
         }

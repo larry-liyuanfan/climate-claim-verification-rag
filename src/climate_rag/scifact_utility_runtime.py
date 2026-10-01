@@ -110,10 +110,15 @@ def ledger_cost(directory: Path, ids: list[str] | None = None) -> dict[str, Any]
             "api_currency_cost": None}
 
 
-def reranker_cost(directory: Path) -> dict[str, Any]:
+def reranker_cost(directory: Path, ids: list[str] | None = None) -> dict[str, Any]:
     requested = completed = tokens = unknown = 0
     elapsed = 0.0
     reservations = list(directory.glob("r*.reserved.json"))
+    if ids is not None:
+        wanted = set(ids)
+        if not wanted <= {p.name.removesuffix(".reserved.json") for p in reservations}:
+            raise ValueError("unreserved_reranker_request")
+        reservations = [p for p in reservations if p.name.removesuffix(".reserved.json") in wanted]
     for path in reservations:
         request = json.loads(path.read_bytes())
         requested += request["requested_pairs"]

@@ -22,8 +22,9 @@ from run_scifact_grounding_train_operator import require, sha
 
 class SerialRerank:
     """Exclusive GPU residency; real forward tokens, not an estimate from text."""
+    capacity_ceiling = 48
     def __init__(self, provider: Any, model: Any, directory: Path, *, max_requests: int = 16) -> None:
-        require(type(max_requests) is int and 1 <= max_requests <= 48, "bounded_rerank_capacity")
+        require(type(max_requests) is int and 1 <= max_requests <= self.capacity_ceiling, "bounded_rerank_capacity")
         directory.mkdir(mode=0o700)
         self.provider, self.model, self.directory = provider, model, directory
         self.max_requests = max_requests
@@ -34,6 +35,7 @@ class SerialRerank:
         key = f"r{number:02d}"
         began = time.monotonic()
         ordered_write(self.directory / (key + ".reserved.json"), {
+            **getattr(self, "request_context", {}),
             "requested_pairs": len(candidates), "generator_calls": 0,
             "query_sha256": identity(query), "candidate_source_sha256": [r.text_sha256 for r in candidates],
             "status": "reserved_before_gpu_swap", "actual_tokens": None})

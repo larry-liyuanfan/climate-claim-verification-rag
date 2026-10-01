@@ -3,6 +3,7 @@
 import copy
 import inspect
 import json
+import hashlib
 
 import pytest
 
@@ -287,17 +288,59 @@ def test_lmfe_nested_schema_accepts_multi_document_and_rejects_cross_document():
     assert "$ref" not in json.dumps(schema)
 
 
-def test_versioned_controller_policy_is_unchanged_except_terminal_handling():
-    old = inspect.getsource(SentenceAgentV3.run)
-    old_block = """                        answer = {
-                            "label": decision["label"],
-                            "citations": [visible[s] for s in decision["sentence_ids"]],
-                            "rationale": None,
-                            "semantic_support": "unmeasured",
-                        }"""
-    assert old_block in old
-    expected = old.replace(
-        old_block, "                        answer = render_answer(decision, visible)"
+def test_historical_document_controller_stays_source_frozen():
+    # The generic v3 controller now has a separately opt-in targeted protocol.
+    # Comparing it verbatim to the historic fork would force that new policy
+    # into old experiments. Pin the unchanged fb404947 historical method instead.
+    assert hashlib.sha256(
+        inspect.getsource(SciFactDocumentAgentV1.run).encode()
+    ).hexdigest() == (
+        "9c2719730c933b8eed9b8e21b7e4658fe4c28c6a256c5fcbb6065683f20624db"
     )
-    expected = expected.replace('"protocol": "sentence-id-v3"', '"protocol": PROTOCOL')
-    assert inspect.getsource(SciFactDocumentAgentV1.run) == expected
+
+
+@pytest.mark.parametrize(
+    "route", ["fixed_retrieval", "fixed_rerank", "deterministic_extra", "adaptive"]
+)
+def test_default_legacy_policy_behavior_matches_frozen_document_controller(route):
+    claim = "Climate example 2020"
+    actions = (
+        [
+            {"action": "read", "source_ids": ["c2"]},
+            {"action": "rewrite", "query": claim + " scientific evidence"},
+            {"action": "rerank"},
+        ]
+        if route == "adaptive"
+        else []
+    ) + [ABSTAIN]
+    docs = [source_from_abstract(d) for d in corpus_fixture().values()]
+    captures = []
+    for controller in (SentenceAgentV3, SciFactDocumentAgentV1):
+        provider = FixtureProvider(actions)
+        result = controller(
+            provider,
+            lambda q, k: docs,
+            rerank=lambda q, rows: list(reversed(rows)),
+            budget=V3Budget(context_k=2),
+        ).run(claim, route)
+        captures.append((result, provider.observations))
+    left, right = captures
+    assert [o for o, s in left[1]] == [o for o, s in right[1]]
+    for field in (
+        "answer",
+        "outcome",
+        "model_calls",
+        "tool_calls",
+        "validation_repairs",
+        "rerank_pairs",
+        "unknown_usage_attempts",
+    ):
+        assert left[0][field] == right[0][field]
+
+    def without_time(events):
+        return [
+            {k: v for k, v in e.items() if k not in {"started", "elapsed_ms"}}
+            for e in events
+        ]
+
+    assert without_time(left[0]["events"]) == without_time(right[0]["events"])
