@@ -31,6 +31,15 @@ prepared records have equal per-claim mass and no gaps. This limited teacher
 coverage is **not a trained Agent result**; no model training or held-out
 evaluation followed, and all negative/no-read cases remain in the private audit.
 
+The prospective [supplemental FIT package](docs/SCIFACT_SUPPLEMENTAL_FIT_20261001.md)
+selected 96 new components using metadata-only SHA ordering, before reading their
+annotations. CPU job **31832344** completed in 108 s: 47 official NEI claims were
+retained as unsupported, while 49 supported claims produced 46 direct answers
+and three context abstains—**zero additional natural reads**. Its 83 records do
+not mean 83 independent claims. No replacement sampling was performed, and the
+original 48 control is unchanged. This negative action-coverage result is not a
+reason to claim Agent improvement or automatically train the enlarged cohort.
+
 A separate [claim-group-mean optimizer contract](docs/SCIFACT_CLAIM_GROUP_MEAN_20261001.md)
 passes synthetic CPU gradient/AdamW checks while preserving historical v2 `/48`.
 It is an interface validation, not a new trainer, adapter or Agent-quality result.
