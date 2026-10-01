@@ -16,9 +16,14 @@ from .scifact_utility_contract import ARMS, MAX_GENERATIONS, PROTOCOL, UtilityDi
 
 class JournalProvider:
     """Only the real underlying generate allocates a physical ID; no warmups."""
+    capacity_ceiling = 168
+
+    def render(self, observation: Any, schema: Any) -> str:
+        return render_scifact_prompt(self.base.tokenizer, observation, schema)
+
     def __init__(self, backend: Any, directory: Path, *, max_generations: int = MAX_GENERATIONS,
                  protocol: str = PROTOCOL, physical_guard: Any = None) -> None:
-        if type(max_generations) is not int or not 1 <= max_generations <= 168:
+        if type(max_generations) is not int or not 1 <= max_generations <= self.capacity_ceiling:
             raise ValueError("bounded_generation_capacity")
         directory.mkdir(mode=0o700)  # No resume/reset of a partially consumed run.
         self.backend, self.directory = backend, directory
@@ -40,7 +45,7 @@ class JournalProvider:
             raise RuntimeError("physical_generation_budget_or_slot")
         key = f"g{number:02d}"
         started = time.monotonic()
-        prompt = render_scifact_prompt(self.base.tokenizer, observation, schema)
+        prompt = self.render(observation, schema)
         guard = {"actual_base_state": self.physical_guard(self.backend)} if self.physical_guard else {}
         ordered_write(self.directory / (key + ".reserved.json"), {
             "physical_attempt_id": key, "slot": self.slot, "protocol": self.protocol, **guard,
