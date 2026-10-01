@@ -23,8 +23,13 @@ A separately approved [shared-corpus CPU protocol](docs/SCIFACT_SHARED_CORPUS_PR
 now freezes the original 48 FIT claims and changes only the retrieval pool to
 all 5,183 public documents. It explicitly drops source-family-unseen claims and
 separates indexing, retrieved candidates, prepared-prompt text and supervision
-targets. The one CPU comparison awaits frozen-source review; no model training
-or held-out evaluation is part of this protocol.
+targets. The one CPU comparison completed as
+[job 31831831](docs/verified-runs/scifact-shared-cpu-closeout-31831831.json):
+45 initial complete witnesses, **one natural read adding 19 citable sentences**
+and a complete post-read rationale, plus two context-limited abstains. The 93
+prepared records have equal per-claim mass and no gaps. This limited teacher
+coverage is **not a trained Agent result**; no model training or held-out
+evaluation followed, and all negative/no-read cases remain in the private audit.
 
 A separate [claim-group-mean optimizer contract](docs/SCIFACT_CLAIM_GROUP_MEAN_20261001.md)
 passes synthetic CPU gradient/AdamW checks while preserving historical v2 `/48`.
