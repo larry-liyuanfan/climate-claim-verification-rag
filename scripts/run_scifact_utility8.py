@@ -22,13 +22,15 @@ from run_scifact_grounding_train_operator import require, sha
 
 class SerialRerank:
     """Exclusive GPU residency; real forward tokens, not an estimate from text."""
-    def __init__(self, provider: Any, model: Any, directory: Path) -> None:
+    def __init__(self, provider: Any, model: Any, directory: Path, *, max_requests: int = 16) -> None:
+        require(type(max_requests) is int and 1 <= max_requests <= 48, "bounded_rerank_capacity")
         directory.mkdir(mode=0o700)
         self.provider, self.model, self.directory = provider, model, directory
+        self.max_requests = max_requests
 
     def __call__(self, query: str, candidates: Any) -> Any:
         number = len(list(self.directory.glob("r*.reserved.json")))
-        require(number < 16 and 0 < len(candidates) <= 20, "rerank_physical_limit")
+        require(number < self.max_requests and 0 < len(candidates) <= 20, "rerank_physical_limit")
         key = f"r{number:02d}"
         began = time.monotonic()
         ordered_write(self.directory / (key + ".reserved.json"), {
@@ -86,13 +88,15 @@ class SerialRerank:
         return output
 
 
-def main() -> None:
+def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("release", "inference-dir", "model-root", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--release-sha", required=True)
-    args = parser.parse_args()
-    from run_scifact_utility8_operator import validate_release
+    return parser.parse_args()
+
+
+def run_inference(args: argparse.Namespace, validate_release: Any, *, natural_fit: bool = False) -> None:
     source = Path(__file__).resolve().parents[1]
     release = json.loads(checked(args.release, args.release_sha))
     validate_release(release)
@@ -102,6 +106,12 @@ def main() -> None:
     require(str(args.output) == release["output"] + "/inference", "fixed_inference_output")
     preparation = json.loads((args.inference_dir.parent / "preparation.json").read_bytes())
     claims = json.loads(checked(args.inference_dir / "claims.json", preparation["claims_sha256"]))
+    if natural_fit:
+        from prepare_scifact_natural import SELECTION_SHA
+        selection = json.loads(checked(args.inference_dir.parent / "selection.json", SELECTION_SHA))
+        require([r["id"] for r in claims] == [r["id"] for r in selection["selected"]]
+                and len(claims) == 24 and preparation["selection_sha256"] == SELECTION_SHA,
+                "frozen_natural_claim_order")
     docs = [parse_abstract(json.loads(r)) for r in checked(args.inference_dir / "corpus.jsonl", CORPUS_SHA).splitlines()]
     corpus = {d.doc_id: d for d in docs}
     require(len(corpus) == len(docs) == 5183, "complete_public_corpus")
@@ -119,13 +129,18 @@ def main() -> None:
             and not any("lora_" in n for n, _ in provider.base.model.named_parameters()), "base_without_adapter")
     # CPU load: only the generator occupies GPU memory until a real tool call.
     reranker = Qwen3CausalLMReranker(str(ranker / "model"), device="cpu", dtype="bfloat16", max_length=2048, batch_size=1)
-    tool = SerialRerank(provider, reranker, args.output.parent / "reranker-ledger")
+    tool = SerialRerank(provider, reranker, args.output.parent / "reranker-ledger", max_requests=48 if natural_fit else 16)
     ordered_write(args.output.parent / "model-load.json", {"model_sha256": MODEL_SHA,
         "reranker_sha256": RERANKER_SHA, "adapter_loaded": False, "warmup_generation_calls": 0,
         "load_elapsed_ms": (time.monotonic() - started) * 1000,
         "serial_gpu_residency": True, "release_sha256": args.release_sha,
         "preparation_sha256": sha(args.inference_dir.parent / "preparation.json")})
-    run_matrix(claims, provider, SciFactBM25(corpus), tool, corpus, args.output)
+    run_matrix(claims, provider, SciFactBM25(corpus), tool, corpus, args.output, natural_fit=natural_fit)
+
+
+def main() -> None:
+    from run_scifact_utility8_operator import validate_release
+    run_inference(arguments(), validate_release)
 
 
 if __name__ == "__main__":

@@ -14,15 +14,16 @@ from package_scifact_source import package, run_shell_guard
 WRAPPER = "hpc/scifact_utility8.sbatch"
 
 
-def freeze(repo: Path, revision: str, output: Path, bash: str) -> dict[str, Any]:
+def freeze(repo: Path, revision: str, output: Path, bash: str, *,
+           wrapper_path: str = WRAPPER, tag: str = "utility8") -> dict[str, Any]:
     receipt = package(repo, revision, output, bash)
     archive = output / "source.tar"
     with tarfile.open(archive) as bundle:
-        stream = bundle.extractfile(WRAPPER)
+        stream = bundle.extractfile(wrapper_path)
         if stream is None:
             raise ValueError("utility8_wrapper_missing")
         raw = stream.read()
-    wrapper = output / "utility8.sbatch"
+    wrapper = output / (tag + ".sbatch")
     with wrapper.open("xb") as stream:
         stream.write(raw)
     run_shell_guard(archive, revision, wrapper, bash)
@@ -42,11 +43,11 @@ def freeze(repo: Path, revision: str, output: Path, bash: str) -> dict[str, Any]
         else:
             raise ValueError("utility8_negative_guard_accepted:" + name)
     result = {"source_git": revision, "source_archive_sha256": receipt["source_archive_sha256"],
-        "source_archive_bytes": receipt["source_archive_bytes"], "wrapper_path": WRAPPER,
-        "wrapper_sha256": hashlib.sha256(raw).hexdigest(), "actual_utility8_guard_passed": True,
-        "rejected_mismatches": negatives, "legacy_guard_is_not_utility8_evidence": True,
+        "source_archive_bytes": receipt["source_archive_bytes"], "wrapper_path": wrapper_path,
+        "wrapper_sha256": hashlib.sha256(raw).hexdigest(), "actual_" + tag + "_guard_passed": True,
+        "rejected_mismatches": negatives, "legacy_guard_is_not_" + tag + "_evidence": True,
         "job_submitted": False, "generator_calls": 0}
-    ordered_write(output / "utility8-source-receipt.json", result)
+    ordered_write(output / (tag + "-source-receipt.json"), result)
     return result
 
 

@@ -62,7 +62,8 @@ def validate_release(release: dict[str, Any], source: Path) -> None:
         and release['no_automatic_retry'] is True, 'exact_note_release_only')
 
 
-def bounded_worker(command: list[str], allocation: Path, inference: Path, seconds: float) -> dict[str, Any]:
+def bounded_worker(command: list[str], allocation: Path, inference: Path, seconds: float,
+                   *, watchdog: Any = None) -> dict[str, Any]:
     """Only our isolated child group is killed; reservation watchdog has no retries."""
     require(os.name == 'posix' and seconds > 0, 'POSIX_positive_timeout_required')
     child: subprocess.Popen[bytes] | None = None
@@ -90,7 +91,9 @@ def bounded_worker(command: list[str], allocation: Path, inference: Path, second
             while child.poll() is None:
                 if time.time() - started >= seconds:
                     raise TimeoutError('worker_deadline')
-                for reservation in inference.glob('case-*/*/reserved.json'):
+                if watchdog is not None:
+                    watchdog(inference)
+                for reservation in ([] if watchdog is not None else inference.glob('case-*/*/reserved.json')):
                     if not (reservation.parent / 'finished.json').exists():
                         # A concurrent exclusive write may still be incomplete.
                         try:

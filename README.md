@@ -40,6 +40,14 @@ terminal call. Strict correctness remained **5/12**, while generation time grew
 **11.729 → 93.081 s**. Rationalized F1 rose only through fewer positive predictions,
 not more correct evidence. This negative quality/cost result is not promoted.
 
+The next [natural FIT24 protocol](docs/SCIFACT_NATURAL_FIT24_20261001.md) is a
+**CPU-prepared, not GPU-executed** follow-up. Metadata-only component exclusions
+leave 136 eligible components from the exposed FIT144 pool; 24 were frozen once.
+An unadapted base model will retain its full natural trajectory, while two
+scripted branches share the real initial prefix and may make at most one new
+generation each. This is a tool-utility diagnostic, not an independent test or
+an established improvement; no training or validation promotion is authorized.
+
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
 roster, and tests complete-claim mean updates with the actual cohort size.
