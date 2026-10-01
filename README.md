@@ -42,13 +42,17 @@ not more correct evidence. This negative quality/cost result is not promoted.
 
 The [natural FIT24 protocol](docs/SCIFACT_NATURAL_FIT24_20261001.md) freezes 24
 components once from 136 eligible exposed FIT144 components. Execution job
-31895661 has now completed. The coordinator's original-scoring readback reports
+31895661 has now completed. Original scoring and the separate read-only audit report
 72/72 valid terminal slots: A/B/C strict correctness **0/7/3 of 24**; all ten B/C
 successes are NEI abstentions, not recovered positive evidence or autonomous tool
-use. A selected no tools. See the [separate posthoc attribution package](docs/SCIFACT_NATURAL_POSTHOC_20261001.md)
-for provenance and limitations. Its synthetic CPU checks are complete, but actual
-posthoc execution still requires a separate exact release. No training or
-validation promotion follows from these negative results.
+use. A selected no tools. The [completed CPU posthoc](docs/verified-runs/scifact-natural-posthoc-closeout-31904484.json)
+finds that **14 of 15 evidence-bearing claims already had complete initial visible
+evidence, but none was answered strictly correctly**. Neither scripted tool made
+an incomplete claim complete. The next implementation decision is terminal
+evidence-selection/label/abstention improvement under the same visible evidence,
+not more retrieval or tool-policy training. See [provenance and limitations](docs/SCIFACT_NATURAL_POSTHOC_20261001.md).
+No training or validation promotion follows automatically from this exposed-TRAIN
+negative result.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
