@@ -2,8 +2,10 @@
 
 The [utility8 tool-value diagnostic draft](docs/SCIFACT_UTILITY8_DRAFT_20261001.md)
 adds a shared-prefix, physically metered A/B/C experiment on eight already
-exposed TRAIN cases. It is locally tested infrastructure awaiting exact-hash
-coordinator release, **not a submitted GPU run, trained model or quality gain**.
+exposed TRAIN cases. After exact-hash release and non-generating preflight,
+[job 31834687](docs/verified-runs/scifact-utility8-submission-31834687.json) was
+submitted once and is awaiting scheduling. **No model result, training or
+quality gain is claimed**; terminal cost and identity audits remain pending.
 
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 

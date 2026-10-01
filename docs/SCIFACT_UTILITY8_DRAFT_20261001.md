@@ -4,6 +4,13 @@ No GPU job, model inference, training or new data inspection was performed when
 preparing this implementation. It requires the coordinator's exact-hash release
 after source/interface/scoring review. It is not evidence of model improvement.
 
+Subsequent execution status: the coordinator released the unchanged exact
+`e22143c` source and [job 31834687](verified-runs/scifact-utility8-submission-31834687.json)
+was submitted once after a non-generating runtime preflight. The submission
+snapshot is `PENDING (Priority)`, with no estimated start or quality result.
+The draft-stage statements below describe the source preparation, not a
+completed GPU run. No automatic resubmission or new polling automation was added.
+
 ## Fixed scope
 
 Eight **already exposed official TRAIN** examples, outcome-selected from the
