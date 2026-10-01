@@ -1,5 +1,28 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 semantic-input isolation and error diagnosis (CPU only)
+
+[Report](SCIFACT_SEMANTIC_INPUT_ISOLATION_20261002.md) and
+[compact](verified-runs/scifact-semantic-input-cpu-31963271.json): job **31963271**,
+COMPLETED / `0:0`, 16 s, 244,588 K MaxRSS; source
+`58975a914b3bb0f224db366b519fe267feb0fbbd`. New explicitly versioned verifier input
+is independent of arm/prior-call/remaining-budget state; planner budgets, physical
+limits and old protocol remain intact. **1,440 arm/counter-state checks across
+120 document probes** (including reference states), 120 clean-history checks
+and **72 audited physical-record replays** passed; exact-source CI **1,342 passed**.
+No inference, training, new sampling or protected split access occurred.
+
+All **18 claim-document annotations / 15 positives** were initially retrieved and their
+complete rationales visible. In the ten top1/adaptive common errors, adaptive
+has four label-disagreement cases, eight with unannotated selected sentences,
+and two with three reachable gold documents left unattempted; categories overlap.
+No locally strict-correct verdict was omitted from final answers. Prioritize
+verifier label/minimal-rationale selection, with multi-document control secondary.
+Annotation mismatch is not proof of semantic falsehood. This consumed TRAIN
+diagnosis proves input invariance, not improved verdicts, independent-test quality
+or Agent value; original quality scores and current resume remain unchanged.
+Compact SHA `5864c9912ad8ada0e868392aa18c883409d3ea43d6910988339f747fe1c38cce`.
+
 ## 2026-10-02 conditional TRAIN24 confirmation: no top1 promotion
 
 [Final report](SCIFACT_PROSPECTIVE24_CONFIRMATION_20261002.md) and

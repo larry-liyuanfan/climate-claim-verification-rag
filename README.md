@@ -1,5 +1,16 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [verifier-input isolation and CPU diagnosis](docs/SCIFACT_SEMANTIC_INPUT_ISOLATION_20261002.md)
+separates scientific evidence from controller budgets without changing the old
+protocol. Whole-chain review preceded CPU job **31963271**: **1,440 arm/counter-state
+checks** (including reference states), 120 clean-history checks and 72
+recorded-episode replays passed in 16 s, with
+zero new model calls. All 18 claim-document annotations for the consumed cohort's 15
+positives were retrieved and visible; label/rationale selection, then incomplete
+multi-document reading, are the observed next repair targets. This is input
+invariance and diagnostic evidence, **not a demonstrated model-quality gain**.
+Old negative results and original scoring remain unchanged.
+
 The [once-frozen conditional TRAIN24 confirmation](docs/SCIFACT_PROSPECTIVE24_CONFIRMATION_20261002.md)
 completed **72/72 slots in 300 s** after integrated pre-submission review.
 Complete evidence-bearing answers were **5/15 top1, 3/15 fixed-all, 5/15 adaptive**.
