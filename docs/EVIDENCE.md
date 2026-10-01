@@ -9,6 +9,12 @@ generation defaults, effective overrides, seed and LMFE binding are recorded.
 This supersedes the earlier 48-call top1-only proposal, not its measured results
 (there were none). Reuses 31969505 without a new Slurm or model call. Fixed-policy
 cross-version and within-version Agent comparisons remain separate; no resume gain.
+Execution source `5a12fd9f398afb1af772111253600e68410e885a`: clean archive 60 passed
+(one Windows POSIX skip); exact Linux CI 36900289223 **1,393 passed**; Ruff, strict
+source typing and secret scan passed. Metadata-only Spartan runtime/configuration
+preflight passed. [Compact receipt](verified-runs/scifact-paired-verifier-preparation-5a12fd9.json)
+binds exact archive, parent/child drafts and runtime hashes; all remain non-executable
+drafts until separate exact-release acceptance.
 
 ## 2026-10-02 structured relation/rationale verifier (CPU readiness only)
 

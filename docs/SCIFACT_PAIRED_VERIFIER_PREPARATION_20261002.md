@@ -107,6 +107,31 @@ binding and paired comparison, not prompt semantics or the dataset.
 
 ## Reproduction and authorization boundary
 
+Exact execution source is **`5a12fd9f398afb1af772111253600e68410e885a`**.
+[Preparation receipt](verified-runs/scifact-paired-verifier-preparation-5a12fd9.json)
+binds the 5,591,040-byte / 682-file source archive, actual paired wrapper,
+parent/two child drafts and Spartan runtime receipt. Archive SHA is
+`978ebecddea29d939852f85444e988d9d6f6ca3cbd894050b810180645e6b85e`;
+parent draft SHA is
+`cd4c2767766604e8b95e40ba0c25f21a44a9baa000eeed95e1595b987ad0e620`.
+Later documentation commits are not this execution source.
+
+The clean archive passed **60 tests**, with one Windows-only skip for the real
+POSIX timer test. [Exact-source Linux CI 36900289223](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36900289223)
+then passed **all 1,393 tests** (105.43 s, 14 expected warnings), Ruff, typing of
+108 source files plus the source packager, and tracked secret/PII scanning.
+The actual archive shell guard and Bash syntax passed.
+
+Spartan metadata/import-only preflight matched the accepted Python 3.10.4 /
+Torch 2.1.2 / Transformers 4.51.3 / LMFE 0.11.3 runtime, verified all **70 expanded
+generation-default fields**, rejected the draft for execution, and validated the
+candidate contract only in memory. No authorized release was written. Runtime
+receipt SHA is `46fbc47025f2b81a641fcc4457308dd96120ff15732f9f1269196c1b4a7e85da`.
+The first ad-hoc SSH probe omitted the module's existing PYTHONPATH and failed to
+import Torch; preserving the module path, as the checked-in wrapper already does,
+resolved it without installing anything or changing project source. No model or
+data was loaded by either probe. This was caught **before any queue submission**.
+
 ```bash
 python -m pytest -q tests/test_scifact_paired_comparison.py tests/test_scifact_evidence_commit_entry.py tests/test_scifact_document_decoder.py
 python -m ruff check src scripts tests

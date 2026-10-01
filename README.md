@@ -6,7 +6,8 @@ binds full decoding defaults/effective settings and prepares one bounded serial
 no new model call or Slurm submission is part of this preparation. Whole-chain
 review covers failure cleanup, original-score compatibility and complete costs.
 GPU execution still needs a later exact-release authorization; no quality gain
-or resume result is claimed.
+or resume result is claimed. Exact-source Linux CI passed **1,393 tests** and the
+Spartan metadata-only runtime/configuration preflight passed with no new job.
 
 The [single-response relation/rationale verifier](docs/SCIFACT_RELATION_RATIONALE_VERIFIER_20261002.md)
 now separates comparable scope, contradictory outcomes, joint direct evidence,
