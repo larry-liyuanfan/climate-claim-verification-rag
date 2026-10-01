@@ -18,6 +18,11 @@ audits utility8 attempt/frame/tool-event lineage and deduplicates shared calls
 without dropping incomplete slots. Accepted observations are not supervision
 targets or evidence of Agent improvement; no real outputs were imported.
 
+An [annotation-bound terminal candidate seam](docs/SCIFACT_TERMINAL_SUPERVISION_20261001.md)
+now distinguishes official-format NEI from missing positive context, checks full
+OR rationales and preserves captured prompts. It is validated only on synthetic
+annotations; no real NEI47 cohort, training target selection or training is released.
+
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
 [FIT-only production-state supervision](docs/SCIFACT_FIT_STATE_SUPERVISION_20261001.md)
