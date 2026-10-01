@@ -37,6 +37,7 @@ class _View:
     visible: dict[str, Any]
     source: dict[str, Any]
     provenance: dict[str, Any]
+    state_event: dict[str, Any]
 
 
 def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -97,7 +98,7 @@ def _bind(report: Mapping[str, Any], reference: Mapping[str, Any], annotation: b
               'parsed_model_proposal': copy.deepcopy(proposal), 'logical_reference': copy.deepcopy(logical),
               'capture': copy.deepcopy(observation['capture'])}
     return _View(gold, frame, sources, registry, order, observation['capture']['visible'],
-                 origin, copy.deepcopy(dict(provenance)))
+                 origin, copy.deepcopy(dict(provenance)), copy.deepcopy(logical['state_event']))
 
 
 def _match(target: Mapping[str, Any], view: _View) -> dict[str, Any]:
@@ -156,8 +157,15 @@ def terminal_candidates(report: Mapping[str, Any], reference: Mapping[str, Any],
                         provenance: Mapping[str, Any], corpus: Mapping[int, Abstract], tokenizer: Any,
                         *, candidate_cap: int) -> dict[str, Any]:
     """All complete-visible documents × their exact OR alternatives, or explicit cap gap."""
-    require(type(candidate_cap) is int and 1 <= candidate_cap <= MAX_CANDIDATES, 'explicit_candidate_cap_1_to_64')
     view = _bind(report, reference, annotation, provenance, corpus, tokenizer)
+    result = _enumerate_bound(view, tokenizer, candidate_cap)
+    result['observed_model'] = view.source
+    return result
+
+
+def _enumerate_bound(view: _View, tokenizer: Any, candidate_cap: int) -> dict[str, Any]:
+    """Shared semantics only; each channel MUST first enforce its own strict binder."""
+    require(type(candidate_cap) is int and 1 <= candidate_cap <= MAX_CANDIDATES, 'explicit_candidate_cap_1_to_64')
     choices = []
     incomplete = []
     for doc_id, alternatives in view.gold.evidence.items():
@@ -177,12 +185,12 @@ def terminal_candidates(report: Mapping[str, Any], reference: Mapping[str, Any],
             choices.append((view.order.index(alias), complete))
         if missing:
             incomplete.append({'document_id': doc_id, 'candidate_alias': alias,
-                'selected_context': bool(alias and alias in view.source['logical_reference']['state_event']['requested_context']),
+                'selected_context': bool(alias and alias in view.state_event['requested_context']),
                 'incomplete_alternatives': missing})
     choices.sort(key=lambda row: row[0])
     count = math.prod(len(alts) for _, alts in choices) if choices else (0 if view.gold.evidence else 1)
     result: dict[str, Any] = {'version': VERSION, 'claim_id': view.gold.claim_id,
-        'provenance': view.provenance, 'observed_model': view.source, 'frame': view.frame,
+        'provenance': view.provenance, 'frame': view.frame,
         'candidate_cap': candidate_cap, 'enumeration': 'all_complete_visible_documents_exact_OR_product',
         'candidate_count_before_cap': count, 'candidates': [], 'gaps': [], 'incomplete_annotation_view': incomplete,
         'budget_observation': {k: view.frame['observation'][k] for k in ('remaining_calls', 'remaining_tools', 'allowed_actions')},

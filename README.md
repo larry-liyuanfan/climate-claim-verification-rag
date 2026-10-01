@@ -23,6 +23,13 @@ now distinguishes official-format NEI from missing positive context, checks full
 OR rationales and preserves captured prompts. It is validated only on synthetic
 annotations; no real NEI47 cohort, training target selection or training is released.
 
+The [NEI47 CPU preparation implementation](docs/SCIFACT_NEI47_PREPARATION_20261001.md)
+adds a separate **program_capture** channel for the 47 already exposed official
+NEI cases inside frozen supplemental96. It uses actual BM25/CommonPacking with
+zero real model calls, not fabricated physical receipts. The fixed-input entry,
+failure accounting and exact-source packaging are synthetic-tested; **no real
+NEI47 preparation or training has run in this implementation package**.
+
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
 [FIT-only production-state supervision](docs/SCIFACT_FIT_STATE_SUPERVISION_20261001.md)
