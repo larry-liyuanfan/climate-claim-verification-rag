@@ -7,6 +7,10 @@ conditional remaining 64 components / 97 IDs, fixed 24-component metadata
 selection, no-generation original retrieval/packing and shared input adapter.
 Zero model calls and no new real-gold access; no independent test or resume
 improvement is claimed. Existing exposed TRAIN24 results remain separate.
+CPU job **31953981** completed in 38 s / exit `0:0`; all 24 input frames are
+prepared. The [compact](verified-runs/scifact-prospective24-cpu-31953981.json)
+records source/data hashes and shared preparation costs; future GPU draft is
+not executable authorization. Exact-candidate Linux CI: 1,329 tests passed.
 
 ## 2026-10-01 separately released component diagnostic submission
 

@@ -83,3 +83,49 @@ tests exercise the successful scoring path and damaged-input failure path.
 Local affected-chain validation: **53 passed**; source/CLI type checking and
 environment/archive checks are reported with the final preparation receipt.
 No current resume or other project is modified.
+
+## Completed CPU receipt
+
+[Redacted compact](verified-runs/scifact-prospective24-cpu-31953981.json), SHA
+`0a1e231bdfbf0d905eef130b331da5027520e21f80e7db0c741c49febad2dee2`.
+
+Job **31953981**: COMPLETED / `0:0`, **38 s**, TotalCPU 30.393 s,
+Slurm batch MaxRSS **301,504 K**, 2 CPU / 8 GiB / 20 min / no GPU. It ran on
+the public `cascade` CPU partition after a successful partition-specific
+test-only. Initial scheduling estimates were conservative; actual backfill
+started promptly. No cancellation, priority modification or duplicate job.
+
+- Candidate/source: `da243036871f61eef2e039a1618b8a3e1e1a00ac`.
+- Source archive SHA: `d4c2ef55a9fc8675df2aba3e1bf537c22fcbd71fc8ee0c8f1f54df0a1421dbce`.
+- CPU wrapper SHA: `a8113495686f5bee6f55de8f8d2df8831dae5f38e193f32e5887a8b8aa2eeb24`.
+- Selection SHA: `351523c9c44bb418e24ed17b40372e6bef7b87792f8ad0b78dcaeb2d22e22754`.
+- Component reservation SHA: `275bd306c9a154b583987ae63df148e3264c2989b671b92ac7b453fc9610a20f`.
+- Preparation SHA: `23e1835a0e4f1330c2d11d0d70a2dbfa5c4655c2192169b05240433f5e5aae72`.
+- Frame SHA: `e20a5188ba51bbaf940009338ee167d6d07bf4429652eaa06967265f37a4e29c`.
+
+All **24 distinct components / 24 claims** were frozen before query reading;
+all frames authenticated. Corpus load/BM25 build 1.159 s, 24 retrievals 0.101 s,
+retrieval plus packing 24.187 s, preparation total 31.534 s. These are nested
+measurements, **not additive totals**. Process-reported MaxRSS 307,656 KiB is
+separate from Slurm's sampled batch MaxRSS. Probe maximum 6,764 tokens / zero
+observed overflows, limited to the documented synthetic feedback cases.
+
+Validation before actual submission:
+
+- **53 affected-chain tests**; **11 clean-archive tests**, imported from the
+  extracted candidate, not the editable worktree.
+- Ruff, secret/PII scan, Linux strict mypy on 106 source files; narrow CLI typing
+  on eight changed entries with imported legacy scripts excluded.
+- [Exact-candidate Linux CI](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36884594874):
+  **1,329 passed**. Native Windows whole-source mypy reports two pre-existing
+  POSIX `resource` attribute errors; Linux target and actual Linux CI pass.
+- Exact Git archive: 660 regular files, unique 41-byte revision marker;
+  clean shell guard and actual CPU wrapper/import/argument checks passed.
+- CPU imports explicitly used `USE_TORCH=0` and loaded no Torch/model; the
+  tokenizer-only warning is intentional, not a missing GPU environment repair.
+
+Future draft SHA `234f0e67c46b81a4ffc1eaf48309c24a3822eb011fc63001a94ae07e8e3f768c`
+binds this preparation and candidate. Actual GPU wrapper SHA remains
+`d30e1a2ebe2cc99630d776f2b9d3d365f1843d37a36a293dc6a0592c1895a815`.
+Its authorization is **DRAFT_CPU_READY_NOT_AUTHORIZED**. No new GPU job, model
+result, calibration, split consumption or resume claim is included.
