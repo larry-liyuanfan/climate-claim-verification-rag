@@ -36,11 +36,11 @@ class Backend(OldBackend):
         return super().generate(obs, schema, maximum, seconds)
 
 
-def run(tmp_path, actions, arm="adaptive", n=2, faults=None, clock=None):
+def run(tmp_path, actions, arm="adaptive", n=2, faults=None, clock=None, protocol=PROTOCOL):
     frame, corpus = inputs(n)
     backend = Backend(actions, faults)
     journal = CommitJournal(backend, tmp_path/"ledger", max_generations=240,
-                            protocol=PROTOCOL, physical_guard=base_state, run_identity=RUN)
+                            protocol=protocol, physical_guard=base_state, run_identity=RUN)
     row = run_episode(1, arm, frame, journal, corpus, tmp_path/"episode", run_identity=RUN,
                       **({"clock": clock} if clock else {}))
     return row, backend, journal, frame, corpus
@@ -50,7 +50,7 @@ def audit(row, backend, journal, frame, corpus, tmp_path):
     # Real scoring consumes JSON from disk, not Python tuples/objects in memory.
     loaded = json.loads(json.dumps(row))
     return audit_episode(loaded, frame, journal.directory, tmp_path/"episode/private-responses",
-                         backend.base.tokenizer, corpus, run_identity=RUN)
+                         backend.base.tokenizer, corpus, run_identity=RUN, protocol=journal.protocol)
 
 
 @pytest.mark.parametrize("arm,calls", [("fixed_top1", 1), ("fixed_all", 4)])
@@ -195,10 +195,11 @@ def test_unknown_cost_stops_no_assembly(tmp_path, monkeypatch):
     assert row["physical_calls"] == ledger_cost(journal.directory)["unknown_usage_attempts"] == 1
 
 
-def test_actual_generate_lmfe_verify_ref_commit_raw_rendering_and_audit(tmp_path):
+@pytest.mark.parametrize("protocol", [PROTOCOL, "scifact-evidence-commit-semantic-v2-20261002"])
+def test_actual_generate_lmfe_verify_ref_commit_raw_rendering_and_audit(tmp_path, protocol):
     # Prescribed synthetic tokens traverse actual inherited generate/LMFE callback.
     frame, corpus = inputs()
-    state = CommitState(1, "adaptive", frame, f"{PROTOCOL}:{RUN}:1:adaptive")
+    state = CommitState(1, "adaptive", frame, f"{protocol}:{RUN}:1:adaptive", protocol=protocol)
     # The helper generator consumes this iterator at model invocation. The last
     # selection depends on the actual preceding physical request/ref identity.
     def dynamic_actions():
@@ -209,7 +210,7 @@ def test_actual_generate_lmfe_verify_ref_commit_raw_rendering_and_audit(tmp_path
     # Build a second real provider whose final action reads the issued state.
     provider, calls, callbacks = real_provider(tmp_path, dynamic_actions())
     provider.__class__ = EvidenceCommitProvider
-    journal = CommitJournal(provider, tmp_path/"ledger", max_generations=240, protocol=PROTOCOL,
+    journal = CommitJournal(provider, tmp_path/"ledger", max_generations=240, protocol=protocol,
                             physical_guard=base_state, run_identity=RUN)
     import climate_rag.scifact_evidence_commit_runtime as runtime
     from unittest.mock import patch

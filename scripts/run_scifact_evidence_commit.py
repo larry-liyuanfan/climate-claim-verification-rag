@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 from typing import Callable, cast
 
-from climate_rag.scifact_evidence_commit import ARMS, PROTOCOL, CALL_CAPS, EvidenceCommitProvider
+from climate_rag.scifact_evidence_commit import ARMS, CALL_CAPS, EvidenceCommitProvider
 from climate_rag.scifact_evidence_commit_runtime import CommitJournal, run_episode
 from climate_rag.scifact_grounding import parse_abstract
 from climate_rag.scifact_natural_contract import base_state
@@ -25,6 +25,7 @@ def main() -> None:
     args = arguments()
     release = json.loads(checked(args.release, args.release_sha))
     validate_release(release)
+    protocol = release["protocol"]
     source = Path(__file__).resolve().parents[1]
     require(os.name == "posix" and bool(os.environ.get("SLURM_JOB_ID")) and bool(os.environ.get("CUDA_VISIBLE_DEVICES"))
             and (source / "SOURCE_REVISION").read_text().strip() == release["source_git"]
@@ -54,10 +55,10 @@ def main() -> None:
         "adapter_loaded": False, "warmup_calls": 0, "reranker_loaded": False,
         "load_and_input_validation_seconds": time.monotonic() - started,
         "initial_frames_sha256": sha(args.output / "initial-frames.json"), "release_sha256": args.release_sha})
-    ordered_write(args.output / "planned.json", {"protocol": PROTOCOL,
+    ordered_write(args.output / "planned.json", {"protocol": protocol,
         "slots": [{"claim_id": c["id"], "arm": a} for c in claims for a in ARMS],
         "max_generations": 240, "call_caps": CALL_CAPS, "max_tools_per_episode": 5, "max_seconds_per_episode": 120})
-    journal = CommitJournal(provider, args.output / "ledger", max_generations=240, protocol=PROTOCOL,
+    journal = CommitJournal(provider, args.output / "ledger", max_generations=240, protocol=protocol,
                             physical_guard=base_state, run_identity=args.release_sha)
     for claim, frame in zip(claims, frames, strict=True):
         for arm in ARMS:

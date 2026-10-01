@@ -11,7 +11,7 @@ from typing import Any
 from .evidence_gap_candidate import _no_duplicate_keys
 from .scifact_document_verifier import DocumentJournal, MAX_SECONDS
 from .scifact_evidence_commit import (
-    ARMS, ASSEMBLER, CALL_CAPS, CommitState, PROTOCOL, render_prompt, verifier_identity,
+    ARMS, ASSEMBLER, CALL_CAPS, CommitState, PROTOCOL, PROTOCOLS, render_prompt, verifier_identity,
 )
 from .scifact_natural_contract import complete_wire, require
 from .scifact_read_continuation import ordered_write
@@ -24,13 +24,14 @@ class CommitJournal(DocumentJournal):
     def __init__(self, backend: Any, directory: Path, *, run_identity: str,
                  max_generations: int = 240, protocol: str = PROTOCOL, physical_guard: Any) -> None:
         require(len(run_identity) == 64 and all(c in "0123456789abcdef" for c in run_identity), "release_sha_required")
+        require(protocol in PROTOCOLS, "unknown_commit_protocol")
         self.run_identity, self.episode_identity, self.frame_sha = run_identity, "", ""
         self.base_guard = physical_guard
         super().__init__(backend, directory, max_generations=max_generations, protocol=protocol,
                          physical_guard=self.bound_physical_state)
 
     def bound_physical_state(self, backend: Any) -> dict[str, Any]:
-        require(self.episode_identity == f"{PROTOCOL}:{self.run_identity}:{self.slot.replace('-', ':', 1)}"
+        require(self.episode_identity == f"{self.protocol}:{self.run_identity}:{self.slot.replace('-', ':', 1)}"
                 and len(self.frame_sha) == 64, "physical_episode_scope_required")
         return dict(self.base_guard(backend), run_identity=self.run_identity,
                     episode_id=self.episode_identity, frame_sha256=self.frame_sha)
@@ -40,12 +41,12 @@ class CommitJournal(DocumentJournal):
         arm = self.slot.split("-", 1)[-1]
         own = [p for p in self.directory.glob("g*.reserved.json")
                if json.loads(p.read_bytes())["slot"] == self.slot]
-        require(self.protocol == PROTOCOL and arm in ARMS and len(own) < CALL_CAPS[arm], "per_arm_call_budget")
+        require(self.protocol in PROTOCOLS and arm in ARMS and len(own) < CALL_CAPS[arm], "per_arm_call_budget")
         return super().generate(observation, schema, max_output_tokens, remaining_seconds)
 
 
 def _result(state: CommitState, frame: Any, steps: Any, corpus: Any, elapsed: float) -> dict[str, Any]:
-    return {"protocol": PROTOCOL, "assembler": ASSEMBLER,
+    return {"protocol": state.protocol, "assembler": ASSEMBLER,
         "claim_id": state.claim_id, "arm": state.arm, "episode_id": state.episode_id,
         "input_sha256": identity(frame),
         "state": "valid_terminal" if state.terminal else "unresolved", "reason": state.reason,
@@ -62,7 +63,8 @@ def run_episode(claim_id: int, arm: str, frame: Any, journal: CommitJournal, cor
     require(len(run_identity) == 64 and all(c in "0123456789abcdef" for c in run_identity), "release_sha_required")
     require(run_identity == journal.run_identity, "journal_release_mismatch")
     output.mkdir(mode=0o700)
-    state = CommitState(claim_id, arm, frame, f"{PROTOCOL}:{run_identity}:{claim_id}:{arm}")
+    state = CommitState(claim_id, arm, frame, f"{journal.protocol}:{run_identity}:{claim_id}:{arm}",
+                        protocol=journal.protocol)
     started = clock()
     ordered_write(output / "reserved.json", {"episode_id": state.episode_id, "run_identity": run_identity,
         "claim_id": claim_id, "arm": arm, "input_sha256": identity(frame),
@@ -130,11 +132,12 @@ def run_episode(claim_id: int, arm: str, frame: Any, journal: CommitJournal, cor
 
 
 def audit_episode(row: Any, frame: Any, ledger: Path, private: Path, tokenizer: Any,
-                  corpus: Any, *, run_identity: str) -> dict[str, Any]:
+                  corpus: Any, *, run_identity: str, protocol: str = PROTOCOL) -> dict[str, Any]:
     """Reissue from verified physical wire, never trust saved refs/feedback."""
     arm, claim_id = row["arm"], row["claim_id"]
-    episode_id = f"{PROTOCOL}:{run_identity}:{claim_id}:{arm}"
-    require(row["protocol"] == PROTOCOL and row["episode_id"] == episode_id
+    require(protocol in PROTOCOLS, "unknown_commit_protocol")
+    episode_id = f"{protocol}:{run_identity}:{claim_id}:{arm}"
+    require(row["protocol"] == protocol and row["episode_id"] == episode_id
             and row["input_sha256"] == identity(frame), "episode_identity")
     reservation = json.loads((private.parent / "reserved.json").read_bytes())
     stamp = reservation.get("started_unix")
@@ -142,7 +145,7 @@ def audit_episode(row: Any, frame: Any, ledger: Path, private: Path, tokenizer: 
     require(reservation == {"episode_id":episode_id, "run_identity":run_identity, "claim_id":claim_id,
             "arm":arm, "input_sha256":identity(frame), "started_unix":stamp,
             "deadline_seconds":MAX_SECONDS}, "episode_reservation_binding")
-    state = CommitState(claim_id, arm, frame, episode_id)
+    state = CommitState(claim_id, arm, frame, episode_id, protocol=protocol)
     own = [p.name.removesuffix(".reserved.json") for p in ledger.glob("g*.reserved.json")
            if json.loads(p.read_bytes())["slot"] == f"{claim_id}-{arm}"]
     require(len(own) <= CALL_CAPS[arm] and not ledger_cost(ledger, own)["unknown_usage_attempts"], "physical_cost_guard")
@@ -175,7 +178,7 @@ def audit_episode(row: Any, frame: Any, ledger: Path, private: Path, tokenizer: 
         guard = request["actual_base_state"]
         require(request["physical_attempt_id"] == finished["physical_attempt_id"] == key
                 and request["slot"] == finished["slot"] == f"{claim_id}-{arm}"
-                and request["protocol"] == PROTOCOL and request["observation"] == obs and request["schema"] == schema
+                and request["protocol"] == protocol and request["observation"] == obs and request["schema"] == schema
                 and request["prompt_sha256"] == identity(prompt) and request["token_ids_sha256"] == identity(ids)
                 and request["max_output_tokens"] == 512
                 and request["remaining_seconds"] == step["remaining_seconds"]

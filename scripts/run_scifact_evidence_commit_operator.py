@@ -8,7 +8,7 @@ import sys
 import time
 from typing import Any
 
-from climate_rag.scifact_evidence_commit import ASSEMBLER, PROTOCOL, ARMS, CALL_CAPS
+from climate_rag.scifact_evidence_commit import ASSEMBLER, PROTOCOL, ISOLATED_PROTOCOL, PROTOCOLS, ARMS, CALL_CAPS
 from climate_rag.scifact_mixed_launch import PYTHON_EXECUTABLE, RUNTIME_FILES_SHA, RUNTIME_RECEIPT_SHA
 from climate_rag.scifact_read_continuation import ordered_write
 from prepare_scifact_natural import SELECTION_SHA, prepare
@@ -47,8 +47,30 @@ REQUIRED_RELEASE_KEYS = frozenset(FROZEN_FIELDS) | {
 }
 
 
-def validate_release(release: dict[str, Any]) -> None:
+def release_fields(release: dict[str, Any]) -> dict[str, Any]:
+    protocol = release.get("protocol", PROTOCOL)
+    require(protocol in PROTOCOLS, "unknown_commit_protocol")
     fields = inputs.frozen_fields(FROZEN_FIELDS) if inputs.prospective(release) else FROZEN_FIELDS
+    if protocol == ISOLATED_PROTOCOL:
+        require(inputs.prospective(release), "isolated_protocol_requires_frozen_prospective_inputs")
+        fields = dict(fields, protocol=protocol, attempt_id="semantic-input-v2",
+            output=(ROOT / "runs" / (protocol + "-prospective24-v1")).as_posix(),
+            comparison_job_id="31956320",
+            comparison_quality_sha256="247fcdd764d5de4d39469786c1ef8b770e87a29fcf03033ab90fe47ed8d29eae",
+            preparation_source_git="da243036871f61eef2e039a1618b8a3e1e1a00ac",
+            preparation_source_archive_sha256="d4c2ef55a9fc8675df2aba3e1bf537c22fcbd71fc8ee0c8f1f54df0a1421dbce",
+            decision_policy_delta="semantic_verifier_input_isolation_v2",
+            selection_sha256="351523c9c44bb418e24ed17b40372e6bef7b87792f8ad0b78dcaeb2d22e22754",
+            component_reservations_sha256="275bd306c9a154b583987ae63df148e3264c2989b671b92ac7b453fc9610a20f",
+            preparation_sha256="23e1835a0e4f1330c2d11d0d70a2dbfa5c4655c2192169b05240433f5e5aae72",
+            claims_sha256="bf5cd947e26ac2b8f83546106fbea673efbf71a84f7a4ea00adb31d40b7a5b7c",
+            frames_sha256="e20a5188ba51bbaf940009338ee167d6d07bf4429652eaa06967265f37a4e29c",
+            ordered_ids_sha256="41ef532f8c1a49caf81118164c615b5d5df6de04b22a7795baa563e37cad3469")
+    return dict(fields)
+
+
+def validate_release(release: dict[str, Any]) -> None:
+    fields = release_fields(release)
     missing = (frozenset(fields) | {"authorization", "source_git", "source_archive_sha256", "wrapper_sha256"}) - release.keys()
     require(not missing, "release_missing_fields:" + ",".join(sorted(missing)))
     require(release["authorization"] == "coordinator_exact_hash_release", "draft_is_not_executable")
@@ -67,7 +89,7 @@ def start_attempt(release: dict[str, Any], release_sha: str, job_id: str) -> dic
     observed = verify_runtime_receipt(release)
     output = output_path(release)
     output.mkdir(mode=0o700)  # exclusive reservation, never reuse another run
-    ordered_write(output / "reserved.json", {"protocol": PROTOCOL, "attempt_id": release["attempt_id"],
+    ordered_write(output / "reserved.json", {"protocol": release["protocol"], "attempt_id": release["attempt_id"],
         "infrastructure_retry": 0, "comparison_job_id": release["comparison_job_id"],
         "assembler": ASSEMBLER,
         "release_sha256": release_sha, "job_id": job_id, "source_git": release["source_git"],
@@ -77,6 +99,8 @@ def start_attempt(release: dict[str, Any], release_sha: str, job_id: str) -> dic
 
 
 def output_path(release: Any) -> Path:
+    if release.get("protocol") == ISOLATED_PROTOCOL:
+        return Path(release_fields(release)["output"])
     return Path(inputs.OUTPUT) if inputs.prospective(release) else OUTPUT
 
 

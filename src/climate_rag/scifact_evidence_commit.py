@@ -25,6 +25,8 @@ from .scifact_terminal import PROTOCOL as TERMINAL
 from .scifact_utility_contract import identity
 
 PROTOCOL = "scifact-evidence-commit-v1-20261002"
+ISOLATED_PROTOCOL = "scifact-evidence-commit-semantic-v2-20261002"
+PROTOCOLS = (PROTOCOL, ISOLATED_PROTOCOL)
 ASSEMBLER = "immutable-verdict-subset-v1"
 ARMS = ("fixed_top1", "fixed_all", "adaptive")
 CALL_CAPS = {"fixed_top1": 1, "fixed_all": 4, "adaptive": 5}
@@ -150,8 +152,11 @@ class EvidenceCommitProvider(DocumentVerifierProvider):
 
 
 class CommitState:
-    def __init__(self, claim_id: int, arm: str, frame: Any, episode_id: str) -> None:
+    def __init__(self, claim_id: int, arm: str, frame: Any, episode_id: str, *,
+                 protocol: str = PROTOCOL) -> None:
         require(arm in ARMS, "unknown_commit_arm")
+        require(protocol in PROTOCOLS, "unknown_commit_protocol")
+        self.protocol = protocol
         self.claim_id, self.arm, self.episode_id = claim_id, arm, episode_id
         self.frame = copy.deepcopy(frame)
         self.registry = VerdictRegistry(claim_id, episode_id, self.frame)
@@ -190,7 +195,14 @@ class CommitState:
 
     def inputs(self, stage: str, doc: str | None, available: list[str]) -> tuple[Any, Any]:
         if doc is not None:
-            return old_call_input(self.frame, stage, doc, self.feedback, self.calls, self.tools, [])
+            obs, schema = old_call_input(self.frame, stage, doc, self.feedback, self.calls, self.tools, [])
+            if self.protocol == ISOLATED_PROTOCOL:
+                require(stage == "verify", "semantic_projection_verify_only")
+                # Explicit semantic allowlist, not fictitious/magnified remaining budget.
+                # Actual counters/deadlines stay in the state, journal and step receipt.
+                obs = {"protocol": ISOLATED_PROTOCOL, **{k: obs[k] for k in
+                    ("stage", "immutable_claim", "current_citable", "source")}}
+            return obs, schema
         catalog = self.registry.catalog()
         schema = action_schema(["abstain"], [], [], 5)
         for action, field, values in (("verify", "source_id", available), ("commit", "selection_id", list(catalog))):
@@ -199,7 +211,7 @@ class CommitState:
                     "action": {"type": "string", "enum": [action]},
                     field: {"type": "string", "enum": values}},
                     "required": ["action", field], "additionalProperties": False})
-        return {"protocol": PROTOCOL, "stage": "plan",
+        return {"protocol": self.protocol, "stage": "plan",
             "immutable_claim": self.frame["observation"]["immutable_claim"],
             "current_citable": copy.deepcopy(self.frame["observation"]["current_citable"]),
             "verification_feedback": model_feedback(self.feedback),

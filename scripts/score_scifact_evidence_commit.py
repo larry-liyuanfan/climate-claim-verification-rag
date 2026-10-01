@@ -22,10 +22,11 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     from climate_rag.scifact_natural_contract import require
     require(reservation["release_sha256"] == proof["release_sha256"] == release_sha,
             "trusted_release_scope_mismatch")
+    protocol = release.get("protocol", PROTOCOL)
     return score_original_entry(output, load_tokenizer, release, root,
-        protocol=PROTOCOL, arms=ARMS,
+        protocol=protocol, arms=ARMS,
         input_adapter=inputs if inputs.prospective(release) else None,
-        audit_fn=partial(audit_episode, run_identity=release_sha), baseline_arm="fixed_all",
+        audit_fn=partial(audit_episode, run_identity=release_sha, protocol=protocol), baseline_arm="fixed_all",
         comparison_limits={
             "verify_is_prerequisite_not_spontaneous_demand": True,
             "fixed_top1_rule": "first frozen retrieval document, no gold selection",

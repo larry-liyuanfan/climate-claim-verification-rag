@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from climate_rag.scifact_evidence_commit import CommitState, PROTOCOL, render_prompt
+from climate_rag.scifact_evidence_commit import CommitState, PROTOCOL, PROTOCOLS, render_prompt
 from climate_rag.scifact_natural_contract import require
 from climate_rag.scifact_read_continuation import ordered_write
 from climate_rag.scifact_semantic_contract import TOKENIZER_SHA, checked
@@ -16,21 +16,22 @@ from run_scifact_evidence_commit_operator import FROZEN_FIELDS
 import scifact_evidence_input as prospective_inputs
 
 
-def probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
+def probe(frame: Any, tokenizer: Any, *, protocol: str = PROTOCOL) -> dict[str, Any]:
+    require(protocol in PROTOCOLS, 'unknown_commit_protocol')
     counts: list[dict[str, Any]] = []
     def measure(state: CommitState, stage: str, doc: str | None, available: list[str]) -> None:
         obs, schema = state.inputs(stage, doc, available)
         counts.append({"stage":stage, "feedback_count":len(state.feedback),
             "ref_count":len(state.registry.records()), "selection_count":len(state.registry.catalog()),
             "tokens":len(tokenizer.encode(render_prompt(tokenizer, obs, schema), add_special_tokens=False))})
-    state = CommitState(1, "adaptive", frame, "synthetic-prompt-probe:"+"a"*64)
+    state = CommitState(1, "adaptive", frame, "synthetic-prompt-probe:"+"a"*64, protocol=protocol)
     measure(state, "plan", None, state.order)
     for doc in state.order:
         measure(state, "verify", doc, [])
     # No scientific labels are inferred here. Stress maximal citation strings
     # and failed-call feedback across the maximum two adaptive verifications.
     for status in ("valid", "failed"):
-        state = CommitState(1, "adaptive", frame, "synthetic-prompt-probe:"+"a"*64)
+        state = CommitState(1, "adaptive", frame, "synthetic-prompt-probe:"+"a"*64, protocol=protocol)
         for index, doc in enumerate(state.order[:2]):
             ids = [s for s in frame["visible"] if s.rsplit(":",1)[0] == doc][:8]
             state.accept({"status":status, "physical_attempt_id":f"g{index}",
@@ -64,8 +65,9 @@ def main() -> None:
         corpus = {d.doc_id:d for d in (parse_abstract(json.loads(line)) for line in
             checked(args.prepared/'inference/corpus.jsonl', CORPUS_SHA).splitlines())}
         frames = prospective_inputs.load_frames(args.prepared, claims, corpus, tokenizer, release)
-        rows = [probe(frame, tokenizer) for frame in frames]
-        report = {'protocol':PROTOCOL, 'input_protocol':release['input_protocol'], 'claims':len(rows),
+        protocol = release['protocol']
+        rows = [probe(frame, tokenizer, protocol=protocol) for frame in frames]
+        report = {'protocol':protocol, 'input_protocol':release['input_protocol'], 'claims':len(rows),
             'preparation_sha256':release['preparation_sha256'], 'rows':rows,
             'maximum_tokens':max(r['maximum_tokens'] for r in rows),
             'overflow_count':sum(r['overflow'] for r in rows), 'model_calls':0, 'gold_read':False,
