@@ -40,13 +40,15 @@ terminal call. Strict correctness remained **5/12**, while generation time grew
 **11.729 → 93.081 s**. Rationalized F1 rose only through fewer positive predictions,
 not more correct evidence. This negative quality/cost result is not promoted.
 
-The next [natural FIT24 protocol](docs/SCIFACT_NATURAL_FIT24_20261001.md) is a
-**CPU-prepared, not GPU-executed** follow-up. Metadata-only component exclusions
-leave 136 eligible components from the exposed FIT144 pool; 24 were frozen once.
-An unadapted base model will retain its full natural trajectory, while two
-scripted branches share the real initial prefix and may make at most one new
-generation each. This is a tool-utility diagnostic, not an independent test or
-an established improvement; no training or validation promotion is authorized.
+The [natural FIT24 protocol](docs/SCIFACT_NATURAL_FIT24_20261001.md) freezes 24
+components once from 136 eligible exposed FIT144 components. Execution job
+31895661 has now completed. The coordinator's original-scoring readback reports
+72/72 valid terminal slots: A/B/C strict correctness **0/7/3 of 24**; all ten B/C
+successes are NEI abstentions, not recovered positive evidence or autonomous tool
+use. A selected no tools. See the [separate posthoc attribution package](docs/SCIFACT_NATURAL_POSTHOC_20261001.md)
+for provenance and limitations. Its synthetic CPU checks are complete, but actual
+posthoc execution still requires a separate exact release. No training or
+validation promotion follows from these negative results.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
