@@ -6,7 +6,7 @@ No model loading, dataset access, epoch runner, scheduler or job submission.
 """
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from fractions import Fraction
 import math
 from typing import Any
@@ -14,7 +14,7 @@ from typing import Any
 from .scifact_semantic_contract import encoded, sha
 from .scifact_state_supervision import (
     VERSION as RECORD_VERSION,
-    assistant_mean_loss, require, validate_tokenized, validate_weights,
+    WeightContract, assistant_mean_loss, require, validate_tokenized, validate_weights,
 )
 
 VERSION = 'scifact-claim-group-mean-optimizer-v1-20261001'
@@ -75,12 +75,27 @@ def optimizer_step_claim_group_mean(
     field remains historical record metadata and is NOT this step denominator.
     Caller must separately authorize/freeze data, shuffle and epoch boundaries.
     """
+    result = claim_group_mean_update(model, optimizer, records, tokenized, group_claim_ids, device)
+    return {'version': VERSION, 'contract_sha256': contract_sha(), **result,
+            'epoch_metric_contribution': result['group_mean_loss'] * result['claim_count'] / 48,
+            'epoch_metric_only_denominator': 48}
+
+
+def claim_group_mean_update(
+    model: Any, optimizer: Any, records: Sequence[Mapping[str, Any]],
+    tokenized: Sequence[Mapping[str, Any]], group_claim_ids: Sequence[int], device: Any = 'cpu', *,
+    weight_contract: WeightContract | None = None, observe: Callable[[str], None] | None = None,
+) -> dict[str, Any]:
+    """Shared mathematics only; no cohort size, epoch divisor or data authorization."""
     import torch
+    def event(name: str) -> None:
+        if observe is not None:
+            observe(name)
     ids = list(group_claim_ids)
     require(1 <= len(ids) <= 4 and len(set(ids)) == len(ids)
             and all(type(i) is int for i in ids)
             and len(tokenized) == len(records), 'complete_claim_group_shape')
-    validate_weights(records, ids)
+    validate_weights(records, ids, contract=weight_contract)
     for row, tokens in zip(records, tokenized, strict=True):
         validate_tokenized(row, tokens)
     parameters = validate_optimizer(model, optimizer)
@@ -90,15 +105,23 @@ def optimizer_step_claim_group_mean(
         inputs = torch.tensor([tokens['input_ids']], device=device)
         labels = torch.tensor([tokens['labels']], device=device)
         attention = torch.tensor([tokens['attention_mask']], device=device)
-        loss = assistant_mean_loss(model(input_ids=inputs, attention_mask=attention).logits, labels)
+        event('forward_started')
+        logits = model(input_ids=inputs, attention_mask=attention).logits
+        event('forward_completed')
+        loss = assistant_mean_loss(logits, labels)
         coefficient = float(Fraction(row['weight_numerator'], row['weight_denominator'])) / len(ids)
         weighted = loss * coefficient
         group_mean += float(weighted.detach().cpu())
+        event('backward_started')
         weighted.backward()
+        event('backward_completed')
     require(math.isfinite(group_mean), 'nonfinite_group_mean')
+    event('clip_started')
     gradient_norm = torch.nn.utils.clip_grad_norm_(parameters, 1.0, norm_type=2.0, error_if_nonfinite=True)
+    event('clip_completed')
+    event('optimizer_step_started')
     optimizer.step()
-    return {'version': VERSION, 'contract_sha256': contract_sha(), 'group_mean_loss': group_mean,
-            'group_normalizer': len(ids), 'epoch_metric_contribution': group_mean*len(ids)/48,
-            'epoch_metric_only_denominator': 48, 'claim_count': len(ids), 'decision_records': len(records),
+    event('optimizer_step_completed')
+    return {'group_mean_loss': group_mean,
+            'group_normalizer': len(ids), 'claim_count': len(ids), 'decision_records': len(records),
             'gradient_norm_before_clip': float(gradient_norm), 'clip_operations': 1, 'optimizer_steps': 1}

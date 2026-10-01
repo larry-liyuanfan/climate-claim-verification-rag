@@ -7,6 +7,12 @@ exposed TRAIN cases. After exact-hash release and non-generating preflight,
 submitted once and is awaiting scheduling. **No model result, training or
 quality gain is claimed**; terminal cost and identity audits remain pending.
 
+A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
+now preserves stable rerank aliases and captured prompts, validates an external
+roster, and tests complete-claim mean updates with the actual cohort size.
+It has no real training entry or accepted real-data roster; the queued utility8
+source and release are unchanged.
+
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
 [FIT-only production-state supervision](docs/SCIFACT_FIT_STATE_SUPERVISION_20261001.md)

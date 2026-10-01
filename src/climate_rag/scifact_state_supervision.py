@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import dataclass
 from fractions import Fraction
 import itertools
 import json
@@ -94,8 +95,21 @@ def capture(claim: GoldClaim, candidates: Sequence[Source], corpus: Mapping[int,
                            'model_calls': 0, 'model_tool_executions': 0}
 
 
-def frame_contract(frame: Mapping[str, Any], candidates: Sequence[Source]) -> dict[str, Any]:
-    aliases = {f'c{i}': source for i, source in enumerate(candidates)}
+def frame_contract(frame: Mapping[str, Any], candidates: Sequence[Source], *,
+                   alias_to_source: Mapping[str, str] | None = None,
+                   candidate_aliases: Sequence[str] | None = None) -> dict[str, Any]:
+    if alias_to_source is None and candidate_aliases is None:
+        aliases = {f'c{i}': source for i, source in enumerate(candidates)}
+    else:
+        require(alias_to_source is not None and candidate_aliases is not None, 'explicit_alias_and_order_required')
+        assert alias_to_source is not None and candidate_aliases is not None
+        sources = {s.source_id: s for s in candidates}
+        require(len(sources) == len(candidates) and len(set(alias_to_source.values())) == len(alias_to_source)
+                and set(alias_to_source.values()) == set(sources)
+                and set(alias_to_source) == {f'c{i}' for i in range(len(alias_to_source))}, 'stable_alias_registry')
+        require(0 < len(candidate_aliases) <= 20 and len(set(candidate_aliases)) == len(candidate_aliases)
+                and set(candidate_aliases) <= set(alias_to_source), 'current_candidate_order')
+        aliases = {a: sources[alias_to_source[a]] for a in candidate_aliases}
     visible = {}
     observation = frame['observation']
     require(set(frame) == {'observation', 'schema'}, 'frame_extra_fields')
@@ -172,8 +186,10 @@ def read_plan(claim: GoldClaim, frame: Mapping[str, Any], candidates: Sequence[S
 
 
 def tokenize_target(tokenizer: Any, frame: Mapping[str, Any], target: Mapping[str, Any],
-                    candidates: Sequence[Source]) -> dict[str, Any]:
-    contract = frame_contract(frame, candidates)
+                    candidates: Sequence[Source], *, alias_to_source: Mapping[str, str] | None = None,
+                    candidate_aliases: Sequence[str] | None = None) -> dict[str, Any]:
+    contract = frame_contract(frame, candidates, alias_to_source=alias_to_source,
+                              candidate_aliases=candidate_aliases)
     canonical = parse_action(dict(target), frame['observation']['allowed_actions'],
                              contract['visible'], list(contract['aliases']), 5)
     prompt = render_scifact_prompt(tokenizer, frame['observation'], frame['schema'])
@@ -280,7 +296,19 @@ def build_claim(claim: GoldClaim, component: str, candidates: Sequence[Source],
     return {'records': records, 'report': report, 'captured_frames': frames}
 
 
-def validate_weights(records: Sequence[Mapping[str, Any]], claim_ids: Sequence[int]) -> None:
+@dataclass(frozen=True)
+class WeightContract:
+    version: str = VERSION
+    decision_origin: str = 'program_teacher'
+    action_provenance: str = 'program_teacher_actual_state_v2'
+    answer_provenance: str = 'official_complete_original_fit_annotation'
+    epoch_normalizer: int = 48
+
+
+def validate_weights(records: Sequence[Mapping[str, Any]], claim_ids: Sequence[int], *,
+                     contract: WeightContract | None = None) -> None:
+    spec = contract or WeightContract()
+    require(type(spec.epoch_normalizer) is int and spec.epoch_normalizer > 0, 'positive_epoch_normalizer')
     require(len(set(claim_ids)) == len(claim_ids) and bool(claim_ids), 'claim_ids')
     require({r['claim_id'] for r in records} == set(claim_ids), 'missing_or_extra_claim')
     for claim_id in claim_ids:
@@ -290,9 +318,9 @@ def validate_weights(records: Sequence[Mapping[str, Any]], claim_ids: Sequence[i
         require(len(identities) == len(rows), 'duplicate_supervision_state')
         mass = Fraction()
         for row in rows:
-            require(row['version'] == VERSION and row['decision_origin'] == 'program_teacher'
-                    and row['action_target_provenance'] == 'program_teacher_actual_state_v2'
-                    and row['declared_claim_weight'] == 1 and row['epoch_normalizer'] == 48,
+            require(row['version'] == spec.version and row['decision_origin'] == spec.decision_origin
+                    and row['action_target_provenance'] == spec.action_provenance
+                    and row['declared_claim_weight'] == 1 and row['epoch_normalizer'] == spec.epoch_normalizer,
                     'v2_provenance_or_normalizer')
             require(all(type(row[k]) is int and row[k] > 0 for k in
                         ('trajectory_count', 'alternative_count', 'state_count', 'weight_denominator', 'weight_numerator')),
@@ -301,7 +329,7 @@ def validate_weights(records: Sequence[Mapping[str, Any]], claim_ids: Sequence[i
                         (('trajectory', 'trajectory_count'), ('alternative', 'alternative_count'), ('state_index', 'state_count'))),
                     'hierarchy_index')
             require(row['model_generated'] is False and row['semantic_target_provenance'] ==
-                    ('official_complete_original_fit_annotation' if row['target']['action'] == 'answer' else 'no_semantic_label'),
+                    (spec.answer_provenance if row['target']['action'] == 'answer' else 'no_semantic_label'),
                     'target_provenance')
             expected = Fraction(1, row['trajectory_count'] * row['alternative_count'] * row['state_count'])
             require(Fraction(row['weight_numerator'], row['weight_denominator']) == expected,
