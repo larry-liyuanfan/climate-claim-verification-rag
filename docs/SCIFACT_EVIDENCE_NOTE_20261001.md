@@ -1,4 +1,47 @@
-# Same-evidence note → terminal diagnostic (CPU candidate)
+# Same-evidence note → terminal diagnostic (closed: no strict gain)
+
+## Measured closeout
+
+[Job 31884581](verified-runs/scifact-evidence-note-closeout-31884581.json) completed
+once, exit `0:0`, in 178 s. Execution source is
+`c76fb71a4c265637422ee251f35adeb12df589a7`; documentation commits are not a new
+execution. The same-source Linux quality run passed all 1114 tests without skips.
+
+| Measure, same exposed TRAIN twelve | Existing direct control | Note + terminal |
+|---|---:|---:|
+| Strict whole answers correct | 5/12 | 5/12 |
+| Correct NEI abstentions | 3/3 | 3/3 |
+| Rationalized documents: correct / predicted / relevant | 2 / 5 / 9 | 2 / 2 / 9 |
+| Rationalized-document F1 | 0.286 | 0.364 |
+| Sentence-selection F1 | 0.261 | 0.200 |
+| Actual generator calls | 12 | 23 |
+| Input / output tokens | 42,914 / 253 | 66,554 / 1,761 |
+| Sum of generation time, excluding model loading | 11.729 s | 93.081 s |
+
+There were **zero recovered and zero regressed strict answers**. Precision rose
+because fewer documents were predicted, not because more correct evidence was
+found. The new route returned two answers, nine abstentions and one failure.
+That failed note reached 512 tokens without EOS; its known cost remains counted,
+its terminal call was not attempted, and the denominator stays twelve. Thus
+**12 note + 11 terminal = 23 physical calls**, not 24 successful calls. The process
+completed correctly while preserving this model-level failure.
+
+Readback checked 132 file hashes, all 23 full raw response receipts, their 23
+empty grammar receipts, 144 restored adapter tensors and all 11 unchanged
+terminal contexts. There were no unknown token totals or physical receipt
+issues. All twelve original frames had passed the frozen worker's equality
+checks before generation; the note supplied no new citable evidence. Costs were
+written after reaping the worker and before the original scoring stage.
+Readback loaded no gold, ran no model and did not recompute quality.
+
+**Decision: do not promote this note stage.** This is a negative quality/cost
+diagnostic on old exposed TRAIN, not an independent test, online SLA, autonomous
+Agent gain or a pure prompt-effect estimate. It does not authorize retry,
+prompt tuning, a new baseline or consumption of validation12/dev300/retired test.
+Private notes, frames, per-case outputs and gold remain on Spartan; only the
+redacted aggregate and hashes are published. The current resume is unchanged.
+
+## Frozen experiment design
 
 **Question:** can the accepted mixed adapter recover rationale/label correctness
 on unchanged evidence, without regressing NEI, and at what extra cost?
@@ -41,7 +84,7 @@ plus model/runtime/audit overhead; the previous real four-route run took189s.
 Synthetic tests cover aliases/frame equality, notes-as-data, physical two-call
 policy/usage joins, failures/overflow/EOS and cost-before-gold. A stdlib-only WSL
 test exercises the exact POSIX watchdog function, including Popen-signal cleanup.
-No real new result is claimed. Raw outputs stay on Spartan. Old12 are exposed
+The measured result is recorded above. Raw outputs stay on Spartan. Old12 are exposed
 TRAIN (one current FIT component overlaps); validation12/dev300/retired test stay
 sealed. Any gain also changes compute and cannot be attributed purely to prompt
 or thinking. Future fixed/adaptive comparison must use the same module before

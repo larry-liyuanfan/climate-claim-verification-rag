@@ -33,9 +33,12 @@ coordinator separately released the unchanged four-route candidate.
 strict correctness was **3/5/4/3 of twelve** (each includes three correct NEI abstentions).
 Adaptive proposed **zero tools**, and sufficient-evidence grounding failures remain.
 This is a negative autonomous-policy result, not Agent success; utility8 remains unchanged.
-A [bounded evidence-note candidate](docs/SCIFACT_EVIDENCE_NOTE_20261001.md) reuses all
-twelve fixed-rerank frames to test two-stage grounding, with **no new baseline calls**.
-CPU implementation is not GPU release or a measured improvement.
+A [bounded evidence-note closeout](docs/SCIFACT_EVIDENCE_NOTE_20261001.md) reuses all
+twelve fixed-rerank frames, with **no new baseline calls**. Job 31884581 made
+12 note + 11 terminal calls; one capped note without EOS correctly skipped its
+terminal call. Strict correctness remained **5/12**, while generation time grew
+**11.729 → 93.081 s**. Rationalized F1 rose only through fewer positive predictions,
+not more correct evidence. This negative quality/cost result is not promoted.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external

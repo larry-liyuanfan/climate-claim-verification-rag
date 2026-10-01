@@ -1,0 +1,74 @@
+{
+  "schema_version": "scifact-evidence-note-compact-closeout-v1",
+  "status": "audited_negative_result",
+  "execution_source_git": "c76fb71a4c265637422ee251f35adeb12df589a7",
+  "source_archive_sha256": "be12129300400053e7325dc615a091417faa606e44281886465a9147f038b9e3",
+  "source_archive_bytes": 4771840,
+  "wrapper_sha256": "3d2aa469cce4b01c93fbe5779b13b2b44311d20ddde09f6b046651ef2e10e1d3",
+  "release_sha256": "f6ccc1972e8b841f1c98676359c3c18fe430d645e6c730e47cd5937346b12c78",
+  "job_id": 31884581,
+  "dry_run_only_id": 31884580,
+  "slurm": {
+    "state": "COMPLETED", "exit_code": "0:0", "elapsed_seconds": 178,
+    "total_cpu_seconds": 158.037, "max_rss_raw": "9989908K",
+    "start_australia_sydney": "2026-10-01T19:47:31+10:00",
+    "end_australia_sydney": "2026-10-01T19:50:29+10:00",
+    "requested": {"a100_gpus": 1, "cpus": 8, "host_ram_gib": 32, "scratch_gib": 30, "seconds": 4200}
+  },
+  "scope": "all_old12_exposed_TRAIN_fixed_rerank_frames_not_independent_test",
+  "control_job_id": 31871386,
+  "planned_claims": 12, "maximum_stage_calls": 24,
+  "physical_calls": 23, "note_calls": 12, "terminal_calls": 11,
+  "unreserved_stage_slots": 1,
+  "status_counts": {"completed": 11, "note_failed": 1},
+  "new_actions": {"answer": 2, "abstain": 9, "failure": 1},
+  "failure": {"count": 1, "stage": "note", "output_tokens": 512, "eos_observed": false,
+    "classification": "incomplete_note_at_output_cap", "terminal_skipped": true,
+    "remains_in_twelve_claim_denominator": true, "known_cost_included": true, "retry": false},
+  "strict_whole_answer": {"old_correct": 5, "new_correct": 5, "denominator": 12, "recovered": 0, "regressed": 0},
+  "official_nei": {"claims": 3, "old_correct": 3, "new_correct": 3, "new_false_evidence": 0},
+  "rationalized_documents": {
+    "old": {"correct": 2, "predicted": 5, "relevant": 9, "precision": 0.4, "recall": 0.2222222222222222, "f1": 0.2857142857142857},
+    "new": {"correct": 2, "predicted": 2, "relevant": 9, "precision": 1.0, "recall": 0.2222222222222222, "f1": 0.3636363636363636}
+  },
+  "sentence_selection": {
+    "old": {"correct": 3, "predicted": 5, "relevant": 18, "f1": 0.2608695652173913},
+    "new": {"correct": 2, "predicted": 2, "relevant": 18, "f1": 0.2}
+  },
+  "sentence_label": {"old_correct": 2, "new_correct": 2, "relevant": 18,
+    "old_f1": 0.1739130434782609, "new_f1": 0.2},
+  "generation_only_cost": {
+    "old": {"calls": 12, "input_tokens": 42914, "output_tokens": 253, "generation_ms_sum": 11728.672109544277},
+    "new": {"calls": 23, "input_tokens": 66554, "output_tokens": 1761, "generation_ms_sum": 93081.23362250626},
+    "note": {"calls": 12, "input_tokens": 24967, "output_tokens": 1566, "generation_ms_sum": 83562.22977116704},
+    "terminal": {"calls": 11, "input_tokens": 41587, "output_tokens": 195, "generation_ms_sum": 9519.003851339221},
+    "unknown_usage_attempts": 0, "lower_bound_totals": false, "missing_generation_times": 0,
+    "includes_failed_note": true, "model_loading_excluded": true,
+    "retrieval_rerank_reused_not_remeasured": true, "not_online_sla": true
+  },
+  "physical_audit": {
+    "manifest_file_hashes_checked": 132, "full_response_files_checked": 23,
+    "physical_grammar_files": 0, "verified_empty_grammar_receipts": 23,
+    "adapter_tensors_reloaded": 144, "original_frames_checked_by_frozen_worker_before_generation": 12,
+    "unchanged_terminal_contexts_checked_on_readback": 11, "legal_final_citation_ids": 2,
+    "new_citable_evidence_from_note": 0, "physical_issues": [],
+    "worker_reaped_before_cost_before_gold_scoring": true,
+    "readback_gold_loaded": false, "readback_quality_recomputed": false
+  },
+  "artifact_sha256": {
+    "allocation/started.json": "3056324bf198d6de88a91002209b8a6cdcd77f1222c8a108bc3021fb0a47eb92",
+    "allocation/runtime-observed.json": "ca1b8c2aa25c4802ce5e4e4cf80fe04509b430d825f14cae69bc81ef2fa13def",
+    "allocation/worker-exit.json": "fbd08ad517dbca795655b569477b076e962ea0dae542f17731d3f47657410780",
+    "cost-before-quality.json": "f7e76b0ae754f1636f146cd99e3f35deae81fed10f560398d78c1257248c0d3c",
+    "score.json": "3542534d766cc620cc4a31b0427911190db631d2aef106fbcfa2d339b58aac58",
+    "inference/run.json": "2ada3d9256c1a33a7741076e02f9ebf86c6a53420a40ad8700b6152ba7ee9fa9",
+    "inference/frames.json": "1a7e91a712b65fbe2eaeead2e18c29e932b62c858554435f1d3f5742950b135c",
+    "inference/adapter-integrity.json": "c8b891cda8bfb081a372a5b95951084ed8f23a1f8868e7f803f684f489bcb70b"
+  },
+  "execution_source_ci": {"run_id": 36844077635, "conclusion": "success", "passed": 1114, "skipped": 0},
+  "new_baseline_calls": 0, "retrieval_or_reranker_calls": 0, "warmups": 0, "retries": 0,
+  "validation_gate": false, "further_execution_authorized": false,
+  "decision": "do_not_promote_note_stage_no_strict_recovery_at_higher_generation_cost",
+  "causal_boundary": "two_calls_more_compute_not_pure_prompt_or_thinking_effect",
+  "publication_boundary": "aggregate_and_hashes_only_raw_notes_claim_ids_gold_and_per_case_outputs_remain_on_Spartan"
+}
