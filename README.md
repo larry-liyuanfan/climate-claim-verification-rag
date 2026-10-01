@@ -1,11 +1,24 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [once-frozen conditional TRAIN24 confirmation](docs/SCIFACT_PROSPECTIVE24_CONFIRMATION_20261002.md)
+completed **72/72 slots in 300 s** after integrated pre-submission review.
+Complete evidence-bearing answers were **5/15 top1, 3/15 fixed-all, 5/15 adaptive**.
+Adaptive matched top1's positive answers but had lower abstract-rationalized
+F1 (**0.5714 vs 0.6061**) and **5.16 times its tokens**. Its six correct explicit
+NEI decisions have a different interface from fixed unresolved outputs and are
+not proof of a fair reasoning advantage. Keep this negative promotion decision:
+no tuning/resampling rerun, independent-test claim, deployment or resume gain.
+The report preserves all costs and three explanatory paired cases. The
+[whole-chain submission checklist](docs/SCIFACT_PROSPECTIVE24_CPU_20261002.md#whole-chain-review-before-submission)
+requires integrated review and exact-archive preflight before queue submission,
+not serial component repairs discovered after each queue wait.
+
 The [prospective conditional TRAIN24 CPU package](docs/SCIFACT_PROSPECTIVE24_CPU_20261002.md)
 adapts once-frozen metadata and gold-free initial frames to the unchanged policy;
 CPU job **31953981 completed in 38 s**, with zero model calls or new real-gold
 access. It adds no model result, independent-test claim or GPU authorization.
 
-The separately authorized [evidence-commit confirmation](docs/SCIFACT_EVIDENCE_COMMIT_CONFIRMATION_20261002.md)
+The earlier, separately authorized [evidence-commit confirmation](docs/SCIFACT_EVIDENCE_COMMIT_CONFIRMATION_20261002.md)
 completed **72/72 slots in 312 s** after whole-chain CPU review. Immutable verifier
 references and deterministic assembly recovered strict evidence-bearing answers:
 **3/15 fixed-top1, 3/15 fixed-all, 4/15 adaptive** on the same exposed TRAIN24.

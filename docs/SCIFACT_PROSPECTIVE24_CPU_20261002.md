@@ -28,6 +28,30 @@ jobs or retest consumed evaluation data for readiness. Static review cannot
 promise absence of runtime failures; preserve failure receipts without blind
 retries. No new GPU job belongs to this package.
 
+Submission rule, reaffirmed by the user on 2026-10-02: finish one integrated
+review **before** submitting, rather than reviewing isolated fixes after each
+queue wait. The owner must close the following in the existing release receipt:
+
+1. Trace producers and consumers together: selection/order/hash, model and
+   tokenizer, candidate width, prompt/schema/decoder, terminal assembly, scoring
+   denominator and physical cost attribution. Include old/new input defaults.
+2. Exercise the real entrypoints with small synthetic inputs, including success,
+   missing/corrupt input, timeout/child exit and reporting failure. No protected
+   test data or fresh full benchmark is needed for a readiness check.
+3. Validate the **exact archive and actual wrapper**, not merely a clean local
+   import: argument parsing, Linux-only dependencies, cache/quota/output paths,
+   Bash syntax and resource settings. Reuse accepted checks at identical hashes.
+4. Close blocking findings as one affected-chain patch; freeze the source,
+   config/data identities and resource plan, then run `sbatch --test-only` and
+   submit one authorized job. Do not enqueue while a known blocking seam remains.
+5. Keep structural readiness separate from the model-quality hypothesis. Passing
+   checks cannot guarantee a quality gain; a negative result is not a reason to
+   resample or repeatedly rerun the same policy.
+
+This is a consolidated checklist, not another review service, polling task or
+sequence of cluster audit jobs. The subsequent authorized confirmation and its
+result are recorded [here](SCIFACT_PROSPECTIVE24_CONFIRMATION_20261002.md).
+
 ## Data contract
 
 - Remaining conditional pool: **64 components / 97 eligible IDs**.

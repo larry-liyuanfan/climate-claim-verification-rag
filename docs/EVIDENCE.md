@@ -1,5 +1,22 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 conditional TRAIN24 confirmation: no top1 promotion
+
+[Final report](SCIFACT_PROSPECTIVE24_CONFIRMATION_20261002.md) and
+[compact](verified-runs/scifact-prospective24-confirmation-31956320.json):
+job **31956320**, COMPLETED / `0:0`, 300 s, 72/72 slots, 200 physical calls;
+execution source `da243036871f61eef2e039a1618b8a3e1e1a00ac`.
+Top1/all/adaptive strict evidence-bearing answers **5/15, 3/15, 5/15**;
+abstract-rationalized F1 **0.6061, 0.5000, 0.5714**; tokens
+**36,941 / 146,242 / 190,689**. Adaptive has no additional positive recovery
+over top1 and costs 5.16 times the tokens. Six correct model NEI decisions are
+not equal-interface gains over fixed unresolved responses. All 531 eligible
+TRAIN rows had earlier gold-preparation exposure: not independent test or
+source-family-unseen evidence. Three real paired examples, all failures/costs
+and once-only shared preparation are preserved. No promotion, automatic rerun
+or resume change. Compact SHA
+`7315a387e66f60dde5aaa11840aca2a2c715168d9c7a043f575b2d65ebc46515`.
+
 ## 2026-10-02 prospective input preparation (CPU only)
 
 [Whole-chain review and input contract](SCIFACT_PROSPECTIVE24_CPU_20261002.md):
