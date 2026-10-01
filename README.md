@@ -1,5 +1,19 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [whole-chain-reviewed bounded-decoder confirmation](docs/SCIFACT_DOCUMENT_BOUNDED_CONFIRMATION_20261001.md)
+completed as [job 31930176](docs/verified-runs/scifact-document-bounded-closeout-31930176.json)
+in 391 s: **all 25 prior structural rejections were removed**, but strict positive
+whole-answer correctness remained **0/15 in both routes**. Fixed correct NEI
+remained 3/9; adaptive remained 0/9 and chose no verification in 24 opportunities.
+All 96 fixed verifier responses are byte-identical to the previous run, and all
+144 paired inputs/prompts/schemas match. Correct rationalized documents increased
+4→10 (fixed) and 2→6 (adaptive), alongside many more predicted documents; this
+is not recovered whole-answer grounding or autonomous Agent benefit. Actual
+cost was 144 generations / 340,743 input / 10,031 output tokens. Keep the proven
+output-constraint repair; the remaining issue is evidence selection/integration,
+not JSON formatting. These are the same exposed TRAIN24 diagnostics, not a new
+validation/test result; no current resume metric is changed.
+
 The [single-document verifier diagnostic](docs/SCIFACT_DOCUMENT_VERIFIER_20261001.md)
 completed as [job 31918065](docs/verified-runs/scifact-document-verifier-closeout-31918065.json)
 with **48/48 recorded episodes and a negative result**: strict positive grounding
@@ -18,8 +32,9 @@ document uniqueness/20-sentence constraints (20 sentence-budget failures and
 5 duplicate-document first failures). All 96 verifier judgments were structurally
 valid, which does not establish correctness. The stage-aware decoder candidate
 reuses the existing bounded prefix only for planning/final answers; single-document
-judgments retain ordinary LMFE. It is a **new, CPU-tested implementation**, not
-a rerun of r2 or a demonstrated quality gain. See the [integrated review and
+judgments retain ordinary LMFE. The confirmation above is a separate implementation
+comparison, not an infrastructure retry or a demonstrated whole-answer gain.
+See the [integrated review and
 release gate](docs/SCIFACT_DOCUMENT_VERIFIER_20261001.md#whole-chain-review-before-submission).
 
 The [utility8 closeout](docs/verified-runs/scifact-utility8-closeout-31834687.json)

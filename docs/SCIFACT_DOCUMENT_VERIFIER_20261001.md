@@ -291,8 +291,15 @@ regression and clean-source integration reproduction; freeze exact source,
 wrapper and release identity together. The coordinator decides any new GPU run
 once from that cohesive package, rather than approving individual files.
 
-Current bounded-decoder candidate: independent actual-diff review found no
+Bounded-decoder pre-submission candidate: independent actual-diff review found no
 remaining blocker; local full regression **1280 passed / 1 Windows-only POSIX
 permission skip** in 142.53 s. Ruff passed for all source/scripts/tests. The
 cached real-tokenizer preflight and 48-slot synthetic scorer entry tests passed.
 These mechanical checks do not change r2 quality or authorize GPU execution.
+
+The coordinator subsequently authorized one exact implementation confirmation.
+[Job 31930176 is now complete](SCIFACT_DOCUMENT_BOUNDED_CONFIRMATION_20261001.md):
+all 25 structural failures are gone, but both routes still have zero strict
+positive whole answers. The new report preserves the unchanged inputs, verifier
+judgments, complete costs and semantic-integration failure cases. Original r2
+results above remain unchanged; this is not an automatic retry or test promotion.
