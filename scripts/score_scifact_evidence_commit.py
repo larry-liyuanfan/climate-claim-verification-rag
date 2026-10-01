@@ -26,7 +26,8 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     return score_original_entry(output, load_tokenizer, release, root,
         protocol=protocol, arms=ARMS,
         input_adapter=inputs if inputs.prospective(release) else None,
-        audit_fn=partial(audit_episode, run_identity=release_sha, protocol=protocol), baseline_arm="fixed_all",
+        audit_fn=partial(audit_episode, run_identity=release_sha, protocol=protocol,
+                         generation_contract=release.get("generation_contract")), baseline_arm="fixed_all",
         comparison_limits={
             "verify_is_prerequisite_not_spontaneous_demand": True,
             "fixed_top1_rule": "first frozen retrieval document, no gold selection",
@@ -35,3 +36,26 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
             "no_automatic_agent_gain": True,
             "exact_reservation_sha256": sha(output / "reserved.json"),
         })
+
+
+def main() -> None:
+    import argparse
+    import json
+    from climate_rag.scifact_semantic_contract import checked
+    from run_scifact_evidence_commit_operator import validate_release, output_path
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--release", type=Path, required=True)
+    parser.add_argument("--release-sha", required=True)
+    parser.add_argument("--model-dir", type=Path, required=True)
+    args = parser.parse_args()
+    release = json.loads(checked(args.release, args.release_sha))
+    validate_release(release)
+    def tokenizer() -> Any:
+        from transformers import AutoTokenizer
+        return AutoTokenizer.from_pretrained(args.model_dir, local_files_only=True)
+    result = score_after_exit(output_path(release), tokenizer, release, release_sha=args.release_sha)
+    raise SystemExit(0 if result["status"] == "scored" else 2)
+
+
+if __name__ == "__main__":
+    main()

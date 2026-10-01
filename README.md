@@ -1,5 +1,13 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [paired v2/v3 three-arm preparation](docs/SCIFACT_PAIRED_VERIFIER_PREPARATION_20261002.md)
+binds full decoding defaults/effective settings and prepares one bounded serial
+**144-slot / 480-call ceiling** comparison. It reuses CPU preflight 31969505;
+no new model call or Slurm submission is part of this preparation. Whole-chain
+review covers failure cleanup, original-score compatibility and complete costs.
+GPU execution still needs a later exact-release authorization; no quality gain
+or resume result is claimed.
+
 The [single-response relation/rationale verifier](docs/SCIFACT_RELATION_RATIONALE_VERIFIER_20261002.md)
 now separates comparable scope, contradictory outcomes, joint direct evidence,
 dispensable background and model-selected minimal citations. Original-score

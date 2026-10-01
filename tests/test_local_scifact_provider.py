@@ -422,6 +422,27 @@ def test_generation_parity_except_renderer_env_guard_and_effective_config_receip
         }
 """
     actual = inspect.getsource(LocalQwenSciFactProvider.generate)
+    # Only the new release opts into a generation binding. Project the exact
+    # reviewed optional seams away, then keep the old source-parity assertion;
+    # the paired tests independently exercise the enabled path and all failures.
+    binding = '''        binding = getattr(self, "generation_binding", None)
+        bound_config, bound_receipt = (binding.prepare(length, max_output_tokens, remaining, schema, decoder, self.tokenizer_data)
+                                       if binding is not None else (None, None))
+        generation_kwargs = ({"generation_config": bound_config, "use_model_defaults": False}
+                             if bound_config is not None else {})
+        binding_diagnostics = ({"generation_binding": bound_receipt} if bound_receipt is not None else {})
+'''
+    assert binding in actual
+    actual = actual.replace(binding, '')
+    for seam in ('                    **generation_kwargs,\n',
+                 '                    **binding_diagnostics,\n',
+                 '        diagnostics.update(binding_diagnostics)\n'):
+        assert seam in actual
+        actual = actual.replace(seam, '')
+    actual = actual.replace('usage, {"category": "decode_failure", **binding_diagnostics}',
+                            'usage, {"category": "decode_failure"}')
+    actual = actual.replace('(bound_config if bound_config is not None else self.base.model.generation_config).eos_token_id',
+                            'self.base.model.generation_config.eos_token_id')
     assert extra in actual
     actual = actual.replace(extra, "")
     actual = actual.replace('        diagnostics.update(decoder.metadata)\n', '')

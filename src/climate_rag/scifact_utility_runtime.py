@@ -54,6 +54,9 @@ class JournalProvider:
             "max_output_tokens": max_output_tokens, "remaining_seconds": remaining_seconds,
             "usage": None, "status": "reserved_before_actual_generate"})
         try:
+            bind = getattr(self.backend, "bind_generation_record", None)
+            if bind is not None:
+                bind(self.directory / (key + ".generation.json"))
             response: dict[str, Any] = self.backend.generate(observation, schema, max_output_tokens, remaining_seconds)
             response = copy.deepcopy(response)
             response.setdefault("diagnostics", {})["physical_attempt_id"] = key
@@ -80,6 +83,10 @@ class JournalProvider:
             if isinstance(exc, ModelResponseValidationError):
                 exc.diagnostics.update(physical_attempt_id=key)
             raise
+        finally:
+            release = getattr(self.backend, "release_generation_record", None)
+            if release is not None:
+                release()
 
 
 def ledger_cost(directory: Path, ids: list[str] | None = None) -> dict[str, Any]:

@@ -45,6 +45,10 @@ def main() -> None:
     started = time.monotonic()
     (args.output.parent / "private-loader").mkdir(mode=0o700)
     provider = EvidenceCommitProvider(generator / "model", manifest, private_dir=args.output.parent / "private-loader")
+    if "generation_contract" in release:
+        from climate_rag.scifact_generation import GenerationBinding
+        provider.generation_binding = GenerationBinding(provider.base, generator / "model", release["generation_contract"])
+        ordered_write(args.output.parent / "generation-config.json", provider.generation_binding.receipt)
     base_state(provider)
     frames = (inputs.load_frames(args.inference_dir.parent, claims, corpus, provider.base.tokenizer, release)
               if inputs.prospective(release) else

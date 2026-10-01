@@ -72,6 +72,10 @@ def release_fields(release: dict[str, Any]) -> dict[str, Any]:
                           comparison_protocol=ISOLATED_PROTOCOL,
                           comparison_status="v2_implemented_not_model_evaluated",
                           decision_policy_delta="single_generation_relation_rationale_v3")
+    if "paired_comparison" in release:
+        from scifact_paired_comparison import PAIR, child_extensions
+        require(release["paired_comparison"] == PAIR, "unknown_paired_comparison")
+        fields = dict(fields, **child_extensions(protocol))
     return dict(fields)
 
 

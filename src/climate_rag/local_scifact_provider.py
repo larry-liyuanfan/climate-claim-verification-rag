@@ -85,6 +85,16 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
         prompt = self.render(observation, schema)
         return len(self.base.tokenizer.encode(prompt, add_special_tokens=False))
 
+    def bind_generation_record(self, path: Path) -> None:
+        binding = getattr(self, "generation_binding", None)
+        if binding is not None:
+            binding.bind_record(path)
+
+    def release_generation_record(self) -> None:
+        binding = getattr(self, "generation_binding", None)
+        if binding is not None:
+            binding.path = None
+
     def generate(
         self,
         observation: dict[str, Any],
@@ -106,6 +116,12 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
             raise ModelResponseValidationError(
                 {}, {"category": "deadline_before_generation"}
             )
+        binding = getattr(self, "generation_binding", None)
+        bound_config, bound_receipt = (binding.prepare(length, max_output_tokens, remaining, schema, decoder, self.tokenizer_data)
+                                       if binding is not None else (None, None))
+        generation_kwargs = ({"generation_config": bound_config, "use_model_defaults": False}
+                             if bound_config is not None else {})
+        binding_diagnostics = ({"generation_binding": bound_receipt} if bound_receipt is not None else {})
         log_sink = self.private_store.sink("grammar", 16384)
         root = logging.getLogger()
         old_handlers, old_level = root.handlers[:], root.level
@@ -115,6 +131,7 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
             with self.base._torch.inference_mode():
                 output = self.base.model.generate(
                     **inputs,
+                    **generation_kwargs,
                     do_sample=False,
                     num_beams=1,
                     max_new_tokens=max_output_tokens,
@@ -130,6 +147,7 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
                     "output_usage_unknown": True,
                     "exception_type": type(exc).__name__,
                     "grammar_log": log_sink.receipt(),
+                    **binding_diagnostics,
                 },
             ) from exc
         finally:
@@ -141,10 +159,10 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
             raw = self.base.tokenizer.decode(generated, skip_special_tokens=True)
         except Exception as exc:
             raise ModelResponseValidationError(
-                usage, {"category": "decode_failure"}
+                usage, {"category": "decode_failure", **binding_diagnostics}
             ) from exc
         try:
-            eos = self.base.model.generation_config.eos_token_id
+            eos = (bound_config if bound_config is not None else self.base.model.generation_config).eos_token_id
             eos_ids = [eos] if isinstance(eos, int) else (eos or [])
             diagnostics = response_diagnostics(
                 raw,
@@ -163,9 +181,11 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
                 {
                     "category": "diagnostic_failure",
                     "exception_type": type(exc).__name__,
+                    **binding_diagnostics,
                 },
             ) from exc
         diagnostics["grammar_log_nonempty"] = log_sink.attempted > 0
+        diagnostics.update(binding_diagnostics)
         diagnostics["grammar"] = decoder.grammar
         diagnostics["grammar_config"] = decoder.config_identity
         diagnostics.update(decoder.metadata)

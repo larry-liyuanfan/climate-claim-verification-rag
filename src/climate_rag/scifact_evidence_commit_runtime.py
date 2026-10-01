@@ -132,7 +132,8 @@ def run_episode(claim_id: int, arm: str, frame: Any, journal: CommitJournal, cor
 
 
 def audit_episode(row: Any, frame: Any, ledger: Path, private: Path, tokenizer: Any,
-                  corpus: Any, *, run_identity: str, protocol: str = PROTOCOL) -> dict[str, Any]:
+                  corpus: Any, *, run_identity: str, protocol: str = PROTOCOL,
+                  generation_contract: Any = None) -> dict[str, Any]:
     """Reissue from verified physical wire, never trust saved refs/feedback."""
     arm, claim_id = row["arm"], row["claim_id"]
     require(protocol in PROTOCOLS, "unknown_commit_protocol")
@@ -188,6 +189,15 @@ def audit_episode(row: Any, frame: Any, ledger: Path, private: Path, tokenizer: 
                 and guard["frame_sha256"] == identity(frame)
                 and guard["training"] is False and guard["lora_parameter_or_module_count"] == 0, "actual_call_binding")
         require(finished["usage_known"] is True and finished["usage"] == step["usage"], "usage_binding")
+        if generation_contract is not None:
+            from .scifact_generation import frozen_contract, audit_generation, expected_parser_config
+
+            require(generation_contract == frozen_contract(), "unknown_generation_contract")
+            generation = json.loads((ledger / (key + ".generation.json")).read_bytes())
+            require(generation["input_tokens"] == len(ids), "generation_input_length")
+            diagnostics = (finished["response"]["diagnostics"] if finished["status"] == "returned"
+                           else finished["diagnostics"])
+            audit_generation(generation, request, diagnostics, expected_parser_config(tokenizer))
         ms = finished["elapsed_ms"]
         require(type(ms) in {int, float} and math.isfinite(ms) and ms >= 0
                 and request["remaining_seconds"] <= MAX_SECONDS-physical_seconds+1e-6, "shared_deadline")

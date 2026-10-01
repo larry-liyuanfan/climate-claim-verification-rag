@@ -1,5 +1,15 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 paired verifier preparation (CPU only; not a result)
+
+[Whole-chain report](SCIFACT_PAIRED_VERIFIER_PREPARATION_20261002.md): prepares the
+same consumed 24 frames across isolated v2 / structured v3 and three arms;
+144 planned slots, independent 240-call ledgers, aggregate ceiling 480. Complete
+generation defaults, effective overrides, seed and LMFE binding are recorded.
+This supersedes the earlier 48-call top1-only proposal, not its measured results
+(there were none). Reuses 31969505 without a new Slurm or model call. Fixed-policy
+cross-version and within-version Agent comparisons remain separate; no resume gain.
+
 ## 2026-10-02 structured relation/rationale verifier (CPU readiness only)
 
 [Implementation/comparison proposal](SCIFACT_RELATION_RATIONALE_VERIFIER_20261002.md)
@@ -20,8 +30,8 @@ These are explicit probe configurations, not a proof that every legal response
 fits or that any scientific label improved. No inference/training/new sampling/
 gold/protected split access; no resume promotion. The unchanged five-call adaptive
 controller still visits at most two documents; the three-document case stays in
-the denominator. A 48-call same-input fixed-top1 v2/v3 proposal awaits separate
-runner/release approval; this package does not authorize it.
+the denominator. The original 48-call proposal was superseded by the later paired
+three-arm preparation linked above; no separate 48-call run is planned or authorized.
 Compact SHA `7e21b603c225374723122763f700f73dacc04f4005cde7784e23e837814cb388`.
 
 ## 2026-10-02 semantic-input isolation and error diagnosis (CPU only)

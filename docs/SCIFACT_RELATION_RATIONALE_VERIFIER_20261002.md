@@ -150,6 +150,11 @@ training occurred. Later documentation commits are not this execution source.
 
 ## Falsifiable same-contract comparison proposal (not run authorization)
 
+**Superseded, not executed:** the coordinator selected one full
+[v2/v3 × three-arm package](SCIFACT_PAIRED_VERIFIER_PREPARATION_20261002.md), 144 slots
+and 480-call total ceiling. Do not run the historical 48-slot proposal below as an
+additional experiment. It is retained only as the decision history.
+
 1. Freeze candidate source/model/tokenizer/prompt/schema/scorer/data identities.
    Use the same consumed 24 claims, the same first visible document per claim and
    the same original frame for both isolated v2 and structured v3. Do not sample
