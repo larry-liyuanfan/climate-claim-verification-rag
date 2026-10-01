@@ -1,17 +1,25 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-The [utility8 tool-value diagnostic draft](docs/SCIFACT_UTILITY8_DRAFT_20261001.md)
-adds a shared-prefix, physically metered A/B/C experiment on eight already
-exposed TRAIN cases. After exact-hash release and non-generating preflight,
-[job 31834687](docs/verified-runs/scifact-utility8-submission-31834687.json) was
-submitted once and is awaiting scheduling. **No model result, training or
-quality gain is claimed**; terminal cost and identity audits remain pending.
+The [utility8 closeout](docs/verified-runs/scifact-utility8-closeout-31834687.json)
+preserves a negative A/B/C diagnostic on eight already exposed TRAIN cases.
+Job 31834687 completed 24/24 valid terminal slots, but strict correctness was
+**0/1/0 of eight**; the single success was an NEI abstention. Scripted read/rerank
+routes did not improve complete-rationale grounding. Actual unique cost was
+24 generator calls / 81,509 input / 3,007 output tokens, not 40 calls after
+double-counting the shared prefix. **This is not autonomous Agent success.**
+
+A [mixed program-artifact bridge and separate trainer entry](docs/SCIFACT_MIXED_TRAINING_BRIDGE_20261001.md)
+now preserve old48/supp49 source records and distinguish NEI47 from five context
+abstentions. Synthetic CPU tests validate the planned **144-claim / 223-row /
+36-update** contract and claim-weighted math. **No real mixed input preparation,
+model load, GPU training or new evaluation has been executed.** Exact-source
+preparation and execution releases remain separate.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
 roster, and tests complete-claim mean updates with the actual cohort size.
-It has no real training entry or accepted real-data roster; the queued utility8
-source and release are unchanged.
+That original seam still has no real-data loader and retains its CPU <=1M
+synthetic-model guard. The separate mixed-input entry does not weaken it.
 
 A [synthetic physical-receipt adapter](docs/SCIFACT_OBSERVATION_RECEIPTS_20261001.md)
 audits utility8 attempt/frame/tool-event lineage and deduplicates shared calls
@@ -21,7 +29,8 @@ targets or evidence of Agent improvement; no real outputs were imported.
 An [annotation-bound terminal candidate seam](docs/SCIFACT_TERMINAL_SUPERVISION_20261001.md)
 now distinguishes official-format NEI from missing positive context, checks full
 OR rationales and preserves captured prompts. It is validated only on synthetic
-annotations; no real NEI47 cohort, training target selection or training is released.
+annotations; the subsequent program-channel NEI47 preparation is reported below.
+No model training is implied.
 
 The [NEI47 CPU preparation implementation](docs/SCIFACT_NEI47_PREPARATION_20261001.md)
 adds a separate **program_capture** channel for the 47 already exposed official

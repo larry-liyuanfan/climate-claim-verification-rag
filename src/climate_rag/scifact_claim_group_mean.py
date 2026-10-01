@@ -115,6 +115,9 @@ def claim_group_mean_update(
         event('backward_started')
         weighted.backward()
         event('backward_completed')
+        # Do not retain a vocabulary-sized previous-row output into the next
+        # forward. Gradients stay accumulated; no allocator flush or extra step.
+        del weighted, loss, logits, inputs, labels, attention
     require(math.isfinite(group_mean), 'nonfinite_group_mean')
     event('clip_started')
     gradient_norm = torch.nn.utils.clip_grad_norm_(parameters, 1.0, norm_type=2.0, error_if_nonfinite=True)
