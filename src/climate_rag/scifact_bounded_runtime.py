@@ -11,6 +11,8 @@ from .local_bounded_scifact_provider import observation_identity
 from .scifact_bounded_agent import SciFactBoundedAgent
 from .scifact_diagnostic_runtime import TraceProvider
 from .scifact_terminal import render_scifact_prompt, to_original_prediction
+from .scifact_utility_contract import UtilityDiagnostic
+from .agent_v3 import Source
 
 ARMS = ("format_repaired", "format_repaired_gap")
 PAIR_PROTOCOL = "scifact-bounded-gap-paired-v1"
@@ -65,10 +67,12 @@ class BoundedTraceProvider(TraceProvider):
 
 def run_bounded_slot(claim_id: int, claim: str, route: str, arm: str,
                      backend: Any, retrieve: Any, rerank: Any, corpus: Any,
-                     persist_raw: Any = None) -> dict[str, Any]:
+                     persist_raw: Any = None, *, diagnostic: UtilityDiagnostic | None = None) -> dict[str, Any]:
     if arm not in ARMS or bool(backend.gap) != (arm == ARMS[1]):
         raise ValueError("arm_backend_mismatch")
     provider = GapProviderAdapter(backend) if backend.gap else backend
+    if diagnostic is not None and backend.gap:
+        raise ValueError("utility_diagnostic_is_base_only_no_gap_or_adapter")
     aliases: dict[str, Any] = {}
     seen: dict[str, str] = {}
 
@@ -83,9 +87,22 @@ def run_bounded_slot(claim_id: int, claim: str, route: str, arm: str,
         return rows
 
     traced = BoundedTraceProvider(provider, aliases)
+    if diagnostic is not None and diagnostic.prefix is not None:
+        p = diagnostic.prefix["payload"]
+        for row in p["sources"]:
+            alias = p["aliases"][row["source_id"]]
+            aliases[alias] = Source(row["source_id"], row["title"], tuple(row["sentences"]))
+            seen[row["source_id"]] = alias
+        frame = p["frame"]
+        traced.visible_attempts.append({"attempt_index": 0, "shared_prefix_reference": True,
+            "visible": [{"alias": sid.split(":")[0], "doc_id": int(v["source_id"]),
+                         "sentence_index": v["sentence_index"], "source_text_sha256": v["source_text_sha256"],
+                         "text_sha256": v["text_sha256"]} for sid, v in frame["visible"].items()],
+            "actual_observation": observation_identity(frame["observation"]),
+            "feedback": frame["observation"]["feedback"]})
     result = SciFactBoundedAgent(
         traced, tracked_retrieve, rerank=rerank, budget=V3Budget(),
-        packing_count=CommonPacking(provider, backend.base.tokenizer)).run(claim, route)
+        packing_count=CommonPacking(provider, backend.base.tokenizer)).run(claim, route, diagnostic=diagnostic)
     result.update(claim_id=claim_id, arm=arm, comparison_protocol=PAIR_PROTOCOL,
                   visible_attempts=traced.visible_attempts)
     if backend.gap:

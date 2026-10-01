@@ -6,6 +6,7 @@ receipt differ. Route policies, actual usage accounting and tools are unchanged.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import time
@@ -24,6 +25,9 @@ from .agent_v3 import (
 )
 from .verification import normalise_claim
 from .scifact_terminal import PROTOCOL, action_schema, parse_action, render_answer
+from .scifact_utility_contract import (
+    PROTOCOL as UTILITY_PROTOCOL, UtilityDiagnostic, identity, seal_prefix, validate_prefix,
+)
 
 
 class SciFactBoundedAgent:
@@ -43,7 +47,8 @@ class SciFactBoundedAgent:
         self.budget, self.clock = budget or V3Budget(), clock
         self.packing_count = packing_count or provider.count_prompt
 
-    def run(self, claim: str, route: str = "adaptive") -> dict[str, Any]:
+    def run(self, claim: str, route: str = "adaptive", *,
+            diagnostic: UtilityDiagnostic | None = None) -> dict[str, Any]:
         if route not in {
             "fixed_retrieval",
             "fixed_rerank",
@@ -69,6 +74,30 @@ class SciFactBoundedAgent:
         reads: set[tuple[str, ...]] = set()
         answer: dict[str, Any] | None = None
         outcome = "generation_budget_exhausted"
+        initial_frame: dict[str, Any] | None = None
+        prefix_emitted = False
+        resumed = diagnostic is not None and diagnostic.prefix is not None
+        if diagnostic is not None and (route != "adaptive" or b != V3Budget()
+                or (diagnostic.prefix is None) != (diagnostic.intervention is None)):
+            raise ValueError("diagnostic_requires_default_adaptive_contract")
+
+        def capture_prefix(decision: dict[str, Any] | None, response: Any) -> None:
+            nonlocal prefix_emitted
+            if (diagnostic is None or resumed or prefix_emitted or len(attempts) != 1
+                    or len(events) != 1 or events[0].get("status") != "completed"):
+                return
+            prefix_emitted = True
+            diagnostic.emit("prefix", seal_prefix({
+                "protocol": UTILITY_PROTOCOL, "claim": claim, "route": route,
+                "budget": b.model_dump(), "elapsed_seconds": self.clock() - start,
+                "sources": [{"source_id": r.source_id, "title": r.title,
+                             "sentences": list(r.sentences), "sha256": r.text_sha256}
+                            for r in sources.values()],
+                "aliases": aliases, "candidates": candidates, "selected": selected,
+                "events": events, "tool_calls": tool_calls, "frame": initial_frame,
+                "attempt": attempts[0], "decision": decision, "response": response,
+                "usage": usage, "read_input_tokens": read_input_tokens,
+            }))
 
         def left() -> float:
             return b.timeout_seconds - (self.clock() - start)
@@ -99,6 +128,7 @@ class SciFactBoundedAgent:
             ids: list[str] | None = None,
             query: str | None = None,
             model_selected: bool = False,
+            scripted: bool = False,
         ) -> None:
             nonlocal candidates, selected, tool_calls, rerank_pairs, rewritten, reranked
             if tool_calls >= b.max_tools or left() <= 0:
@@ -117,6 +147,8 @@ class SciFactBoundedAgent:
                 else None,
             }
             events.append(event)
+            if scripted:
+                event["origin"] = "scripted_intervention"
             if kind in {"retrieve", "rewrite"}:
                 try:
                     rows = list(self.retrieve(query or claim, b.candidate_k))[
@@ -241,7 +273,34 @@ class SciFactBoundedAgent:
             return observation, schema, visible, count
 
         try:
-            tool("retrieve")
+            if resumed:
+                assert diagnostic is not None and diagnostic.prefix is not None
+                prior = validate_prefix(diagnostic.prefix, claim, b)
+                start -= prior["elapsed_seconds"]
+                sources = {r["source_id"]: Source(r["source_id"], r["title"], tuple(r["sentences"]))
+                           for r in prior["sources"]}
+                aliases, candidates, selected = prior["aliases"], prior["candidates"], prior["selected"]
+                events, tool_calls = prior["events"], prior["tool_calls"]
+                events[0]["shared_prefix_reference"] = True
+                original = prior["frame"]
+                obs, schema, visible, count = pack(original["observation"]["allowed_actions"])
+                frame = {"observation": obs, "schema": schema, "visible": visible,
+                         "prompt_tokens": count, "alias_to_source": {v: k for k, v in aliases.items()}}
+                if identity(frame) != identity(original):
+                    raise ValueError("shared_initial_frame_changed")
+                diagnostic.emit("initial_frame", frame)
+                attempts = [copy.deepcopy(prior["attempt"])]
+                attempts[0]["shared_prefix_reference"] = True
+                usage, read_input_tokens = prior["usage"], prior["read_input_tokens"]
+                intervention = diagnostic.intervention
+                assert intervention is not None
+                action = parse_action(intervention, obs["allowed_actions"], visible, candidates, b.context_k)
+                if action["action"] not in {"read", "rerank"}:
+                    raise ValueError("invalid_scripted_intervention")
+                tool(action["action"], action.get("source_ids"), scripted=True)
+                feedback = "tool_completed: inspect current_citable; no semantic conclusion implied"
+            else:
+                tool("retrieve")
             if route == "deterministic_extra":
                 # More retrieval work, not replacement by a lower rank window.
                 extra_query = deterministic_extra_query(claim)
@@ -275,6 +334,14 @@ class SciFactBoundedAgent:
                     if candidates and self.rerank is not None and not reranked:
                         allowed.append("rerank")
                 observation, schema, visible, prompt_tokens = pack(allowed)
+                if diagnostic is not None:
+                    frame = {"observation": observation, "schema": schema, "visible": visible,
+                             "prompt_tokens": prompt_tokens,
+                             "alias_to_source": {v: k for k, v in aliases.items()}}
+                    if not attempts:
+                        initial_frame = copy.deepcopy(frame)
+                        diagnostic.emit("initial_frame", frame)
+                    diagnostic.emit("frame", frame)
                 if left() <= 0:
                     outcome = "deadline_during_prompt_assembly"
                     break
@@ -311,6 +378,7 @@ class SciFactBoundedAgent:
                     ),
                 }
                 attempts.append(record)
+                response = None
                 try:
                     response = self.provider.generate(
                         observation, schema, b.max_output_tokens, left()
@@ -336,6 +404,7 @@ class SciFactBoundedAgent:
                         json.loads(raw), allowed, visible, candidates, b.context_k
                     )
                     record.update(status="valid_decision", action=decision["action"])
+                    capture_prefix(decision, response)
                     feedback = None
                     if decision["action"] == "abstain":
                         outcome = "model_abstention:" + decision["reason"]
@@ -343,6 +412,19 @@ class SciFactBoundedAgent:
                     if decision["action"] == "answer":
                         answer = render_answer(decision, visible)
                         outcome = "ids_validated_semantics_unmeasured"
+                        break
+                    if resumed:
+                        record["proposed_decision"] = decision
+                        error = None
+                        if decision["action"] == "read" and (decision["source_ids"] == selected
+                                or tuple(decision["source_ids"]) in reads):
+                            error = "read_loop"
+                        if decision["action"] == "rewrite" and not valid_search_query(
+                                claim, normalise_claim(decision["query"])):
+                            error = "rewrite_constraint_or_loop"
+                        record.update(proposal_validation="schema_valid", controller_legal=error is None,
+                                      controller_error=error)
+                        outcome = "proposed_not_executed"
                         break
                     if decision["action"] == "rewrite":
                         query = normalise_claim(decision["query"])
@@ -390,6 +472,10 @@ class SciFactBoundedAgent:
                     "provider_response_invalid",
                 }:
                     record["error_code"] = feedback
+                    capture_prefix(None, response)
+                    if resumed:
+                        outcome = "continuation_invalid"
+                        break
                     if repairs >= b.max_repairs:
                         outcome = "validation_repair_exhausted"
                         break
@@ -410,7 +496,8 @@ class SciFactBoundedAgent:
             events.append({"failure_type": type(exc).__name__})
             if attempts and attempts[-1]["status"] in {"pending", "response_received"}:
                 attempts[-1]["status"] = "terminal_failure"
-        return {
+            capture_prefix(None, None)
+        result = {
             "protocol": PROTOCOL,
             "controller_version": "scifact-common-packing-v1",
             "route": route,
@@ -437,3 +524,9 @@ class SciFactBoundedAgent:
             "equal_caps_not_equal_actual_cost": True,
             "unknown_usage_attempts": sum(not a["usage_known"] for a in attempts),
         }
+        if diagnostic is not None:
+            result.update(shared_prefix_attempts=1 if resumed and attempts else 0,
+                          new_model_calls=len(attempts) - (1 if resumed and attempts else 0),
+                          diagnostic_protocol=UTILITY_PROTOCOL,
+                          shared_prefix_sha256=diagnostic.prefix["sha256"] if resumed and diagnostic.prefix else None)
+        return result

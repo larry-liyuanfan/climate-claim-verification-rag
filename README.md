@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [utility8 tool-value diagnostic draft](docs/SCIFACT_UTILITY8_DRAFT_20261001.md)
+adds a shared-prefix, physically metered A/B/C experiment on eight already
+exposed TRAIN cases. It is locally tested infrastructure awaiting exact-hash
+coordinator release, **not a submitted GPU run, trained model or quality gain**.
+
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
 [FIT-only production-state supervision](docs/SCIFACT_FIT_STATE_SUPERVISION_20261001.md)
