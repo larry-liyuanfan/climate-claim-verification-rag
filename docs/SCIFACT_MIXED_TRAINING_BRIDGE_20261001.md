@@ -1,7 +1,8 @@
 # Frozen program-artifact bridge and claim-mean training entry
 
-Status: **real CPU preparation and GPU training accepted; one tune evaluation submitted,
-no new quality conclusion; four-route evaluation not released**.
+Status: **real CPU preparation, GPU training and tune12 physical closeout completed;
+tune shows a precision/coverage trade-off, not independent-test or Agent gain;
+separately released four-route evaluation submitted once as 31871386**.
 [Job 31854794](verified-runs/scifact-mixed-cpu-closeout-31854794.json) prepared
 144/144 claims and 223 rows with 36 planned updates, zero failed/unknown slots.
 Slurm elapsed was 82 s, TotalCPU 69.512 s and batch MaxRSS 621,280 K. Three
@@ -22,6 +23,36 @@ Observed training loss was 0.2840036816, not a quality result. The coordinator
 independently matched every group to the frozen plan and scanned all 144 FP32
 saved tensors / 2,949,120 parameters for finite values. Full PEFT reload/value
 equality remains mandatory inside the actual evaluation allocation.
+
+The subsequent [tune closeout](verified-runs/scifact-mixed-tune-closeout-31865294.json)
+verified that actual reload: all 144 saved LoRA tensors equaled the loaded adapter
+at its runtime dtype. This is not a full-base-parameter comparison or a per-call
+active-state probe. Both arms completed all 12 terminal requests with zero failed,
+unknown-cost or unattempted slots. Hashes of 49 physical files per arm, private raw
+attachments and raw-to-parsed predictions were reconciled without rerunning the
+scorer or opening gold during recovery. Child exit, durable cost and score receipts
+match the frozen source and nanosecond file order; this is not an OS access trace.
+
+| Fixed exposed tune12 diagnostic | Base | Mixed adapter |
+|---|---:|---:|
+| Correct rationalized documents / predicted / relevant | 1 / 41 / 9 | 2 / 3 / 9 |
+| Rationalized-document F1 | 0.040 | 0.333 |
+| Sentence-selection recall | 9/17 | 2/17 |
+| NEI claims with false evidence | 4/4 | 0/4 |
+| Empty-evidence predictions | 0/12 | 9/12 |
+| Input / output tokens | 39,400 / 1,844 | 39,400 / 223 |
+| Sum of call elapsed time, seconds | 55.497 | 10.236 |
+
+Of the adapter's nine empty outputs, four are valid NEI abstentions and five are
+evidence-bearing claims (5/8): less over-citation did not establish overall success.
+Complete alternatives at any position also fell 3 → 2. Claim-verdict accuracy and
+free-text entailment remain unmeasured/null, not zero. Token/elapsed differences
+are this small offline terminal comparison, not online latency or API savings.
+Actual 144-FIT metadata shows zero direct-claim and component overlap with tune12;
+historical reuse still makes tune exposed, not an independent or unseen test.
+No bootstrap significance, automatic validation, checkpoint selection or autonomous
+tool benefit is claimed. `gate.passed=false` is the mixed route's deliberate
+no-promotion rule, not a quality rejection; four-route release remains separate.
 
 `scifact_mixed_checkpoint.py` is an identity adapter, not a second trainer or
 evaluator. It binds the successful child exit, actual three adapter files,
@@ -65,7 +96,14 @@ state was `PENDING(Resources)`; scheduler estimates are not promises. See the
 [submission and preflight receipt](verified-runs/scifact-mixed-tune-submission-31865294.json).
 The same source archive also supplies the original four-route wrapper and a
 metadata-only candidate, without reading gold or running inference. Its exact
-release remains separate and cannot run before tune closeout and authorization.
+release was subsequently authorized after accepted tune closeout, without
+changing any frozen source, wrapper, policy, checkpoint or release bytes.
+[Actual four-route job 31871386](verified-runs/scifact-mixed-four-route-submission-31871386.json)
+was submitted once after preflight and `sbatch --test-only`; simulation 31871238
+is not an actual job. Initial state was `PENDING(Resources)` with no actual start
+estimate. It retains 48 slots / 168 generation calls / 36 reranks / 720 requested
+pairs and does not authorize training, validation12, dev300 or retired test.
+Submission is not completion or autonomous Agent improvement.
 
 ## Utility8 conclusion, not Agent success
 

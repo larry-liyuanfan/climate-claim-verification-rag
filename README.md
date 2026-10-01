@@ -19,12 +19,18 @@ The separately released [training job 31858295](docs/verified-runs/scifact-mixed
 then completed all **144 claims / 223 rows / 36 updates exactly once** in 394 s.
 The final 144 FP32 LoRA tensors passed hash, shape and finite-value checks;
 observed training loss 0.284 is **not retrieval or grounding quality**.
-Mixed checkpoint binding now feeds the existing tune12 and four-route entries;
-only synthetic seam tests have completed. The separately authorized
-[paired tune job 31865294](docs/verified-runs/scifact-mixed-tune-submission-31865294.json)
-is submitted, with exact PEFT tensor reload, physical costs before gold and no
-automatic validation promotion. Submission is not a quality result; the
-four-route candidate is not released. The utility8 negative conclusion above is unchanged.
+The [paired tune job 31865294](docs/verified-runs/scifact-mixed-tune-closeout-31865294.json)
+completed **24/24 valid calls**, with all 144 saved LoRA tensors reloaded and
+physical costs audited before gold. On the same already-exposed 12 TRAIN-internal
+terminal cases, rationalized-document F1 rose **0.040 → 0.333** (only 1 → 2 correct
+documents), while sentence-selection recall fell **9/17 → 2/17**. NEI false-evidence
+cases fell 4/4 → 0/4, but the adapter also returned no evidence for **5/8 evidence-bearing
+claims**. This is a precision/coverage trade-off, not an independent-test or Agent
+gain. No validation promotion follows automatically. After this closeout, the
+coordinator separately released the unchanged four-route candidate; actual job
+[31871386](docs/verified-runs/scifact-mixed-four-route-submission-31871386.json)
+was submitted once and initially `PENDING(Resources)`, not a completed result.
+The utility8 negative result is unchanged.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
