@@ -1,0 +1,97 @@
+{
+  "package_id": "document_evidence_commit_cpu",
+  "protocol": "scifact-evidence-commit-v1-20261002",
+  "assembler": "immutable-verdict-subset-v1",
+  "status": "cpu_ready_pending_exact_release_acceptance_not_model_quality",
+  "source_git": "2ab219bb13564790b004797354dcc89554da2bf6",
+  "source_archive_sha256": "e05642eef2d7348b1439d2a86089c3982ab3c59fd7315b00f5ca7a17509833cf",
+  "source_archive_bytes": 5181440,
+  "actual_wrapper": "evidence-commit.sbatch",
+  "wrapper_sha256": "d30e1a2ebe2cc99630d776f2b9d3d365f1843d37a36a293dc6a0592c1895a815",
+  "release_draft_sha256": "2a9315799d201c07211cbeac3489a5dce4c9cbb148eca0e4263907efc6c3abf9",
+  "authorization": "DRAFT_CPU_READY_NOT_AUTHORIZED",
+  "attempt_id": "evidence-commit-v1",
+  "runtime_observation_sha256": "6153e39d11dbf44b57b311359cf2b5846dcf6a45ef70cd9069f69e4c8c68d455",
+  "initial_inventory_sha256": "0c4b663184acabc0a4b0421f37f92182a5aea2ab414dcad7d3a5840e3b57c028",
+  "comparison": {
+    "track": "previously_exposed_SciFact_TRAIN24",
+    "claims": 24,
+    "planned_slots": 72,
+    "call_caps": {"fixed_top1": 1, "fixed_all": 4, "adaptive": 5},
+    "global_physical_call_cap": 240,
+    "fixed_empty_or_overbound": "unresolved_not_NEI",
+    "shared_verifier_and_assembler": true,
+    "not_equal_actual_compute_or_inspection_breadth": true,
+    "forced_verify_prerequisite_not_spontaneous_tool_demand": true
+  },
+  "review_fixes": [
+    "Physical pre-call receipt binds release, episode and frame, checked by replay audit.",
+    "Runtime and audit enforce the same terminal assembly deadline.",
+    "Actual reservation carries started_unix for the existing slot watchdog.",
+    "Three-arm summary covers top1-only, all-only, adaptive-only and all-zero recovery."
+  ],
+  "validation": {
+    "windows_full_suite": {"passed": 1317, "skipped": 1, "seconds": 240.74, "skip": "existing_POSIX_permission_case"},
+    "linux_ci": {
+      "run_id": 36876570554,
+      "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36876570554",
+      "head_sha": "2ab219bb13564790b004797354dcc89554da2bf6",
+      "conclusion": "success",
+      "passed": 1318,
+      "skipped": 0,
+      "seconds": 103.32
+    },
+    "clean_archive": {
+      "sha256_verified_before_extract": true,
+      "import_path_checked_inside_extraction": true,
+      "passed": 42,
+      "seconds": 46.44,
+      "tests": ["test_scifact_evidence_commit.py", "test_scifact_evidence_commit_entry.py", "test_scifact_document_score_entry.py"],
+      "environment": "existing_pinned_validation_environment_not_fresh_provisioning"
+    },
+    "ruff": "passed",
+    "library_strict_mypy_source_files": 105,
+    "entry_strict_mypy": "six_new_or_changed_entries_passed_with_follow_imports_silent",
+    "legacy_imported_scripts_claimed_type_clean": false,
+    "source_packager_strict_mypy": "passed",
+    "actual_bash_syntax": "passed",
+    "actual_archive_shell_guard": "passed",
+    "tracked_secret_pii_scan": "passed",
+    "prompt_preflight": {
+      "report_sha256": "f478d7a296ae2d8229d42c4b99d2f68c8ba6539e474b5bf79125becf34ae9f86",
+      "claims": 24,
+      "max_input_tokens": 6573,
+      "overflow_claims": 0,
+      "model_calls": 0,
+      "gold_read": false,
+      "feedback": "synthetic_maximum_verdict_and_failure_envelopes_not_predictions"
+    }
+  },
+  "resource_proposal_only": {
+    "gpu": "A100:1",
+    "cpus": 8,
+    "host_ram_gib": 32,
+    "scratch_gib": 30,
+    "slurm_seconds": 2400,
+    "wrapper_timeout_seconds": 2370,
+    "worker_seconds": 1980,
+    "episode_seconds": 120,
+    "input_token_limit": 8192,
+    "output_token_limit": 512,
+    "derivation": "Prior same-model 391 s / 144 calls scaled to 240 calls is ~652 s; 3x allowance plus 420 s setup/scoring fits 40 minutes.",
+    "automatic_retry": false
+  },
+  "temporary_copy_cleanup": {
+    "matched_files": 686,
+    "matched_bytes": 12840070,
+    "manifest_sha256": "28589814848865bc4c5b41c08109421dbba4d9b7f0f4ce4ba9781b63e17ba4b0",
+    "status": "hash_verified_removal_blocked_by_tool_policy_no_files_removed",
+    "remote_originals_unchanged": true
+  },
+  "model_calls": 0,
+  "job_submitted": false,
+  "training": false,
+  "protected_split_read": false,
+  "new_model_quality_measured": false,
+  "current_resume_changed": false
+}

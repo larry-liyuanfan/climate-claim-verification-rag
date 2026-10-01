@@ -122,6 +122,18 @@ legacy script diagnostics suppressed, not misreported as newly type-clean legacy
 code. The source packager's existing strict check, actual Bash syntax check,
 diff check and tracked secret/PII scan passed.
 
+The frozen execution candidate is `2ab219bb13564790b004797354dcc89554da2bf6`.
+Its exact-source [Linux CI](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36876570554)
+completed with **1318 passed**, including the POSIX case skipped on Windows.
+Fresh extraction of the hash-verified source archive imported the extracted
+library (not the editable checkout) and passed **42 targeted tests in 46.44 s**:
+the new core/runtime/entry tests plus the unchanged document scorer entry tests.
+This uses the pinned validation environment; it is a clean-source reproduction,
+not a newly provisioned environment or a scientific model run. Exact package
+hashes and the scope of each check are in the
+[CPU readiness receipt](verified-runs/scifact-evidence-commit-cpu-2ab219b.json).
+Documentation-only closeout commits do not change or repackage this candidate.
+
 ## Proposed resources, still not authorized to submit
 
 One A100, eight CPUs, 32 GiB host memory, 30 GiB scratch, **40 minutes**;
