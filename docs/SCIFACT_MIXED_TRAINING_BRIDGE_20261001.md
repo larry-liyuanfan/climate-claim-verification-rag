@@ -1,8 +1,12 @@
 # Frozen program-artifact bridge and claim-mean training entry
 
-Status: **implementation and synthetic CPU validation only**. No real mixed
-bundle has been prepared, no model loaded, no GPU job submitted and no quality
-gain measured by this package. The earlier CPU NEI47 run is complete, not a
+Status: **real CPU preparation complete; GPU training not released**.
+[Job 31854794](verified-runs/scifact-mixed-cpu-closeout-31854794.json) prepared
+144/144 claims and 223 rows with 36 planned updates, zero failed/unknown slots.
+Slurm elapsed was 82 s, TotalCPU 69.512 s and batch MaxRSS 621,280 K. Three
+physical output hashes and the atomic complete marker were independently
+rechecked. No model was loaded, optimizer stepped or quality gain measured.
+The earlier CPU NEI47 run is complete, not a
 missing-Torch/POSIX failure. Existing Windows Torch 2.7.1+cpu and Linux runtime
 are reused; no dependency or operating-system installation is needed.
 
@@ -60,8 +64,9 @@ preparation. Trainer-side validation does not reopen those source files.
 The subsequent bounded package now implements that producer in
 `scripts/prepare_scifact_mixed_inputs.py`, with the actual
 `hpc/scifact_mixed_prepare_cpu.sbatch` and exact-source packager
-`scripts/package_scifact_mixed_preparation.py`. **It has not been executed on
-real training records**; an interface/test result is not a prepared real bundle.
+`scripts/package_scifact_mixed_preparation.py`. It was subsequently executed
+once on the fixed exposed training sources as job 31854794; source `cb1e7646`
+and the content-free receipt hashes are retained in the closeout above.
 
 The producer reads only fixed metadata, old48/supp49 records, the accepted NEI47
 inventory/47 artifacts and the existing public corpus/tokenizer. Original48 IDs
@@ -90,8 +95,9 @@ wrapper and archive; a generic old-wrapper result is not used as its proof.
 Four new synthetic preparation tests passed in **2.62 s** after the private
 failure-diagnostic addition; Ruff and strict
 Linux-platform mypy passed on the three new source files. No old mathematical
-suite was rerun for this producer addition. Actual CPU execution still requires
-the coordinator's single exact-source release; GPU training is not authorized.
+suite was rerun for this producer addition. The coordinator's subsequent
+single exact-source CPU release completed successfully; GPU training remains
+separate and is not authorized by that CPU completion.
 
 ## Separate real trainer, no execution release
 

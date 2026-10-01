@@ -10,13 +10,13 @@ double-counting the shared prefix. **This is not autonomous Agent success.**
 
 A [mixed program-artifact bridge and separate trainer entry](docs/SCIFACT_MIXED_TRAINING_BRIDGE_20261001.md)
 now preserve old48/supp49 source records and distinguish NEI47 from five context
-abstentions. Synthetic CPU tests validate the planned **144-claim / 223-row /
-36-update** contract and claim-weighted math. **No real mixed input preparation,
-model load, GPU training or new evaluation has been executed.** Exact-source
-preparation and execution releases remain separate. A subsequent thin CPU
-producer now constructs the required files through those raw-byte factories,
-checks physical readback, and passes four small synthetic tests; its real-data
-execution is still pending a separate exact-source release.
+abstentions. [CPU preparation job 31854794](docs/verified-runs/scifact-mixed-cpu-closeout-31854794.json)
+completed **144/144 ready / 223 rows / 36 planned updates**, with no failed or
+unknown claims. Raw-byte factories and physical readback preserve the fixed
+records, token packing and equal claim mass. All three output hashes and the
+atomic completion marker were rechecked; records remain private on Spartan.
+**This is input preparation, not model training, new evaluation or quality gain.**
+Exact-source preparation and GPU execution releases remain separate.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
