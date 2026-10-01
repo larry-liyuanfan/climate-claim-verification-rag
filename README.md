@@ -1,5 +1,13 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+A separate [evidence-commit CPU candidate](docs/SCIFACT_EVIDENCE_COMMIT_20261002.md)
+lets the model select source-bound verifier references; a deterministic assembler
+preserves their labels and original sentence order. The preregistered comparison
+includes fixed-top1, fixed-all and adaptive routes (72 slots, at most 240 physical
+calls). Verification is an interface prerequisite, **not proof of spontaneous
+tool demand**. Implementation/preflight evidence is not a new model-quality result;
+no GPU submission or resume gain is authorized by this candidate.
+
 The [whole-chain-reviewed bounded-decoder confirmation](docs/SCIFACT_DOCUMENT_BOUNDED_CONFIRMATION_20261001.md)
 completed as [job 31930176](docs/verified-runs/scifact-document-bounded-closeout-31930176.json)
 in 391 s: **all 25 prior structural rejections were removed**, but strict positive

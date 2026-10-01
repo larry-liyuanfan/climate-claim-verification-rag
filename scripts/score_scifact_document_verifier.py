@@ -23,9 +23,9 @@ from prepare_scifact_utility8 import ARCHIVE, ARCHIVE_SHA, PREP, TRAIN_SHA
 from run_scifact_grounding_train_operator import ROOT, require, sha
 
 
-def arm_costs_before_gold(ledger: Path, ids: list[int]) -> tuple[dict[str, Any], dict[str, Any]]:
-    groups: dict[str, list[str]] = {arm: [] for arm in (*ARMS, "unassigned")}
-    slots = {f"{i}-{arm}": arm for i in ids for arm in ARMS}
+def arm_costs_before_gold(ledger: Path, ids: list[int], arms: tuple[str, ...] = ARMS) -> tuple[dict[str, Any], dict[str, Any]]:
+    groups: dict[str, list[str]] = {arm: [] for arm in (*arms, "unassigned")}
+    slots = {f"{i}-{arm}": arm for i in ids for arm in arms}
     for path in ledger.glob("g*.reserved.json"):
         key = path.name.removesuffix(".reserved.json")
         try:
@@ -50,13 +50,14 @@ def arm_costs_before_gold(ledger: Path, ids: list[int]) -> tuple[dict[str, Any],
                 unknown += 1
         result[arm] = {**ledger_cost(ledger, keys), "model_backend_elapsed_ms": None if unknown else elapsed,
                        "backend_elapsed_known_lower_bound_ms": elapsed, "unknown_backend_timing_attempts": unknown}
-    return {arm: result[arm] for arm in ARMS}, result["unassigned"]
+    return {arm: result[arm] for arm in arms}, result["unassigned"]
 
 
-def summarize(ids: list[int], golds: list[Any], rows: Any, corpus: Any) -> dict[str, Any]:
+def summarize(ids: list[int], golds: list[Any], rows: Any, corpus: Any,
+              arms: tuple[str, ...] = ARMS, baseline_arm: str = "fixed") -> dict[str, Any]:
     require([g.claim_id for g in golds] == ids, "ordered_all_claims")
     report: dict[str, Any] = {"arms": {}}
-    for arm in ARMS:
+    for arm in arms:
         predictions, cases = [], []
         for gold in golds:
             row = rows[gold.claim_id, arm]
@@ -77,7 +78,7 @@ def summarize(ids: list[int], golds: list[Any], rows: Any, corpus: Any) -> dict[
             "nei_correct": sum(not c["positive"] and c["strict_whole_answer"] for c in cases),
             "unresolved": sum(c["state"] != "valid_terminal" for c in cases),
             "official_micro": score_original(golds, predictions)}
-    fixed, adaptive = report["arms"]["fixed"], report["arms"]["adaptive"]
+    fixed, adaptive = report["arms"][baseline_arm], report["arms"]["adaptive"]
     if fixed["positive_correct"] == adaptive["positive_correct"] == 0:
         report["hypothesis"] = "not_supported_positive_grounding_remains_zero"
     elif fixed["positive_correct"] == 0:
@@ -85,11 +86,23 @@ def summarize(ids: list[int], golds: list[Any], rows: Any, corpus: Any) -> dict[
     else:
         report["hypothesis"] = "fixed_verifier_positive_recovery_observed_agent_gain_requires_case_audit"
     report["adaptive_minus_fixed_positive_correct"] = adaptive["positive_correct"] - fixed["positive_correct"]
+    if arms == ("fixed_top1", "fixed_all", "adaptive"):
+        counts = {a: report["arms"][a]["positive_correct"] for a in arms}
+        recovered = [a for a in arms if counts[a] > 0]
+        report["positive_recovered_arms"] = recovered
+        report["fixed_baseline_arm"] = baseline_arm
+        report["adaptive_minus_fixed_positive_correct_by_arm"] = {
+            a: counts["adaptive"] - counts[a] for a in ("fixed_top1", "fixed_all")}
+        report["hypothesis"] = ("not_supported_positive_grounding_remains_zero" if not recovered else
+            "positive_recovery_observed_in_named_arms_requires_trajectory_and_both_baselines_not_automatic_Agent_gain")
     report["limits"] = "Previously consumed TRAIN24 diagnostic; not independent test, SFT evidence or causal Agent proof."
     return report
 
 
-def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path = ROOT) -> dict[str, Any]:
+def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path = ROOT, *,
+                     protocol: str = PROTOCOL, arms: tuple[str, ...] = ARMS,
+                     audit_fn: Any = None, baseline_arm: str = "fixed",
+                     comparison_limits: dict[str, Any] | None = None) -> dict[str, Any]:
     proof = json.loads((output / "worker-exit.json").read_bytes())
     require(proof["child_reaped"] is True, "exit_before_cost_and_gold")
     selection = json.loads(checked(output / "prepared/selection.json", SELECTION_SHA))
@@ -97,16 +110,18 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     require(len(ids) == len(set(ids)) == 24, "all_24_fixed")
     inference = output / "inference"
     cost = ledger_cost(inference / "ledger")
-    arm_costs, unassigned = arm_costs_before_gold(inference / "ledger", ids)
-    missing = sum(not (inference / f"{i}-{a}/result.json").exists() for i in ids for a in ARMS)
-    ordered_write(output / "cost-before-gold.json", {"protocol": PROTOCOL, "planned_slots": 48,
+    arm_costs, unassigned = arm_costs_before_gold(inference / "ledger", ids, arms)
+    missing = sum(not (inference / f"{i}-{a}/result.json").exists() for i in ids for a in arms)
+    planned_slots = len(ids) * len(arms)
+    audit_call = audit_episode if audit_fn is None else audit_fn
+    ordered_write(output / "cost-before-gold.json", {"protocol": protocol, "planned_slots": planned_slots,
         "physical_generation_cost": cost, "missing_episodes": missing, "gold_read": False,
         "arm_physical_generation_cost": arm_costs,
         "unassigned_physical_generation_cost": unassigned,
         "exit_proof_sha256": sha(output / "worker-exit.json"),
         "initial_retrieval_cost": "historical frozen artifacts replayed, not newly timed online retrieval"})
     def no_quality(reason: str) -> dict[str, Any]:
-        report = {"protocol": PROTOCOL, "status": "no_quality", "reason": reason, "planned_slots": 48,
+        report = {"protocol": protocol, "status": "no_quality", "reason": reason, "planned_slots": planned_slots,
                   "gold_read": False, "cost_sha256": sha(output / "cost-before-gold.json")}
         ordered_write(output / "no-quality.json", report)
         return report
@@ -124,11 +139,11 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
         require(json.loads((inference / "initial-frames.json").read_bytes()) == frames, "input_copy_changed")
         rows = {}
         for i, frame in zip(ids, frames, strict=True):
-            for arm in ARMS:
+            for arm in arms:
                 directory = inference / f"{i}-{arm}"
                 row = json.loads((directory / "result.json").read_bytes())
                 require(row["claim_id"] == i and row["arm"] == arm, "slot_identity")
-                rows[i, arm] = audit_episode(row, frame, inference / "ledger", directory / "private-responses", tokenizer, corpus)
+                rows[i, arm] = audit_call(row, frame, inference / "ledger", directory / "private-responses", tokenizer, corpus)
         require(sum(r["physical_calls"] for r in rows.values()) == cost["unique_physical_calls"], "no_unassigned_calls")
     except (ValueError, KeyError, OSError, TypeError, RuntimeError, ImportError):
         return no_quality("physical_or_feedback_identity_failed")
@@ -136,10 +151,12 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     with tarfile.open(root / "envs" / ARCHIVE) as bundle:
         with member(bundle, PREP + "/gold/claims_train.jsonl") as stream:
             gold = select_complete_fit(stream, TRAIN_SHA, ids, corpus)
-    report = {"protocol": PROTOCOL, "status": "scored", "selection_sha256": SELECTION_SHA,
+    report = {"protocol": protocol, "status": "scored", "selection_sha256": SELECTION_SHA,
         "scoring_train_member_sha256": TRAIN_SHA, "cost_sha256": sha(output / "cost-before-gold.json"),
-        **summarize(ids, list(gold.values()), rows, corpus), "arm_physical_generation_cost": arm_costs,
+        **summarize(ids, list(gold.values()), rows, corpus, arms, baseline_arm), "arm_physical_generation_cost": arm_costs,
         "generation_time_note": "ledger elapsed includes prompt/journal/decoding; not end-to-end online SLA",
         "training_authorized": False}
+    if comparison_limits is not None:
+        report["comparison_limits"] = comparison_limits
     ordered_write(output / "quality.json", report)
     return report
