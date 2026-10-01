@@ -25,6 +25,8 @@ warmup, retry, repair, downloads or seed search. Stage1 failure skips stage2.
 Overflow fails explicitly without repacking/removing sentences. EOS at token512,
 no EOS at the cap, and truncated private files are different states. Per-stage
 reservation/response costs survive later failures; unknown cost is not zero.
+Cost comparison uses old one-call versus new two-call generation tokens/time;
+old end-to-end latency includes retrieval/rerank and is not a matched comparator.
 One isolated worker has a 120s stage watchdog and a total bound; it is reaped
 before durable costs, and only then can a separate scorer load gold. Failures
 remain in the twelve-question denominator and cannot count as successful NEI.

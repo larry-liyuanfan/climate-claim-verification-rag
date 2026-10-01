@@ -157,10 +157,16 @@ def score(args: Any) -> dict[str, Any]:
         for g, r, p, c in zip(gold, rows, predicted, control, strict=True)]
     old_score = json.loads((CONTROL / 'score.json').read_bytes())['quality']['routes']['fixed_rerank']
     require(score_original(gold, control) == old_score['official_point_score'], 'old_control_not_rerun_or_changed')
+    control_generations = [a for r in control_rows for a in r['result']['generation_attempts']]
     return {'scope': 'old12_exposed_TRAIN_not_independent_test_not_gate', 'claims': 12,
         'cost_before_quality_sha256': sha(cost_path.read_bytes()), 'costs': costs,
         'status_counts': dict(Counter(r['status'] for r in rows)), 'paired_private_diagnostics': pairs,
         'new_point_score': score_original(gold, predicted), 'old_control': old_score,
+        'generation_only_cost_comparison': {
+            'old_direct_calls': tariff(control_generations), 'new_note_plus_terminal_calls': costs['costs'],
+            'shared_retrieval_rerank': 'reused_frame_not_remeasured',
+            'old_whole_question_latency_not_comparable_to_new_generation_only': True,
+            'model_loading_excluded_from_generation_times': True},
         'old_strict_correct': sum(p['old_strict_correct'] for p in pairs),
         'new_strict_correct': sum(p['new_strict_correct'] for p in pairs),
         'recovered': sum(not p['old_strict_correct'] and p['new_strict_correct'] for p in pairs),
