@@ -5,10 +5,10 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, cast
 
 from climate_rag.scifact_evidence_bottleneck import BottleneckJournal, BottleneckProvider, PROTOCOL, ROUTES, run_case
-from climate_rag.scifact_generation import GenerationBinding, frozen_contract
+from climate_rag.scifact_generation import GenerationBinding
 from climate_rag.scifact_grounding import parse_abstract
 from climate_rag.scifact_natural_contract import require
 from climate_rag.scifact_read_continuation import ordered_write
@@ -46,12 +46,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release", type=Path, required=True)
     parser.add_argument("--release-sha", required=True)
+    parser.add_argument("--runtime-paths", type=Path)
+    parser.add_argument("--model-dir", type=Path)
     args = parser.parse_args()
     release = json.loads(checked(args.release, args.release_sha))
-    require(release["protocol"] == PROTOCOL and release["status"] == "authorized_model_run"
-            and release["model_execution_authorized"] is True
-            and release["scope"] == adapter.SCOPE and release["generation_contract"] == frozen_contract()
-            and release["model_sha256"] == MODEL_SHA, "new_exact_source_authorization_required")
+    from scifact_bottleneck_execution import validate_release, check_paths
+    validate_release(release)
+    require(args.runtime_paths is not None and args.model_dir is not None, "supervised_runtime_paths_required")
+    check_paths(release, args.release_sha, args.runtime_paths, args.model_dir)
     require(os.name == "posix" and bool(os.environ.get("SLURM_JOB_ID"))
             and bool(os.environ.get("CUDA_VISIBLE_DEVICES")), "allocated_gpu_required")
     source = Path(__file__).resolve().parents[1]
@@ -60,8 +62,8 @@ def main() -> None:
     _, claims = adapter.check_prepared(prepared, release)
     corpus = {d.doc_id: d for d in (parse_abstract(json.loads(r)) for r in
         checked(prepared / "inference/corpus.jsonl", CORPUS_SHA).splitlines())}
-    model = Path(release["model_directory"])
-    manifest = verify_manifest(model.parent / "model_manifest.json", model, MODEL_SHA)
+    model = args.model_dir
+    manifest = cast(Callable[..., Any], verify_manifest)(model.parent / "model_manifest.json", model, MODEL_SHA)
     for name, digest in TOKENIZER_SHA.items():
         checked(model / name, digest)
     output = Path(release["output"])

@@ -1,5 +1,17 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 evidence bottleneck supervised execution preparation
+
+[Execution entry and reproduction](SCIFACT_BOTTLENECK_EXECUTION_20261002.md)
+adds the parent/runner/exit/scorer/compact connection without changing A/B/C,
+input, decoding, cost or scoring contracts. Fixed 72 planned slots and physical
+cost survive preparation, model-load, worker and scorer failures. The model
+path is bound to actual scratch extraction rather than a rewritten release.
+Only synthetic CPU/CI validation and metadata packaging are authorized here;
+no cluster submission, model weight loading, real gold or new quality result.
+The prior tokenizer receipt is reused only after component/probe equality checks;
+31996384 remains the same historical failed job, not a rerun.
+
 ## 2026-10-02 evidence bottleneck CPU implementation
 
 [Frozen mechanism and reproduction](SCIFACT_EVIDENCE_BOTTLENECK_CPU_20261002.md):

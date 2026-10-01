@@ -149,3 +149,68 @@ def export_compact(reports: Path, target: Path) -> dict[str, Any]:
     require(not target.exists(), "exclusive_export")
     ordered_write(target, compact)
     return compact
+
+
+def load_original_gold(ids: Any, corpus: Any, reports: Path) -> Any:
+    """Invoked by the original scorer only after its complete audit barrier."""
+    import tarfile
+    from climate_rag.scifact_fit_selection import select_complete_fit
+    from prepare_scifact_state_supervision import member
+    from prepare_scifact_utility8 import ARCHIVE, ARCHIVE_SHA, PREP, TRAIN_SHA
+    from run_scifact_grounding_train_operator import ROOT, sha
+    # Durable marker is before archive reads; timeout never means gold-unread.
+    ordered_write(reports / "gold-read-started.json", {"stage": "after_complete_physical_audit"})
+    require(sha(ROOT / "envs" / ARCHIVE) == ARCHIVE_SHA, "original_train_archive")
+    with tarfile.open(ROOT / "envs" / ARCHIVE) as bundle:
+        with member(bundle, PREP + "/gold/claims_train.jsonl") as stream:
+            gold = select_complete_fit(stream, TRAIN_SHA, ids, corpus)
+    return [gold[i] for i in ids]
+
+
+def score_cli(release: Any, release_path: Path, release_sha: str, binding: Path, model: Path) -> Any:
+    from climate_rag.scifact_grounding import parse_abstract
+    from climate_rag.scifact_semantic_contract import CORPUS_SHA, TOKENIZER_SHA
+    from scifact_bottleneck_execution import verify_exit, failure_report
+    import scifact_evidence_input as adapter
+    reports, output = Path(release["reports"]), Path(release["output"])
+    require(not reports.exists(), "exclusive_score_directory")
+    try:
+        verify_exit(release, release_sha, binding, model)
+        # Tokenizer/config only. The scorer never constructs a model.
+        for name, digest in TOKENIZER_SHA.items():
+            checked(model / name, digest)
+        import transformers
+        tokenizer = getattr(transformers, "AutoTokenizer").from_pretrained(model, local_files_only=True)
+        prepared = Path(release["prepared"])
+        _, claims = adapter.check_prepared(prepared, release)
+        corpus = {d.doc_id: d for d in (parse_abstract(json.loads(r)) for r in
+            checked(prepared / "inference/corpus.jsonl", CORPUS_SHA).splitlines())}
+        frames = adapter.load_frames(prepared, claims, corpus, tokenizer, release)
+    except (ValueError, OSError, KeyError, TypeError, ImportError, RuntimeError) as exc:
+        reports.mkdir(mode=0o700)
+        result = dict(failure_report(release, type(exc).__name__), release_sha256=release_sha)
+        ordered_write(reports / "no-quality.json", result)
+        return result
+    result = score_after_exit(output, release_path, release_sha, frames, tokenizer, corpus,
+        lambda ids: load_original_gold(ids, corpus, reports), reports=reports)
+    if result["status"] == "scored":
+        export_compact(reports, reports / "compact.json")
+    return result
+
+
+def main() -> None:
+    import argparse
+    from scifact_bottleneck_execution import load_release
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--release", type=Path, required=True)
+    parser.add_argument("--release-sha", required=True)
+    parser.add_argument("--runtime-paths", type=Path, required=True)
+    parser.add_argument("--model-dir", type=Path, required=True)
+    args = parser.parse_args()
+    release = load_release(args.release, args.release_sha)
+    result = score_cli(release, args.release, args.release_sha, args.runtime_paths, args.model_dir)
+    raise SystemExit(0 if result["status"] == "scored" else 2)
+
+
+if __name__ == "__main__":
+    main()

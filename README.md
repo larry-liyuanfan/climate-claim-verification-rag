@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [supervised bottleneck execution entry](docs/SCIFACT_BOTTLENECK_EXECUTION_20261002.md)
+connects the unchanged A/B/C runner to scratch-bound model paths, bounded POSIX
+exit/reap, post-audit scoring and compact export. This is synthetic execution
+verification and an **unauthorized release candidate**, not a new model run.
+
 The new [evidence-bottleneck CPU package](docs/SCIFACT_EVIDENCE_BOTTLENECK_CPU_20261002.md)
 separates evidence-first field order from actual label-input masking. B/C share
 one immutable sentence selection, differing only in full-document visibility;
