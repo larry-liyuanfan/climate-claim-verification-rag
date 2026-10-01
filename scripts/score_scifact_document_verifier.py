@@ -103,7 +103,15 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
                      protocol: str = PROTOCOL, arms: tuple[str, ...] = ARMS,
                      audit_fn: Any = None, baseline_arm: str = "fixed",
                      comparison_limits: dict[str, Any] | None = None,
-                     input_adapter: Any = None) -> dict[str, Any]:
+                     input_adapter: Any = None,
+                     report_directory: Path | None = None) -> dict[str, Any]:
+    reports = output
+    if report_directory is not None:
+        reports = report_directory.resolve()
+        original = output.resolve()
+        require(not reports.is_relative_to(original) and not original.is_relative_to(reports),
+                "replay_reports_must_be_disjoint")
+        reports.mkdir(parents=True, exist_ok=False)
     proof = json.loads((output / "worker-exit.json").read_bytes())
     require(proof["child_reaped"] is True, "exit_before_cost_and_gold")
     inference = output / "inference"
@@ -135,7 +143,7 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     if not ids:
         missing = planned_slots
     audit_call = audit_episode if audit_fn is None else audit_fn
-    ordered_write(output / "cost-before-gold.json", {"protocol": protocol, "planned_slots": planned_slots,
+    ordered_write(reports / "cost-before-gold.json", {"protocol": protocol, "planned_slots": planned_slots,
         "physical_generation_cost": cost, "missing_episodes": missing, "gold_read": False,
         "arm_physical_generation_cost": arm_costs,
         "unassigned_physical_generation_cost": unassigned,
@@ -143,8 +151,8 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
         "initial_retrieval_cost": preparation_cost})
     def no_quality(reason: str) -> dict[str, Any]:
         report = {"protocol": protocol, "status": "no_quality", "reason": reason, "planned_slots": planned_slots,
-                  "gold_read": False, "cost_sha256": sha(output / "cost-before-gold.json")}
-        ordered_write(output / "no-quality.json", report)
+                  "gold_read": False, "cost_sha256": sha(reports / "cost-before-gold.json")}
+        ordered_write(reports / "no-quality.json", report)
         return report
     if input_failed:
         return no_quality("prospective_input_binding_failed_cost_preserved")
@@ -177,7 +185,7 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
         with member(bundle, PREP + "/gold/claims_train.jsonl") as stream:
             gold = select_complete_fit(stream, TRAIN_SHA, ids, corpus)
     report = {"protocol": protocol, "status": "scored", "selection_sha256": selected_sha,
-        "scoring_train_member_sha256": TRAIN_SHA, "cost_sha256": sha(output / "cost-before-gold.json"),
+        "scoring_train_member_sha256": TRAIN_SHA, "cost_sha256": sha(reports / "cost-before-gold.json"),
         **summarize(ids, list(gold.values()), rows, corpus, arms, baseline_arm), "arm_physical_generation_cost": arm_costs,
         "generation_time_note": "ledger elapsed includes prompt/journal/decoding; not end-to-end online SLA",
         "training_authorized": False}
@@ -186,5 +194,5 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     if input_adapter is not None:
         report["limits"] = release["input_scope"]
         report["initial_retrieval_cost"] = preparation_cost
-    ordered_write(output / "quality.json", report)
+    ordered_write(reports / "quality.json", report)
     return report

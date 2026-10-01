@@ -59,8 +59,10 @@ def test_three_arm_gate_cost_before_any_audit_or_gold(tmp_path, monkeypatch, fau
     assert not (tmp_path/"quality.json").exists()
 
 
-def test_72_actual_journal_slots_reassembled_before_synthetic_gold(tmp_path, monkeypatch):
+@pytest.mark.parametrize("replay", [False, True])
+def test_72_actual_journal_slots_reassembled_before_synthetic_gold(tmp_path, monkeypatch, replay):
     output = tmp_path/"run"
+    reports = tmp_path/"replay" if replay else output
     ids = setup(output, monkeypatch)
     frame, corpus = inputs(5)
     frames = [copy.deepcopy(frame) for _ in ids]
@@ -101,7 +103,7 @@ def test_72_actual_journal_slots_reassembled_before_synthetic_gold(tmp_path, mon
     seen = []
     original_audit, original_open = scoring.audit_episode, tarfile.open
     def physical_audit(row, *args, **kwargs):
-        assert (output/"cost-before-gold.json").is_file()
+        assert (reports/"cost-before-gold.json").is_file()
         seen.append((row["claim_id"], row["arm"]))
         return original_audit(row, *args, **kwargs)
     def after_audit(path, *args, **kwargs):
@@ -109,12 +111,43 @@ def test_72_actual_journal_slots_reassembled_before_synthetic_gold(tmp_path, mon
         return original_open(path, *args, **kwargs)
     monkeypatch.setattr(scoring, "audit_episode", physical_audit)
     monkeypatch.setattr(shared.tarfile, "open", after_audit)
+    if replay:
+        ordered_write(output/"no-quality.json", {"status":"no_quality", "gold_read":False})
+    before = {p.relative_to(output): sha(p) for p in output.rglob("*") if p.is_file()}
     report = scoring.score_after_exit(output, lambda: backend.base.tokenizer,
-                                     {"initial_inventory_sha256":"synthetic"}, root, release_sha=RUN)
+                                     {"initial_inventory_sha256":"synthetic"}, root, release_sha=RUN,
+                                     report_directory=reports if replay else None)
     assert report["status"] == "scored" and len(seen) == 72
     assert [report["arms"][a]["positive_correct"] for a in ARMS] == [24,24,24]
     assert [report["arm_physical_generation_cost"][a]["unique_physical_calls"] for a in ARMS] == [24,96,72]
     assert report["comparison_limits"]["no_automatic_agent_gain"] is True
+    if replay:
+        assert before == {p.relative_to(output): sha(p) for p in output.rglob("*") if p.is_file()}
+        assert (reports/"quality.json").is_file() and not (output/"quality.json").exists()
+        with pytest.raises(FileExistsError):
+            scoring.score_after_exit(output, lambda: backend.base.tokenizer,
+                                     {}, root, release_sha=RUN, report_directory=reports)
+
+
+@pytest.mark.parametrize("relative", [".", "run", "run/replay"])
+def test_replay_reports_cannot_overlap_original(tmp_path, monkeypatch, relative):
+    output = tmp_path/"run"
+    setup(output, monkeypatch)
+    with pytest.raises(ValueError, match="replay_reports_must_be_disjoint"):
+        scoring.score_after_exit(output, lambda: None, {}, release_sha=RUN,
+                                 report_directory=tmp_path/relative)
+
+
+def test_replay_no_quality_preserves_original(tmp_path, monkeypatch):
+    output, reports = tmp_path/"run", tmp_path/"reports"
+    setup(output, monkeypatch)
+    ordered_write(output/"no-quality.json", {"status":"original_failure"})
+    before = {p.relative_to(output): sha(p) for p in output.rglob("*") if p.is_file()}
+    report = scoring.score_after_exit(output, lambda: pytest.fail("no tokenizer allowed"), {},
+                                     release_sha=RUN, report_directory=reports)
+    assert report["status"] == "no_quality" and not report["gold_read"]
+    assert (reports/"no-quality.json").is_file()
+    assert before == {p.relative_to(output): sha(p) for p in output.rglob("*") if p.is_file()}
 
 
 def test_cpu_candidate_release_scope_is_not_gpu_authorization(tmp_path, monkeypatch):

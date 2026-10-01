@@ -200,7 +200,7 @@ def test_comparison_axes_and_micro_not_mean_per_case():
         pair.compare_quality([old,new])
 
 
-def bound_provider(tmp_path, monkeypatch, actions):
+def bound_provider(tmp_path, monkeypatch, actions, *, contract=None):
     provider, calls, _ = real_provider(tmp_path, [])
     provider.__class__ = EvidenceCommitProvider
     provider.base._torch = torch
@@ -208,7 +208,8 @@ def bound_provider(tmp_path, monkeypatch, actions):
     provider.tokenizer_data.eos_token_id = 151645
     provider.base.model.generation_config = GenerationConfig.from_dict(copy.deepcopy(FILE_DEFAULTS))
     monkeypatch.setattr("climate_rag.scifact_generation.checked", lambda *args: b"synthetic_fixture")
-    provider.generation_binding = GenerationBinding(provider.base, tmp_path, frozen_contract())
+    provider.generation_binding = GenerationBinding(
+        provider.base, tmp_path, frozen_contract() if contract is None else contract)
     old_decode = provider.base.tokenizer.decode
     provider.base.tokenizer.decode = lambda ids, **kw: old_decode([i for i in ids if int(i) != 151645], **kw)
     iterator = iter(actions)
@@ -264,6 +265,58 @@ def test_real_journal_effective_config_seed_lmfe_and_tamper(tmp_path, monkeypatc
     changed_diagnostics["effective_parser_config"] = changed["effective_parser_config"]
     with pytest.raises(ValueError):
         audit_generation(changed,request,changed_diagnostics,parser_config)
+
+
+@pytest.mark.parametrize("protocol", pair.VERSIONS)
+def test_released_numeric_serialization_full_disk_audit(tmp_path, monkeypatch, protocol):
+    from climate_rag.scifact_evidence_commit_runtime import run_episode
+    from climate_rag.scifact_generation import expected_parser_config
+    from climate_rag.scifact_relation_verifier import QUALIFIERS
+    from climate_rag.scifact_utility_contract import identity
+
+    contract = copy.deepcopy(frozen_contract())
+    for key, value in contract["expanded_model_defaults"].items():
+        if type(value) is float and value.is_integer():
+            contract["expanded_model_defaults"][key] = int(value)
+    assert contract == frozen_contract()
+    assert identity(contract) != identity(frozen_contract())
+    action = verdict()
+    if protocol == pair.VERSIONS[1]:
+        action = {"source_id": "c7", "relation": "SUPPORTS",
+                  "qualifiers": {k: "aligned" for k in QUALIFIERS},
+                  "direct_sentence_ids": action["sentence_ids"],
+                  "background_sentence_ids": [], "minimal_sentence_ids": action["sentence_ids"],
+                  "uncertainty": "none"}
+    provider, calls = bound_provider(tmp_path, monkeypatch, [action], contract=contract)
+    frame, corpus = inputs(2)
+    journal = CommitJournal(provider, tmp_path/"ledger", run_identity=RUN,
+                            protocol=protocol, physical_guard=base_state)
+    run_episode(1, "fixed_top1", frame, journal, corpus, tmp_path/"episode", run_identity=RUN)
+    row = json.loads((tmp_path/"episode/result.json").read_bytes())
+    assert row["state"] == "valid_terminal" and len(calls) == 1
+    # Derive the trusted parser contract from provider tokenizer data, never
+    # from the response's self-reported diagnostics. No model weights involved.
+    monkeypatch.setattr("lmformatenforcer.integrations.transformers.build_token_enforcer_tokenizer_data",
+                        lambda tokenizer, use_bitmask: provider.tokenizer_data)
+    parser_config = expected_parser_config(provider.base.tokenizer)
+    request = json.loads((journal.directory/"g00.reserved.json").read_bytes())
+    saved = json.loads((journal.directory/"g00.generation.json").read_bytes())
+    diagnostics = json.loads((journal.directory/"g00.finished.json").read_bytes())["response"]["diagnostics"]
+    with pytest.raises(ValueError, match="paired_effective_generation_binding"):
+        audit_generation(saved, request, diagnostics, parser_config)
+    assert audit_episode(row, frame, journal.directory, tmp_path/"episode/private-responses",
+                         provider.base.tokenizer, corpus, run_identity=RUN, protocol=protocol,
+                         generation_contract=contract) == row
+    changed = copy.deepcopy(saved)
+    changed["contract"] = frozen_contract()
+    changed["contract_sha256"] = identity(changed["contract"])
+    with pytest.raises(ValueError, match="paired_effective_generation_binding"):
+        audit_generation(changed, request, dict(diagnostics, generation_binding=changed),
+                         parser_config, trusted_contract=contract)
+    invalid_contract = copy.deepcopy(contract)
+    invalid_contract["overrides"]["max_new_tokens"] = 1024
+    with pytest.raises(ValueError, match="paired_unknown_generation_contract"):
+        audit_generation(saved, request, diagnostics, parser_config, trusted_contract=invalid_contract)
 
 
 @pytest.mark.parametrize("where", ["decoder", "tokenizer", "deadline"])

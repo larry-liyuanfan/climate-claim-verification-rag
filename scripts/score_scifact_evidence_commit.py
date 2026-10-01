@@ -13,7 +13,7 @@ import scifact_evidence_input as inputs
 
 
 def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path = ROOT, *,
-                     release_sha: str) -> dict[str, Any]:
+                     release_sha: str, report_directory: Path | None = None) -> dict[str, Any]:
     # Scope includes the exact release identity, not a client-supplied saved ref.
     from run_scifact_grounding_train_operator import sha
     import json
@@ -25,6 +25,7 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     protocol = release.get("protocol", PROTOCOL)
     return score_original_entry(output, load_tokenizer, release, root,
         protocol=protocol, arms=ARMS,
+        report_directory=report_directory,
         input_adapter=inputs if inputs.prospective(release) else None,
         audit_fn=partial(audit_episode, run_identity=release_sha, protocol=protocol,
                          generation_contract=release.get("generation_contract")), baseline_arm="fixed_all",
@@ -47,13 +48,16 @@ def main() -> None:
     parser.add_argument("--release", type=Path, required=True)
     parser.add_argument("--release-sha", required=True)
     parser.add_argument("--model-dir", type=Path, required=True)
+    parser.add_argument("--report-directory", type=Path,
+                        help="New disjoint directory for CPU replay; original run remains read-only")
     args = parser.parse_args()
     release = json.loads(checked(args.release, args.release_sha))
     validate_release(release)
     def tokenizer() -> Any:
         from transformers import AutoTokenizer
         return AutoTokenizer.from_pretrained(args.model_dir, local_files_only=True)
-    result = score_after_exit(output_path(release), tokenizer, release, release_sha=args.release_sha)
+    result = score_after_exit(output_path(release), tokenizer, release, release_sha=args.release_sha,
+                              report_directory=args.report_directory)
     raise SystemExit(0 if result["status"] == "scored" else 2)
 
 

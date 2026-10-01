@@ -147,13 +147,23 @@ def expected_parser_config(tokenizer: Any) -> dict[str, Any]:
             "max_consecutive_whitespaces": 12, "force_json_field_order": False, "max_json_array_length": 20}
 
 
-def audit_generation(row: Any, request: Any, diagnostics: Any, parser_config: Any) -> None:
+def audit_generation(row: Any, request: Any, diagnostics: Any, parser_config: Any, *,
+                     trusted_contract: Any = None) -> None:
     """Verify the recorded config without loading any weights or changing scores."""
+    expected_contract = frozen_contract() if trusted_contract is None else trusted_contract
+    if expected_contract != frozen_contract():
+        raise ValueError("paired_unknown_generation_contract")
     defaults = expected_defaults()
     overrides = dict(CONTRACT["overrides"], max_time=row["overrides"]["max_time"],
                      max_length=row["input_tokens"] + 512)
     expected = dict(defaults, **overrides, _from_model_config=False)
-    if (row["contract"] != frozen_contract() or row["contract_sha256"] != identity(frozen_contract())
+    # The coordinator's release is the byte-identity authority. JSON writers may
+    # serialize 1.0 as 1 without changing the validated configuration. Keep the
+    # exact released representation; do not replace it with a rebuilt object's
+    # hash, or normalize physical prompts/model-default receipts globally.
+    if (row["contract"] != expected_contract
+            or row["contract_sha256"] != identity(expected_contract)
+            or identity(row["contract"]) != identity(expected_contract)
             or row["loaded_model_defaults"] != defaults
             or row["loaded_model_defaults_sha256"] != identity(defaults)
             or row["source_file_version"] != "4.51.0"

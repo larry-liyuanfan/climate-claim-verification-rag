@@ -197,7 +197,8 @@ def audit_episode(row: Any, frame: Any, ledger: Path, private: Path, tokenizer: 
             require(generation["input_tokens"] == len(ids), "generation_input_length")
             diagnostics = (finished["response"]["diagnostics"] if finished["status"] == "returned"
                            else finished["diagnostics"])
-            audit_generation(generation, request, diagnostics, expected_parser_config(tokenizer))
+            audit_generation(generation, request, diagnostics, expected_parser_config(tokenizer),
+                             trusted_contract=generation_contract)
         ms = finished["elapsed_ms"]
         require(type(ms) in {int, float} and math.isfinite(ms) and ms >= 0
                 and request["remaining_seconds"] <= MAX_SECONDS-physical_seconds+1e-6, "shared_deadline")
