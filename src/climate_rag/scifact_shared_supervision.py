@@ -84,10 +84,12 @@ def exposure_for_frame(frame: Mapping[str, Any], candidates: Sequence[Mapping[st
 
 def layer_inventory(records: Sequence[Mapping[str, Any]], captured: Sequence[Mapping[str, Any]],
                     indexed: Sequence[Mapping[str, Any]], partitions: Mapping[int, str],
-                    corpus: Mapping[int, Abstract]) -> tuple[dict[str, Any], dict[str, Any]]:
+                    corpus: Mapping[int, Abstract], *,
+                    expected_provenance: Mapping[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     prompts, targets, runtime = [], [], []
     for record in records:
-        require(record['data_provenance'] == provenance(), 'shared_record_protocol')
+        require(record['data_provenance'] == (provenance() if expected_provenance is None else expected_provenance),
+                'shared_record_protocol')
         entry = exposure_for_frame(record['frame'], record['candidates'], corpus)
         prompts.append(dict(entry, claim_id=record['claim_id'], record_sha256=record['record_sha256'],
                             rendered_prompt_sha256=record['packing']['prompt_sha256'],
