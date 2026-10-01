@@ -369,9 +369,13 @@ for commands, cases, framework boundaries and the separately measured search tra
 
 ### Existing retrieval CLI
 
+The basic install below is for the retrieval CLI, not the complete optional-model
+test suite. Use the explicit Windows Torch or Linux/POSIX interpreter in
+[local validation environments](docs/LOCAL_VALIDATION_ENVIRONMENTS.md) for tests;
+`.[test]` alone does not install Torch/PEFT.
+
 ```bash
 python -m pip install -e ".[test]"
-pytest
 
 climate-rag index \
   --evidence fixtures/evidence.json \
