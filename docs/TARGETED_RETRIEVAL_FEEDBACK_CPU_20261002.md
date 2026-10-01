@@ -155,6 +155,15 @@ blobs and the real shell source guard is exercised. The draft's
 `model_execution_authorized=false` is checked before any input preparation/model
 access. Previous run authorizations cannot authorize this source.
 
+Portable-release correction: the remote output path is serialized with
+`as_posix()` on every producer platform. A CPU regression models both Windows and
+POSIX draft generation followed by Linux validation: an unchanged unauthorized
+draft is rejected, the synthetic explicitly authorized dictionary validates, and
+backslash-mutated output is rejected. The original `d7ecd80` package is retained
+as superseded evidence, not patched in place; this correction requires a newly
+committed and repackaged source. Data, algorithm, scoring and the two-hour resource
+proposal are unchanged.
+
 Only **after separate exact-source authorization** and current allocation checks,
 the coordinator can bind an authorized release and use the following commands;
 none have been run for this package:

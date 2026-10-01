@@ -47,7 +47,7 @@ def draft(source_git: str, archive_sha: str, wrapper_sha: str) -> dict[str, Any]
         "source_git": source_git,
         "source_archive_sha256": archive_sha,
         "wrapper_sha256": wrapper_sha,
-        "output": str(ROOT / "runs" / ("targeted-feedback-" + source_git[:12])),
+        "output": (ROOT / "runs" / ("targeted-feedback-" + source_git[:12])).as_posix(),
         "policy": policy(),
         "resource_cap": RESOURCE,
         "generation_contract": frozen_contract(),

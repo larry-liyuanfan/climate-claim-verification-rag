@@ -2,7 +2,7 @@
 
 import copy
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from types import SimpleNamespace
 
 import pytest
@@ -446,6 +446,29 @@ def test_supervised_cli_connections_reaped_then_cost_then_quality(
         0 if phase == "prepare_fail" else 14
     )
     assert result["automatic_retry"] is False
+
+
+@pytest.mark.parametrize("producer_path", [PureWindowsPath, PurePosixPath])
+def test_release_output_is_portable_to_linux_validator(monkeypatch, producer_path):
+    root = "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
+    monkeypatch.setattr(operator, "ROOT", producer_path(root))
+    value = json.loads(json.dumps(operator.draft("a" * 40, "b" * 64, "c" * 64)))
+    assert value["output"] == root + "/runs/targeted-feedback-" + "a" * 12
+    assert "\\" not in value["output"]
+    assert value["model_execution_authorized"] is False
+
+    # Model the consumer platform without filesystem or model access.
+    monkeypatch.setattr(operator, "ROOT", PurePosixPath(root))
+    with pytest.raises(ValueError, match="unauthorized_draft_no_model_or_preparation"):
+        operator.validate_release(value)
+    value.update(
+        authorization="coordinator_exact_hash_release", model_execution_authorized=True
+    )
+    operator.validate_release(value)
+    malformed = copy.deepcopy(value)
+    malformed["output"] = str(PureWindowsPath(value["output"]))
+    with pytest.raises(ValueError, match="frozen_release_changed"):
+        operator.validate_release(malformed)
 
 
 def test_release_cannot_change_route_input_or_budget(tmp_path, monkeypatch):
