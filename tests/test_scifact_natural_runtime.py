@@ -1,5 +1,7 @@
 """Synthetic transport/trajectory tests; no real data/model inference."""
 import json
+import os
+import stat
 import types
 
 import pytest
@@ -32,7 +34,7 @@ class Backend(SyntheticBackend):
         self.calls = 0
 
     def start_slot(self, path):
-        path.mkdir()
+        path.mkdir(mode=0o700)
         self.store = PrivateDiagnosticStore(path, max_files=10, max_bytes=100000)
 
     def generate(self, observation, schema, max_output_tokens, remaining_seconds):
@@ -49,6 +51,15 @@ class Backend(SyntheticBackend):
             d["eos_observed"] = False
         self.calls += 1
         return response
+
+
+def test_synthetic_private_store_matches_production_permissions(tmp_path):
+    path = tmp_path / "private-responses"
+    backend = Backend([])
+    backend.start_slot(path)
+    assert backend.store.root == path.resolve()
+    if os.name == "posix":
+        assert stat.S_IMODE(path.stat().st_mode) & 0o077 == 0
 
 
 def matrix(tmp_path, actions, faults=None):
