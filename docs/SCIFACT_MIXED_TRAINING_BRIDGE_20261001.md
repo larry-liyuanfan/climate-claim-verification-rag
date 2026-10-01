@@ -1,6 +1,7 @@
 # Frozen program-artifact bridge and claim-mean training entry
 
-Status: **real CPU preparation and GPU training accepted; evaluation not released**.
+Status: **real CPU preparation and GPU training accepted; one tune evaluation submitted,
+no new quality conclusion; four-route evaluation not released**.
 [Job 31854794](verified-runs/scifact-mixed-cpu-closeout-31854794.json) prepared
 144/144 claims and 223 rows with 36 planned updates, zero failed/unknown slots.
 Slurm elapsed was 82 s, TotalCPU 69.512 s and batch MaxRSS 621,280 K. Three
@@ -56,6 +57,15 @@ The package reuses the existing source packager and actual tune wrapper guard;
 wrong revision/archive/wrapper must fail. It does not upload, allocate, load
 weights or read scoring data. A separate exact-hash coordinator release is
 required before the one 24-call paired evaluation; no automatic replay follows.
+
+The coordinator subsequently authorized the exact `6f764f824125` package and
+unchanged release SHA `2580535e8fc1…b330ad0`. Actual job **31865294** was submitted
+once; dry-run number **31865293** was only a simulation. The initial actual
+state was `PENDING(Resources)`; scheduler estimates are not promises. See the
+[submission and preflight receipt](verified-runs/scifact-mixed-tune-submission-31865294.json).
+The same source archive also supplies the original four-route wrapper and a
+metadata-only candidate, without reading gold or running inference. Its exact
+release remains separate and cannot run before tune closeout and authorization.
 
 ## Utility8 conclusion, not Agent success
 

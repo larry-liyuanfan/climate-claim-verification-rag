@@ -20,9 +20,11 @@ then completed all **144 claims / 223 rows / 36 updates exactly once** in 394 s.
 The final 144 FP32 LoRA tensors passed hash, shape and finite-value checks;
 observed training loss 0.284 is **not retrieval or grounding quality**.
 Mixed checkpoint binding now feeds the existing tune12 and four-route entries;
-only synthetic seam tests have run. Real paired evaluation remains separately
-released, with exact PEFT tensor reload, physical costs before gold and no
-automatic validation promotion. The utility8 negative conclusion above is unchanged.
+only synthetic seam tests have completed. The separately authorized
+[paired tune job 31865294](docs/verified-runs/scifact-mixed-tune-submission-31865294.json)
+is submitted, with exact PEFT tensor reload, physical costs before gold and no
+automatic validation promotion. Submission is not a quality result; the
+four-route candidate is not released. The utility8 negative conclusion above is unchanged.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
