@@ -1,12 +1,14 @@
 # Climate Evidence Retrieval and Grounded Verification
 
 The [single-document verifier diagnostic](docs/SCIFACT_DOCUMENT_VERIFIER_20261001.md)
-is **CPU implementation/preflight only**, not a new model-quality result or Agent
-success. It preserves the actual original FIT24 visible sentences and compares
+has an **r2 CPU startup-contract repair candidate**, not a new model-quality
+result or Agent success. Job 31914601 failed before model loading because its
+release omitted the runtime interpreter field; no inference was scored. The
+candidate preserves the actual original FIT24 visible sentences and compares
 fixed-order versus optional adaptive verification using the same unadapted model,
 terminal scorer and shared generation/tool/time ceilings. The 24 claims are
 already-exposed TRAIN diagnostics, not validation or an independent test. No new
-GPU run, training, deployment or resume metric is implied by this code delivery.
+GPU retry, training, deployment or resume metric is authorized by this code delivery.
 
 The [utility8 closeout](docs/verified-runs/scifact-utility8-closeout-31834687.json)
 preserves a negative A/B/C diagnostic on eight already exposed TRAIN cases.

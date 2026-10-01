@@ -9,6 +9,7 @@ import time
 from typing import Any
 
 from climate_rag.scifact_document_verifier import PROTOCOL
+from climate_rag.scifact_mixed_launch import PYTHON_EXECUTABLE, RUNTIME_FILES_SHA, RUNTIME_RECEIPT_SHA
 from climate_rag.scifact_read_continuation import ordered_write
 from prepare_scifact_natural import SELECTION_SHA, prepare
 from run_budget_agent_full_operator import ARCHIVES, read_only_tree
@@ -18,26 +19,52 @@ from run_scifact_grounding_train_operator import ROOT, require, sha
 from run_scifact_natural_operator import slot_watchdog
 from run_scifact_utility8_operator import verify_runtime_receipt
 
-OUTPUT = ROOT / "runs" / PROTOCOL
+ATTEMPT = "r2"
+OUTPUT = ROOT / "runs" / (PROTOCOL + "-" + ATTEMPT)
 RESOURCE = {"gpu": "A100:1", "cpus": 8, "host_ram_gib": 32, "scratch_gib": 30, "slurm_seconds": 7200}
 WRAPPER = "hpc/scifact_document_verifier.sbatch"
+RUNTIME_OBSERVATION_SHA = "6153e39d11dbf44b57b311359cf2b5846dcf6a45ef70cd9069f69e4c8c68d455"
+FROZEN_FIELDS: dict[str, Any] = {
+    "protocol": PROTOCOL, "attempt_id": ATTEMPT, "infrastructure_retry": 1,
+    "previous_attempt_job_id": "31914601",
+    "previous_attempt_release_sha256": "015a5b464da78f11573a3ef2492d752add1b8497b9306c2866603357712d309e",
+    "output": OUTPUT.as_posix(), "resource_cap": RESOURCE, "selection_sha256": SELECTION_SHA,
+    "initial_inventory_sha256": "0c4b663184acabc0a4b0421f37f92182a5aea2ab414dcad7d3a5840e3b57c028",
+    "max_generator_calls": 240, "planned_episodes": 48, "max_episode_seconds": 120,
+    "max_episode_tools": 5, "max_episode_generations": 5, "max_worker_seconds": 6360,
+    "warmup_generation_calls": 0, "training_authorized": False, "protected_split_read": False,
+    "automatic_retry": False, "adapter_loaded": False, "reranker_loaded": False,
+    "model_archive_sha256": ARCHIVES["input"][1], "python_executable": PYTHON_EXECUTABLE,
+    "runtime_receipt_sha256": RUNTIME_RECEIPT_SHA, "runtime_files_sha256": RUNTIME_FILES_SHA,
+    "runtime_observation_sha256": RUNTIME_OBSERVATION_SHA,
+}
+REQUIRED_RELEASE_KEYS = frozenset(FROZEN_FIELDS) | {
+    "authorization", "source_git", "source_archive_sha256", "wrapper_sha256",
+}
 
 
 def validate_release(release: dict[str, Any]) -> None:
+    missing = REQUIRED_RELEASE_KEYS - release.keys()
+    require(not missing, "release_missing_fields:" + ",".join(sorted(missing)))
     require(release["authorization"] == "coordinator_exact_hash_release", "draft_is_not_executable")
-    require(release["protocol"] == PROTOCOL and release["output"] == str(OUTPUT)
-            and release["resource_cap"] == RESOURCE and release["selection_sha256"] == SELECTION_SHA
-            and release["max_generator_calls"] == 240 and release["planned_episodes"] == 48
-            and release["max_episode_seconds"] == 120 and release["max_episode_tools"] == 5
-            and release["max_episode_generations"] == 5 and release["max_worker_seconds"] == 6360
-            and release["warmup_generation_calls"] == 0 and release["training_authorized"] is False
-            and release["protected_split_read"] is False and release["automatic_retry"] is False
-            and release["adapter_loaded"] is False and release["reranker_loaded"] is False
-            and release["model_archive_sha256"] == ARCHIVES["input"][1], "document_verifier_frozen_contract")
-    for key in ("source_archive_sha256", "wrapper_sha256", "runtime_receipt_sha256",
-                "runtime_files_sha256", "initial_inventory_sha256"):
-        require(len(release[key]) == 64 and all(c in "0123456789abcdef" for c in release[key]), "release_hash")
-    require(len(release["source_git"]) == 40 and all(c in "0123456789abcdef" for c in release["source_git"]), "exact_source")
+    require(all(type(release[k]) is type(v) and release[k] == v for k, v in FROZEN_FIELDS.items()),
+            "document_verifier_frozen_contract")
+    for key, size in (("source_archive_sha256", 64), ("wrapper_sha256", 64), ("source_git", 40)):
+        require(isinstance(release[key], str) and len(release[key]) == size
+                and all(c in "0123456789abcdef" for c in release[key]), "release_hash:" + key)
+
+
+def start_attempt(release: dict[str, Any], release_sha: str, job_id: str) -> dict[str, Any]:
+    """Exercise the real consumer before data preparation or model loading."""
+    validate_release(release)
+    observed = verify_runtime_receipt(release)
+    OUTPUT.mkdir(mode=0o700)  # exclusive new r2 reservation; r1 is never replaced
+    ordered_write(OUTPUT / "reserved.json", {"protocol": PROTOCOL, "attempt_id": ATTEMPT,
+        "infrastructure_retry": 1, "previous_attempt_job_id": release["previous_attempt_job_id"],
+        "release_sha256": release_sha, "job_id": job_id, "source_git": release["source_git"],
+        "planned_episodes": 48, "automatic_retry": False})
+    ordered_write(OUTPUT / "runtime.json", observed)
+    return observed
 
 
 def main() -> None:
@@ -55,11 +82,8 @@ def main() -> None:
     require((source / "SOURCE_REVISION").read_text().strip() == release["source_git"] == os.environ["CLIMATE_SOURCE_GIT"]
             and release["source_archive_sha256"] == os.environ["CLIMATE_SOURCE_SHA256"]
             and sha(source / WRAPPER) == release["wrapper_sha256"], "source_binding")
-    OUTPUT.mkdir(mode=0o700)  # one lifetime reservation; no retry/replacement
-    ordered_write(OUTPUT / "reserved.json", {"protocol": PROTOCOL, "release_sha256": release_sha,
-        "job_id": os.environ["SLURM_JOB_ID"], "source_git": release["source_git"], "planned_episodes": 48})
+    start_attempt(release, release_sha, os.environ["SLURM_JOB_ID"])
     prepared = prepare(OUTPUT / "prepared")
-    ordered_write(OUTPUT / "runtime.json", verify_runtime_receipt(release))
     generator_only(ROOT / "envs" / ARCHIVES["input"][0], work / "input", release["model_archive_sha256"])
     read_only_tree(work / "input")
     read_only_tree(OUTPUT / "prepared/inference")
@@ -81,7 +105,8 @@ def main() -> None:
         "status": scored["status"], "inference_returncode": proof["returncode"],
         "cost_sha256": sha(OUTPUT / "cost-before-gold.json"),
         "quality_sha256": sha(OUTPUT / "quality.json") if (OUTPUT / "quality.json").exists() else None,
-        "elapsed_seconds": time.monotonic() - began, "training_authorized": False, "retry": False})
+        "elapsed_seconds": time.monotonic() - began, "training_authorized": False,
+        "attempt_id": ATTEMPT, "infrastructure_retry": 1, "automatic_retry": False})
     raise SystemExit(proof["returncode"] or 0)
 
 

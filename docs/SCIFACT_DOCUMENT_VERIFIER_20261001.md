@@ -2,9 +2,43 @@
 
 ## Status and falsifiable question
 
-CPU implementation, synthetic regression and tokenizer-only readiness. **No real
-model call, GPU submission, new training, validation or frozen-test evaluation is
-part of this delivery.** One exact-hash coordinator release is required to execute.
+The original CPU package was released once as job **31914601** (source
+`496b584cdb93041fa53a5f8eb662fdad0c49a088`). It failed before model loading on
+2026-10-01, 22:16:20–22:16:40 +10, `FAILED/1:0`: the release omitted
+`python_executable`, required by the reused runtime consumer. Allocated resources
+were one A100, 8 CPUs and 32 GiB; batch MaxRSS was 304436 KiB. Only preparation
+and reservation files exist: **zero inference ledger entries/results, no quality
+denominator**. This was a startup-contract defect, not missing Torch or POSIX.
+
+The first infrastructure retry **r2** is CPU-only pending a new exact-hash
+coordinator release. The protocol, original 24×2 matrix, model, prompts, scoring
+and all budgets are unchanged. The old stage, lock and run remain preserved;
+the new run is `runs/scifact-document-verifier-v1-20261001-r2`. No automatic
+submission, training, validation or frozen-test evaluation is authorized here.
+
+### Startup-contract repair
+
+The tracked release constructor now binds both the accepted inventory receipt
+and the actual successful job 31895661 runtime observation (SHA
+`6153e39d11dbf44b57b311359cf2b5846dcf6a45ef70cd9069f69e4c8c68d455`).
+The inventory receipt does not itself contain the interpreter field; the
+observation supplies the actual executable, with matching Python, POSIX, Torch,
+package versions and module locations. The validator checks every downstream
+release key before reservation, and the operator calls the real runtime consumer
+before preparing data or loading a model. Remote output paths are canonical POSIX
+strings even when the candidate is packaged on Windows.
+
+CPU regression covers constructor → validator → actual runtime receipt/hash
+consumer → exclusive reservation; only the import observation is stubbed.
+Missing keys, wrong interpreter/type/path, receipt tampering, attempt drift and
+duplicate output are rejected. The failed r1 package is a retained negative case;
+its previously passing validator-only fixture did not exercise the consumer.
+The new producer emits a draft, not execution permission. A distinct r2 stage,
+submission lock and newly approved exact hashes are required for any later run.
+Affected CPU tests: **74 passed** (startup and existing verifier semantics), plus
+**32 passed** source-package regressions. Ruff, strict affected-script mypy and
+shell syntax passed. Prior unchanged full-suite/model-semantic results are
+retained rather than rerun locally to validate an unchanged model protocol.
 
 Hypothesis: the same unadapted Qwen3-4B can recover positive grounding by judging
 the entire immutable claim against a single document's actually visible original
@@ -129,7 +163,9 @@ Decision rules:
   identity, generator-only extraction, child exit, cost-first scoring.
 - `score_scifact_document_verifier.py`: raw/contract reconstruction and TRAIN24
   quality; old scorer modules are unchanged.
-- `hpc/scifact_document_verifier.sbatch`: **DRAFT**, single A100/8 CPU/32 GiB RAM/
+- `package_scifact_document_verifier.py`: reproducible draft release constructor,
+  bound to the two accepted runtime records; no submission or model calls.
+- `hpc/scifact_document_verifier.sbatch`: **DRAFT r2 candidate**, single A100/8 CPU/32 GiB RAM/
   30 GiB scratch/2 h, no requeue. Worker cap 6360 s comprises 48×120 s ceilings
   plus 600 s loading/preflight; the remainder covers extraction/scoring/exit.
   Previous comparable run used 666 s for 72 generations, but this is not a

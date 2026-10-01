@@ -202,17 +202,9 @@ def test_unknown_cost_stops_without_terminal(tmp_path, monkeypatch):
 
 
 def test_release_draft_and_budget_mutation_rejected():
-    from run_scifact_document_verifier_operator import RESOURCE, OUTPUT, validate_release
-    from prepare_scifact_natural import SELECTION_SHA
-    from run_budget_agent_full_operator import ARCHIVES
-    release = dict(authorization='draft', protocol=PROTOCOL, output=str(OUTPUT), resource_cap=RESOURCE,
-        selection_sha256=SELECTION_SHA, max_generator_calls=240, planned_episodes=48,
-        max_episode_seconds=120, max_episode_tools=5, max_episode_generations=5, max_worker_seconds=6360,
-        warmup_generation_calls=0, training_authorized=False, protected_split_read=False,
-        automatic_retry=False, adapter_loaded=False, reranker_loaded=False,
-        model_archive_sha256=ARCHIVES['input'][1], source_git='a'*40)
-    for key in ('source_archive_sha256','wrapper_sha256','runtime_receipt_sha256','runtime_files_sha256','initial_inventory_sha256'):
-        release[key] = 'a'*64
+    from run_scifact_document_verifier_operator import FROZEN_FIELDS, validate_release
+    release = dict(FROZEN_FIELDS, authorization='draft', source_git='a'*40,
+                   source_archive_sha256='a'*64, wrapper_sha256='b'*64)
     with pytest.raises(ValueError, match='draft'):
         validate_release(release)
     release['authorization'] = 'coordinator_exact_hash_release'
