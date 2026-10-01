@@ -1,5 +1,43 @@
 # Fixed NEI47: CPU preparation implementation, not a completed experiment
 
+## Subsequent authorized CPU execution: 2026-10-01
+
+The implementation-only scope described below was followed by one separately
+authorized submission, **31843230**; test-only reference **31843090** was not an
+actual job. Exact executed source remained `782892d57365be62095fe3e31a7ee6f2a2f40b94`.
+The [redacted closeout](verified-runs/scifact-nei47-cpu-closeout-31843230.json)
+records `COMPLETED / 0:0`, 47/47 ready, zero gap/failed/unknown, and a matching
+atomic complete marker. All 100 private-file hashes and all 47 capture/assistant
+mask bindings were verified remotely; no gold or full frame was downloaded.
+
+| Measurement | Observed value and boundary |
+|---|---|
+| Actual submission/start/end, Sydney time | 16:22:04 / 16:22:29 / 16:25:03 AEST |
+| Requested allocation | 1 CPU, 4 GiB, 15 min, sapphire, no GPU, no requeue |
+| Slurm elapsed / TotalCPU / batch MaxRSS | 154 s / 141.899 s / 289,528 K |
+| Preparation wall / process CPU / process MaxRSS | 142.525773 s / 140.560524 s / 298,224 KiB |
+| Scripted / real model responses | 47 scripted, 0 real model calls; unknown scripted cost 0 |
+| Captured prompt / target tokens | 185,613 / 705 total; scripted tokenization, not billable LLM usage |
+| Training / roster / weights | No optimizer steps, no training authorization, no roster or weights |
+
+Process `getrusage` and Slurm sampling measure different scopes; their peaks are
+not interchangeable. Slurm `billing=5` is a scheduler resource weight, not a
+currency cost. The scheduler's test-only estimate did not predict the actual
+25-second wait and is not reported as an SLA.
+
+The first offline-preflight command completed its substantive checks but had a
+Windows-to-SSH heredoc tail `NameError` afterwards. No job was submitted then.
+The record was preserved, input CR transport corrected, and a separate successful
+confirmation preceded the scheduling test and exclusive submission reservation.
+No environment was reinstalled and no preparation job was retried.
+
+Closeout compact SHA: `bbee6b6e0bf7d92ab6199911ddcc22896c933cdffcd57f035d0adeb75be62799`.
+Complete marker SHA: `2cf645d23c0dc0db2f557e37d2cbde4f2b3f1f3818759f1524bb940dc6fcc121`.
+This closes **CPU preparation only**. Original48/supplemental49 were not rerun;
+there is no new training, model comparison, independent evaluation or Agent gain.
+
+## Original implementation-package boundary
+
 This bounded package follows semantic kernel `3f640175`. It adds code and
 synthetic verification, not a new training roster, weights, model call,
 training/evaluation run, or quality claim. The coordinator must separately

@@ -28,7 +28,10 @@ adds a separate **program_capture** channel for the 47 already exposed official
 NEI cases inside frozen supplemental96. It uses actual BM25/CommonPacking with
 zero real model calls, not fabricated physical receipts. The fixed-input entry,
 failure accounting and exact-source packaging are synthetic-tested; **no real
-NEI47 preparation or training has run in this implementation package**.
+model or training is invoked by that path**. The subsequent authorized
+[CPU job 31843230](docs/verified-runs/scifact-nei47-cpu-closeout-31843230.json)
+completed **47/47 ready** with no gaps/failed/unknown cases. This is preparation
+of already exposed TRAIN examples, **not a trained model or quality gain**.
 
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 

@@ -1,0 +1,124 @@
+{
+  "47_capture_and_assistant_mask_bindings_verified": true,
+  "NEI_ordered_ids_sha256": "066f4140a1cf1337ee8283fdc3b227aa5fa420cfcd5b18b2153edc7d2834651a",
+  "actual_job_id": "31843230",
+  "actual_records": 47,
+  "actual_sbatch_calls": 1,
+  "actual_wrapper_sha256": "e05962499c0bf3c72046c62b692f3e6c0ea24115658d71b96b71a69129ff1eb1",
+  "audit_utc": "2026-10-01T06:26:09.797045+00:00",
+  "claim_status_sha256": "daae7ff23d2fc83bca31f221406687b5ac0b92232713d93b5e2d2af163aeb42b",
+  "compact_sha256": "bbee6b6e0bf7d92ab6199911ddcc22896c933cdffcd57f035d0adeb75be62799",
+  "complete_sha256": "2cf645d23c0dc0db2f557e37d2cbde4f2b3f1f3818759f1524bb940dc6fcc121",
+  "config_sha256": "864ad989c11b72d0ec9396454b076374c8f3dcda9fe82d3b9f9f4c04da4a9ae8",
+  "corpus_sha256": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+  "denominator": 47,
+  "freeze_before_gold_reopen_verified": true,
+  "frozen_selection_sha256": {
+    "NEI-reservation.json": "53f03271cdc21ce2e3f414facc9d9c5a5f07115154d8db9f6b0eb8fc172b9830",
+    "NEI-selection.json": "a55441fa2a9bace07b307ccf2c0b622a033323a8923e2fb3e047a782e32c666a"
+  },
+  "full_private_artifact_hash_check": true,
+  "gold_and_frames_returned_to_local": false,
+  "input_sha256": {
+    "claim-reports.json": "9595ac7a58807459a3e8d55e441acb76cd072dbb16d668e1daf341aea1c5b82e",
+    "compact.json": "4ef3d782ecde3efd36ca9dfef1482b9117f3f0ed695cca020bacdec8c047284e",
+    "complete-selected-fit-gold.json": "cb948810eb48fc455c1ef26582cc6e4a09ad66e34c3c61475a7e32ff26d31ba1",
+    "component-reservations.json": "5afb9f5c5843ac083ea046b2276a0bdf117a8046beaa43190b469ae3409c56d2",
+    "selection-before-content.json": "72d0012fd12bf76396fb88c5f0d9581ef8d154996608e5fd167ea8f23e0a1355"
+  },
+  "optimizer_steps": 0,
+  "original48_reexecuted": false,
+  "original96_ordered_ids_sha256": "7fcb6c6ff1c5421d2c9c8ac64d54db3bf4b2c7830da58a131d95b4600222d670",
+  "preparation_elapsed_seconds": 142.5257727932185,
+  "private_file_count_verified": 100,
+  "private_hash_inventory_identity": "8adf5c61a38462e17183988ade012218aede54af6318eea4d3795bf74df16a31",
+  "process_resources": {
+    "available": true,
+    "cpu_seconds": 140.560524,
+    "maxrss_kib": 298224,
+    "scope": "whole_preparation_process"
+  },
+  "prompt_tokens_min_max_total": [
+    3050,
+    5515,
+    185613
+  ],
+  "real_model_calls": 0,
+  "release_sha256": "b9841a5db73e826c2780829560fa82520a70e1dcba69e6537a34da4154c4b674",
+  "roster_created": false,
+  "scheduler_timestamp_timezone": "Australia/Melbourne UTC+10 on 2026-10-01",
+  "scope": "already_exposed_TRAIN_NEI_program_capture_preparation_not_training_or_model_quality_gain",
+  "scripted_responses": 47,
+  "slurm_accounting": [
+    {
+      "AllocCPUS": "1",
+      "AllocTRES": "billing=5,cpu=1,mem=4G,node=1",
+      "Elapsed": "00:02:34",
+      "ElapsedRaw": "154",
+      "End": "2026-10-01T16:25:03",
+      "ExitCode": "0:0",
+      "JobID": "31843230",
+      "MaxRSS": "",
+      "ReqMem": "4G",
+      "Start": "2026-10-01T16:22:29",
+      "State": "COMPLETED",
+      "Submit": "2026-10-01T16:22:04",
+      "TotalCPU": "02:21.899"
+    },
+    {
+      "AllocCPUS": "1",
+      "AllocTRES": "cpu=1,mem=4G,node=1",
+      "Elapsed": "00:02:34",
+      "ElapsedRaw": "154",
+      "End": "2026-10-01T16:25:03",
+      "ExitCode": "0:0",
+      "JobID": "31843230.batch",
+      "MaxRSS": "289528K",
+      "ReqMem": "",
+      "Start": "2026-10-01T16:22:29",
+      "State": "COMPLETED",
+      "Submit": "2026-10-01T16:22:29",
+      "TotalCPU": "02:21.899"
+    },
+    {
+      "AllocCPUS": "1",
+      "AllocTRES": "billing=5,cpu=1,mem=4G,node=1",
+      "Elapsed": "00:02:34",
+      "ElapsedRaw": "154",
+      "End": "2026-10-01T16:25:03",
+      "ExitCode": "0:0",
+      "JobID": "31843230.extern",
+      "MaxRSS": "",
+      "ReqMem": "",
+      "Start": "2026-10-01T16:22:29",
+      "State": "COMPLETED",
+      "Submit": "2026-10-01T16:22:29",
+      "TotalCPU": "00:00:00"
+    }
+  ],
+  "source_archive_sha256": "2a75a3d1a472f2722d740e9e36b8883344c19f01c29951924fc296d14eec4a26",
+  "source_git": "782892d57365be62095fe3e31a7ee6f2a2f40b94",
+  "status_counts": {
+    "failed": 0,
+    "gap": 0,
+    "ready": 47,
+    "unknown": 0
+  },
+  "supplemental49_reexecuted": false,
+  "target_tokens_min_max_total": [
+    15,
+    15,
+    705
+  ],
+  "test_only_reference": "31843090",
+  "tokenizer_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "training_authorized": false,
+  "unknown_scripted_cost_claims": 0,
+  "version": "scifact-NEI47-CPU-closeout-v1-20261001",
+  "weights_created": false
+}
