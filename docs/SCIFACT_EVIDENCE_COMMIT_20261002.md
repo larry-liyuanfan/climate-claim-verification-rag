@@ -1,5 +1,10 @@
 # Evidence-commit: CPU candidate, not measured Agent improvement
 
+This page records the CPU package boundary. A later exact release authorized
+one real comparison; its complete result and tradeoffs are in the
+[separate confirmation report](SCIFACT_EVIDENCE_COMMIT_CONFIRMATION_20261002.md).
+That execution does not retroactively turn synthetic CPU tests into model evidence.
+
 ## Decision and falsifiable question
 
 The prior [bounded confirmation](SCIFACT_DOCUMENT_BOUNDED_CONFIRMATION_20261001.md)
@@ -109,9 +114,12 @@ and timeout → child-group termination/reap paths are tested with synthetic
 process transport, not claimed as a real GPU process demonstration.
 
 The cached, hash-pinned Qwen tokenizer was run against all 24 original views,
-with synthetic maximum-size verdict and failure envelopes: **maximum 6573 input
-tokens, zero overflow, zero model calls and no gold read**. These are prompt-size
-checks only, not model behavior or a quality result.
+using the first two document references and predefined synthetic verdict/failure
+feedback probes: **observed maximum 6573 input tokens, zero overflow, zero model
+calls and no gold read**. This is the maximum of these probes, not a strict upper
+bound across every reachable document/subset/feedback prompt. These are
+prompt-size checks only, not model behavior or a quality result; the actual
+runtime still checks each prompt without repacking it.
 
 Whole-package validation and clean-source receipt are recorded with the source
 candidate; earlier unchanged training/test results are not rerun as new evidence.

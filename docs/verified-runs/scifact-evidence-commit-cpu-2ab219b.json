@@ -64,7 +64,8 @@
       "overflow_claims": 0,
       "model_calls": 0,
       "gold_read": false,
-      "feedback": "synthetic_maximum_verdict_and_failure_envelopes_not_predictions"
+      "feedback": "first_two_document_references_and_predefined_synthetic_verdict_failure_probes_not_predictions",
+      "maximum_scope": "observed_probe_maximum_not_strict_bound_over_all_reachable_prompts"
     }
   },
   "resource_proposal_only": {

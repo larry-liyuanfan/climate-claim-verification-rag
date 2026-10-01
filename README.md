@@ -1,12 +1,19 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-A separate [evidence-commit CPU candidate](docs/SCIFACT_EVIDENCE_COMMIT_20261002.md)
-lets the model select source-bound verifier references; a deterministic assembler
-preserves their labels and original sentence order. The preregistered comparison
-includes fixed-top1, fixed-all and adaptive routes (72 slots, at most 240 physical
-calls). Verification is an interface prerequisite, **not proof of spontaneous
-tool demand**. Implementation/preflight evidence is not a new model-quality result;
-no GPU submission or resume gain is authorized by this candidate.
+The separately authorized [evidence-commit confirmation](docs/SCIFACT_EVIDENCE_COMMIT_CONFIRMATION_20261002.md)
+completed **72/72 slots in 312 s** after whole-chain CPU review. Immutable verifier
+references and deterministic assembly recovered strict evidence-bearing answers:
+**3/15 fixed-top1, 3/15 fixed-all, 4/15 adaptive** on the same exposed TRAIN24.
+The model proposed and executed 30 verifications; six episodes continued after
+INSUFFICIENT feedback. One paired case correctly chose `c1` instead of `c0` or
+all positive documents. This is exercised document selection, not universal
+Agent gain: adaptive abstract-rationalized F1 **0.4444 < top1 0.4848**, and its
+222,945 tokens cost **5.30× top1**. It used 12.5% fewer calls than fixed-all but
+39.3% more tokens. Verification is mandatory before commit; every actual commit
+had only one legal positive subset. Correct model NEI, fixed unresolved states,
+wrong evidence and costs are reported separately. No independent test, resume
+gain, automatic rerun or deployment is claimed. The
+[CPU protocol and receipts](docs/SCIFACT_EVIDENCE_COMMIT_20261002.md) remain preserved.
 
 The [whole-chain-reviewed bounded-decoder confirmation](docs/SCIFACT_DOCUMENT_BOUNDED_CONFIRMATION_20261001.md)
 completed as [job 31930176](docs/verified-runs/scifact-document-bounded-closeout-31930176.json)

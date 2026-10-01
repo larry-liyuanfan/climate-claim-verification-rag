@@ -1,0 +1,1220 @@
+{
+  "accounting_fields": [
+    "JobID",
+    "State",
+    "ExitCode",
+    "Start",
+    "End",
+    "ElapsedRaw",
+    "MaxRSS",
+    "TotalCPU",
+    "AllocCPUS",
+    "ReqMem",
+    "AllocTRES"
+  ],
+  "accounting_rows": [
+    [
+      "31944832",
+      "COMPLETED",
+      "0:0",
+      "2026-10-02T00:43:50",
+      "2026-10-02T00:49:02",
+      "312",
+      "",
+      "04:54.600",
+      "8",
+      "32G",
+      "billing=112,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1"
+    ],
+    [
+      "31944832.batch",
+      "COMPLETED",
+      "0:0",
+      "2026-10-02T00:43:50",
+      "2026-10-02T00:49:02",
+      "312",
+      "9310224K",
+      "04:54.600",
+      "8",
+      "",
+      "cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1"
+    ],
+    [
+      "31944832.extern",
+      "COMPLETED",
+      "0:0",
+      "2026-10-02T00:43:50",
+      "2026-10-02T00:49:02",
+      "312",
+      "",
+      "00:00:00",
+      "8",
+      "",
+      "billing=112,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1"
+    ]
+  ],
+  "adaptive_choice_limits": {
+    "episodes_with_multiple_positive_refs": 0,
+    "max_issued_positive_refs_in_episode": 1,
+    "max_legal_commit_options_in_actual_plan": 1,
+    "note": "Document selection and feedback use do not imply an observed choice among multiple positive subsets."
+  },
+  "arms": {
+    "adaptive": {
+      "nei_correct": 4,
+      "nei_denominator": 9,
+      "official_micro": {
+        "claim_count": 24,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 10,
+            "f1": 0.5555555555555555,
+            "precision": 0.5263157894736842,
+            "predicted": 19,
+            "recall": 0.5882352941176471,
+            "relevant": 17
+          },
+          "abstract_rationalized": {
+            "correct": 8,
+            "f1": 0.4444444444444444,
+            "precision": 0.42105263157894735,
+            "predicted": 19,
+            "recall": 0.47058823529411764,
+            "relevant": 17
+          },
+          "sentence_label": {
+            "correct": 15,
+            "f1": 0.3409090909090909,
+            "precision": 0.30612244897959184,
+            "predicted": 49,
+            "recall": 0.38461538461538464,
+            "relevant": 39
+          },
+          "sentence_selection": {
+            "correct": 21,
+            "f1": 0.4772727272727273,
+            "precision": 0.42857142857142855,
+            "predicted": 49,
+            "recall": 0.5384615384615384,
+            "relevant": 39
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 5,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 9,
+          "nei_claims_with_false_evidence": 5,
+          "nei_false_evidence_rate": 0.5555555555555556
+        }
+      },
+      "planned": 24,
+      "positive_correct": 4,
+      "positive_count": 15,
+      "strict_whole_answer_count": 8,
+      "trajectory": {
+        "derived_continue_after_feedback": 6,
+        "derived_continue_after_insufficient": 6,
+        "executed_verify": 30,
+        "first_model_selected_source_aliases": {
+          "c0": 16,
+          "c1": 6,
+          "c2": 1,
+          "c4": 1
+        },
+        "model_selected_source_aliases": {
+          "c0": 17,
+          "c1": 8,
+          "c2": 3,
+          "c4": 2
+        },
+        "proposed_verify": 30,
+        "reason_counts": {
+          "valid_terminal": 24
+        },
+        "terminal_counts": {
+          "abstain": 5,
+          "commit": 19
+        },
+        "trajectory_patterns": {
+          "plan:verify > verify:INSUFFICIENT > plan:abstain": 1,
+          "plan:verify > verify:INSUFFICIENT > plan:verify > verify:INSUFFICIENT > plan:abstain": 4,
+          "plan:verify > verify:INSUFFICIENT > plan:verify > verify:REFUTES > plan:commit": 1,
+          "plan:verify > verify:INSUFFICIENT > plan:verify > verify:SUPPORTS > plan:commit": 1,
+          "plan:verify > verify:REFUTES > plan:commit": 6,
+          "plan:verify > verify:SUPPORTS > plan:commit": 11
+        },
+        "valid_verify": 30
+      },
+      "unresolved": 0
+    },
+    "fixed_all": {
+      "nei_correct": 0,
+      "nei_denominator": 9,
+      "official_micro": {
+        "claim_count": 24,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 12,
+            "f1": 0.46153846153846156,
+            "precision": 0.34285714285714286,
+            "predicted": 35,
+            "recall": 0.7058823529411765,
+            "relevant": 17
+          },
+          "abstract_rationalized": {
+            "correct": 10,
+            "f1": 0.3846153846153846,
+            "precision": 0.2857142857142857,
+            "predicted": 35,
+            "recall": 0.5882352941176471,
+            "relevant": 17
+          },
+          "sentence_label": {
+            "correct": 18,
+            "f1": 0.2337662337662338,
+            "precision": 0.1565217391304348,
+            "predicted": 115,
+            "recall": 0.46153846153846156,
+            "relevant": 39
+          },
+          "sentence_selection": {
+            "correct": 24,
+            "f1": 0.3116883116883116,
+            "precision": 0.20869565217391303,
+            "predicted": 115,
+            "recall": 0.6153846153846154,
+            "relevant": 39
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 4,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 9,
+          "nei_claims_with_false_evidence": 5,
+          "nei_false_evidence_rate": 0.5555555555555556
+        }
+      },
+      "planned": 24,
+      "positive_correct": 3,
+      "positive_count": 15,
+      "strict_whole_answer_count": 3,
+      "trajectory": {
+        "derived_continue_after_feedback": 0,
+        "derived_continue_after_insufficient": 0,
+        "executed_verify": 96,
+        "first_model_selected_source_aliases": {
+          "none": 24
+        },
+        "model_selected_source_aliases": {},
+        "proposed_verify": 0,
+        "reason_counts": {
+          "fixed_empty_or_overbound_positive_refs": 4,
+          "valid_terminal": 20
+        },
+        "terminal_counts": {
+          "commit": 20,
+          "unresolved": 4
+        },
+        "trajectory_patterns": {
+          "verify:INSUFFICIENT > verify:INSUFFICIENT > verify:INSUFFICIENT > verify:INSUFFICIENT": 4,
+          "verify:INSUFFICIENT > verify:INSUFFICIENT > verify:REFUTES > verify:INSUFFICIENT": 1,
+          "verify:INSUFFICIENT > verify:INSUFFICIENT > verify:REFUTES > verify:REFUTES": 1,
+          "verify:INSUFFICIENT > verify:INSUFFICIENT > verify:SUPPORTS > verify:INSUFFICIENT": 1,
+          "verify:INSUFFICIENT > verify:REFUTES > verify:INSUFFICIENT > verify:INSUFFICIENT": 1,
+          "verify:REFUTES > verify:INSUFFICIENT > verify:INSUFFICIENT > verify:INSUFFICIENT": 2,
+          "verify:REFUTES > verify:REFUTES > verify:INSUFFICIENT > verify:INSUFFICIENT": 1,
+          "verify:REFUTES > verify:REFUTES > verify:REFUTES > verify:INSUFFICIENT": 1,
+          "verify:REFUTES > verify:SUPPORTS > verify:INSUFFICIENT > verify:INSUFFICIENT": 2,
+          "verify:SUPPORTS > verify:INSUFFICIENT > verify:INSUFFICIENT > verify:INSUFFICIENT": 4,
+          "verify:SUPPORTS > verify:INSUFFICIENT > verify:REFUTES > verify:INSUFFICIENT": 1,
+          "verify:SUPPORTS > verify:REFUTES > verify:SUPPORTS > verify:INSUFFICIENT": 1,
+          "verify:SUPPORTS > verify:SUPPORTS > verify:INSUFFICIENT > verify:INSUFFICIENT": 3,
+          "verify:SUPPORTS > verify:SUPPORTS > verify:SUPPORTS > verify:SUPPORTS": 1
+        },
+        "valid_verify": 96
+      },
+      "unresolved": 4
+    },
+    "fixed_top1": {
+      "nei_correct": 0,
+      "nei_denominator": 9,
+      "official_micro": {
+        "claim_count": 24,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 10,
+            "f1": 0.6060606060606061,
+            "precision": 0.625,
+            "predicted": 16,
+            "recall": 0.5882352941176471,
+            "relevant": 17
+          },
+          "abstract_rationalized": {
+            "correct": 8,
+            "f1": 0.48484848484848486,
+            "precision": 0.5,
+            "predicted": 16,
+            "recall": 0.47058823529411764,
+            "relevant": 17
+          },
+          "sentence_label": {
+            "correct": 15,
+            "f1": 0.3658536585365854,
+            "precision": 0.3488372093023256,
+            "predicted": 43,
+            "recall": 0.38461538461538464,
+            "relevant": 39
+          },
+          "sentence_selection": {
+            "correct": 19,
+            "f1": 0.46341463414634154,
+            "precision": 0.4418604651162791,
+            "predicted": 43,
+            "recall": 0.48717948717948717,
+            "relevant": 39
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 8,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 9,
+          "nei_claims_with_false_evidence": 3,
+          "nei_false_evidence_rate": 0.3333333333333333
+        }
+      },
+      "planned": 24,
+      "positive_correct": 3,
+      "positive_count": 15,
+      "strict_whole_answer_count": 3,
+      "trajectory": {
+        "derived_continue_after_feedback": 0,
+        "derived_continue_after_insufficient": 0,
+        "executed_verify": 24,
+        "first_model_selected_source_aliases": {
+          "none": 24
+        },
+        "model_selected_source_aliases": {},
+        "proposed_verify": 0,
+        "reason_counts": {
+          "fixed_empty_or_overbound_positive_refs": 8,
+          "valid_terminal": 16
+        },
+        "terminal_counts": {
+          "commit": 16,
+          "unresolved": 8
+        },
+        "trajectory_patterns": {
+          "verify:INSUFFICIENT": 8,
+          "verify:REFUTES": 6,
+          "verify:SUPPORTS": 10
+        },
+        "valid_verify": 24
+      },
+      "unresolved": 8
+    }
+  },
+  "artifact_sha256": {
+    "complete.json": "58cc1c698cc83fdf9042682f368e2667b54c5200f92004536242b06980d54fcf",
+    "cost-before-gold.json": "19fd60719bc2fbb621f2bbabd1dda1950cf67e6d9fe28266c059906597d2b355",
+    "inference/initial-frames.json": "b45dce8612962ddcb1a832a86186dcbf440254a50eb65451c8d56c88aad9216a",
+    "quality.json": "9be14408e6d89f9e5b4785cedad5ed83e19712ba11b347bec32fb77e94545f8b",
+    "reserved.json": "159ef3255e8accd8272a9a913ee27cfcbaa23d88dc01a8736a1b574f18c5bb61",
+    "runtime.json": "6153e39d11dbf44b57b311359cf2b5846dcf6a45ef70cd9069f69e4c8c68d455",
+    "worker-exit.json": "9d0e29e49b235554fcbbe8f9dcb341f1580ad9714321da0f4bd19300702ca8b7"
+  },
+  "comparison": {
+    "adaptive_minus_fixed_positive_correct_by_arm": {
+      "fixed_all": 1,
+      "fixed_top1": 1
+    },
+    "comparison_limits": {
+      "call_caps": {
+        "adaptive": 5,
+        "fixed_all": 4,
+        "fixed_top1": 1
+      },
+      "exact_reservation_sha256": "159ef3255e8accd8272a9a913ee27cfcbaa23d88dc01a8736a1b574f18c5bb61",
+      "fixed_empty_positive_is_unresolved_not_NEI": true,
+      "fixed_top1_rule": "first frozen retrieval document, no gold selection",
+      "no_automatic_agent_gain": true,
+      "verify_is_prerequisite_not_spontaneous_demand": true
+    },
+    "fixed_baseline_arm": "fixed_all",
+    "hypothesis": "positive_recovery_observed_in_named_arms_requires_trajectory_and_both_baselines_not_automatic_Agent_gain",
+    "limits": "Previously consumed TRAIN24 diagnostic; not independent test, SFT evidence or causal Agent proof.",
+    "positive_recovered_arms": [
+      "fixed_top1",
+      "fixed_all",
+      "adaptive"
+    ]
+  },
+  "cost": {
+    "arm_physical_generation_cost": {
+      "adaptive": {
+        "api_currency_cost": null,
+        "backend_elapsed_known_lower_bound_ms": 102237.95858956873,
+        "elapsed_ms": 102986.32774502039,
+        "known_token_lower_bound": {
+          "input_tokens": 219774,
+          "output_tokens": 3171
+        },
+        "model_backend_elapsed_ms": 102237.95858956873,
+        "total_tokens": {
+          "input_tokens": 219774,
+          "output_tokens": 3171
+        },
+        "unique_physical_calls": 84,
+        "unknown_backend_timing_attempts": 0,
+        "unknown_usage_attempts": 0
+      },
+      "fixed_all": {
+        "api_currency_cost": null,
+        "backend_elapsed_known_lower_bound_ms": 99088.35048601031,
+        "elapsed_ms": 99749.71107207239,
+        "known_token_lower_bound": {
+          "input_tokens": 156761,
+          "output_tokens": 3244
+        },
+        "model_backend_elapsed_ms": 99088.35048601031,
+        "total_tokens": {
+          "input_tokens": 156761,
+          "output_tokens": 3244
+        },
+        "unique_physical_calls": 96,
+        "unknown_backend_timing_attempts": 0,
+        "unknown_usage_attempts": 0
+      },
+      "fixed_top1": {
+        "api_currency_cost": null,
+        "backend_elapsed_known_lower_bound_ms": 29272.01892249286,
+        "elapsed_ms": 29440.021608024836,
+        "known_token_lower_bound": {
+          "input_tokens": 41137,
+          "output_tokens": 892
+        },
+        "model_backend_elapsed_ms": 29272.01892249286,
+        "total_tokens": {
+          "input_tokens": 41137,
+          "output_tokens": 892
+        },
+        "unique_physical_calls": 24,
+        "unknown_backend_timing_attempts": 0,
+        "unknown_usage_attempts": 0
+      }
+    },
+    "exit_proof_sha256": "9d0e29e49b235554fcbbe8f9dcb341f1580ad9714321da0f4bd19300702ca8b7",
+    "gold_read": false,
+    "initial_retrieval_cost": "historical frozen artifacts replayed, not newly timed online retrieval",
+    "missing_episodes": 0,
+    "physical_generation_cost": {
+      "api_currency_cost": null,
+      "elapsed_ms": 232176.0604251176,
+      "known_token_lower_bound": {
+        "input_tokens": 417672,
+        "output_tokens": 7307
+      },
+      "total_tokens": {
+        "input_tokens": 417672,
+        "output_tokens": 7307
+      },
+      "unique_physical_calls": 204,
+      "unknown_usage_attempts": 0
+    },
+    "planned_slots": 72,
+    "protocol": "scifact-evidence-commit-v1-20261002",
+    "unassigned_physical_generation_cost": {
+      "api_currency_cost": null,
+      "backend_elapsed_known_lower_bound_ms": 0.0,
+      "elapsed_ms": 0,
+      "known_token_lower_bound": {
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "model_backend_elapsed_ms": 0.0,
+      "total_tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "unique_physical_calls": 0,
+      "unknown_backend_timing_attempts": 0,
+      "unknown_usage_attempts": 0
+    }
+  },
+  "exporter_sha256": "5a59faf96e561d75b63b8f1a03ccbe39a20b144008b3b57afa7a192f108ed151",
+  "job_id": "31944832",
+  "limitations": [
+    "Previously exposed TRAIN24 diagnostic, not independent test.",
+    "Mandatory verify prerequisite is not spontaneous tool demand or proof of Agent gain.",
+    "Continue counts are derived sequences, not a separate model action.",
+    "Initial retrieval replays historical artifacts; allocation/CPU/backend time is not online SLA or monetary cost.",
+    "Case correctness is existing scorer output; no raw gold, claim text, source text or physical responses exported."
+  ],
+  "paired_cases": [
+    {
+      "arms": {
+        "adaptive": {
+          "committed": [
+            {
+              "label": "REFUTES",
+              "sentence_count": 2,
+              "source_alias": "c1"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 4.7337615340948105,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 3,
+          "proposed_verify": 1,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": true,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c1",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 2,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "commit",
+              "physical_call": true,
+              "selected_source_aliases": [
+                "c1"
+              ],
+              "stage": "plan",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        },
+        "fixed_all": {
+          "committed": [
+            {
+              "label": "REFUTES",
+              "sentence_count": 4,
+              "source_alias": "c0"
+            },
+            {
+              "label": "REFUTES",
+              "sentence_count": 2,
+              "source_alias": "c1"
+            },
+            {
+              "label": "REFUTES",
+              "sentence_count": 4,
+              "source_alias": "c2"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 5.238710269331932,
+          "executed_verify": 4,
+          "feedback_status_counts": {
+            "valid": 4
+          },
+          "physical_calls": 4,
+          "proposed_verify": 0,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": false,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 4,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 2,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 4,
+              "source_alias": "c2",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c3",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 4
+        },
+        "fixed_top1": {
+          "committed": [
+            {
+              "label": "REFUTES",
+              "sentence_count": 4,
+              "source_alias": "c0"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 1.5086433067917824,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 1,
+          "proposed_verify": 0,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": false,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 4,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        }
+      },
+      "case": "case_16",
+      "illustrative_selection": "adaptive_correct_commit_both_baselines_incorrect"
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "committed": [
+            {
+              "label": "SUPPORTS",
+              "sentence_count": 2,
+              "source_alias": "c0"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 4.062472594901919,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 3,
+          "proposed_verify": 1,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": true,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c0",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "SUPPORTS",
+              "physical_call": true,
+              "sentence_count": 2,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "commit",
+              "physical_call": true,
+              "selected_source_aliases": [
+                "c0"
+              ],
+              "stage": "plan",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        },
+        "fixed_all": {
+          "committed": [
+            {
+              "label": "SUPPORTS",
+              "sentence_count": 2,
+              "source_alias": "c0"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 3.7545523643493652,
+          "executed_verify": 4,
+          "feedback_status_counts": {
+            "valid": 4
+          },
+          "physical_calls": 4,
+          "proposed_verify": 0,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": true,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "label": "SUPPORTS",
+              "physical_call": true,
+              "sentence_count": 2,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c2",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c3",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 4
+        },
+        "fixed_top1": {
+          "committed": [
+            {
+              "label": "SUPPORTS",
+              "sentence_count": 2,
+              "source_alias": "c0"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 1.1280354857444763,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 1,
+          "proposed_verify": 0,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": true,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "label": "SUPPORTS",
+              "physical_call": true,
+              "sentence_count": 2,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        }
+      },
+      "case": "case_14",
+      "illustrative_selection": "all_arms_correct_positive_commit"
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "committed": [],
+          "derived_continue_after_feedback": 1,
+          "derived_continue_after_insufficient": 1,
+          "elapsed_seconds": 4.08661225438118,
+          "executed_verify": 2,
+          "feedback_status_counts": {
+            "valid": 2
+          },
+          "physical_calls": 5,
+          "proposed_verify": 2,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": true,
+          "terminal_action": "abstain",
+          "trace": [
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c0",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c4",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c4",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "abstain",
+              "physical_call": true,
+              "reason": "insufficient_evidence",
+              "stage": "plan",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 2
+        },
+        "fixed_all": {
+          "committed": [
+            {
+              "label": "REFUTES",
+              "sentence_count": 3,
+              "source_alias": "c1"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 4.0174601674079895,
+          "executed_verify": 4,
+          "feedback_status_counts": {
+            "valid": 4
+          },
+          "physical_calls": 4,
+          "proposed_verify": 0,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": false,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 3,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c2",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c3",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 4
+        },
+        "fixed_top1": {
+          "committed": [],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 0.8566233552992344,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 1,
+          "proposed_verify": 0,
+          "reason": "fixed_empty_or_overbound_positive_refs",
+          "state": "unresolved",
+          "strict_whole_answer": false,
+          "terminal_action": null,
+          "trace": [
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        }
+      },
+      "case": "case_07",
+      "illustrative_selection": "correct_model_abstention_vs_incorrect_fixed_all_commit"
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "committed": [
+            {
+              "label": "REFUTES",
+              "sentence_count": 2,
+              "source_alias": "c4"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 4.363433068618178,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 3,
+          "proposed_verify": 1,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": false,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c4",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "REFUTES",
+              "physical_call": true,
+              "sentence_count": 2,
+              "source_alias": "c4",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "commit",
+              "physical_call": true,
+              "selected_source_aliases": [
+                "c4"
+              ],
+              "stage": "plan",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        },
+        "fixed_all": {
+          "committed": [],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 3.517388792708516,
+          "executed_verify": 4,
+          "feedback_status_counts": {
+            "valid": 4
+          },
+          "physical_calls": 4,
+          "proposed_verify": 0,
+          "reason": "fixed_empty_or_overbound_positive_refs",
+          "state": "unresolved",
+          "strict_whole_answer": false,
+          "terminal_action": null,
+          "trace": [
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c2",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c3",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 4
+        },
+        "fixed_top1": {
+          "committed": [],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 0.899724880233407,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 1,
+          "proposed_verify": 0,
+          "reason": "fixed_empty_or_overbound_positive_refs",
+          "state": "unresolved",
+          "strict_whole_answer": false,
+          "terminal_action": null,
+          "trace": [
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        }
+      },
+      "case": "case_02",
+      "illustrative_selection": "incorrect_adaptive_commit_vs_fixed_unresolved"
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "committed": [],
+          "derived_continue_after_feedback": 1,
+          "derived_continue_after_insufficient": 1,
+          "elapsed_seconds": 4.443850051611662,
+          "executed_verify": 2,
+          "feedback_status_counts": {
+            "valid": 2
+          },
+          "physical_calls": 5,
+          "proposed_verify": 2,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": false,
+          "terminal_action": "abstain",
+          "trace": [
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c0",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "verify",
+              "physical_call": true,
+              "source_alias": "c1",
+              "stage": "plan",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "action": "abstain",
+              "physical_call": true,
+              "reason": "insufficient_evidence",
+              "stage": "plan",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 2
+        },
+        "fixed_all": {
+          "committed": [
+            {
+              "label": "SUPPORTS",
+              "sentence_count": 3,
+              "source_alias": "c2"
+            }
+          ],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 4.101615997031331,
+          "executed_verify": 4,
+          "feedback_status_counts": {
+            "valid": 4
+          },
+          "physical_calls": 4,
+          "proposed_verify": 0,
+          "reason": "valid_terminal",
+          "state": "valid_terminal",
+          "strict_whole_answer": false,
+          "terminal_action": "commit",
+          "trace": [
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c1",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "SUPPORTS",
+              "physical_call": true,
+              "sentence_count": 3,
+              "source_alias": "c2",
+              "stage": "verify",
+              "status": "valid"
+            },
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c3",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 4
+        },
+        "fixed_top1": {
+          "committed": [],
+          "derived_continue_after_feedback": 0,
+          "derived_continue_after_insufficient": 0,
+          "elapsed_seconds": 0.9623650629073381,
+          "executed_verify": 1,
+          "feedback_status_counts": {
+            "valid": 1
+          },
+          "physical_calls": 1,
+          "proposed_verify": 0,
+          "reason": "fixed_empty_or_overbound_positive_refs",
+          "state": "unresolved",
+          "strict_whole_answer": false,
+          "terminal_action": null,
+          "trace": [
+            {
+              "label": "INSUFFICIENT",
+              "physical_call": true,
+              "sentence_count": 0,
+              "source_alias": "c0",
+              "stage": "verify",
+              "status": "valid"
+            }
+          ],
+          "valid_verify": 1
+        }
+      },
+      "case": "case_09",
+      "illustrative_selection": "incorrect_model_abstention"
+    }
+  ],
+  "paired_outcomes": {
+    "fixed_all": {
+      "NEI": {
+        "adaptive_only": 4,
+        "neither": 5
+      },
+      "evidence_bearing": {
+        "adaptive_only": 1,
+        "both_correct": 3,
+        "neither": 11
+      }
+    },
+    "fixed_top1": {
+      "NEI": {
+        "adaptive_only": 4,
+        "neither": 5
+      },
+      "evidence_bearing": {
+        "adaptive_only": 1,
+        "both_correct": 3,
+        "neither": 11
+      }
+    }
+  },
+  "protocol": "scifact-evidence-commit-v1-20261002",
+  "release_sha256": "0df679bb6ef9b58f875435b242d16de82541863e7bd13e52cf4804eecc14e556",
+  "reporting_revision": "v2_add_paired_counts_and_positive_choice_boundary_no_rescoring",
+  "source_git": "2ab219bb13564790b004797354dcc89554da2bf6",
+  "status": "scored"
+}
