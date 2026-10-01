@@ -265,3 +265,37 @@ supervision later; if the evidence is in the prompt yet the answer stays wrong,
 the failure is feedback use. Scripted conditional continuation, if separately
 needed for attribution, never becomes autonomous evidence. No repeated epochs
 or prompt tuning to chase a positive result and no 48-slot execution are released.
+
+## 解释补充：格式诊断、训练信号与 Agent 证据（2026-10-01）
+
+定位均基于冻结执行源 `6f764f8`；本节仅修正文案，不改 policy、release 或作业。
+
+1. **mixed 已用 c0 生产状态。** old48/supp49 经
+   [shared `build_shared_claim`](../src/climate_rag/scifact_shared_supervision.py#L44) →
+   [state `capture/frame_contract`](../src/climate_rag/scifact_state_supervision.py#L73)，
+   NEI 经 [program capture 校验](../src/climate_rag/scifact_program_capture.py#L98)，
+   都沿用 c0 别名和生产 controller 捕获状态，非模型自主轨迹。冻结 policy 的历史 `SFT c1` 文本
+   指旧 grounding/tune12，不能据此声称本轮 mixed 与 controller 别名不一致。
+   [旧 tune context](../src/climate_rag/scifact_grounding_sft.py#L95) 是 c1、仅
+   answer/abstain、无 preview、1 call/0 tools；其正负结果都不能单独宣布或否定 Agent 提升。
+
+2. **本轮监督很窄。** [固定计数与监督权重](../src/climate_rag/scifact_mixed_inputs.py#L249)
+   为 170 answer / 1 read / 52 abstain；read 占 epoch claim-mean 权重 `0.5/144`，
+   无 rewrite/rerank 目标。[teacher](../src/climate_rag/scifact_state_supervision.py#L214)
+   按 gold 可见性/官方 NEI 标签派生目标，最多成功一步 read → terminal；
+   未覆盖错误反馈修复或长轨迹。生产状态对齐不等于学会完整工具策略。
+
+3. **48-slot 分层判读，不偷换因果。** 保留初始充分、真实 read 机会、Top20 缺依据、NEI。
+   先核对 fixed/adaptive 实际可见句与 packing 是否一致，再判断早停或 grounding；
+   按[现有物理事件评分](../scripts/score_scifact_adapter_regression.py#L115)记录
+   “提议 → 合法执行 → 可见依据变化 → 下一决定”。若没有自主工具调用，固定路线成功
+   不能称反馈利用；某次 read 新增句为 0，也不证明所有真实 read 机会无效。
+
+4. **tune 不是追逐正结果的筛选门槛。** 完整 24 calls、成本可核对且 PEFT 真回载后，
+   如实报告质量正负；不据结果重新选模型或重跑。四路线仍须协调方按原 tuple 单独放行，
+   validation12/dev300/旧 test 保持封存。
+
+5. **论文仅作后续条件性依据。** [Agent-FLAN §3/4.2/4.3](https://arxiv.org/html/2403.12881v1)
+   （[ACL 正式版本](https://aclanthology.org/2024.findings-acl.557/)）区分格式、工具选择、
+   参数理解与推理信号，并加入“有工具但不应调用”等负例。后续若需补监督，可据此分能力
+   设计与验收；本项目未复现论文，也未证明其适用于当前结果，不立即扩训练。
