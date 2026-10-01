@@ -1,0 +1,1291 @@
+{
+  "cases": [
+    {
+      "case": "case_01",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 3,
+      "selection_extra_count": 3,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_02",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 2,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_03",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 1,
+      "selection_extra_count": 1,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_04",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 2,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_05",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 5,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 3,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_06",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 4,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 2,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_07",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 2,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_08",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [],
+          "correct_doc_labels": 1,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": true,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 2,
+      "selection_extra_count": 0,
+      "selection_gold_overlap_count": 2,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_09",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [],
+          "correct_doc_labels": 1,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": true,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 5,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 5,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": false,
+      "selection_count": 8,
+      "selection_extra_count": 5,
+      "selection_gold_overlap_count": 3,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_10",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 3,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 4,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 2,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_11",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 3,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 4,
+      "selection_extra_count": 4,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_12",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 2,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 2,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_13",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "wrong_label",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 3,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 8,
+      "selection_extra_count": 7,
+      "selection_gold_overlap_count": 1,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_14",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [],
+          "correct_doc_labels": 1,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": true,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 3,
+      "selection_extra_count": 0,
+      "selection_gold_overlap_count": 3,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_15",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 4,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 4,
+      "selection_extra_count": 4,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_16",
+      "gold_document_count": 2,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 3,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_set_mismatch",
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 4,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_set_mismatch",
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 4,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 4,
+      "selection_extra_count": 4,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_17",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 2,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_18",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "wrong_label"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 1,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "wrong_label",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 1,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 4,
+      "selection_extra_count": 1,
+      "selection_gold_overlap_count": 3,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_19",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [],
+          "correct_doc_labels": 1,
+          "extra_sentences": 0,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": true,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 2,
+      "selection_extra_count": 1,
+      "selection_gold_overlap_count": 1,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_20",
+      "gold_document_count": 0,
+      "positive": false,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 6,
+          "label": "REFUTES",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 7,
+      "selection_extra_count": 7,
+      "selection_gold_overlap_count": 0,
+      "top1_is_gold_document": false
+    },
+    {
+      "case": "case_21",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [],
+          "correct_doc_labels": 1,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": true,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 3,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 3,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 4,
+      "selection_extra_count": 3,
+      "selection_gold_overlap_count": 1,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_22",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [],
+          "correct_doc_labels": 1,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": true,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 2,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 1,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": true,
+      "selection_count": 3,
+      "selection_extra_count": 2,
+      "selection_gold_overlap_count": 1,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_23",
+      "gold_document_count": 1,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "wrong_label",
+            "no_complete_rationale_in_first3"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_insufficient"
+          ],
+          "correct_doc_labels": 0,
+          "extra_sentences": 0,
+          "label": "INSUFFICIENT",
+          "predicted_documents": 0,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": false,
+      "selection_complete_first3": false,
+      "selection_count": 3,
+      "selection_extra_count": 1,
+      "selection_gold_overlap_count": 2,
+      "top1_is_gold_document": true
+    },
+    {
+      "case": "case_24",
+      "gold_document_count": 3,
+      "positive": true,
+      "routes": {
+        "A": {
+          "blockers": [
+            "document_set_mismatch",
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 4,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "B": {
+          "blockers": [
+            "document_set_mismatch",
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 4,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        },
+        "C": {
+          "blockers": [
+            "document_set_mismatch",
+            "no_complete_rationale_in_first3",
+            "extra_non_gold_sentences"
+          ],
+          "correct_doc_labels": 1,
+          "extra_sentences": 4,
+          "label": "SUPPORTS",
+          "predicted_documents": 1,
+          "rationalized_correct_documents": 0,
+          "strict_positive_correct": false,
+          "technical_failure": null
+        }
+      },
+      "selection_complete_anywhere": true,
+      "selection_complete_first3": false,
+      "selection_count": 5,
+      "selection_extra_count": 4,
+      "selection_gold_overlap_count": 1,
+      "top1_is_gold_document": true
+    }
+  ],
+  "job": "32006925",
+  "new_gold_rows_decoded": 0,
+  "new_model_calls": 0,
+  "ordered_row_sha256": [
+    "498467c44a139184dafd84457c304646c0c2065dec9b470dc4aa75f848b7f4c8",
+    "61b2acd34348d2afc2c3f9bd16dce513a4033f1d4733d6463b03d66a30543ebf",
+    "91ded9f28a0dc594fa3b483193553f05ef443a1fb261a1345cf2299bec5c9f56",
+    "0b04852ddc85184f3a936d9952e74e86573f898704506ff58e6a41ed3a42f9d9",
+    "38e9e5f4555d82c0661c8b1177b3cc44f69b4b8f1fbba36489cbc52db50605ce",
+    "133844bdc56bd7e5779e67718d30e3c39861df7072ffb83c6db0a1bfb4c05d3d",
+    "65c27c26cee6bf55b51da1ca0a0ca8bfa6bdb3db8f0936db1c6d41da4d66bdb6",
+    "83878742cbf30462048c536c28eda2aee7fc2f70777d985f3b55b52585b22b43",
+    "cfa2c6bc56f76982f961f72387daad2ee6613db0b01ca9819b03a0dae295874f",
+    "ac273f4b4ff03a0637c8158cb66d8baadaa857be669afdab42758d6ad4d700f9",
+    "4da7477cf928265d670e625fc8fc649aebeb94634261fac43661352f9918124c",
+    "b4a9d43cb6e34d2ca7066c13862184314cf333e07fdddbfb7ddedde83da3c7cb",
+    "1c2257fc075f6aae5ac55aecd6000bd4f0bc07a86e41c2b496ba9bcc43f306b5",
+    "ae22436b9dce8ac1cd298010ae459e3c1efa44d7d67e5e52051dfff658565bd3",
+    "aade676bbc6092632cdcf085026e96b572e7b727faca4837049bb5653b52e6e8",
+    "cd8885d0e84a6b282dc39d339ec1e7679a64358e0f7b468051b6c1f23c0fc008",
+    "cf26aa1cb6e42508bbca908bfe65758ea0082c0f678c8f022a9526c524d2f934",
+    "84d4d223f992e047aadbb75e1757e3702f0a1f1dbfc8271f43e9dc7ee9542a9a",
+    "7fbe1dd5bb72dd348fa6eede242f198939413fc2c5879e90e22a784316c5fdd5",
+    "4825f3e98e059478ac22343f55250e1d0547a95bf8eb384c28efd5c120f99894",
+    "ec27b999859d05310df6ea1c6ce489e2cdc9579ae09c6cc1e1d148e0ee823ba6",
+    "4b583d254eaaf753aa3d02d10179431c0c263e52904712502eec299a62d6ba2e",
+    "6affeb868b8dcb10299ce11d1e195e46cd775afdddc125e1d8bee3709e565ef8",
+    "0f3fe805a712895a51d04427cae224cd4334ea7e2eeb880e91f9a69da2e7d92d"
+  ],
+  "original_artifacts_unchanged": true,
+  "protocol": "scifact-bottleneck-readonly-diagnosis-v1",
+  "routes": {
+    "A": {
+      "blockers_on_emitted_positive": {
+        "document_set_mismatch": 3,
+        "extra_non_gold_sentences": 7,
+        "no_complete_rationale_in_first3": 3,
+        "wrong_label": 3
+      },
+      "correct_doc_labels": 11,
+      "positive_abstained": 0,
+      "positive_abstained_with_complete_shared_selection": null,
+      "positive_claims": 15,
+      "positive_emitted": 15,
+      "rationalized_correct_documents": 9,
+      "strict_positive_correct": 6
+    },
+    "B": {
+      "blockers_on_emitted_positive": {
+        "document_set_mismatch": 2,
+        "extra_non_gold_sentences": 9,
+        "no_complete_rationale_in_first3": 3
+      },
+      "correct_doc_labels": 9,
+      "positive_abstained": 6,
+      "positive_abstained_with_complete_shared_selection": 4,
+      "positive_claims": 15,
+      "positive_emitted": 9,
+      "rationalized_correct_documents": 6,
+      "strict_positive_correct": 0
+    },
+    "C": {
+      "blockers_on_emitted_positive": {
+        "document_set_mismatch": 2,
+        "extra_non_gold_sentences": 8,
+        "no_complete_rationale_in_first3": 3,
+        "wrong_label": 1
+      },
+      "correct_doc_labels": 7,
+      "positive_abstained": 7,
+      "positive_abstained_with_complete_shared_selection": 5,
+      "positive_claims": 15,
+      "positive_emitted": 8,
+      "rationalized_correct_documents": 4,
+      "strict_positive_correct": 0
+    }
+  },
+  "same_consumed_gold_rows_reused": 24,
+  "scope": "conditional_metadata_selected_TRAIN_early_gold_preparation_seen_not_independent_test",
+  "score_changed": false,
+  "selection_counts": {
+    "complete_anywhere": 12,
+    "complete_first3": 10,
+    "positive_claims": 15,
+    "positive_selection_has_extras": 13,
+    "top1_gold_document": 14
+  },
+  "source_git": "7cd8c44e97e7e9351259ff75ae98a60dd2369b9a",
+  "source_sha256": {
+    "compact.json": "bd215b0d256d6bdecde955802276383b6924855130616b166ecee3bdd213de98",
+    "complete.json": "e1a27671e91eafee3c2139e21ec89bf73805c82b6589e1ed53599c0e54ad12dc",
+    "reports/quality.json": "8bea959f1e1fbfe151ae49abe12cb1fa6d018c898e936dab25216f2978a88b8b"
+  }
+}

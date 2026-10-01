@@ -1,15 +1,22 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-The [supervised bottleneck execution entry](docs/SCIFACT_BOTTLENECK_EXECUTION_20261002.md)
-connects the unchanged A/B/C runner to scratch-bound model paths, bounded POSIX
-exit/reap, post-audit scoring and compact export. This is synthetic execution
-verification and an **unauthorized release candidate**, not a new model run.
+The [completed evidence-bottleneck result](docs/SCIFACT_BOTTLENECK_RESULT_20261002.md)
+records **72 route slots / 96 calls** from job 32006925, with no technical
+failures. The masked-input C route is **not promoted**: against shared-selection
+B, joint F1 fell **.4138 → .2963**, despite one fewer NEI false-evidence answer.
+All emitted B/C positive answers copied extra non-gold context into citations;
+positive over-abstention and one label reversal also hurt C. The strongest
+archived v2 top1 retains joint F1 **.5882** on this same consumed TRAIN24.
+Full costs, five redacted cases and the negative decision are preserved;
+this is not independent-test or Agent-gain evidence. The
+[supervised execution entry](docs/SCIFACT_BOTTLENECK_EXECUTION_20261002.md)
+is the historical preparation for this now-completed authorized run.
 
-The new [evidence-bottleneck CPU package](docs/SCIFACT_EVIDENCE_BOTTLENECK_CPU_20261002.md)
+The preceding [evidence-bottleneck CPU package](docs/SCIFACT_EVIDENCE_BOTTLENECK_CPU_20261002.md)
 separates evidence-first field order from actual label-input masking. B/C share
 one immutable sentence selection, differing only in full-document visibility;
-physical and independent-deployment costs are separate. This is implemented
-mechanism-test infrastructure, **not a new model result or Agent quality gain**.
+physical and independent-deployment costs are separate. That preparation alone
+is mechanism-test infrastructure, **not a model result or Agent quality gain**.
 
 The [paired v2/v3 confirmation and CPU recovery](docs/SCIFACT_PAIRED_VERIFIER_RESULT_20261002.md)
 completed **144 slots / 392 model calls** on the same consumed TRAIN24. The

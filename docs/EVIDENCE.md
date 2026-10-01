@@ -1,5 +1,22 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 evidence bottleneck completed negative result
+
+[Result and five-case diagnosis](SCIFACT_BOTTLENECK_RESULT_20261002.md),
+[unaltered compact](verified-runs/scifact-bottleneck-32006925.json), SHA
+`bd215b0d256d6bdecde955802276383b6924855130616b166ecee3bdd213de98`:
+job **32006925 COMPLETED/0:0**, 175 s, MaxRSS 9,281,620 K, executed source
+`7cd8c44e97e7e9351259ff75ae98a60dd2369b9a`. All 72 slots and 96 physical calls
+are accounted for (102,324 input / 3,197 output tokens, no unknown usage).
+C versus B joint F1 **.2963 vs .4138**, label F1 **.5185 vs .6207**, NEI false
+evidence **1/9 vs 2/9**: the preregistered non-regression gate fails. Strongest
+archived v2 top1 remains **.5882 joint F1**. B/C each have zero strict positives:
+all emitted positive answers cite extra non-gold context; positive abstention
+is 6/15 and 7/15, including 4 and 5 cases with complete shared rationales.
+Independent deployments charge the selector once each (B 37,873 tokens/48
+calls; C 27,956/48), never twice in the physical run. Negative TRAIN24 diagnostic
+only; no new test, training, inference, changed scoring or resume gain.
+
 ## 2026-10-02 evidence bottleneck supervised execution preparation
 
 [Execution entry and reproduction](SCIFACT_BOTTLENECK_EXECUTION_20261002.md)
