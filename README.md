@@ -13,6 +13,11 @@ roster, and tests complete-claim mean updates with the actual cohort size.
 It has no real training entry or accepted real-data roster; the queued utility8
 source and release are unchanged.
 
+A [synthetic physical-receipt adapter](docs/SCIFACT_OBSERVATION_RECEIPTS_20261001.md)
+audits utility8 attempt/frame/tool-event lineage and deduplicates shared calls
+without dropping incomplete slots. Accepted observations are not supervision
+targets or evidence of Agent improvement; no real outputs were imported.
+
 ## Grounding adaptation: controlled tune signal, not yet Agent improvement
 
 [FIT-only production-state supervision](docs/SCIFACT_FIT_STATE_SUPERVISION_20261001.md)
