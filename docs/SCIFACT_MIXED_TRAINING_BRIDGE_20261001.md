@@ -2,7 +2,7 @@
 
 Status: **real CPU preparation, GPU training and tune12 physical closeout completed;
 tune shows a precision/coverage trade-off, not independent-test or Agent gain;
-separately released four-route evaluation submitted once as 31871386**.
+separately released four-route evaluation 31871386 completed with no autonomous tool use**.
 [Job 31854794](verified-runs/scifact-mixed-cpu-closeout-31854794.json) prepared
 144/144 claims and 223 rows with 36 planned updates, zero failed/unknown slots.
 Slurm elapsed was 82 s, TotalCPU 69.512 s and batch MaxRSS 621,280 K. Three
@@ -103,7 +103,9 @@ was submitted once after preflight and `sbatch --test-only`; simulation 31871238
 is not an actual job. Initial state was `PENDING(Resources)` with no actual start
 estimate. It retains 48 slots / 168 generation calls / 36 reranks / 720 requested
 pairs and does not authorize training, validation12, dev300 or retired test.
-Submission is not completion or autonomous Agent improvement.
+The [subsequent closeout](verified-runs/scifact-mixed-four-route-closeout-31871386.json)
+verified 48 calls / 24 reranks / 480 requested pairs; the above numbers are caps,
+not actual usage. Adaptive selected no tools. No independent-test/Agent gain follows.
 
 ## Utility8 conclusion, not Agent success
 

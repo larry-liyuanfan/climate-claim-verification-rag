@@ -27,10 +27,15 @@ documents), while sentence-selection recall fell **9/17 → 2/17**. NEI false-ev
 cases fell 4/4 → 0/4, but the adapter also returned no evidence for **5/8 evidence-bearing
 claims**. This is a precision/coverage trade-off, not an independent-test or Agent
 gain. No validation promotion follows automatically. After this closeout, the
-coordinator separately released the unchanged four-route candidate; actual job
-[31871386](docs/verified-runs/scifact-mixed-four-route-submission-31871386.json)
-was submitted once and initially `PENDING(Resources)`, not a completed result.
-The utility8 negative result is unchanged.
+coordinator separately released the unchanged four-route candidate.
+[Job 31871386 completed](docs/verified-runs/scifact-mixed-four-route-closeout-31871386.json)
+48/48 slots in 189 s: fixed retrieval / fixed rerank / deterministic extra / adaptive
+strict correctness was **3/5/4/3 of twelve** (each includes three correct NEI abstentions).
+Adaptive proposed **zero tools**, and sufficient-evidence grounding failures remain.
+This is a negative autonomous-policy result, not Agent success; utility8 remains unchanged.
+A [bounded evidence-note candidate](docs/SCIFACT_EVIDENCE_NOTE_20261001.md) reuses all
+twelve fixed-rerank frames to test two-stage grounding, with **no new baseline calls**.
+CPU implementation is not GPU release or a measured improvement.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external
