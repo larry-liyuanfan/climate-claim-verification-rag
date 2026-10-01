@@ -13,6 +13,7 @@ from climate_rag.scifact_read_continuation import ordered_write
 from climate_rag.scifact_semantic_contract import TOKENIZER_SHA, checked
 from climate_rag.scifact_utility_contract import identity
 from run_scifact_evidence_commit_operator import FROZEN_FIELDS
+import scifact_evidence_input as prospective_inputs
 
 
 def probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
@@ -44,15 +45,38 @@ def probe(frame: Any, tokenizer: Any) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("inputs", "inventory", "tokenizer", "output"):
+    for name in ("tokenizer", "output"):
         parser.add_argument("--"+name, type=Path, required=True)
+    for name in ("inputs", "inventory", "prepared", "release"):
+        parser.add_argument("--"+name, type=Path)
     args = parser.parse_args()
-    inventory = json.loads(args.inventory.read_bytes())
-    require(identity(inventory) == FROZEN_FIELDS["initial_inventory_sha256"], "frozen_inventory_required")
     for name, digest in TOKENIZER_SHA.items():
         checked(args.tokenizer/name, digest)
     import transformers
     tokenizer = getattr(transformers, "AutoTokenizer").from_pretrained(args.tokenizer, local_files_only=True)
+    if args.prepared is not None:
+        require(args.release is not None and args.inputs is None and args.inventory is None, 'one_input_protocol_only')
+        release = json.loads(args.release.read_bytes())
+        require(prospective_inputs.prospective(release), 'prospective_preflight_release')
+        receipt, claims = prospective_inputs.check_prepared(args.prepared, release)
+        from climate_rag.scifact_grounding import parse_abstract
+        from climate_rag.scifact_semantic_contract import CORPUS_SHA
+        corpus = {d.doc_id:d for d in (parse_abstract(json.loads(line)) for line in
+            checked(args.prepared/'inference/corpus.jsonl', CORPUS_SHA).splitlines())}
+        frames = prospective_inputs.load_frames(args.prepared, claims, corpus, tokenizer, release)
+        rows = [probe(frame, tokenizer) for frame in frames]
+        report = {'protocol':PROTOCOL, 'input_protocol':release['input_protocol'], 'claims':len(rows),
+            'preparation_sha256':release['preparation_sha256'], 'rows':rows,
+            'maximum_tokens':max(r['maximum_tokens'] for r in rows),
+            'overflow_count':sum(r['overflow'] for r in rows), 'model_calls':0, 'gold_read':False,
+            'shared_preparation_cost':receipt['shared_preparation_cost'],
+            'probe_scope':'first_two_refs_fixed_synthetic_feedback_not_all_reachable_states'}
+        ordered_write(args.output, report)
+        print(json.dumps({k:v for k,v in report.items() if k != 'rows'}))
+        return
+    require(args.inputs is not None and args.inventory is not None and args.release is None, 'old_inventory_required')
+    inventory = json.loads(args.inventory.read_bytes())
+    require(identity(inventory) == FROZEN_FIELDS["initial_inventory_sha256"], "frozen_inventory_required")
     rows = []
     for claim_id in inventory["ordered_claim_ids"]:
         initial = f"inference/{claim_id}-A/initial-frame.json"

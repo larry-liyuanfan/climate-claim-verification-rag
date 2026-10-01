@@ -1,5 +1,13 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 prospective input preparation (CPU only)
+
+[Whole-chain review and input contract](SCIFACT_PROSPECTIVE24_CPU_20261002.md):
+conditional remaining 64 components / 97 IDs, fixed 24-component metadata
+selection, no-generation original retrieval/packing and shared input adapter.
+Zero model calls and no new real-gold access; no independent test or resume
+improvement is claimed. Existing exposed TRAIN24 results remain separate.
+
 ## 2026-10-01 separately released component diagnostic submission
 
 [Receipt](verified-runs/scifact-component-submission-31729507.json): exactly one

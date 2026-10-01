@@ -18,6 +18,7 @@ from run_scifact_evidence_note_operator import bounded_worker
 from run_scifact_grounding_train_operator import ROOT, require, sha
 from run_scifact_natural_operator import slot_watchdog
 from run_scifact_utility8_operator import verify_runtime_receipt
+import scifact_evidence_input as inputs
 
 ATTEMPT = "evidence-commit-v1"
 OUTPUT = ROOT / "runs" / (PROTOCOL + "-" + ATTEMPT)
@@ -47,11 +48,14 @@ REQUIRED_RELEASE_KEYS = frozenset(FROZEN_FIELDS) | {
 
 
 def validate_release(release: dict[str, Any]) -> None:
-    missing = REQUIRED_RELEASE_KEYS - release.keys()
+    fields = inputs.frozen_fields(FROZEN_FIELDS) if inputs.prospective(release) else FROZEN_FIELDS
+    missing = (frozenset(fields) | {"authorization", "source_git", "source_archive_sha256", "wrapper_sha256"}) - release.keys()
     require(not missing, "release_missing_fields:" + ",".join(sorted(missing)))
     require(release["authorization"] == "coordinator_exact_hash_release", "draft_is_not_executable")
-    require(all(type(release[k]) is type(v) and release[k] == v for k, v in FROZEN_FIELDS.items()),
+    require(all(type(release[k]) is type(v) and release[k] == v for k, v in fields.items()),
             "evidence_commit_frozen_contract")
+    if inputs.prospective(release):
+        inputs.validate_hashes(release)
     for key, size in (("source_archive_sha256", 64), ("wrapper_sha256", 64), ("source_git", 40)):
         require(isinstance(release[key], str) and len(release[key]) == size
                 and all(c in "0123456789abcdef" for c in release[key]), "release_hash:" + key)
@@ -61,14 +65,19 @@ def start_attempt(release: dict[str, Any], release_sha: str, job_id: str) -> dic
     """Exercise the real consumer before data preparation or model loading."""
     validate_release(release)
     observed = verify_runtime_receipt(release)
-    OUTPUT.mkdir(mode=0o700)  # new implementation comparison, never reuse r1/r2
-    ordered_write(OUTPUT / "reserved.json", {"protocol": PROTOCOL, "attempt_id": ATTEMPT,
+    output = output_path(release)
+    output.mkdir(mode=0o700)  # exclusive reservation, never reuse another run
+    ordered_write(output / "reserved.json", {"protocol": PROTOCOL, "attempt_id": release["attempt_id"],
         "infrastructure_retry": 0, "comparison_job_id": release["comparison_job_id"],
         "assembler": ASSEMBLER,
         "release_sha256": release_sha, "job_id": job_id, "source_git": release["source_git"],
         "planned_episodes": 72, "automatic_retry": False})
-    ordered_write(OUTPUT / "runtime.json", observed)
-    return observed
+    ordered_write(output / "runtime.json", observed)
+    return dict(observed)
+
+
+def output_path(release: Any) -> Path:
+    return Path(inputs.OUTPUT) if inputs.prospective(release) else OUTPUT
 
 
 def main() -> None:
@@ -87,30 +96,32 @@ def main() -> None:
             and release["source_archive_sha256"] == os.environ["CLIMATE_SOURCE_SHA256"]
             and sha(source / WRAPPER) == release["wrapper_sha256"], "source_binding")
     start_attempt(release, release_sha, os.environ["SLURM_JOB_ID"])
-    prepared = prepare(OUTPUT / "prepared")
+    output = output_path(release)
+    prepared = (inputs.copy_prepared(output / "prepared", release) if inputs.prospective(release)
+                else prepare(output / "prepared"))
     generator_only(ROOT / "envs" / ARCHIVES["input"][0], work / "input", release["model_archive_sha256"])
     read_only_tree(work / "input")
-    read_only_tree(OUTPUT / "prepared/inference")
+    read_only_tree(output / "prepared/inference")
     command = [sys.executable, str(source / "scripts/run_scifact_evidence_commit.py"),
         "--release", str(release_path), "--release-sha", release_sha,
-        "--inference-dir", str(OUTPUT / "prepared/inference"), "--model-root", str(work / "input/models"),
-        "--output", str(OUTPUT / "inference")]
-    proof = bounded_worker(command, OUTPUT, OUTPUT / "inference",
+        "--inference-dir", str(output / "prepared/inference"), "--model-root", str(work / "input/models"),
+        "--output", str(output / "inference")]
+    proof = bounded_worker(command, output, output / "inference",
         min(1980, 2400 - (time.monotonic() - began) - 420), watchdog=slot_watchdog)
-    proof.update(release_sha256=release_sha, preparation_sha256=sha(OUTPUT / "prepared/preparation.json"))
-    ordered_write(OUTPUT / "worker-exit.json", proof)
+    proof.update(release_sha256=release_sha, preparation_sha256=sha(output / "prepared/preparation.json"))
+    ordered_write(output / "worker-exit.json", proof)
     require(proof["child_reaped"] is True, "no_scoring_before_reap")
     from score_scifact_evidence_commit import score_after_exit
     def load_tokenizer() -> Any:
         import transformers
         return getattr(transformers, "AutoTokenizer").from_pretrained(work / "input/models/generator/model", local_files_only=True)
-    scored = score_after_exit(OUTPUT, load_tokenizer, release, release_sha=release_sha)
-    ordered_write(OUTPUT / "complete.json", {"source_git": release["source_git"], "prepared": prepared,
+    scored = score_after_exit(output, load_tokenizer, release, release_sha=release_sha)
+    ordered_write(output / "complete.json", {"source_git": release["source_git"], "prepared": prepared,
         "status": scored["status"], "inference_returncode": proof["returncode"],
-        "cost_sha256": sha(OUTPUT / "cost-before-gold.json"),
-        "quality_sha256": sha(OUTPUT / "quality.json") if (OUTPUT / "quality.json").exists() else None,
+        "cost_sha256": sha(output / "cost-before-gold.json"),
+        "quality_sha256": sha(output / "quality.json") if (output / "quality.json").exists() else None,
         "elapsed_seconds": time.monotonic() - began, "training_authorized": False,
-        "attempt_id": ATTEMPT, "infrastructure_retry": 0,
+        "attempt_id": release["attempt_id"], "infrastructure_retry": 0,
         "assembler": ASSEMBLER, "automatic_retry": False})
     raise SystemExit(proof["returncode"] or 0)
 

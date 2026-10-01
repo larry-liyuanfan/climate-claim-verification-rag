@@ -102,29 +102,52 @@ def summarize(ids: list[int], golds: list[Any], rows: Any, corpus: Any,
 def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path = ROOT, *,
                      protocol: str = PROTOCOL, arms: tuple[str, ...] = ARMS,
                      audit_fn: Any = None, baseline_arm: str = "fixed",
-                     comparison_limits: dict[str, Any] | None = None) -> dict[str, Any]:
+                     comparison_limits: dict[str, Any] | None = None,
+                     input_adapter: Any = None) -> dict[str, Any]:
     proof = json.loads((output / "worker-exit.json").read_bytes())
     require(proof["child_reaped"] is True, "exit_before_cost_and_gold")
-    selection = json.loads(checked(output / "prepared/selection.json", SELECTION_SHA))
-    ids = [r["id"] for r in selection["selected"]]
-    require(len(ids) == len(set(ids)) == 24, "all_24_fixed")
     inference = output / "inference"
-    cost = ledger_cost(inference / "ledger")
+    cost = ledger_cost(inference / "ledger")  # preserve physical cost independently of prepared inputs
+    selected_sha = SELECTION_SHA
+    preparation_cost: Any = "historical frozen artifacts replayed, not newly timed online retrieval"
+    input_failed = False
+    if input_adapter is not None:
+        selected_sha = release["selection_sha256"]
+        preparation_cost = {"status": "unknown_input_binding_failed", "seconds": None}
+    ids: list[int] = []
+    try:
+        selection = json.loads(checked(output / "prepared/selection.json", selected_sha))
+        ids = [r["id"] for r in selection["selected"]]
+        require(len(ids) == len(set(ids)) == 24, "all_24_fixed")
+    except (ValueError, KeyError, OSError, TypeError):
+        if input_adapter is None:
+            raise
+        ids, input_failed = [], True
+    if input_adapter is not None and not input_failed:
+        try:
+            bound, _ = input_adapter.check_prepared(output / "prepared", release)
+            preparation_cost = bound["shared_preparation_cost"]
+        except (ValueError, KeyError, OSError, TypeError, RuntimeError, ImportError):
+            input_failed = True
     arm_costs, unassigned = arm_costs_before_gold(inference / "ledger", ids, arms)
     missing = sum(not (inference / f"{i}-{a}/result.json").exists() for i in ids for a in arms)
-    planned_slots = len(ids) * len(arms)
+    planned_slots = 24 * len(arms)  # failed input identity never shrinks the denominator
+    if not ids:
+        missing = planned_slots
     audit_call = audit_episode if audit_fn is None else audit_fn
     ordered_write(output / "cost-before-gold.json", {"protocol": protocol, "planned_slots": planned_slots,
         "physical_generation_cost": cost, "missing_episodes": missing, "gold_read": False,
         "arm_physical_generation_cost": arm_costs,
         "unassigned_physical_generation_cost": unassigned,
         "exit_proof_sha256": sha(output / "worker-exit.json"),
-        "initial_retrieval_cost": "historical frozen artifacts replayed, not newly timed online retrieval"})
+        "initial_retrieval_cost": preparation_cost})
     def no_quality(reason: str) -> dict[str, Any]:
         report = {"protocol": protocol, "status": "no_quality", "reason": reason, "planned_slots": planned_slots,
                   "gold_read": False, "cost_sha256": sha(output / "cost-before-gold.json")}
         ordered_write(output / "no-quality.json", report)
         return report
+    if input_failed:
+        return no_quality("prospective_input_binding_failed_cost_preserved")
     if (proof["returncode"] != 0 or proof["interrupted"] is not None or missing
             or cost["unknown_usage_attempts"] or cost["unique_physical_calls"] > 240
             or unassigned["unique_physical_calls"]):
@@ -135,7 +158,9 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
             checked(output / "prepared/inference/corpus.jsonl", CORPUS_SHA).splitlines())}
         receipt = json.loads((output / "prepared/preparation.json").read_bytes())
         claims = json.loads(checked(output / "prepared/inference/claims.json", receipt["claims_sha256"]))
-        frames = load_frames(claims, corpus, tokenizer, release["initial_inventory_sha256"])
+        frames = (input_adapter.load_frames(output / "prepared", claims, corpus, tokenizer, release)
+                  if input_adapter is not None else
+                  load_frames(claims, corpus, tokenizer, release["initial_inventory_sha256"]))
         require(json.loads((inference / "initial-frames.json").read_bytes()) == frames, "input_copy_changed")
         rows = {}
         for i, frame in zip(ids, frames, strict=True):
@@ -151,12 +176,15 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
     with tarfile.open(root / "envs" / ARCHIVE) as bundle:
         with member(bundle, PREP + "/gold/claims_train.jsonl") as stream:
             gold = select_complete_fit(stream, TRAIN_SHA, ids, corpus)
-    report = {"protocol": protocol, "status": "scored", "selection_sha256": SELECTION_SHA,
+    report = {"protocol": protocol, "status": "scored", "selection_sha256": selected_sha,
         "scoring_train_member_sha256": TRAIN_SHA, "cost_sha256": sha(output / "cost-before-gold.json"),
         **summarize(ids, list(gold.values()), rows, corpus, arms, baseline_arm), "arm_physical_generation_cost": arm_costs,
         "generation_time_note": "ledger elapsed includes prompt/journal/decoding; not end-to-end online SLA",
         "training_authorized": False}
     if comparison_limits is not None:
         report["comparison_limits"] = comparison_limits
+    if input_adapter is not None:
+        report["limits"] = release["input_scope"]
+        report["initial_retrieval_cost"] = preparation_cost
     ordered_write(output / "quality.json", report)
     return report

@@ -52,8 +52,8 @@ def _result(state: CommitState, frame: Any, steps: Any, corpus: Any, elapsed: fl
         "terminal": state.terminal, "assembled": state.assembled, "prediction": state.prediction(corpus),
         "steps": steps, "verification_feedback": state.feedback, "verdict_refs": state.registry.records(),
         "physical_calls": state.calls, "tool_calls": state.tools, "elapsed_seconds": elapsed,
-        "initial_retrieval": {"status": "replayed_frozen_original", "tool_debit": 1,
-            "cost": "historical_not_recomputed_or_claimed_free_online"},
+        "initial_retrieval": frame.get("initial_retrieval", {"status": "replayed_frozen_original", "tool_debit": 1,
+            "cost": "historical_not_recomputed_or_claimed_free_online"}),
         "verify_is_commit_prerequisite_not_spontaneous_demand": True}
 
 

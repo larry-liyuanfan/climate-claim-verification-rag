@@ -18,6 +18,7 @@ from run_scifact_bounded_arm import verify_manifest
 from run_scifact_evidence_commit_operator import validate_release
 from run_scifact_grounding_train_operator import require, sha
 from run_scifact_utility8 import arguments
+import scifact_evidence_input as inputs
 
 
 def main() -> None:
@@ -29,6 +30,8 @@ def main() -> None:
             and (source / "SOURCE_REVISION").read_text().strip() == release["source_git"]
             and str(args.output) == release["output"] + "/inference", "allocated_bound_source_required")
     preparation = json.loads((args.inference_dir.parent / "preparation.json").read_bytes())
+    if inputs.prospective(release):
+        preparation, _ = inputs.check_prepared(args.inference_dir.parent, release)
     claims = json.loads(checked(args.inference_dir / "claims.json", preparation["claims_sha256"]))
     docs = [parse_abstract(json.loads(r)) for r in checked(args.inference_dir / "corpus.jsonl", CORPUS_SHA).splitlines()]
     corpus = {d.doc_id: d for d in docs}
@@ -42,7 +45,9 @@ def main() -> None:
     (args.output.parent / "private-loader").mkdir(mode=0o700)
     provider = EvidenceCommitProvider(generator / "model", manifest, private_dir=args.output.parent / "private-loader")
     base_state(provider)
-    frames = load_frames(claims, corpus, provider.base.tokenizer, release["initial_inventory_sha256"])
+    frames = (inputs.load_frames(args.inference_dir.parent, claims, corpus, provider.base.tokenizer, release)
+              if inputs.prospective(release) else
+              load_frames(claims, corpus, provider.base.tokenizer, release["initial_inventory_sha256"]))
     args.output.mkdir(mode=0o700)
     ordered_write(args.output / "initial-frames.json", frames)
     ordered_write(args.output.parent / "model-load.json", {"base_model_sha256": MODEL_SHA,

@@ -1,5 +1,9 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [prospective conditional TRAIN24 CPU package](docs/SCIFACT_PROSPECTIVE24_CPU_20261002.md)
+adapts once-frozen metadata and gold-free initial frames to the unchanged policy;
+it adds no model result, independent-test claim or GPU authorization.
+
 The separately authorized [evidence-commit confirmation](docs/SCIFACT_EVIDENCE_COMMIT_CONFIRMATION_20261002.md)
 completed **72/72 slots in 312 s** after whole-chain CPU review. Immutable verifier
 references and deterministic assembly recovered strict evidence-bearing answers:

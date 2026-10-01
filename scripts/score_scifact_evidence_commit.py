@@ -9,6 +9,7 @@ from climate_rag.scifact_evidence_commit import ARMS, PROTOCOL
 from climate_rag.scifact_evidence_commit_runtime import audit_episode
 from score_scifact_document_verifier import score_after_exit as score_original_entry
 from run_scifact_grounding_train_operator import ROOT
+import scifact_evidence_input as inputs
 
 
 def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path = ROOT, *,
@@ -23,6 +24,7 @@ def score_after_exit(output: Path, load_tokenizer: Any, release: Any, root: Path
             "trusted_release_scope_mismatch")
     return score_original_entry(output, load_tokenizer, release, root,
         protocol=PROTOCOL, arms=ARMS,
+        input_adapter=inputs if inputs.prospective(release) else None,
         audit_fn=partial(audit_episode, run_identity=release_sha), baseline_arm="fixed_all",
         comparison_limits={
             "verify_is_prerequisite_not_spontaneous_demand": True,
