@@ -1,5 +1,37 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 paired verifier result and CPU-only scoring recovery
+
+[Result/decision report](SCIFACT_PAIRED_VERIFIER_RESULT_20261002.md) and
+[redacted compact](verified-runs/scifact-paired-31980221-cpu-replay.json), SHA
+`d68fa9ace3ff7749c2f9ca5a86775d09ca7eb413214127425f109f3a0c4cb6e9`:
+same consumed conditional TRAIN24 × two protocols × three arms, all 144 slots,
+392 physical calls, 830,597 input / 20,737 output tokens, zero unknown usage.
+No new sample, training, protected split or model call was used by closeout.
+
+Original GPU job **31980221** is still FAILED/2:0, 762 s, MaxRSS 9,269,536K;
+both workers exited 0 and were reaped. Original no-quality/gold-unread reports
+remain untouched. The exact failure was `paired_effective_generation_binding`:
+authorized JSON stored seven integer-valued floats as integers. Recorded contract
+identity matched the released contract, but not the scorer's rebuilt representation.
+Repair **1f6f920** retains frozen semantic checks and all model/physical/feedback
+audits while checking the trusted release's exact `identity()` serialization.
+Separate CPU replay **31988504** completed in 49 s / 868,868K MaxRSS, restored both
+scores with unchanged original-tree manifests and zero model calls. A 684-file
+`verify_source_tree` check passed **after** this replay; it is not a pre-execution
+attestation. Future replay entrypoints now perform that same check before scoring.
+Exact-repair [Linux CI](https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36907952703)
+passed **1,400 tests**, Ruff, strict typing and tracked secret/PII scanning.
+
+v2 → v3 fixed-top1 strict positives **5/15 → 4/15**, official abstract-rationalized
+F1 **0.5882 → 0.3500**; fixed-all **3/15 → 2/15**, F1 **0.4906 → 0.2750**.
+Adaptive strict positives remain **5/15**, but NEI correct **6/9 → 2/9** and F1
+**0.5556 → 0.4000**. v3 adaptive beats its own weaker top1 by one positive, not the
+v2 top1 quality/cost baseline. Across-version adaptive has three positive wins and
+three losses, not recovery of the same five cases. Reject v3 promotion; no resume
+quality gain. Fixed unresolved and adaptive explicit abstention remain asymmetric;
+do not convert these into a fair NEI/classification improvement claim.
+
 ## 2026-10-02 paired verifier preparation (CPU only; not a result)
 
 [Whole-chain report](SCIFACT_PAIRED_VERIFIER_PREPARATION_20261002.md): prepares the

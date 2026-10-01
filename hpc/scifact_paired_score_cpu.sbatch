@@ -34,9 +34,12 @@ from climate_rag.scifact_semantic_contract import TOKENIZER_SHA, checked
 from climate_rag.scifact_utility_contract import identity
 from run_scifact_grounding_train_operator import ROOT, require, sha
 from scifact_paired_comparison import validate_pair, compare_quality
+from prepare_scifact_semantic_pair import verify_source_tree
 
 stage = pathlib.Path(os.environ['CLIMATE_REPLAY_STAGE'])
 source = stage/'source'
+verify_source_tree(source, stage/'source.tar', os.environ['CLIMATE_REPLAY_ARCHIVE_SHA'],
+                   os.environ['CLIMATE_REPLAY_GIT'])
 original = ROOT/'runs/scifact-evidence-commit-paired-v2-v3-20261002'
 release_path = ROOT/'envs/paired-verifier-5a12fd9f398a/paired-release.authorized.json'
 release_sha = 'a09e0488d2b2bcc1fee05ea242f3820b91eadc44c126121f48f4007c1b80d96e'

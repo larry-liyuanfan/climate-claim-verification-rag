@@ -1,13 +1,18 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-The [paired v2/v3 three-arm preparation](docs/SCIFACT_PAIRED_VERIFIER_PREPARATION_20261002.md)
-binds full decoding defaults/effective settings and prepares one bounded serial
-**144-slot / 480-call ceiling** comparison. It reuses CPU preflight 31969505;
-no new model call or Slurm submission is part of this preparation. Whole-chain
-review covers failure cleanup, original-score compatibility and complete costs.
-GPU execution still needs a later exact-release authorization; no quality gain
-or resume result is claimed. Exact-source Linux CI passed **1,393 tests** and the
-Spartan metadata-only runtime/configuration preflight passed with no new job.
+The [paired v2/v3 confirmation and CPU recovery](docs/SCIFACT_PAIRED_VERIFIER_RESULT_20261002.md)
+completed **144 slots / 392 model calls** on the same consumed TRAIN24. The
+relation/rationale v3 candidate is **not promoted**: fixed-top1 strict positives
+fell **5/15 → 4/15**, while adaptive remained **5/15** and correct NEI abstentions
+fell **6/9 → 2/9**. Original official scores, full costs and five redacted paired
+cases are retained; this is not independent-test or causal Agent-gain evidence.
+GPU job 31980221 remains FAILED/no-quality because its scorer hashed a rebuilt
+contract instead of the authorized JSON representation (`1.0` versus `1`).
+CPU-only replay 31988504 restored both original scores in **49 s**, with **zero
+new model calls** and identical before/after original-artifact hashes. Executed
+and replay source identities are separate. The repair passed **1,400 Linux tests**;
+the earlier [whole-chain preparation](docs/SCIFACT_PAIRED_VERIFIER_PREPARATION_20261002.md)
+remains historical preparation evidence, not a guarantee against every runtime bug.
 
 The [single-response relation/rationale verifier](docs/SCIFACT_RELATION_RATIONALE_VERIFIER_20261002.md)
 now separates comparable scope, contradictory outcomes, joint direct evidence,
