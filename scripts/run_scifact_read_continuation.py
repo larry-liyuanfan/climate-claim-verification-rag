@@ -93,8 +93,8 @@ def main() -> None:
     provider = ActiveAdapterProvider(args.model_dir, manifest, private_dir=args.output/'private-responses', gap=False)
     provider.base.model, integrity = restore_causal_adapter(provider.base.model, args.adapter/'final')
     require(integrity['tensor_count'] == 144 and integrity['all_checkpoint_values_equal'], 'tensor_restoration')
-    # Provider only needs active=True; the rest is a separately bound probe policy.
-    binding = identity['policy'] | {'adapter_active':True}
+    # Bind the same checkpoint identity as the separately released probe policy.
+    binding = identity['policy']
     integrity['active_state'] = provider.bind(binding)
     identity['provider_binding_sha256'] = sha(encoded(binding))
     write_once(args.output/'adapter-integrity.json', integrity | identity)

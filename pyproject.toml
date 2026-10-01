@@ -46,6 +46,8 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+# CLI entry modules are tested directly; do not depend on a developer's PYTHONPATH.
+pythonpath = ["scripts"]
 
 [tool.ruff]
 target-version = "py310"

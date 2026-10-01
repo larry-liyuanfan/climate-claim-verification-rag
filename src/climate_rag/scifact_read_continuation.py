@@ -21,7 +21,10 @@ CALL_SECONDS = 120
 
 
 def policy(source: Path) -> dict[str, Any]:
-    return {'protocol': PROTOCOL, 'inherited_regression_policy': policy_identity(source),
+    inherited = policy_identity(source)
+    return {'protocol': PROTOCOL, 'inherited_regression_policy': inherited,
+        'adapter_active': inherited['adapter_active'],
+        'adapter_model_sha256': inherited['adapter_model_sha256'],
         'planned_slots': 3, 'max_generator_calls': 3, 'calls_per_slot': 1,
         'repair_calls': 0, 'warmup_calls': 0, 'reranker_calls': 0,
         'execute_model_proposed_tools': False, 'max_output_tokens': 512,

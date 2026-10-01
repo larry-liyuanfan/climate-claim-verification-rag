@@ -22,6 +22,21 @@ from test_scifact_train_diagnostic import TinyTokenizer
 SOURCE = Path(__file__).resolve().parents[1]
 
 
+def test_probe_policy_inherits_one_explicit_adapter_identity(monkeypatch):
+    import climate_rag.scifact_read_continuation as module
+    inherited = {'adapter_active':True, 'adapter_model_sha256':'a'*64, 'fixture':True}
+    calls = []
+    def frozen(source):
+        calls.append(source)
+        return inherited
+    monkeypatch.setattr(module, 'policy_identity', frozen)
+    actual = policy(SOURCE)
+    assert calls == [SOURCE]
+    assert actual['inherited_regression_policy'] == inherited
+    assert actual['adapter_active'] is inherited['adapter_active']
+    assert actual['adapter_model_sha256'] == inherited['adapter_model_sha256']
+
+
 def prepared():
     corpus,sources,review = fixture()
     tokenizer = TinyTokenizer()
@@ -182,7 +197,7 @@ def scored_fixture(tmp_path,monkeypatch):
         'private_membership_sha256':sha((prep/'private-membership.json').read_bytes())}
     write_once(tmp_path/'release.json',r)
     digest=sha((tmp_path/'release.json').read_bytes())
-    binding=r['policy'] | {'adapter_active':True}
+    binding=r['policy']
     provider.bind(binding)
     identity={'release_sha256':digest,'provider_binding_sha256':sha(encoded(binding))}
     records=[call_once(provider,row,corpus,directory,i,identity) for i,row in enumerate(rows,1)]

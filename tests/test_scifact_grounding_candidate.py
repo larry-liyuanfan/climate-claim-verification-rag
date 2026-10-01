@@ -178,6 +178,7 @@ def test_audit_rejects_changed_summary(tmp_path: Path, corpus: dict[int, Abstrac
 
 def test_partial_entrypoint_score_retains_whole_planned_denominator(tmp_path: Path, corpus: dict[int, Abstract], monkeypatch: pytest.MonkeyPatch) -> None:
     import run_scifact_grounding_candidate as entry
+    from run_scifact_grounding_tune_operator import TRAINING_SHA
     from climate_rag.scifact_semantic_contract import encoded, sha, write_once
     bundle, output = tmp_path / "bundle", tmp_path / "output"
     (bundle / "inference").mkdir(parents=True)
@@ -191,7 +192,7 @@ def test_partial_entrypoint_score_retains_whole_planned_denominator(tmp_path: Pa
     manifest = {"files": {"inference/tune.json": sha(encoded(rows)), "scoring/tune.json": sha(encoded(gold))}}
     monkeypatch.setattr(entry, "load_bundle", lambda *args: (manifest, corpus))
     evaluate_arm(rows, corpus, Provider(fail=True), output / "base", "base")
-    entry.terminate_inference(output, "tune", "data", "adapter")
+    entry.terminate_inference(output, "tune", "data", TRAINING_SHA)
     execution = output.with_name("output-execution")
     execution.mkdir()
     write_once(execution / "worker-exit.json", {"child_reaped": True, "returncode": 0,
