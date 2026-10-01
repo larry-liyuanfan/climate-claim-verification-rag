@@ -119,14 +119,31 @@ def test_child_group_is_killed_and_reaped_before_any_scoring(tmp_path,monkeypatc
     assert bool(proof['parent_wait_interrupted']) is (failure != 'timeout')
 
 
-def fixture_run(tmp_path,monkeypatch):
+def fixture_run(tmp_path,monkeypatch,checkpoint_binding=None):
     out = tmp_path/'output'
     directory = out/'inference'
     (directory/'private-responses').mkdir(parents=True)
     (out/'allocation').mkdir()
     monkeypatch.setattr(operator,'OUTPUT',out)
-    monkeypatch.setattr(scorer,'OUTPUT',out)
     r = release()
+    if checkpoint_binding is not None:
+        from climate_rag.scifact_mixed_checkpoint import binding_identity
+        from climate_rag.scifact_mixed_inputs import seal
+        r.update(checkpoint_binding=checkpoint_binding, **{k:v for k,v in binding_identity(checkpoint_binding).items()
+            if k in {'adapter_training_sha256','adapter_model_sha256'}})
+        r['policy'] = policy_identity(SOURCE,checkpoint_binding)
+        monkeypatch.setattr(operator,'release_paths',lambda _: (out,Path(checkpoint_binding['directory'])))
+        monkeypatch.setattr(scorer,'release_paths',operator.release_paths)
+        # Metadata fixture only, deliberately direct != component overlap.
+        roster = json.loads(Path(checkpoint_binding['training_release_file']).read_bytes())
+        roster_path = Path(roster['prepared_directory'])/'roster.json'
+        value = json.loads(roster_path.read_bytes())['payload']
+        value['components'][str(value['claim_ids'][0])] = 'fixture-0'
+        value['components'][str(value['claim_ids'][1])] = 'fixture-1'
+        value['components'][str(value['claim_ids'][2])] = 'fixture-2'
+        roster_path.write_text(json.dumps(seal(value),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+        checkpoint_binding['roster_file_sha256'] = sha(roster_path.read_bytes())
+        r['policy'] = policy_identity(SOURCE,checkpoint_binding)
     release_path = tmp_path/'release.json'
     write_once(release_path,r)
     digest = sha(release_path.read_bytes())
@@ -144,7 +161,7 @@ def fixture_run(tmp_path,monkeypatch):
     rows = runner.execute_slots(claims,provider,lambda q,k:sources,lambda q,c:c,corpus,directory,identity)
     assert len(calls) == len(rows) == 48
     assert [row['route'] for row in rows] == list(ROUTES)*12
-    assert all(row['result']['generation_attempts'][0]['diagnostics']['adapter_sha256'] == ADAPTER_SHA for row in rows)
+    assert all(row['result']['generation_attempts'][0]['diagnostics']['adapter_sha256'] == r['adapter_model_sha256'] for row in rows)
     assert all(row['result']['generation_attempts'][0]['diagnostics']['base_model_sha256'] == MODEL_SHA for row in rows)
     integrity = identity | {'active_state':active_state(provider.base.model), 'tensor_count':144,'all_checkpoint_values_equal':True}
     write_once(directory/'adapter-integrity.json',integrity)
@@ -183,8 +200,8 @@ def test_full_four_route_fixture_uses_physical_event_and_prediction_scorers(tmp_
     report = scorer.score(args)
     assert report['planned_slots'] == report['costs']['actual_model_calls'] == 48
     assert report['validation_gate'] is False and report['independent_test'] is False
-    assert report['read_opportunity_fit_subgroups']['read_opportunity_fit_overlap']['claims'] == 1
-    assert report['read_opportunity_fit_subgroups']['read_opportunity_no_direct_fit_overlap']['claims'] == 2
+    assert report['read_opportunity_fit_subgroups']['read_opportunity_component_overlap']['claims'] == 1
+    assert report['read_opportunity_fit_subgroups']['read_opportunity_no_component_overlap']['claims'] == 2
     assert report['costs']['reranker_tokens'] is None
 
 

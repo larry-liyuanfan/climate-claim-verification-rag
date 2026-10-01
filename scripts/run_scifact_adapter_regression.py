@@ -76,9 +76,9 @@ def main() -> None:
     verifier(args.reranker_manifest, args.reranker_dir, RERANKER_SHA)
     for name, digest in TOKENIZER_SHA.items():
         checked(args.model_dir / name, digest)
-    checkpoint_metadata(args.adapter)
+    checkpoint_metadata(args.adapter, release.get('checkpoint_binding'))
     args.output.mkdir(mode=0o700)
-    policy = policy_identity(source)
+    policy = policy_identity(source, release.get('checkpoint_binding'))
     identity = {'source_git': release['source_git'], 'source_archive_sha256': release['source_archive_sha256'],
         'release_sha256': args.release_sha, 'policy': policy, 'policy_sha256': sha(encoded(policy)),
         'inference_archive_sha256': release['inference_archive_sha256'], 'gold_loaded': False}

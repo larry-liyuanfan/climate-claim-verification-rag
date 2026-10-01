@@ -1,6 +1,6 @@
 # Frozen program-artifact bridge and claim-mean training entry
 
-Status: **real CPU preparation complete; GPU training not released**.
+Status: **real CPU preparation and GPU training accepted; evaluation not released**.
 [Job 31854794](verified-runs/scifact-mixed-cpu-closeout-31854794.json) prepared
 144/144 claims and 223 rows with 36 planned updates, zero failed/unknown slots.
 Slurm elapsed was 82 s, TotalCPU 69.512 s and batch MaxRSS 621,280 K. Three
@@ -9,6 +9,53 @@ rechecked. No model was loaded, optimizer stepped or quality gain measured.
 The earlier CPU NEI47 run is complete, not a
 missing-Torch/POSIX failure. Existing Windows Torch 2.7.1+cpu and Linux runtime
 are reused; no dependency or operating-system installation is needed.
+
+## Accepted training and bounded evaluation seam
+
+[Actual training job 31858295](verified-runs/scifact-mixed-training-closeout-31858295.json)
+used immutable source `53d786ce6fca1ec981e9a3deda4a0771bb1fb553`.
+All 144 claims / 223 rows were processed once in 36 complete-claim mean updates;
+the first-step pilot is update 1, not an extra epoch or reinitialized optimizer.
+Elapsed was 394 s, TotalCPU 378.046 s and batch MaxRSS 9,432,296 K.
+Observed training loss was 0.2840036816, not a quality result. The coordinator
+independently matched every group to the frozen plan and scanned all 144 FP32
+saved tensors / 2,949,120 parameters for finite values. Full PEFT reload/value
+equality remains mandatory inside the actual evaluation allocation.
+
+`scifact_mixed_checkpoint.py` is an identity adapter, not a second trainer or
+evaluator. It binds the successful child exit, actual three adapter files,
+source/release/runtime and accepted CPU receipt. Serialized file SHA values
+remain distinct from prepared/plan logical envelope identities. The inference
+loader does not open training `prepared.json`, `plan.json` or target records.
+
+- Tune12 reuses the old frozen inputs/decoder and performs base12 then adapted12
+  with the same loaded model. The new training config is not substituted for
+  the old evaluation-data config. A distinct source-keyed output is exclusive.
+- Physical response/cost audit is durably written before scoring gold; absent
+  or mismatched mixed release, incomplete/unknown costs or nonzero child exit
+  prevent quality scoring. The mixed gate always has `next_validation_calls=0`.
+- The original four routes retain 48 slots / at most 168 generation calls /
+  36 reranks / 720 requested pairs, the existing c0 aliases and CommonPacking.
+  The new checkpoint SHA follows provider names, success/failure diagnostics,
+  policy and scoring. Overlap uses metadata from all 144 training claims;
+  direct-claim and component overlaps are separate. Empty component subgroups
+  are unavailable, not zero-score groups or independent held-outs.
+- No independent validation12, dev300 or retired test data is opened. No real
+  tune or four-route run is executed by packaging or local synthetic tests.
+
+Freeze a **candidate only** from a clean committed checkout:
+
+```powershell
+$env:PYTHONPATH='src;scripts'
+.venv-validation/Scripts/python.exe scripts/package_scifact_mixed_tune.py `
+  --repo . --commit <exact-current-HEAD> --output artifacts/mixed-tune-<HEAD12> `
+  --bash E:/SoftWare/Git/bin/bash.exe
+```
+
+The package reuses the existing source packager and actual tune wrapper guard;
+wrong revision/archive/wrapper must fail. It does not upload, allocate, load
+weights or read scoring data. A separate exact-hash coordinator release is
+required before the one 24-call paired evaluation; no automatic replay follows.
 
 ## Utility8 conclusion, not Agent success
 

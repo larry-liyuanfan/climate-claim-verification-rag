@@ -195,7 +195,7 @@ def test_last_slot_stop_blocks_gate_despite_semantic_gain(tmp_path: Path,
     for arm, provider in [('base',Base()),('adapted',Adapted())]:
         result = evaluate_arm(rows,corpus,provider,output/arm,arm)
         assert result['attempts'] == 12
-    entry.terminate_inference(output,partition,'data','adapter')
+    entry.terminate_inference(output,partition,'data',operator.TRAINING_SHA)
     execution = output.with_name('output-execution')
     execution.mkdir()
     write_once(execution/'worker-exit.json',{'child_reaped':True,'returncode':0,

@@ -9,14 +9,14 @@ from pathlib import Path
 from typing import Any
 
 from climate_rag.scifact_adapter_regression import (
-    ADAPTER_SHA, FIT_SHA, PREVIOUS_SOURCE, PROTOCOL, SCORING_MANIFEST,
+    FIT_SHA, PREVIOUS_SOURCE, PROTOCOL, SCORING_MANIFEST,
     load_frozen, policy_identity, require,
 )
 from climate_rag.scifact_diagnostic_scoring import score_diagnostic
 from climate_rag.scifact_grounding import parse_abstract, parse_gold
 from climate_rag.scifact_semantic_contract import MODEL_SHA, ROUTES, SCORING_NAMES, checked, encoded, sha, write_once
 from audit_scifact_bounded_closeout import audit_slot, physical, tariff
-from run_scifact_adapter_regression_operator import OUTPUT, validate_release
+from run_scifact_adapter_regression_operator import release_paths, validate_release
 from run_scifact_grounding_train_operator import ROOT
 from score_scifact_semantic_pair import terminal_counts, validate_prepared_scoring
 
@@ -85,11 +85,12 @@ def score(args: Any) -> dict[str, Any]:
     source = Path(__file__).resolve().parents[1]
     release = json.loads(checked(args.release, args.release_sha))
     validate_release(release, source)
-    require(args.output == OUTPUT, 'fixed_scoring_output')
+    require(args.output == release_paths(release)[0], 'fixed_scoring_output')
     proof = json.loads((args.output / 'allocation/worker-exit.json').read_bytes())
     require(proof['child_reaped'] is True and proof['release_sha256'] == args.release_sha, 'inference_must_exit_first')
     directory = args.output / 'inference'
-    policy = policy_identity(source)
+    binding = release.get('checkpoint_binding')
+    policy = policy_identity(source, binding)
     identity = {'source_git': release['source_git'], 'source_archive_sha256': release['source_archive_sha256'],
         'release_sha256': args.release_sha, 'policy': policy, 'policy_sha256': sha(encoded(policy)),
         'inference_archive_sha256': release['inference_archive_sha256'], 'gold_loaded': False}
@@ -118,11 +119,11 @@ def score(args: Any) -> dict[str, Any]:
     for index, row in enumerate(rows, 1):
         require(row['result']['regression_protocol'] == PROTOCOL, 'regression_protocol_binding')
         for attempt in row['result']['generation_attempts']:
-            binding = attempt['diagnostics']
-            require(binding['base_model_sha256'] == MODEL_SHA and binding['adapter_sha256'] == ADAPTER_SHA
-                    and binding['regression_policy_sha256'] == identity['policy_sha256']
-                    and binding['adapter_state'] == expected_state
-                    and all(len(binding[key]) == 64 for key in ('actual_prompt_sha256', 'actual_schema_sha256')),
+            diagnostic = attempt['diagnostics']
+            require(diagnostic['base_model_sha256'] == MODEL_SHA and diagnostic['adapter_sha256'] == policy['adapter_model_sha256']
+                    and diagnostic['regression_policy_sha256'] == identity['policy_sha256']
+                    and diagnostic['adapter_state'] == expected_state
+                    and all(len(diagnostic[key]) == 64 for key in ('actual_prompt_sha256', 'actual_schema_sha256')),
                     'physical_call_active_binding')
         wire, raw = physical(directory / f'private-responses/slot-{index:02d}', row['result']['generation_attempts'], False)
         raw_per_slot.append((wire, raw))
@@ -150,18 +151,26 @@ def score(args: Any) -> dict[str, Any]:
             for _, audit in routed:
                 totals.update(audit[key])
             quality['routes'][route][key] = dict(totals)
-    fit = json.loads(checked(ROOT / 'posthoc/scifact-grounding-candidate-40d84a377bd1/fit/records.json', FIT_SHA))
-    fit_ids, fit_components = {r['claim_id'] for r in fit}, {r['component'] for r in fit}
-    overlap = {s['id'] for s in selected if s['component'] in fit_components}
-    require(overlap == {s['id'] for s in selected if s['id'] in fit_ids} and len(overlap) == 1, 'fixed_overlap')
+    if release.get('checkpoint_binding') is not None:
+        from climate_rag.scifact_mixed_checkpoint import fit_overlap
+        fit_info = fit_overlap(release['checkpoint_binding'], selected)
+        overlap = set(fit_info['component_overlap'])
+    else:
+        fit = json.loads(checked(ROOT / 'posthoc/scifact-grounding-candidate-40d84a377bd1/fit/records.json', FIT_SHA))
+        fit_ids, fit_components = {r['claim_id'] for r in fit}, {r['component'] for r in fit}
+        overlap = {s['id'] for s in selected if s['component'] in fit_components}
+        require(overlap == {s['id'] for s in selected if s['id'] in fit_ids} and len(overlap) == 1, 'fixed_overlap')
+        fit_info = {'direct_claim_overlap': sorted(overlap), 'component_overlap': sorted(overlap), 'fit_claims': len(fit_ids)}
     read_ids = {s['id'] for s in selected if s['legacy_stratum'] == 'top20_doc_replenishable'}
-    groups = {'read_opportunity_fit_overlap': read_ids & overlap, 'read_opportunity_no_direct_fit_overlap': read_ids-overlap}
-    subgroup = {name: {'claims': len(ids), 'exposed_regression_not_heldout': True,
+    groups = {'read_opportunity_component_overlap': read_ids & overlap,
+              'read_opportunity_no_component_overlap': read_ids-overlap}
+    subgroup = {name: {'claims': len(ids), 'available': bool(ids), 'exposed_regression_not_heldout': True,
         'quality': score_diagnostic([g for g in gold if g.claim_id in ids], corpus,
-            [r for r in rows if r['claim_id'] in ids], [s for s in legacy if s['id'] in ids])}
+            [r for r in rows if r['claim_id'] in ids], [s for s in legacy if s['id'] in ids]) if ids else None}
         for name, ids in groups.items()}
     return {'status': 'old_TRAIN_four_route_regression_scored_not_gate', 'identity': identity,
         'costs': costs, 'quality': quality, 'read_opportunity_fit_subgroups': subgroup,
+        'fit_overlap_metadata': fit_info,
         'planned_slots': 48, 'gold_loaded_after_inference_exit': True,
         'wire_audits': [wire for wire, _ in raw_per_slot], 'independent_test': False,
         'validation_gate': False, 'further_execution_authorized': False,

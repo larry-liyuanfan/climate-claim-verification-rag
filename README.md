@@ -15,8 +15,14 @@ completed **144/144 ready / 223 rows / 36 planned updates**, with no failed or
 unknown claims. Raw-byte factories and physical readback preserve the fixed
 records, token packing and equal claim mass. All three output hashes and the
 atomic completion marker were rechecked; records remain private on Spartan.
-**This is input preparation, not model training, new evaluation or quality gain.**
-Exact-source preparation and GPU execution releases remain separate.
+The separately released [training job 31858295](docs/verified-runs/scifact-mixed-training-closeout-31858295.json)
+then completed all **144 claims / 223 rows / 36 updates exactly once** in 394 s.
+The final 144 FP32 LoRA tensors passed hash, shape and finite-value checks;
+observed training loss 0.284 is **not retrieval or grounding quality**.
+Mixed checkpoint binding now feeds the existing tune12 and four-route entries;
+only synthetic seam tests have run. Real paired evaluation remains separately
+released, with exact PEFT tensor reload, physical costs before gold and no
+automatic validation promotion. The utility8 negative conclusion above is unchanged.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external

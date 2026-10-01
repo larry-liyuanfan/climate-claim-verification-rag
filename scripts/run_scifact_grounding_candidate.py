@@ -188,12 +188,23 @@ def evaluate(args: Any) -> None:
     if args.partition == "validation":
         from run_scifact_grounding_validation_operator import verify_frozen_gate
         verify_frozen_gate(args.gate, release)
-    training = json.loads(checked(args.adapter / "complete.json", release["adapter_training_sha256"]))
-    require(training["data_manifest_sha256"] == args.data_sha
-            and training["config_sha256"] == config_sha(), "trained_adapter_identity")
-    for name, digest in training["adapter_files"].items():
-        require(Path(name).name == name, "adapter_path")
-        checked(args.adapter / "final" / name, digest)
+    evaluation_identity = None
+    if release.get('checkpoint_binding') is not None:
+        from climate_rag.scifact_mixed_checkpoint import binding_identity, checkpoint_metadata
+        from run_scifact_grounding_tune_operator import fixed_tune_release
+        fixed_tune_release(release)
+        require(args.partition == 'tune', 'mixed_tune_only')
+        checkpoint_metadata(args.adapter, release['checkpoint_binding'])
+        evaluation_identity = {'checkpoint': binding_identity(release['checkpoint_binding']),
+            'release_sha256': args.release_sha, 'source_git': release['source_git'],
+            'source_archive_sha256': release['source_archive_sha256']}
+    else:
+        training = json.loads(checked(args.adapter / "complete.json", release["adapter_training_sha256"]))
+        require(training["data_manifest_sha256"] == args.data_sha
+                and training["config_sha256"] == config_sha(), "trained_adapter_identity")
+        for name, digest in training["adapter_files"].items():
+            require(Path(name).name == name, "adapter_path")
+            checked(args.adapter / "final" / name, digest)
     name = f"inference/{args.partition}.json"
     rows = json.loads(checked(args.bundle / name, manifest["files"][name]))
     require(len(rows) == 12, "evaluation_24_call_cap")
@@ -202,7 +213,7 @@ def evaluate(args: Any) -> None:
     provider = LocalQwenBoundedSciFactProvider(args.model, model_manifest(args.model_manifest),
         private_dir=args.output, gap=False)
     provider.base.model, integrity = restore_causal_adapter(provider.base.model, args.adapter / "final")
-    write_once(args.output / "adapter-integrity.json", integrity)
+    write_once(args.output / "adapter-integrity.json", {**integrity, 'evaluation_identity': evaluation_identity})
     # Same loaded CausalLM and same full input. Only adapter state differs.
     try:
         with provider.base.model.disable_adapter():
@@ -213,10 +224,11 @@ def evaluate(args: Any) -> None:
         require(base["input_identity"] == adapted["input_identity"], "paired_inputs")
     finally:
         terminate_inference(args.output, args.partition, args.data_sha,
-                            release["adapter_training_sha256"])
+                            release["adapter_training_sha256"], evaluation_identity)
 
 
-def terminate_inference(output: Path, partition: str, data_sha: str, adapter_sha: str) -> None:
+def terminate_inference(output: Path, partition: str, data_sha: str, adapter_sha: str,
+                        evaluation_identity: dict[str, Any] | None = None) -> None:
     """Preserve partial runs and unattempted arm; no fabricated zero-cost calls."""
     arms: dict[str, dict[str, Any]] = {}
     for arm in ("base", "adapted"):
@@ -229,6 +241,9 @@ def terminate_inference(output: Path, partition: str, data_sha: str, adapter_sha
     write_once(output / "inference-terminated.json", {
         "partition": partition, "data_manifest_sha256": data_sha,
         "adapter_training_sha256": adapter_sha, "arms": arms,
+        "evaluation_identity": evaluation_identity,
+        "adapter_integrity_sha256": sha((output/'adapter-integrity.json').read_bytes())
+            if (output/'adapter-integrity.json').is_file() else None,
         "attempted_calls": sum(a["attempted"] for a in arms.values()), "gold_loaded": False})
 
 
@@ -240,30 +255,76 @@ def score(args: Any) -> None:
     end = json.loads(checked(args.output / "inference-terminated.json", exit_proof["terminated_sha256"]))
     require(end["data_manifest_sha256"] == args.data_sha and end["partition"] == args.partition
             and 0 <= end["attempted_calls"] <= 24 and end["gold_loaded"] is False, "inference_termination_identity")
-    name = f"scoring/{args.partition}.json"
-    gold = [parse_gold(r, corpus) for r in json.loads(checked(args.bundle / name, manifest["files"][name]))]
     input_name = f"inference/{args.partition}.json"
     rows = json.loads(checked(args.bundle / input_name, manifest["files"][input_name]))
-    results = {}
-    for arm in ("base", "adapted"):
-        info = end["arms"][arm]
-        directory = args.output / arm
-        if info["summary_sha256"] is not None:
-            checked(directory / "complete.json", info["summary_sha256"])
-            run = audit_arm(directory, rows, corpus)
-        else:
-            require(info["attempted"] == 0 and not directory.exists(), "interrupted_summary_requires_cost_reconciliation")
-            run = {"input_identity": sha(encoded(rows)), "attempts": 0, "records": []}
-        require(run["attempts"] == info["attempted"], "physical_attempt_denominator")
-        results[arm] = score_arm(run, gold, corpus)
+    require(len(rows) == 12, 'fixed_twelve_tune_queries')
+    runs, costs = {}, {}
+    from climate_rag.scifact_component_runtime import known_usage
+    try:
+        for arm in ("base", "adapted"):
+            info = end["arms"][arm]
+            directory = args.output / arm
+            if info["summary_sha256"] is not None:
+                checked(directory / "complete.json", info["summary_sha256"])
+                run = audit_arm(directory, rows, corpus)
+            else:
+                require(info["attempted"] == 0 and not directory.exists(), "interrupted_summary_requires_cost_reconciliation")
+                run = {"input_identity": sha(encoded(rows)), "attempts": 0, "records": []}
+            require(run["attempts"] == info["attempted"], "physical_attempt_denominator")
+            runs[arm] = run
+            records = run['records']
+            require(all(math.isfinite(r['elapsed_ms']) and r['elapsed_ms'] >= 0 for r in records), 'physical_elapsed')
+            costs[arm] = {'attempted_calls': run['attempts'], 'not_attempted': 12-run['attempts'],
+                'input_tokens_known_lower_bound': sum(known_usage(r['usage'] or r.get('usage_lower_bound', {})).get('input_tokens', 0) for r in records),
+                'output_tokens_known_lower_bound': sum(known_usage(r['usage'] or r.get('usage_lower_bound', {})).get('output_tokens', 0) for r in records),
+                'unknown_usage': sum(not r['usage_known'] for r in records),
+                'elapsed_ms': sum(r['elapsed_ms'] for r in records)}
+    except BaseException as exc:
+        write_once(args.output/'cost-before-quality.json', {'status': 'physical_audit_failed',
+            'partial_costs': costs, 'exception_type': type(exc).__name__, 'unknown_cost': True,
+            'gold_loaded': False, 'quality_scored': False, 'automatic_retry': False})
+        raise
+    write_once(args.output/'cost-before-quality.json', {'status': 'physical_costs_audited', 'arms': costs,
+        'attempted_calls': end['attempted_calls'], 'worker_exit_sha256': sha(exit_file.read_bytes()),
+        'gold_loaded': False, 'quality_scored': False})
+    # Gold cannot be opened before both physical arms and durable costs above.
+    from run_scifact_grounding_tune_operator import TRAINING_SHA, fixed_tune_release
+    mixed = end.get('evaluation_identity') is not None or end['adapter_training_sha256'] != TRAINING_SHA
+    require(not mixed or getattr(args, 'release', None) is not None, 'mixed_scoring_requires_release')
+    if getattr(args, 'release', None) is not None:
+        release = json.loads(checked(args.release, args.release_sha))
+        require(mixed == (release.get('checkpoint_binding') is not None), 'checkpoint_kind_cannot_change_at_scoring')
+        if mixed:
+            from climate_rag.scifact_mixed_checkpoint import binding_identity
+            fixed_tune_release(release)
+            expected_identity = {'checkpoint': binding_identity(release['checkpoint_binding']),
+                'release_sha256': args.release_sha, 'source_git': release['source_git'],
+                'source_archive_sha256': release['source_archive_sha256']}
+            integrity = json.loads(checked(args.output/'adapter-integrity.json', end['adapter_integrity_sha256']))
+            require(args.partition == 'tune' and exit_proof['release_sha256'] == args.release_sha
+                    and end['adapter_training_sha256'] == release['adapter_training_sha256']
+                    and args.data_sha == release['data_manifest_sha256']
+                    and args.output.resolve().as_posix() == Path(release['output']).resolve().as_posix()
+                    and end['evaluation_identity'] == expected_identity
+                    and integrity['evaluation_identity'] == expected_identity
+                    and integrity['tensor_count'] == 144 and integrity['all_checkpoint_values_equal'] is True,
+                    'mixed_score_release_and_reload')
+            if end['attempted_calls'] != 24 or exit_proof['returncode'] != 0 or any(c['unknown_usage'] for c in costs.values()):
+                write_once(args.output/'quality-blocked.json', {'reason': 'incomplete_or_unknown_cost',
+                    'gold_loaded': False, 'next_validation_calls': 0})
+                return
+    name = f"scoring/{args.partition}.json"
+    gold = [parse_gold(r, corpus) for r in json.loads(checked(args.bundle / name, manifest["files"][name]))]
+    results = {arm: score_arm(run, gold, corpus) for arm, run in runs.items()}
     write_once(args.output / "score.json", results)
     if args.partition == "tune":
         write_once(args.output / "gate.json", {
-            "passed": end["attempted_calls"] == 24 and exit_proof["returncode"] == 0
+            "passed": not mixed and end["attempted_calls"] == 24 and exit_proof["returncode"] == 0
                       and advancement(results["base"], results["adapted"]),
             "data_manifest_sha256": args.data_sha,
             "adapter_training_sha256": end["adapter_training_sha256"],
-            "score_sha256": sha(encoded(results)), "next_validation_calls": 24})
+            "score_sha256": sha(encoded(results)), "next_validation_calls": 0 if mixed else 24,
+            "further_execution_authorized": False})
 
 
 def main() -> None:

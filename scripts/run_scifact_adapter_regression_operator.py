@@ -28,12 +28,26 @@ BUNDLES = ROOT / 'envs/scifact-semantic-bundles-99cd9ff'
 RESOURCE = {'gpu': 'A100:1', 'cpus': 8, 'host_ram_gib': 32, 'scratch_gib': 30, 'slurm_seconds': 7200}
 
 
+def release_paths(release: dict[str, Any]) -> tuple[Path, Path]:
+    binding = release.get('checkpoint_binding')
+    if binding is None:
+        return OUTPUT, ADAPTER
+    return ROOT/'runs'/('scifact-mixed-four-route-'+release['source_git'][:12]), Path(binding['directory'])
+
+
 def validate_release(release: dict[str, Any], source: Path, *, draft: bool = False) -> None:
     require(release['authorization'] == ('DRAFT_NOT_AUTHORIZED' if draft else 'coordinator_exact_hash_release'),
             'explicit_exact_release_required')
-    require(release['purpose'] == 'old12_four_route_regression' and release['output'] == str(OUTPUT)
-            and release['policy'] == policy_identity(source)
-            and release['adapter_training_sha256'] == TRAINING_SHA and release['adapter_model_sha256'] == ADAPTER_SHA
+    binding = release.get('checkpoint_binding')
+    identity = {'adapter_training_sha256': TRAINING_SHA, 'adapter_model_sha256': ADAPTER_SHA}
+    if binding is not None:
+        from climate_rag.scifact_mixed_checkpoint import binding_identity
+        identity = binding_identity(binding)
+    output, _ = release_paths(release)
+    require(release['purpose'] == 'old12_four_route_regression' and release['output'] == str(output)
+            and release['policy'] == policy_identity(source, binding)
+            and release['adapter_training_sha256'] == identity['adapter_training_sha256']
+            and release['adapter_model_sha256'] == identity['adapter_model_sha256']
             and release['inference_archive_sha256'] == INFERENCE_SHA and release['scoring_archive_sha256'] == SCORING_SHA
             and release['model_archive_sha256'] == ARCHIVES['input'][1]
             and release['max_worker_seconds'] == 6300 and release['max_operator_seconds'] == 6900
@@ -105,31 +119,32 @@ def main() -> None:
     require(sha(release_path) == release_sha, 'release_hash')
     release = json.loads(release_path.read_bytes())
     validate_release(release, source)
+    output, adapter = release_paths(release)
     require((source / 'SOURCE_REVISION').read_text().strip() == release['source_git']
             == os.environ['CLIMATE_SOURCE_GIT'], 'exact_source')
     require(release['source_archive_sha256'] == os.environ['CLIMATE_SOURCE_SHA256']
             and sha(source / 'hpc/scifact_adapter_regression.sbatch') == release['wrapper_sha256'], 'wrapper_identity')
-    require(not OUTPUT.exists(), 'fixed_unused_output')
-    OUTPUT.mkdir(mode=0o700)
-    allocation = OUTPUT / 'allocation'
+    require(not output.exists(), 'fixed_unused_output')
+    output.mkdir(mode=0o700)
+    allocation = output / 'allocation'
     allocation.mkdir(mode=0o700)
     write_once(allocation / 'started.json', {'source_git': release['source_git'], 'release_sha256': release_sha,
         'job_id': os.environ['SLURM_JOB_ID'], 'started_unix': began, 'training': False, 'validation': False})
     write_once(allocation / 'runtime-observed.json', runtime_check(release))
-    checkpoint_metadata(ADAPTER)
+    checkpoint_metadata(adapter, release.get('checkpoint_binding'))
     extract_models(ROOT / 'envs' / ARCHIVES['input'][0], work / 'input', release['model_archive_sha256'])
     read_only_tree(work / 'input')
     extract_bound(BUNDLES / 'inference.tar', work / 'inference-input', INFERENCE_SHA, INFERENCE_NAMES)
     read_only_tree(work / 'inference-input')
     command = [sys.executable, str(source / 'scripts/run_scifact_adapter_regression.py'),
-        '--inference-dir', str(work / 'inference-input'), '--adapter', str(ADAPTER),
-        '--output', str(OUTPUT / 'inference'), '--release', str(release_path), '--release-sha', release_sha]
+        '--inference-dir', str(work / 'inference-input'), '--adapter', str(adapter),
+        '--output', str(output / 'inference'), '--release', str(release_path), '--release-sha', release_sha]
     for kind in ('model', 'reranker'):
         directory = work / 'input/models' / ('generator' if kind == 'model' else kind)
         command.extend(['--' + kind + '-dir', str(directory / 'model'), '--' + kind + '-manifest', str(directory / 'model_manifest.json')])
     remaining = release['max_operator_seconds'] - (time.time() - began) - release['scoring_timeout_seconds']
     exit_proof = bounded_child(command, allocation / 'worker.log', min(release['max_worker_seconds'], remaining))
-    completed = OUTPUT / 'inference/run.json'
+    completed = output / 'inference/run.json'
     exit_proof.update(release_sha256=release_sha, run_sha256=sha(completed) if completed.exists() else None)
     write_once(allocation / 'worker-exit.json', exit_proof)
     # Only now may scoring inputs be extracted. A partial inference gets costs,
@@ -138,7 +153,7 @@ def main() -> None:
         extract_bound(BUNDLES / 'scoring.tar', work / 'scoring', SCORING_SHA, SCORING_NAMES)
         read_only_tree(work / 'scoring')
     score_command = [sys.executable, str(source / 'scripts/score_scifact_adapter_regression.py'),
-        '--output', str(OUTPUT), '--inference-dir', str(work / 'inference-input'), '--scoring-dir', str(work / 'scoring'),
+        '--output', str(output), '--inference-dir', str(work / 'inference-input'), '--scoring-dir', str(work / 'scoring'),
         '--release', str(release_path), '--release-sha', release_sha]
     with (allocation / 'score.log').open('xb') as stream:
         scored = subprocess.run(score_command, stdout=stream, stderr=stream, check=False,

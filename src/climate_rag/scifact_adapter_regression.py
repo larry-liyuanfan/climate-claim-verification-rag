@@ -34,11 +34,16 @@ def require(ok: bool, reason: str) -> None:
         raise ValueError(reason)
 
 
-def policy_identity(source: Path) -> dict[str, Any]:
+def policy_identity(source: Path, binding: dict[str, Any] | None = None) -> dict[str, Any]:
     require(V3Budget().model_dump() == BUDGET, 'unchanged_bounded_budget')
+    identity = {'adapter_model_sha256': ADAPTER_SHA, 'adapter_training_sha256': TRAINING_SHA}
+    if binding is not None:
+        from .scifact_mixed_checkpoint import binding_identity
+        identity = binding_identity(binding)
     return {'protocol': PROTOCOL, 'scope': 'previously_exposed_TRAIN_regression_not_heldout',
         'base_model_manifest_sha256': MODEL_SHA, 'adapter_model_sha256': ADAPTER_SHA,
         'adapter_training_sha256': TRAINING_SHA, 'adapter_name': 'default', 'adapter_active': True,
+        **identity,
         'reranker_manifest_sha256': RERANKER_SHA, 'tokenizer_sha256': TOKENIZER_SHA,
         'prompt_sha256': sha(system_prompt_scifact().encode()),
         'implementation_sha256': {n: sha((source / 'src/climate_rag' / n).read_bytes()) for n in SOURCES},
@@ -59,7 +64,10 @@ def load_frozen(directory: Path) -> tuple[list[dict[str, Any]], bytes]:
     return claims, corpus
 
 
-def checkpoint_metadata(adapter: Path) -> dict[str, Any]:
+def checkpoint_metadata(adapter: Path, binding: dict[str, Any] | None = None) -> dict[str, Any]:
+    if binding is not None:
+        from .scifact_mixed_checkpoint import checkpoint_metadata as mixed_metadata
+        return mixed_metadata(adapter, binding)
     training: dict[str, Any] = json.loads(checked(adapter / 'complete.json', TRAINING_SHA))
     require(training['data_manifest_sha256'] == DATA_SHA and training['config_sha256'] == CONFIG_SHA,
             'frozen_training_background')
@@ -90,13 +98,14 @@ class ActiveAdapterProvider(LocalQwenBoundedSciFactProvider):
         require(self.gap is False and policy['adapter_active'] is True, 'bare_active_provider')
         state = active_state(self.base.model)
         self.regression_policy_sha = sha(encoded(policy))
-        self.name += ':active-adapter:' + ADAPTER_SHA
+        self.adapter_sha = policy['adapter_model_sha256']
+        self.name += ':active-adapter:' + self.adapter_sha
         return state
 
     def generate(self, observation: dict[str, Any], schema: dict[str, Any],
                  max_output_tokens: int, remaining_seconds: float) -> dict[str, Any]:
         binding = {'regression_policy_sha256': self.regression_policy_sha,
-            'base_model_sha256': MODEL_SHA, 'adapter_sha256': ADAPTER_SHA,
+            'base_model_sha256': MODEL_SHA, 'adapter_sha256': self.adapter_sha,
             'adapter_state': active_state(self.base.model),
             'actual_prompt_sha256': sha(self.render(observation, schema).encode()),
             'actual_schema_sha256': sha(encoded(schema))}
