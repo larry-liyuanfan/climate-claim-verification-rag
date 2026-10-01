@@ -1,7 +1,7 @@
 """Train-only, separately versioned release entry. No prepare/evaluate/resume.
 
-The release and tokenized preparation do not exist yet. This implementation is
-not permission to load a model, prepare real inputs or submit a GPU job.
+Tokenized preparation is complete. This implementation/package is not itself
+permission to load a model or submit a GPU job; exact release is separate.
 """
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ from typing import Any
 
 from climate_rag.scifact_mixed_inputs import SCOPE, input_config_sha, make_plan, validate_inputs
 from climate_rag.scifact_mixed_training import CONFIG, VERSION, _run_epoch, config_sha
+from climate_rag.scifact_mixed_launch import launch_identity, preparation_fields, scratch_model_paths
 from climate_rag.scifact_read_continuation import ordered_write
 from climate_rag.scifact_semantic_contract import MODEL_SHA, checked, sha
 from climate_rag.scifact_state_supervision import require
@@ -30,22 +31,17 @@ def release_inputs(path: Path, digest: str) -> tuple[dict[str, Any], dict[str, A
     release = json.loads(checked(path, digest))
     require(release['authorization'] == 'coordinator_exact_hash_release'
             and release['purpose'] == VERSION and release['config_sha256'] == config_sha(), 'new_exact_release_required')
-    require(type(release['max_runtime_seconds']) is int and 60 <= release['max_runtime_seconds'] <= 86400,
-            'separately_frozen_runtime_required')
     source = Path(__file__).resolve().parents[1]
     require((source/'SOURCE_REVISION').read_text().strip() == release['source_git'], 'mixed_source_revision')
-    files = {p.relative_to(source).as_posix() for p in (source/'src').rglob('*.py')}
-    files |= {'scripts/run_scifact_mixed_training.py', 'scripts/run_scifact_grounding_candidate.py',
-              'scripts/run_scifact_grounding_train_operator.py'}
-    require(set(release['source_files_sha256']) == files, 'complete_executable_source_manifest')
-    for name in files:
-        checked(source/name, release['source_files_sha256'][name])
+    launch_identity(release, source)
     output = Path(release['output'])
-    require(output.parent == ROOT/'runs' and output.name.startswith('scifact-mixed-training-')
+    require(output == ROOT/'runs'/('scifact-mixed-training-'+release['source_git'][:12])
             and not output.exists(), 'exclusive_mixed_output')
     bundle = Path(release['prepared_directory'])
     require(bundle.resolve().is_relative_to(ROOT/'posthoc'), 'private_prepared_directory')
-    preparation = json.loads(checked(bundle/'complete.json', release['preparation_receipt_sha256']))
+    raw_preparation = checked(bundle/'complete.json', release['preparation_receipt_sha256'])
+    require(all(release[k] == v for k, v in preparation_fields(raw_preparation).items()), 'accepted_CPU_bundle_only')
+    preparation = json.loads(raw_preparation)
     require(preparation['status'] == 'complete' and preparation['scope'] == SCOPE
             and preparation['source_bridge_validated'] is True
             and preparation['input_config_sha256'] == release['input_config_sha256'] == input_config_sha(),
@@ -65,7 +61,7 @@ def release_inputs(path: Path, digest: str) -> tuple[dict[str, Any], dict[str, A
     return dict(release), prepared, plan
 
 
-def train(release: dict[str, Any], prepared: dict[str, Any], plan: dict[str, Any]) -> None:
+def train(release: dict[str, Any], prepared: dict[str, Any], plan: dict[str, Any], model_root: Path) -> None:
     from run_scifact_grounding_train_operator import runtime_check
     from run_scifact_grounding_candidate import model_manifest
     runtime = runtime_check(release)
@@ -74,7 +70,9 @@ def train(release: dict[str, Any], prepared: dict[str, Any], plan: dict[str, Any
     from climate_rag.local_agent_model import LocalQwenDecisionProvider
     require(torch.cuda.is_available(), 'GPU_runtime_unavailable')
     torch.manual_seed(CONFIG['seed'])
-    provider = LocalQwenDecisionProvider(Path(release['model_directory']), model_manifest(Path(release['model_manifest'])))
+    model_dir, manifest = scratch_model_paths(release, model_root, source=Path(__file__).resolve().parents[1],
+        work=Path(os.environ['CLIMATE_MIXED_WORK']), job_id=os.environ['SLURM_JOB_ID'])
+    provider = LocalQwenDecisionProvider(model_dir, model_manifest(manifest))
     builder: Any = get_peft_model
     model = builder(provider.model, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.0,
         target_modules=['q_proj', 'v_proj'], task_type='CAUSAL_LM', bias='none'))
@@ -180,19 +178,23 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--release', type=Path, required=True)
     parser.add_argument('--release-sha', required=True)
+    parser.add_argument('--model-root', type=Path, required=True)
     parser.add_argument('--worker', action='store_true')
     args = parser.parse_args()
     release, prepared, plan = release_inputs(args.release, args.release_sha)
+    scratch_model_paths(release, args.model_root, source=Path(__file__).resolve().parents[1],
+        work=Path(os.environ['CLIMATE_MIXED_WORK']), job_id=os.environ['SLURM_JOB_ID'])
     execution = Path(release['output']+'-execution')
     if args.worker:
         claim_worker(execution, args.release_sha)
-        train(release, prepared, plan)
+        train(release, prepared, plan, args.model_root)
         return
     execution.mkdir(mode=0o700, exist_ok=False)
     ordered_write(execution/'reserved.json', {'version': VERSION, 'release_sha256': args.release_sha,
         'parent_pid': os.getpid(), 'max_runtime_seconds': release['max_runtime_seconds'], 'automatic_retry': False})
     code = bounded_worker([sys.executable, str(Path(__file__).resolve()), '--release', str(args.release),
-        '--release-sha', args.release_sha, '--worker'], execution, release['max_runtime_seconds'])
+        '--release-sha', args.release_sha, '--model-root', str(args.model_root), '--worker'],
+        execution, release['max_runtime_seconds'])
     require(code == 0, 'bounded_training_worker_failed_no_retry')
 
 

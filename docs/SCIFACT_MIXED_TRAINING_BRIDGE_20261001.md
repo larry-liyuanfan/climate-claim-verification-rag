@@ -101,7 +101,7 @@ separate and is not authorized by that CPU completion.
 
 ## Separate real trainer, no execution release
 
-`scripts/run_scifact_mixed_training.py --release FILE --release-sha SHA` is the
+`scripts/run_scifact_mixed_training.py --release FILE --release-sha SHA --model-root ROOT` is the
 new train-only entry. It has **no** prepare, evaluation, resume or retry option.
 It binds the new purpose/config, exact executable source manifest/revision,
 runtime receipt/files/interpreter, frozen input files/receipt, fresh model
@@ -154,6 +154,42 @@ real short CPU child timeout and synthetic interrupt/creation-race checks.
 Initial fixture failures came from sorted JSON changing prompt/key order;
 fixtures now preserve physical serialization and negative cases assert the
 intended validation error. Production prompt/hash checks were not weakened.
+
+## GPU launch candidate, not a GPU execution release
+
+The dedicated `hpc/scifact_mixed_train.sbatch` and
+`scripts/package_scifact_mixed_training.py` preserve the accepted CPU receipt
+`131cc074...` as the only input source. The packager refuses failed, partial,
+different or unaccepted preparation receipts; no raw records are downloaded.
+The source archive and actual mixed GPU wrapper are checked together, including
+wrong-revision / wrong-wrapper / wrong-archive rejection. The generic diagnostic
+wrapper check is not evidence for this wrapper. The launch manifest covers all
+`src/**/*.py` and `scripts/**/*.py`, including transitive extraction helpers.
+
+`run_scifact_mixed_operator.py` verifies source, release and prepared inputs,
+reserves a distinct persistent `-allocation` directory, and reuses the existing
+`generator_only()` against the frozen archive. It extracts only the fixed
+generator prefix. The release binds the archive SHA, generator relative paths
+and canonical `MODEL_SHA`; the provider still verifies every model file before
+loading. `--model-root` must resolve to the current allocation's exclusive
+scratch `input`, with no symlinks or cross-job path substitution. The frozen
+release is never rewritten to insert a random scratch path.
+
+The operator uses `exec` to enter the **parent** runner, never `--worker`.
+Only that parent creates the persistent `-execution` reservation and one bounded
+child. The wrapper does not precreate either runner-owned output directory.
+The single-worker timeout remains 1500 s inside a 30-minute Slurm allocation:
+1 full A100, 4 CPUs, 32 GiB RAM, 30 GiB scratch, no requeue or automatic retry.
+The existing four dependency sites, module runtime and offline scratch caches
+are reused without installation. Algorithm, data, seed, LoRA configuration,
+144/223/36 shape and first-step-in-one-epoch semantics are unchanged.
+
+Four new launch-only synthetic tests cover scratch identity/path rejection,
+accepted CPU completion, complete source/resource contracts, and parent-to-worker
+argument forwarding with exclusive execution reservation. They do not load
+weights, run training or test model quality. This package produces only an
+exact release **candidate**: the coordinator must separately authorize its hash
+before any scheduler submission; no GPU has been submitted by this package.
 
 Preparation, actual training and evaluation remain separate releases. If a
 candidate is later trained, first freeze the exact decoder/budget/version and
