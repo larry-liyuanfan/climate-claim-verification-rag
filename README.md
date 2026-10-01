@@ -13,7 +13,10 @@ now preserve old48/supp49 source records and distinguish NEI47 from five context
 abstentions. Synthetic CPU tests validate the planned **144-claim / 223-row /
 36-update** contract and claim-weighted math. **No real mixed input preparation,
 model load, GPU training or new evaluation has been executed.** Exact-source
-preparation and execution releases remain separate.
+preparation and execution releases remain separate. A subsequent thin CPU
+producer now constructs the required files through those raw-byte factories,
+checks physical readback, and passes four small synthetic tests; its real-data
+execution is still pending a separate exact-source release.
 
 A [CPU-only captured-state training seam](docs/SCIFACT_CAPTURED_STATE_TRAINING_DRIVER_20261001.md)
 now preserves stable rerank aliases and captured prompts, validates an external

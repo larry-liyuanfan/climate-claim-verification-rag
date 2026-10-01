@@ -57,9 +57,41 @@ against pinned physical source bytes, then `build_inputs` / `make_plan`, and
 freeze `prepared.json`, `roster.json`, `plan.json` plus a completion receipt.
 Directly sealing JSON that merely *declares* old source hashes is not a valid
 preparation. Trainer-side validation does not reopen those source files.
-The executable preparation producer/CLI is **not part of this package**; it is
-the next bounded implementation/release step. The trainer interface alone is
-not an end-to-end runnable training pipeline.
+The subsequent bounded package now implements that producer in
+`scripts/prepare_scifact_mixed_inputs.py`, with the actual
+`hpc/scifact_mixed_prepare_cpu.sbatch` and exact-source packager
+`scripts/package_scifact_mixed_preparation.py`. **It has not been executed on
+real training records**; an interface/test result is not a prepared real bundle.
+
+The producer reads only fixed metadata, old48/supp49 records, the accepted NEI47
+inventory/47 artifacts and the existing public corpus/tokenizer. Original48 IDs
+come from the frozen split, components from the independent claim reports;
+supp49/NEI47 reuse the fixed original96 selection, not the rows that happen to
+survive. Exclusions reuse split/component metadata, without protected question
+or annotation reads. No original gold, teacher call, retrieval or model call is
+performed. On failure, all 144 denominator slots remain ready/failed/unknown;
+there is no replacement, dropping, resume or success marker for a partial run.
+
+Writes preserve nested key order. Readback compares physical token IDs/masks,
+packing and full source envelopes against the in-memory **factory outputs**,
+not merely new self-hashes. Only complete success atomically publishes the
+exact three-file receipt consumed by the trainer. Compact output contains
+counts, hashes and resource usage; raw examples stay private on Spartan.
+Failures additionally retain the stage, original exception type and a bounded
+message in owner-only `private/failure-diagnostic.json`. This diagnostic is
+not part of the public compact receipt or exported artifacts; it lets a
+source-contract failure be investigated without repeating real preparation.
+
+The thin wrapper requests **1 CPU / 4 GiB / 15 minutes / sapphire / no requeue /
+zero GPUs**, reuses the existing offline tokenizer environment with
+`USE_TORCH=0`, and binds actual source/archive/wrapper/release hashes. The
+packager validates this wrapper's real shell guard and rejects wrong revision,
+wrapper and archive; a generic old-wrapper result is not used as its proof.
+Four new synthetic preparation tests passed in **2.62 s** after the private
+failure-diagnostic addition; Ruff and strict
+Linux-platform mypy passed on the three new source files. No old mathematical
+suite was rerun for this producer addition. Actual CPU execution still requires
+the coordinator's single exact-source release; GPU training is not authorized.
 
 ## Separate real trainer, no execution release
 
