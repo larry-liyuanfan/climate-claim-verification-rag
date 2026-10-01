@@ -11,6 +11,7 @@ import logging
 import os
 import time
 from collections.abc import Mapping
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,17 @@ from .local_agent_v3 import (
 from .model_diagnostics import response_diagnostics
 from .private_diagnostics_v3 import PrivateLogHandler
 from .scifact_terminal import PROTOCOL, render_scifact_prompt
+
+
+@dataclass(frozen=True)
+class DecoderBinding:
+    """One fresh callback and the actual parser/config used by that callback."""
+
+    prefix: Any
+    parser: Any
+    grammar: str
+    config_identity: dict[str, Any]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 def require_clean_grammar_environment() -> None:
@@ -54,6 +66,19 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
     def decoder_schema(self, schema: Mapping[str, Any]) -> dict[str, Any]:
         return dict(schema)
 
+    def build_decoder(
+        self, observation: Mapping[str, Any], schema: Mapping[str, Any]
+    ) -> DecoderBinding:
+        from lmformatenforcer import JsonSchemaParser
+        from lmformatenforcer.integrations.transformers import (
+            build_transformers_prefix_allowed_tokens_fn,
+        )
+
+        parser = JsonSchemaParser(self.decoder_schema(schema), config=fixed_grammar_config())
+        prefix = build_transformers_prefix_allowed_tokens_fn(self.tokenizer_data, parser)
+        return DecoderBinding(prefix, parser, "lm-format-enforcer0.11.3/fresh-inline-anyOf",
+                              grammar_config_identity())
+
     def count_prompt(
         self, observation: Mapping[str, Any], schema: Mapping[str, Any]
     ) -> int:
@@ -68,16 +93,9 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
         remaining_seconds: float,
     ) -> dict[str, Any]:
         require_clean_grammar_environment()
-        from lmformatenforcer import JsonSchemaParser
-        from lmformatenforcer.integrations.transformers import (
-            build_transformers_prefix_allowed_tokens_fn,
-        )
-
         begin = time.perf_counter()
-        parser = JsonSchemaParser(self.decoder_schema(schema), config=fixed_grammar_config())
-        prefix_fn = build_transformers_prefix_allowed_tokens_fn(
-            self.tokenizer_data, parser
-        )
+        decoder = self.build_decoder(observation, schema)
+        parser, prefix_fn = decoder.parser, decoder.prefix
         prompt = self.render(observation, schema)
         inputs = self.base.tokenizer(
             prompt, return_tensors="pt", add_special_tokens=False
@@ -148,8 +166,9 @@ class LocalQwenSciFactProvider(LocalQwenV3Provider):
                 },
             ) from exc
         diagnostics["grammar_log_nonempty"] = log_sink.attempted > 0
-        diagnostics["grammar"] = "lm-format-enforcer0.11.3/fresh-inline-anyOf"
-        diagnostics["grammar_config"] = grammar_config_identity()
+        diagnostics["grammar"] = decoder.grammar
+        diagnostics["grammar_config"] = decoder.config_identity
+        diagnostics.update(decoder.metadata)
         diagnostics["effective_parser_config"] = {
             "alphabet_sha256": hashlib.sha256(
                 parser.config.alphabet.encode()

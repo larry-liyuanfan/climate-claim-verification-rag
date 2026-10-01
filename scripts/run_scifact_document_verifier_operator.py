@@ -8,7 +8,7 @@ import sys
 import time
 from typing import Any
 
-from climate_rag.scifact_document_verifier import PROTOCOL
+from climate_rag.scifact_document_verifier import DECODER_IMPLEMENTATION, PROTOCOL
 from climate_rag.scifact_mixed_launch import PYTHON_EXECUTABLE, RUNTIME_FILES_SHA, RUNTIME_RECEIPT_SHA
 from climate_rag.scifact_read_continuation import ordered_write
 from prepare_scifact_natural import SELECTION_SHA, prepare
@@ -19,15 +19,15 @@ from run_scifact_grounding_train_operator import ROOT, require, sha
 from run_scifact_natural_operator import slot_watchdog
 from run_scifact_utility8_operator import verify_runtime_receipt
 
-ATTEMPT = "r2"
+ATTEMPT = "bounded-decoder-v1"
 OUTPUT = ROOT / "runs" / (PROTOCOL + "-" + ATTEMPT)
 RESOURCE = {"gpu": "A100:1", "cpus": 8, "host_ram_gib": 32, "scratch_gib": 30, "slurm_seconds": 7200}
 WRAPPER = "hpc/scifact_document_verifier.sbatch"
 RUNTIME_OBSERVATION_SHA = "6153e39d11dbf44b57b311359cf2b5846dcf6a45ef70cd9069f69e4c8c68d455"
 FROZEN_FIELDS: dict[str, Any] = {
-    "protocol": PROTOCOL, "attempt_id": ATTEMPT, "infrastructure_retry": 1,
-    "previous_attempt_job_id": "31914601",
-    "previous_attempt_release_sha256": "015a5b464da78f11573a3ef2492d752add1b8497b9306c2866603357712d309e",
+    "protocol": PROTOCOL, "attempt_id": ATTEMPT, "infrastructure_retry": 0,
+    "decoder_implementation": DECODER_IMPLEMENTATION, "comparison_job_id": "31918065",
+    "comparison_quality_sha256": "95c43ad2e30cd65b0193a6a8bc42a9c97e2dd5796169c6a97c95743ce08a58e9",
     "output": OUTPUT.as_posix(), "resource_cap": RESOURCE, "selection_sha256": SELECTION_SHA,
     "initial_inventory_sha256": "0c4b663184acabc0a4b0421f37f92182a5aea2ab414dcad7d3a5840e3b57c028",
     "max_generator_calls": 240, "planned_episodes": 48, "max_episode_seconds": 120,
@@ -58,9 +58,10 @@ def start_attempt(release: dict[str, Any], release_sha: str, job_id: str) -> dic
     """Exercise the real consumer before data preparation or model loading."""
     validate_release(release)
     observed = verify_runtime_receipt(release)
-    OUTPUT.mkdir(mode=0o700)  # exclusive new r2 reservation; r1 is never replaced
+    OUTPUT.mkdir(mode=0o700)  # new implementation comparison, never reuse r1/r2
     ordered_write(OUTPUT / "reserved.json", {"protocol": PROTOCOL, "attempt_id": ATTEMPT,
-        "infrastructure_retry": 1, "previous_attempt_job_id": release["previous_attempt_job_id"],
+        "infrastructure_retry": 0, "comparison_job_id": release["comparison_job_id"],
+        "decoder_implementation": DECODER_IMPLEMENTATION,
         "release_sha256": release_sha, "job_id": job_id, "source_git": release["source_git"],
         "planned_episodes": 48, "automatic_retry": False})
     ordered_write(OUTPUT / "runtime.json", observed)
@@ -106,7 +107,8 @@ def main() -> None:
         "cost_sha256": sha(OUTPUT / "cost-before-gold.json"),
         "quality_sha256": sha(OUTPUT / "quality.json") if (OUTPUT / "quality.json").exists() else None,
         "elapsed_seconds": time.monotonic() - began, "training_authorized": False,
-        "attempt_id": ATTEMPT, "infrastructure_retry": 1, "automatic_retry": False})
+        "attempt_id": ATTEMPT, "infrastructure_retry": 0,
+        "decoder_implementation": DECODER_IMPLEMENTATION, "automatic_retry": False})
     raise SystemExit(proof["returncode"] or 0)
 
 

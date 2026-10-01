@@ -29,7 +29,7 @@ def startup(tmp_path, monkeypatch):
     path.write_text(json.dumps(receipt))
     observation = tmp_path / 'accepted-runtime.json'
     observation.write_text(json.dumps(observed))
-    output = tmp_path / 'run-r2'
+    output = tmp_path / 'run-bounded-decoder-v1'
     frozen = dict(copy.deepcopy(operator.FROZEN_FIELDS), output=str(output),
         runtime_receipt_sha256=runtime.sha(path), runtime_observation_sha256=runtime.sha(observation),
         runtime_files_sha256=runtime.sha(inventory))
@@ -56,8 +56,9 @@ def test_producer_through_actual_startup_and_runtime_consumer(startup):
     assert actual['python_executable'] == release['python_executable']
     assert actual['model_loaded'] is False and actual['generation_calls'] == 0
     reservation = json.loads((output / 'reserved.json').read_bytes())
-    assert reservation['attempt_id'] == 'r2' and reservation['infrastructure_retry'] == 1
-    assert reservation['previous_attempt_job_id'] == '31914601'
+    assert reservation['attempt_id'] == 'bounded-decoder-v1' and reservation['infrastructure_retry'] == 0
+    assert reservation['comparison_job_id'] == '31918065'
+    assert reservation['decoder_implementation'] == operator.DECODER_IMPLEMENTATION
     assert reservation['automatic_retry'] is False
     assert {p.name for p in output.iterdir()} == {'reserved.json', 'runtime.json'}
     with pytest.raises(FileExistsError):
@@ -76,7 +77,7 @@ def test_every_missing_consumer_key_fails_before_import_or_reservation(startup, 
 @pytest.mark.parametrize('key,value', [
     ('python_executable', '/usr/bin/python'), ('python_executable', ''),
     ('python_executable', None), ('python_executable', 'python'), ('attempt_id', 'r1'),
-    ('infrastructure_retry', 2), ('automatic_retry', True),
+    ('attempt_id', 'r2'), ('infrastructure_retry', 1), ('automatic_retry', True),
     ('output', str(operator.ROOT / 'runs' / operator.PROTOCOL)),
 ])
 def test_contract_drift_or_old_attempt_refused(startup, key, value):

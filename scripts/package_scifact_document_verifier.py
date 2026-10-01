@@ -1,4 +1,4 @@
-"""Freeze the first infrastructure-retry candidate; never submit or run models."""
+"""Freeze a new decoder implementation candidate; never submit or run models."""
 from __future__ import annotations
 
 import argparse

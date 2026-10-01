@@ -1,14 +1,26 @@
 # Climate Evidence Retrieval and Grounded Verification
 
 The [single-document verifier diagnostic](docs/SCIFACT_DOCUMENT_VERIFIER_20261001.md)
-has an **r2 CPU startup-contract repair candidate**, not a new model-quality
-result or Agent success. Job 31914601 failed before model loading because its
-release omitted the runtime interpreter field; no inference was scored. The
-candidate preserves the actual original FIT24 visible sentences and compares
-fixed-order versus optional adaptive verification using the same unadapted model,
-terminal scorer and shared generation/tool/time ceilings. The 24 claims are
-already-exposed TRAIN diagnostics, not validation or an independent test. No new
-GPU retry, training, deployment or resume metric is authorized by this code delivery.
+completed as [job 31918065](docs/verified-runs/scifact-document-verifier-closeout-31918065.json)
+with **48/48 recorded episodes and a negative result**: strict positive grounding
+was 0/15 in both fixed and adaptive routes; correct NEI was 3/9 versus 0/9.
+The adaptive model made no verify proposal or call in its 24 actual first
+responses. Fixed verification consumed 120 generations versus 24 adaptive
+generations, with every token accounted for; lower cost without correct answers
+is not Agent efficiency. The original visible evidence, unadapted model, scorer
+and shared limits were frozen. These are already-exposed TRAIN24 diagnostics,
+not validation, independent test or online improvement. R1's separate pre-model
+startup failure is preserved; no automatic next retry, training or resume gain
+is authorized by this result.
+
+Whole-chain review traced **25 rejected terminals** to missing generation-time
+document uniqueness/20-sentence constraints (20 sentence-budget failures and
+5 duplicate-document first failures). All 96 verifier judgments were structurally
+valid, which does not establish correctness. The stage-aware decoder candidate
+reuses the existing bounded prefix only for planning/final answers; single-document
+judgments retain ordinary LMFE. It is a **new, CPU-tested implementation**, not
+a rerun of r2 or a demonstrated quality gain. See the [integrated review and
+release gate](docs/SCIFACT_DOCUMENT_VERIFIER_20261001.md#whole-chain-review-before-submission).
 
 The [utility8 closeout](docs/verified-runs/scifact-utility8-closeout-31834687.json)
 preserves a negative A/B/C diagnostic on eight already exposed TRAIN cases.

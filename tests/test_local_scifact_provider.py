@@ -423,4 +423,19 @@ def test_generation_parity_except_renderer_env_guard_and_effective_config_receip
 """
     actual = inspect.getsource(LocalQwenSciFactProvider.generate)
     assert extra in actual
-    assert actual.replace(extra, "") == expected
+    actual = actual.replace(extra, "")
+    actual = actual.replace('        diagnostics.update(decoder.metadata)\n', '')
+    actual = actual.replace('decoder.grammar', '"lm-format-enforcer0.11.3/fresh-inline-anyOf"')
+    actual = actual.replace('decoder.config_identity', 'grammar_config_identity()')
+    actual = actual.replace(
+        '        decoder = self.build_decoder(observation, schema)\n        parser, prefix_fn = decoder.parser, decoder.prefix\n',
+        '        parser = JsonSchemaParser(self.decoder_schema(schema), config=fixed_grammar_config())\n'
+        '        prefix_fn = build_transformers_prefix_allowed_tokens_fn(\n            self.tokenizer_data, parser\n        )\n')
+    imports = ('        from lmformatenforcer import JsonSchemaParser\n'
+        '        from lmformatenforcer.integrations.transformers import (\n'
+        '            build_transformers_prefix_allowed_tokens_fn,\n        )\n\n')
+    actual = actual.replace('        begin = time.perf_counter()\n', imports + '        begin = time.perf_counter()\n')
+    assert actual == expected  # only the reviewed hook extraction differs
+    hook = inspect.getsource(LocalQwenSciFactProvider.build_decoder)
+    assert 'JsonSchemaParser(self.decoder_schema(schema), config=fixed_grammar_config())' in hook
+    assert 'build_transformers_prefix_allowed_tokens_fn(self.tokenizer_data, parser)' in hook

@@ -6,6 +6,8 @@ This diagnostic deliberately excludes retrieval changes, decomposition and SFT.
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
+import hashlib
 import json
 import math
 import time
@@ -13,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from .evidence_gap_candidate import _no_duplicate_keys
-from .local_scifact_provider import LocalQwenSciFactProvider
+from .local_scifact_provider import DecoderBinding, LocalQwenSciFactProvider
 from .private_diagnostics_v3 import PrivateDiagnosticStore
 from .scifact_natural_contract import complete_wire, require
 from .scifact_read_continuation import ordered_write
@@ -25,6 +27,7 @@ from .scifact_utility_contract import identity
 from .scifact_utility_runtime import JournalProvider, ledger_cost
 
 PROTOCOL = "scifact-document-verifier-v1-20261001"
+DECODER_IMPLEMENTATION = "scifact-document-stage-bounded-v1-20261001"
 ARMS = ("fixed", "adaptive")
 MAX_CALLS, MAX_TOOLS, MAX_SECONDS = 5, 5, 120
 
@@ -62,6 +65,27 @@ class DocumentVerifierProvider(LocalQwenSciFactProvider):
 
     def render(self, observation: Any, schema: Any) -> str:
         return render_prompt(self.base.tokenizer, observation, schema)
+
+    def build_decoder(self, observation: Any, schema: Any) -> DecoderBinding:
+        stage = observation["stage"]
+        require(stage in {"verify", "plan", "terminal"}, "unknown_document_decoder_stage")
+        metadata = {"decoder_implementation": DECODER_IMPLEMENTATION, "decoder_stage": stage}
+        if stage == "verify":
+            return replace(super().build_decoder(observation, schema), metadata=metadata)
+        # Keep verdict LMFE and all model-facing inputs unchanged. Import lazily:
+        # bounded grammar itself imports the ordinary provider's environment guard.
+        from .bounded_scifact_grammar import PROTOCOL as BOUNDED, build_bounded_scifact_prefix
+        prefix = build_bounded_scifact_prefix(self.tokenizer_data, schema)
+        parser = prefix.token_enforcer.root_parser
+        config = parser.config
+        return DecoderBinding(prefix, parser, BOUNDED, {
+            "lmfe_version": "0.11.3",
+            "alphabet_sha256": hashlib.sha256(config.alphabet.encode()).hexdigest(),
+            "alphabet_characters": len(config.alphabet),
+            "max_consecutive_whitespaces": config.max_consecutive_whitespaces,
+            "force_json_field_order": config.force_json_field_order,
+            "max_json_array_length": config.max_json_array_length,
+        }, metadata)
 
     def start_slot(self, path: Path) -> None:
         path.mkdir(mode=0o700)

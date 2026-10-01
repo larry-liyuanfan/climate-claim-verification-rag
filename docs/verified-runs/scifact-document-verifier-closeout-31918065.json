@@ -1,0 +1,131 @@
+{
+  "protocol": "scifact-document-verifier-v1-20261001",
+  "attempt_id": "r2",
+  "status": "completed_scored_negative",
+  "job_id": "31918065",
+  "execution_git": "86414e39d4bd9516c9f8cc2d20c10b184c56f2b7",
+  "source_archive_sha256": "82cdea8ed40ad28fec3ced4783c170cf09183aa85308149cb83fa58f5a71ba68",
+  "wrapper_sha256": "f13f4ffb93b6dc1491d6fc33ce49d54b34eb1170e4b80b00d30acc965ad3e955",
+  "release_sha256": "7efcde3be0a066c504bfe876df961a7eebf53f56b7af93a411dcf1020ad25877",
+  "selection_sha256": "107c50a8ecc1fd4d1b352cdc7e2f86b2997d6abc027d5afeb176bab1d09f7acb",
+  "corpus_sha256": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+  "base_model_manifest_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+  "initial_frames_sha256": "b45dce8612962ddcb1a832a86186dcbf440254a50eb65451c8d56c88aad9216a",
+  "artifact_sha256": {
+    "complete.json": "5faae91c1041623243c32f2b5cd30a8064ea7962d8f890c0c2a610491c1117d4",
+    "cost-before-gold.json": "4fac43d3ee5d892808ef0c7e5d0139b6a30a58444cc774b88b78424abcb64161",
+    "quality.json": "95c43ad2e30cd65b0193a6a8bc42a9c97e2dd5796169c6a97c95743ce08a58e9",
+    "model-load.json": "718e51b6b4160145a9153b279151002d69d209b7527d7df6fc9a9d52f58f95e9",
+    "worker-exit.json": "c8ad58519af9688c838c1cbdc5aa39413b7a2434f5e36bdd3f29bf4e78b2590e",
+    "runtime.json": "6153e39d11dbf44b57b311359cf2b5846dcf6a45ef70cd9069f69e4c8c68d455"
+  },
+  "accounting": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "start": "2026-10-01T22:33:56+10:00",
+    "end": "2026-10-01T22:41:16+10:00",
+    "elapsed_seconds": 440,
+    "batch_max_rss_kib": 9263156,
+    "total_cpu_seconds": 428.791,
+    "allocated_gpu_count": 1,
+    "allocated_gpu_type": "A100",
+    "allocated_cpus": 8,
+    "allocated_ram_gib": 32,
+    "scratch_request_gib": 30,
+    "walltime_limit_seconds": 7200,
+    "note": "Allocation duration is not GPU utilization or a billed monetary amount."
+  },
+  "data_scope": {
+    "track": "previously_exposed_SciFact_TRAIN_diagnostic",
+    "claims": 24,
+    "positive_claims": 15,
+    "nei_claims": 9,
+    "planned_episodes": 48,
+    "recorded_episodes": 48,
+    "missing_episodes": 0,
+    "protected_split_read": false,
+    "reselection": false
+  },
+  "arms": {
+    "fixed": {
+      "strict_positive_correct": 0,
+      "positive_denominator": 15,
+      "strict_nei_correct": 3,
+      "nei_denominator": 9,
+      "strict_whole_answer_correct": 3,
+      "valid_terminal": 15,
+      "unresolved": 9,
+      "scripted_verifier_calls": 96,
+      "model_selected_verifier_calls": 0,
+      "generator_calls": 120,
+      "input_tokens": 254677,
+      "output_tokens": 6815,
+      "ledger_elapsed_ms": 216487.4975848943,
+      "model_backend_elapsed_ms": 215506.2839370221,
+      "official_f1": {
+        "abstract_label_only": 0.13559322033898302,
+        "abstract_rationalized": 0.13559322033898302,
+        "sentence_selection": 0.1333333333333333,
+        "sentence_label": 0.0606060606060606
+      }
+    },
+    "adaptive": {
+      "strict_positive_correct": 0,
+      "positive_denominator": 15,
+      "strict_nei_correct": 0,
+      "nei_denominator": 9,
+      "strict_whole_answer_correct": 0,
+      "valid_terminal": 8,
+      "unresolved": 16,
+      "scripted_verifier_calls": 0,
+      "model_selected_verifier_calls": 0,
+      "generator_calls": 24,
+      "input_tokens": 86066,
+      "output_tokens": 5076,
+      "ledger_elapsed_ms": 150845.53354419768,
+      "model_backend_elapsed_ms": 150486.46742105484,
+      "official_f1": {
+        "abstract_label_only": 0.125,
+        "abstract_rationalized": 0.08333333333333333,
+        "sentence_selection": 0.07894736842105263,
+        "sentence_label": 0.05263157894736842
+      }
+    }
+  },
+  "physical_cost_reconciliation": {
+    "reserved_calls": 144,
+    "finished_calls": 144,
+    "input_tokens": 340743,
+    "output_tokens": 11891,
+    "unknown_usage_attempts": 0,
+    "unassigned_calls": 0,
+    "recomputed_from_all_finished_receipts": true,
+    "api_currency_cost": null
+  },
+  "decision": "Single-document verification plus terminal generation did not recover strict positive grounding; no autonomous Agent improvement is established.",
+  "raw_mechanical_diagnosis": {
+    "complete_wires": 144,
+    "fixed_first_failures": {"total_sentence_budget": 7, "duplicate_or_excess_documents": 2},
+    "adaptive_first_failures": {"total_sentence_budget": 13, "duplicate_or_excess_documents": 3},
+    "bounded_semantic_replay_rejected": 25,
+    "bounded_semantic_replay_accepted": 23,
+    "adaptive_verify_offered": 24,
+    "adaptive_actual_first_action_answer": 24,
+    "valid_verifier_output_label_counts_not_accuracy": {"SUPPORTS": 20, "REFUTES": 15, "INSUFFICIENT": 61},
+    "new_decoder_quality_measured": false
+  },
+  "limits": [
+    "This is consumed TRAIN24, not independent validation/test, population generalization or an online A/B.",
+    "All 96 fixed verifier responses are structurally valid model judgments, not gold labels or measured verifier accuracy.",
+    "Lower adaptive cost accompanies zero strict successes; it is not successful-agent cost savings.",
+    "Unresolved episodes remain failures, not correct NEI, and all costs are retained.",
+    "R1 job 31914601 failed before inference and is excluded from the scientific denominator, with its original artifacts preserved.",
+    "Old A/B/C runs are compute-different historical references and remain unchanged."
+  ],
+  "training": false,
+  "adapter_loaded": false,
+  "reranker_loaded": false,
+  "warmup_calls": 0,
+  "automatic_retry": false,
+  "further_gpu_execution_authorized": false
+}
