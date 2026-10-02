@@ -11,7 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import tarfile
-from typing import Any
+from typing import Any, cast
 
 from climate_rag.climate_fever import _UnionFind, _near_duplicate_pairs, _normalise, _token_set
 from climate_rag.fair_acquisition import PROTOCOL
@@ -93,7 +93,7 @@ def freeze(metadata: dict[str, Any], evidence: dict[str, str], consumed: set[str
     groups = components(metadata, evidence)
     eligible = [c for c in groups if not set(c) & consumed]
     def order(c: list[str]) -> str:
-        return identity({"domain": SALT, "component_ids": c})
+        return cast(str, identity({"domain": SALT, "component_ids": c}))
     selected_components = sorted(eligible, key=order)[:cap]
     selected = [min(c, key=lambda k: identity({"domain": SALT + ":claim", "id": k})) for c in selected_components]
     tasks = [{"id": key, "claim_text": metadata[key]["claim_text"]} for key in selected]
