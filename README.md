@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [Runpod private-storage CPU repair](docs/RUNPOD_PRIVATE_STORAGE_20261003.md)
+separates persistent MFS assets from owner-only POSIX run/scoring output after
+an observed pre-model permission failure (0/160 slots). It preserves strict
+privacy checks; no new model quality result or automatic retry is claimed.
+
 The [Runpod namespace CPU compatibility delta](docs/RUNPOD_NAMESPACE_COMPATIBILITY_20261003.md)
 adds an explicit visible-limit/provider-allocation contract for the observed
 container layout. Hidden ancestors and exclusive resource availability remain

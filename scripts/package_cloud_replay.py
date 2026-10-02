@@ -11,11 +11,13 @@ from cloud_replay_contract import ENTRY, draft
 from climate_rag.targeted_replay import INPUT_SHA
 from package_scifact_source import git, require_clean_source, validate_archive
 from cloud_capacity import COMPLETE_HOST, RUNPOD_VISIBLE, provider_from_evidence
+from cloud_private_storage import SINGLE_ROOT, PRIVATE_POSIX
 
 
 def package(repo: Path, revision: str, output: Path, *, root: str, run_id: str,
             input_sha: str = INPUT_SHA, capacity_contract: str = COMPLETE_HOST,
-            provider_evidence: Path | None = None, provider_evidence_sha: str | None = None) -> dict[str, Any]:
+            provider_evidence: Path | None = None, provider_evidence_sha: str | None = None,
+            storage_contract: str = SINGLE_ROOT, private_root: str | None = None) -> dict[str, Any]:
     require_clean_source(repo, revision)
     allocation_bytes: bytes | None = None
     allocation_sha = None
@@ -36,11 +38,14 @@ def package(repo: Path, revision: str, output: Path, *, root: str, run_id: str,
     receipt = validate_archive(repo, revision, archive, wrapper=ENTRY)
     value = draft(revision, str(receipt["source_archive_sha256"]), str(receipt["wrapper_sha256"]),
                   root=root, run_id=run_id, input_sha=input_sha, capacity_contract=capacity_contract,
-                  provider_allocation_sha=allocation_sha, provider_evidence_sha=provider_evidence_sha)
+                  provider_allocation_sha=allocation_sha, provider_evidence_sha=provider_evidence_sha,
+                  storage_contract=storage_contract, private_root=private_root)
     receipt.update(backend=value["backend"], entry=ENTRY, entry_sha256=value["entry_sha256"],
                    model_execution_authorized=False, runtime_status="unobserved",
                    capacity_contract=capacity_contract, provider_allocation_sha256=allocation_sha,
-                   provider_evidence_sha256=provider_evidence_sha)
+                   provider_evidence_sha256=provider_evidence_sha,
+                   storage_contract=storage_contract, private_root=private_root,
+                   private_storage_status="unobserved")
     if allocation_bytes is not None:
         with (output / "provider-allocation.json").open("xb") as stream:
             stream.write(allocation_bytes)
@@ -60,11 +65,14 @@ def main() -> None:
     parser.add_argument("--capacity-contract", choices=(COMPLETE_HOST, RUNPOD_VISIBLE), default=COMPLETE_HOST)
     parser.add_argument("--provider-evidence", type=Path)
     parser.add_argument("--provider-evidence-sha")
+    parser.add_argument("--storage-contract", choices=(SINGLE_ROOT, PRIVATE_POSIX), default=SINGLE_ROOT)
+    parser.add_argument("--private-root")
     args = parser.parse_args()
     print(json.dumps(package(Path(__file__).resolve().parents[1], args.source_git, args.output,
                              root=args.root, run_id=args.run_id, input_sha=args.input_sha,
                              capacity_contract=args.capacity_contract, provider_evidence=args.provider_evidence,
-                             provider_evidence_sha=args.provider_evidence_sha), indent=2))
+                             provider_evidence_sha=args.provider_evidence_sha,
+                             storage_contract=args.storage_contract, private_root=args.private_root), indent=2))
 
 
 if __name__ == "__main__":

@@ -45,13 +45,21 @@ def early_supervised_run() -> None:
             or value.get("model_execution_authorized") is not True
             or value.get("backend") != "standalone-linux-v1"):
         raise ValueError("unauthorized_draft_no_model_or_preparation")
-    root, receipt = Path(value["root"]), Path(value["deadline_receipt"])
+    private_storage = value.get("storage_contract") == "runpod-private-posix-v1"
+    root = Path(value["private_root"] if private_storage else value["root"])
+    receipt = Path(value["deadline_receipt"])
     run_id = value["run_id"]
     if (not root.is_absolute() or root.resolve() != root or len(root.parts) < 3
             or not isinstance(run_id, str) or not run_id or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-" for c in run_id)
             or receipt != root / "runtime" / (run_id + "-deadline.json") or receipt.resolve() != receipt
             or not receipt.parent.is_dir()):
         raise ValueError("deadline_receipt_path")
+    if private_storage:
+        guard = runpy.run_path(str(SOURCE / "scripts/cloud_private_storage.py"))
+        guard["checked_directory"](root)
+        guard["check_ancestors"](root)
+        guard["checked_directory"](receipt.parent)
+        os.umask(0o077)
 
     def child() -> dict[str, Any]:
         try:
@@ -109,7 +117,11 @@ from run_budget_agent_full_operator import read_only_tree
 from run_scifact_evidence_commit_paired import cpu_stage, supervisor_signals
 from run_targeted_replay_operator import run_supervised
 from cloud_capacity import observe_capacity, check_provider_instance
-from cloud_destination import destination_preflight, verify_destination
+from cloud_destination import destination_preflight, verify_destination, container_budget, GIB
+from cloud_private_storage import (
+    is_split, observe_storage, verify_storage, checked_file,
+    configure_private_environment,
+)
 
 
 def imported_runtime(runtime_files: dict[str, str]) -> dict[str, Any]:
@@ -139,6 +151,7 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
         raise ValueError("observed_instance_identity_required")
     if sys.executable != value["python_executable"] or platform.python_version_tuple()[:2] != ("3", "11"):
         raise ValueError("cloud_python_identity")
+    storage = observe_storage(value)
     versions = {key: importlib.metadata.version(key) for key in DEPENDENCIES}
     if versions != DEPENDENCIES:
         raise ValueError("cloud_dependency_versions")
@@ -172,6 +185,7 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
     return {"backend": BACKEND, "status": "observed", "synthetic": False,
             "runtime_identity_schema": "stable-configuration-v2",
             "capacity_contract": value["capacity_contract"],
+            "storage_configuration": storage,
             "provider_allocation_sha256": value["provider_allocation_sha256"],
             "provider_evidence_sha256": value["provider_evidence_sha256"],
             "instance_id": instance_id, "machine_id_sha256": digest(machine),
@@ -221,7 +235,7 @@ def projection_command(value: dict[str, Any], release_path: Path, release_sha: s
         raise ValueError("unknown_stage")
     path, fingerprint = release_path, release_sha
     if stage == "worker":
-        path = Path(value["work"]) / "worker-projection.json"
+        path = Path(value["private_scratch"] if is_split(value) else value["work"]) / "worker-projection.json"
         ordered_write(path, worker_projection(value, release_sha))
         fingerprint = digest(path)
         ordered_write(Path(value["output"]) / "allocation/worker-projection-binding.json",
@@ -236,7 +250,12 @@ def launch(value: dict[str, Any], release_path: Path, release_sha: str) -> dict[
     source = Path(__file__).resolve().parents[1]
     def prelaunch() -> dict[str, Any]:
         verify_source(value, source)
+        verify_storage(value)
         verify_destination(value)
+        if is_split(value):
+            os.umask(0o077)
+            Path(value["private_scratch"]).mkdir(mode=0o700)
+            configure_private_environment(value)
         return verify_runtime(value)
 
     bounded: Any = cpu_stage
@@ -252,6 +271,8 @@ def launch(value: dict[str, Any], release_path: Path, release_sha: str) -> dict[
                       OPENBLAS_NUM_THREADS="8", MKL_NUM_THREADS="8", PYTHONNOUSERSITE="1",
                       HF_HOME=str(Path(value["work"]) / "hf-cache"),
                       PYTHONPATH=os.pathsep.join((str(source / "src"), str(source / "scripts"))))
+    if is_split(value):
+        configure_private_environment(value)
     with supervisor_signals():
         return run_supervised(value, release_path, release_sha, source, Path(value["work"]),
                               validate_fn=validate_release, prepare_fn=prepare,
@@ -270,9 +291,13 @@ def worker_stage(path: Path, expected_sha: str) -> None:
         raise ValueError("worker_must_not_receive_gold")
     validate_projection(value, path, expected_sha)
     verify_source(value, Path(__file__).resolve().parents[1])
+    verify_storage(value, require_gold=False, require_output=True)
+    if is_split(value):
+        configure_private_environment(value)
     verify_runtime(value)
     input_dir = Path(value["input"])
-    if input_dir.resolve() != input_dir or path.resolve().parent != input_dir.parent:
+    projection_parent = Path(value["private_scratch"]) if is_split(value) else input_dir.parent
+    if input_dir.resolve() != input_dir or path.resolve().parent != projection_parent:
         raise ValueError("worker_private_input_path")
     from run_targeted_replay import worker_body
 
@@ -282,7 +307,7 @@ def worker_stage(path: Path, expected_sha: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("asset-preflight", "runtime-preflight", "run", "worker", "score"))
+    parser.add_argument("stage", choices=("storage-preflight", "asset-preflight", "runtime-preflight", "run", "worker", "score"))
     parser.add_argument("--release", required=True, type=Path)
     parser.add_argument("--release-sha", required=True)
     parser.add_argument("--instance-id")
@@ -290,8 +315,27 @@ def main() -> None:
     if args.stage == "worker":
         worker_stage(args.release, args.release_sha)
         return
-    value = load_release(args.release, args.release_sha, execution=args.stage not in ("asset-preflight", "runtime-preflight"))
-    if args.stage == "asset-preflight":
+    value = load_release(args.release, args.release_sha, execution=args.stage not in ("storage-preflight", "asset-preflight", "runtime-preflight"))
+    if is_split(value):
+        os.umask(0o077)
+    if args.stage == "storage-preflight":
+        if not is_split(value):
+            raise ValueError("explicit_private_storage_contract_required")
+        check_paths(value, new_run=True)
+        verify_source(value, SOURCE)
+        receipt = {"scope": "private_posix_preflight_not_execution_authority",
+                   "source_git": value["source_git"], "run_id": value["run_id"],
+                   "provider_allocation_sha256": value["provider_allocation_sha256"],
+                   "configuration": observe_storage(value, probe=True), "probe_passed": True,
+                   "container_budget_observation": container_budget(value, 15 * GIB),
+                   "model_weights_loaded": False, "model_execution_authorized": False}
+        path = Path(value["storage_receipt"])
+        if path.exists():
+            raise ValueError("storage_receipt_already_exists")
+        ordered_write(path, receipt)
+        checked_file(path)
+        print(json.dumps({"storage_receipt_sha256": digest(path), "model_execution_authorized": False}))
+    elif args.stage == "asset-preflight":
         receipt = destination_preflight(value, SOURCE)
         path = Path(value["asset_receipt"])
         if path.exists():
@@ -301,6 +345,8 @@ def main() -> None:
     elif args.stage == "runtime-preflight":
         check_paths(value, new_run=True)
         verify_source(value, Path(__file__).resolve().parents[1])
+        observe_storage(value)
+        configure_private_environment(value, preflight=True)
         receipt = observe_runtime(value, args.instance_id or "")
         path = Path(value["runtime_receipt"])
         if path.exists():
@@ -318,6 +364,9 @@ def main() -> None:
     else:
         check_paths(value, new_run=False)
         verify_source(value, Path(__file__).resolve().parents[1])
+        verify_storage(value, require_output=True)
+        if is_split(value):
+            configure_private_environment(value)
         verify_runtime(value)
         from run_targeted_replay import score_after_exit
 

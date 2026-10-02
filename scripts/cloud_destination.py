@@ -11,6 +11,7 @@ from typing import Any
 from cloud_replay_contract import check_paths, digest, validate_release, verify_source
 from cloud_capacity import observe_capacity, provider_for_release, RUNPOD_VISIBLE, _unescape
 from preflight_cloud_assets import inventory
+from cloud_private_storage import is_split, observe_storage, private_mount
 
 GIB = 1024**3
 RUNPOD_WORKSPACE = Path("/workspace")
@@ -71,8 +72,47 @@ def provider_volume_budget(value: dict[str, Any], additional: int) -> dict[str, 
 
 
 def plan_sha(value: dict[str, Any]) -> str:
-    ignored = {"authorization", "model_execution_authorized", "runtime_receipt_sha256", "asset_receipt_sha256"}
+    ignored = {"authorization", "model_execution_authorized", "runtime_receipt_sha256", "asset_receipt_sha256", "storage_receipt_sha256"}
     return hashlib.sha256(json.dumps({k: v for k, v in value.items() if k not in ignored}, sort_keys=True).encode()).hexdigest()
+
+
+def container_budget(value: dict[str, Any], additional: int) -> dict[str, Any]:
+    """Separate private-project budget plus actual container FS free space.
+
+    Overlay df may describe a shared backing filesystem. We do not manufacture
+    a service-side usage/quota receipt or pool this budget with the MFS volume.
+    """
+    provider = provider_for_release(value)
+    if provider is None or not is_split(value):
+        raise ValueError("private_container_provider_required")
+    root = Path(value["private_root"])
+    mount = private_mount(root, Path(value["root"]))
+    used = 0
+    seen: set[tuple[int, int]] = set()
+
+    def unreadable(error: OSError) -> None:
+        raise error
+
+    for directory, dirs, files in os.walk(root, onerror=unreadable, followlinks=False):
+        for path in [Path(directory), *(Path(directory) / name for name in dirs + files)]:
+            info = path.lstat()
+            if path.is_symlink() or info.st_dev != mount["device"]:
+                raise ValueError("private_budget_symlink_or_submount")
+            identity = (info.st_dev, info.st_ino)
+            if identity not in seen:
+                seen.add(identity)
+                used += max(info.st_size, getattr(info, "st_blocks", 0) * 512)
+    allocated = provider["allocation"]["container_gb"] * 10**9
+    free = shutil.disk_usage(root).free
+    if additional <= 0 or used + additional > allocated or additional > free:
+        raise ValueError("private_container_capacity")
+    return {"private_root": str(root), "mount": mount,
+            "provider_container_allocated_bytes": allocated,
+            "observed_private_tree_bytes": used, "filesystem_free_bytes": free,
+            "additional_reserved_bytes": additional, "workspace_space_not_pooled": True,
+            "container_other_usage_verified": False, "service_quota_verified": False,
+            "budget_scope": "private_project_usage_plus_reserve_not_whole_container_usage",
+            "required_operator_check": "Account for base image/other container use before execution; recover raw results privately before stop."}
 
 
 def disk_capacity(value: dict[str, Any], extracted_bytes: int) -> list[dict[str, Any]]:
@@ -86,6 +126,9 @@ def disk_capacity(value: dict[str, Any], extracted_bytes: int) -> list[dict[str,
     reservations = {"input_archive": 0, "gold_path": 0, "source": 2 * GIB,
                     "python_executable": 2 * GIB, "work": extracted_bytes + 4 * GIB,
                     "output": 8 * GIB, "asset_receipt": GIB}
+    if is_split(value):
+        # 4 GiB scratch/cache plus 2 GiB headroom, not model/input duplication.
+        reservations["private_scratch"] = 6 * GIB
     groups: dict[int, dict[str, Any]] = {}
     for key, needed in reservations.items():
         path = Path(value[key])
@@ -106,11 +149,25 @@ def disk_capacity(value: dict[str, Any], extracted_bytes: int) -> list[dict[str,
         if group["free_bytes"] < group["additional_required_bytes"]:
             raise ValueError("destination_filesystem_capacity")
     if value.get("capacity_contract") == RUNPOD_VISIBLE:
-        if any(not Path(value[key]).is_relative_to(RUNPOD_WORKSPACE) for key in reservations):
-            raise ValueError("runpod_reserved_paths_outside_workspace")
-        budget = provider_volume_budget(value, sum(g["additional_required_bytes"] for g in groups.values()))
+        workspace_needed = private_needed = 0
+        private_root = Path(value["private_root"]) if is_split(value) else None
+        for key, needed in reservations.items():
+            path = Path(value[key])
+            if path.is_relative_to(RUNPOD_WORKSPACE):
+                workspace_needed += needed
+            elif private_root is not None and path.is_relative_to(private_root):
+                private_needed += needed
+            else:
+                raise ValueError("runpod_reserved_paths_outside_bound_roots")
+        budget = provider_volume_budget(value, workspace_needed)
+        container = container_budget(value, private_needed) if is_split(value) else None
         for group in groups.values():
-            group["provider_volume_budget"] = budget
+            if any(Path(p["path"]).is_relative_to(RUNPOD_WORKSPACE) for p in group["paths"]):
+                if any(not Path(p["path"]).is_relative_to(RUNPOD_WORKSPACE) for p in group["paths"]):
+                    raise ValueError("private_and_persistent_filesystems_not_separate")
+                group["provider_volume_budget"] = budget
+            else:
+                group["private_container_budget"] = container
     return list(groups.values())
 
 
@@ -118,6 +175,7 @@ def destination_preflight(value: dict[str, Any], source: Path) -> dict[str, Any]
     validate_release(value, execution=False)
     check_paths(value, new_run=True)
     verify_source(value, source)
+    private_storage = observe_storage(value, probe=is_split(value), require_gold=is_split(value))
     effective_compute = observe_capacity(value)
     if not Path(value["python_executable"]).is_file():
         raise ValueError("destination_environment_missing")
@@ -134,6 +192,7 @@ def destination_preflight(value: dict[str, Any], source: Path) -> dict[str, Any]
             "effective_compute": effective_compute,
             "capacity_contract": value["capacity_contract"],
             "provider_allocation_sha256": value["provider_allocation_sha256"],
+            "private_storage": private_storage,
             "gold_labels_parsed": False, "model_weights_loaded": False}
 
 
@@ -147,6 +206,8 @@ def verify_destination(value: dict[str, Any]) -> None:
             or receipt.get("model_execution_authorized") is not False):
         raise ValueError("destination_receipt_binding")
     assets = receipt["assets"]
+    if is_split(value) and receipt.get("private_storage") != observe_storage(value, require_gold=True):
+        raise ValueError("destination_private_storage_changed")
     if (assets["input"]["status"] != "verified"
             or assets["input"]["transport_sha256"] != value["input_transport_sha256"]
             or assets["gold"]["sha256"] != value["gold_sha256"]
