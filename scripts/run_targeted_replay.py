@@ -85,6 +85,11 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
         or not os.environ.get("CUDA_VISIBLE_DEVICES")
     ):
         raise ValueError("allocated_gpu_required")
+    worker_body(release, input_dir)
+
+
+def worker_body(release: dict[str, Any], input_dir: Path) -> None:
+    """Shared implementation; entrypoints must validate their own backend first."""
     tasks, documents, sources = load_inputs(input_dir)
     manifests = {}
     for key, identity in (("generator", MODEL_SHA), ("reranker", RERANKER_SHA)):
@@ -130,7 +135,7 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
             "reranker_sha256": RERANKER_SHA,
             "warmup_calls": 0,
             "load_index_elapsed_ms": (time.monotonic() - started) * 1000,
-            "input_archive": INPUT_NAME,
+            "input_archive": release.get("input_transport_sha256", INPUT_NAME),
         },
     )
     run_matrix(
@@ -144,7 +149,7 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
     )
 
 
-def score_after_exit(release: dict[str, Any], input_dir: Path) -> None:
+def score_after_exit(release: dict[str, Any], input_dir: Path, *, gold_path: Path | None = None) -> None:
     output = Path(release["output"])
     proof = json.loads((output / "allocation/worker-exit.json").read_bytes())
     if not (
@@ -192,6 +197,7 @@ def score_after_exit(release: dict[str, Any], input_dir: Path) -> None:
         OLD_PROTOCOL_SHA,
         claim_hashes,
         (
+            gold_path if gold_path is not None else
             ROOT / "envs" / ("budget-agent-validation-gold-" + GOLD_SHA + ".json")
         ).read_bytes(),
         load_selection_manifest(),

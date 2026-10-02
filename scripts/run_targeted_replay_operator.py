@@ -160,8 +160,11 @@ def run_supervised(
     prepare_fn: Any = prepare,
     worker_fn: Any = bounded_worker,
     scorer_fn: Any = subprocess.run,
+    validate_fn: Any = validate_release,
+    stage_command: Any = None,
+    execution_identity: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    validate_release(release)  # Must precede mkdir, extraction or any model access.
+    validate_fn(release)  # Must precede mkdir, extraction or any model access.
     output = Path(release["output"])
     output.mkdir(mode=0o700)
     allocation = output / "allocation"
@@ -174,7 +177,7 @@ def run_supervised(
             "planned_slots": 160,
             "max_generator_calls": 800,
             "automatic_retry": False,
-            "job_id": os.environ.get("SLURM_JOB_ID"),
+            **({"job_id": os.environ.get("SLURM_JOB_ID")} if execution_identity is None else execution_identity),
         },
     )
     began = time.monotonic()
@@ -200,7 +203,7 @@ def run_supervised(
         bounded_prepare: Any = cpu_stage
         bounded_prepare(release["preparation_seconds"], prepare_fn, release, work)
         proof = worker_fn(
-            [*command, "worker", *common],
+            [*command, "worker", *common] if stage_command is None else stage_command("worker"),
             allocation,
             output / "inference",
             min(
@@ -235,7 +238,7 @@ def run_supervised(
             raise TimeoutError("score_budget_exhausted")
         with (allocation / "score.log").open("xb") as stream:
             scorer_fn(
-                [*command, "score", *common],
+                [*command, "score", *common] if stage_command is None else stage_command("score"),
                 check=True,
                 timeout=seconds,
                 stdout=stream,

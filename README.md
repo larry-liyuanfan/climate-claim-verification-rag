@@ -1,5 +1,13 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [standalone Linux CPU preparation](docs/CLOUD_REPLAY_CPU_PREPARATION_20261002.md)
+adds an explicit opt-in cloud backend while retaining the old Slurm entry.
+Feedback-conditioned synthetic branches are now tested. The original 16.12GB
+local input archive and 31 required inference members have passed full-byte
+verification; gold stays scorer-only. **No cloud instance, model execution,
+new quality result or resume promotion is authorized or claimed.** Runtime and
+approval remain separate; the package emits only an unauthorized release.
+
 The [stop/acquire CPU package and whole-chain review](docs/STOP_ACQUIRE_CPU_REVIEW_20261002.md)
 adds an **opt-in acquisition gate followed by a separate verifier**; the four fixed
 controls and historical free-action adaptive remain unchanged. Synthetic controller,

@@ -46,7 +46,7 @@ def exact_tree(repo: Path, revision: str) -> dict[str, tuple[int, bytes]]:
     return entries
 
 
-def validate_archive(repo: Path, revision: str, archive: Path) -> dict[str, object]:
+def validate_archive(repo: Path, revision: str, archive: Path, *, wrapper: str | None = None) -> dict[str, object]:
     expected = exact_tree(repo, revision)
     directories = {
         "/".join(name.split("/")[:i])
@@ -88,7 +88,7 @@ def validate_archive(repo: Path, revision: str, archive: Path) -> dict[str, obje
         "regular_files": len(files), "directories": len(directories),
         "source_revision_members": 1, "source_revision_bytes": 41,
         "normalized_members_unique": True, "complete_git_blob_allowlist": True,
-        "wrapper_sha256": hashlib.sha256(expected[WRAPPER][1]).hexdigest(),
+        "wrapper_sha256": hashlib.sha256(expected[WRAPPER if wrapper is None else wrapper][1]).hexdigest(),
     }
 
 
