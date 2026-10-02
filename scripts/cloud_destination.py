@@ -183,7 +183,10 @@ def destination_preflight(value: dict[str, Any], source: Path) -> dict[str, Any]
         if not Path(value[key]).parent.is_dir():
             raise ValueError("dedicated_run_parent_required")
     assets = inventory(Path(value["input_archive"]), Path(value["gold_path"]), source,
-                       full=True, input_sha=value["input_transport_sha256"])
+                       full=True, input_sha=value["input_transport_sha256"],
+                       **({"gold_sha": value["gold_sha256"]} if "fair_binding" in value else {}))
+    if "fair_binding" in value:
+        assets["assets"]["fair"] = fair_asset_hashes(value)
     if assets["asset_status"] != "verified_local_assets":
         raise ValueError("destination_assets_unverified")
     return {"scope": "destination_cpu_assets_not_execution_authority", "plan_sha256": plan_sha(value),
@@ -213,6 +216,16 @@ def verify_destination(value: dict[str, Any]) -> None:
             or assets["gold"]["sha256"] != value["gold_sha256"]
             or digest(Path(value["gold_path"])) != value["gold_sha256"]):
         raise ValueError("destination_asset_identity")
+    if "fair_binding" in value and assets.get("fair") != fair_asset_hashes(value):
+        raise ValueError("fair_destination_asset_drift")
     disk_capacity(value, assets["input"]["extracted_bytes"])
     # prepare() independently rehashes transport and each extracted member
     # before the model child can start. No mtime/inode trust shortcut.
+
+
+def fair_asset_hashes(value: dict[str, Any]) -> dict[str, str]:
+    result = {key: digest(Path(value[key])) for key in ("cohort_path", "exposure_audit_path")}
+    if (result["cohort_path"] != value["fair_binding"]["cohort_sha256"]
+            or result["exposure_audit_path"] != value["fair_binding"]["exposure_audit_sha256"]):
+        raise ValueError("fair_destination_asset_hash")
+    return result

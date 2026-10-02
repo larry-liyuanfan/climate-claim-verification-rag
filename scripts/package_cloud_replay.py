@@ -17,8 +17,19 @@ from cloud_private_storage import SINGLE_ROOT, PRIVATE_POSIX
 def package(repo: Path, revision: str, output: Path, *, root: str, run_id: str,
             input_sha: str = INPUT_SHA, capacity_contract: str = COMPLETE_HOST,
             provider_evidence: Path | None = None, provider_evidence_sha: str | None = None,
-            storage_contract: str = SINGLE_ROOT, private_root: str | None = None) -> dict[str, Any]:
+            storage_contract: str = SINGLE_ROOT, private_root: str | None = None,
+            fair_binding: dict[str, Any] | None = None,
+            fair_gold_sha256: str | None = None) -> dict[str, Any]:
     require_clean_source(repo, revision)
+    if fair_binding is not None:
+        from climate_rag.fair_replay import validate_binding
+        from cloud_replay_contract import hex_id
+        validate_binding(fair_binding)
+        if fair_gold_sha256 is None:
+            raise ValueError("fair_package_requires_scorer_hash")
+        hex_id(fair_gold_sha256)
+    elif fair_gold_sha256 is not None:
+        raise ValueError("gold_without_fair_binding")
     allocation_bytes: bytes | None = None
     allocation_sha = None
     if capacity_contract == RUNPOD_VISIBLE:
@@ -39,13 +50,17 @@ def package(repo: Path, revision: str, output: Path, *, root: str, run_id: str,
     value = draft(revision, str(receipt["source_archive_sha256"]), str(receipt["wrapper_sha256"]),
                   root=root, run_id=run_id, input_sha=input_sha, capacity_contract=capacity_contract,
                   provider_allocation_sha=allocation_sha, provider_evidence_sha=provider_evidence_sha,
-                  storage_contract=storage_contract, private_root=private_root)
+                  storage_contract=storage_contract, private_root=private_root,
+                  fair_binding=fair_binding, fair_gold_sha256=fair_gold_sha256)
     receipt.update(backend=value["backend"], entry=ENTRY, entry_sha256=value["entry_sha256"],
                    model_execution_authorized=False, runtime_status="unobserved",
                    capacity_contract=capacity_contract, provider_allocation_sha256=allocation_sha,
                    provider_evidence_sha256=provider_evidence_sha,
                    storage_contract=storage_contract, private_root=private_root,
                    private_storage_status="unobserved")
+    if fair_binding is not None:
+        receipt.update(fair_binding=fair_binding, purpose=value["purpose"],
+                       policy=value["policy"])
     if allocation_bytes is not None:
         with (output / "provider-allocation.json").open("xb") as stream:
             stream.write(allocation_bytes)
@@ -67,12 +82,16 @@ def main() -> None:
     parser.add_argument("--provider-evidence-sha")
     parser.add_argument("--storage-contract", choices=(SINGLE_ROOT, PRIVATE_POSIX), default=SINGLE_ROOT)
     parser.add_argument("--private-root")
+    parser.add_argument("--fair-binding", type=Path, help="CPU-frozen binding; never scorer gold")
+    parser.add_argument("--fair-gold-sha256", help="Scorer-only file hash, not its contents")
     args = parser.parse_args()
     print(json.dumps(package(Path(__file__).resolve().parents[1], args.source_git, args.output,
                              root=args.root, run_id=args.run_id, input_sha=args.input_sha,
                              capacity_contract=args.capacity_contract, provider_evidence=args.provider_evidence,
                              provider_evidence_sha=args.provider_evidence_sha,
-                             storage_contract=args.storage_contract, private_root=args.private_root), indent=2))
+                             storage_contract=args.storage_contract, private_root=args.private_root,
+                             fair_binding=json.loads(args.fair_binding.read_bytes()) if args.fair_binding else None,
+                             fair_gold_sha256=args.fair_gold_sha256), indent=2))
 
 
 if __name__ == "__main__":

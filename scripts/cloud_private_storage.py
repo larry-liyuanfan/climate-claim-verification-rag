@@ -75,7 +75,7 @@ def private_mount(root: Path, persistent: Path) -> dict[str, Any]:
 
 def required_parents(value: dict[str, Any]) -> list[Path]:
     root = Path(value["private_root"])
-    return [root, root / "runs", root / "scoring", root / "runtime", root / "scratch"]
+    return [root, root / "runs", root / "scoring", root / "runtime", root / "scratch"] + ([root / "assets"] if "fair_binding" in value else [])
 
 
 def permission_probe(root: Path) -> None:
@@ -127,6 +127,9 @@ def observe_storage(value: dict[str, Any], *, probe: bool = False,
         raise ValueError("private_parent_submount")
     if require_gold:
         checked_file(Path(value["gold_path"]))
+    if "fair_binding" in value:
+        for key in ("cohort_path", "exposure_audit_path"):
+            checked_file(Path(value[key]))
     if require_output:
         checked_directory(Path(value["output"]))
         check_output_tree(Path(value["output"]))

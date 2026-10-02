@@ -13,6 +13,7 @@ from .private_diagnostics_v3 import PrivateDiagnosticStore
 from .scifact_natural_contract import complete_wire
 from .targeted_query import PROTOCOL
 from . import stop_acquire
+from . import fair_acquisition
 
 
 class LocalTargetedProvider(LocalQwenSciFactProvider):
@@ -28,7 +29,7 @@ class LocalTargetedProvider(LocalQwenSciFactProvider):
         self.name = self.base.name + ":" + protocol
 
     def render(self, observation: Mapping[str, Any], schema: Mapping[str, Any]) -> str:
-        if observation.get("protocol") not in {PROTOCOL, stop_acquire.PROTOCOL}:
+        if observation.get("protocol") not in {PROTOCOL, stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL}:
             raise ValueError("targeted_prompt_protocol")
         return render_v3_prompt(self.base.tokenizer, observation, schema)
 

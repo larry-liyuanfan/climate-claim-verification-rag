@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import time
 from typing import Any
@@ -28,6 +29,7 @@ from climate_rag.targeted_replay import (
     ROOT,
     RERANKER_SHA,
     MANIFEST_BYTES,
+    SELECTION_SHA,
     frozen_tasks,
     run_matrix,
     sha,
@@ -36,6 +38,8 @@ from climate_rag.targeted_score import audit, score
 from run_scifact_utility8 import SerialRerank
 from run_budget_agent_full_operator import digest
 from score_budget_agent import load_selection_manifest, validate_gold
+from climate_rag import fair_acquisition
+from climate_rag.fair_replay import validate_binding, validate_tasks
 
 SOURCE = Path(__file__).resolve().parents[1]
 SELECTION = (
@@ -44,7 +48,7 @@ SELECTION = (
 
 
 class TargetedRerank(SerialRerank):
-    capacity_ceiling = 128
+    capacity_ceiling = 384
 
     def start_slot(self, slot: str) -> None:
         self.request_context = {"slot": slot}
@@ -59,9 +63,35 @@ class TargetedRerank(SerialRerank):
 
 
 def load_inputs(
-    input_dir: Path,
+    input_dir: Path, release: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, str]], list[Any], dict[str, Source]]:
-    tasks = frozen_tasks(
+    fair = release is not None and release.get("purpose") == fair_acquisition.PROTOCOL
+    if fair:
+        assert release is not None
+        binding = release["fair_binding"]
+        validate_binding(binding)
+        cohort = Path(release["cohort_path"])
+        exposure = Path(release["exposure_audit_path"])
+        if cohort.resolve() != cohort or exposure.resolve() != exposure:
+            raise ValueError("fair_asset_symlink")
+        if digest(cohort) != binding["cohort_sha256"] or digest(exposure) != binding["exposure_audit_sha256"]:
+            raise ValueError("fair_asset_sha")
+        tasks = json.loads(cohort.read_bytes())
+        validate_tasks(tasks, binding)
+        audit_data = json.loads(exposure.read_bytes())
+        canonical_raw = SELECTION.read_bytes()
+        if sha(canonical_raw) != SELECTION_SHA:
+            raise ValueError("canonical_consumption_receipt_hash")
+        canonical_consumed = json.loads(canonical_raw)["selected_ids"]
+        selected = [t["id"] for t in tasks]
+        if (audit_data["selected_ids"] != selected or audit_data["sealed_test_read"] is not False
+                or audit_data["model_results_read"] is not False or audit_data["labels_used_for_selection"] is not False
+                or audit_data["consumption_receipt_sha256"] != SELECTION_SHA
+                or audit_data["consumed_ids"] != sorted(canonical_consumed)
+                or any(set(c) & set(audit_data["consumed_ids"]) for c in audit_data["selected_component_ids"])):
+            raise ValueError("fair_exposure_eligibility")
+    else:
+        tasks = frozen_tasks(
         (input_dir / "validation-protocol.json").read_bytes(), SELECTION.read_bytes()
     )
     if digest(input_dir / "evidence.jsonl") != CORPUS_SHA:
@@ -90,7 +120,13 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
 
 def worker_body(release: dict[str, Any], input_dir: Path) -> None:
     """Shared implementation; entrypoints must validate their own backend first."""
-    tasks, documents, sources = load_inputs(input_dir)
+    if release.get("purpose") == fair_acquisition.PROTOCOL:
+        if (release.get("authorization") != "validated_worker_projection"
+                or not re.fullmatch(r"[0-9a-f]{40}", str(release.get("source_git")))
+                or not re.fullmatch(r"[0-9a-f]{64}", str(release.get("source_archive_sha256")))
+                or not re.fullmatch(r"[a-z0-9][a-z0-9-]{5,79}", str(release.get("run_id")))):
+            raise ValueError("fair_worker_unbound_run_identity")
+    tasks, documents, sources = (load_inputs(input_dir, release) if release["purpose"] == fair_acquisition.PROTOCOL else load_inputs(input_dir))
     manifests = {}
     for key, identity in (("generator", MODEL_SHA), ("reranker", RERANKER_SHA)):
         root = input_dir / "models" / key
@@ -121,7 +157,7 @@ def worker_body(release: dict[str, Any], input_dir: Path) -> None:
         batch_size=1,
     )
     rerank = TargetedRerank(
-        backend, ranker, output / "reranker-ledger", max_requests=128
+        backend, ranker, output / "reranker-ledger", max_requests=(len(tasks) * 12 if release["purpose"] == fair_acquisition.PROTOCOL else 128)
     )
     index = BM25Index().fit(documents)
 
@@ -146,6 +182,7 @@ def worker_body(release: dict[str, Any], input_dir: Path) -> None:
         output / "inference",
         physical_guard=base_state,
         protocol=release["purpose"],
+        binding=release.get("fair_binding"),
     )
 
 
@@ -161,10 +198,12 @@ def score_after_exit(release: dict[str, Any], input_dir: Path, *, gold_path: Pat
         raise ValueError("worker_not_cleanly_reaped")
     if not (output / "cost-before-quality.json").is_file():
         raise ValueError("missing_cost_before_gold")
-    tasks, _, sources = load_inputs(input_dir)
+    tasks, _, sources = (load_inputs(input_dir, release) if release["purpose"] == fair_acquisition.PROTOCOL else load_inputs(input_dir))
     run = json.loads((output / "inference/run.json").read_bytes())
     if run.get("protocol") != release["purpose"]:
         raise ValueError("run_release_protocol_mismatch")
+    if release["purpose"] == fair_acquisition.PROTOCOL and run.get("fair_binding") != release["fair_binding"]:
+        raise ValueError("fair_run_release_binding_mismatch")
     # Tokenizer-only, not weights: bind physical prompt IDs and decoding receipts.
     from transformers.models.auto.tokenization_auto import AutoTokenizer
 
@@ -185,9 +224,18 @@ def score_after_exit(release: dict[str, Any], input_dir: Path, *, gold_path: Pat
         cost["generation"] != ledger_cost(output / "inference/ledger")
         or cost["reranker"] != reranker_cost(output / "reranker-ledger")
         or cost["planned_slots"] != cost["completed_slots"]
-        or cost["completed_slots"] != 160
+        or cost["completed_slots"] != release.get("policy", {}).get("planned_slots", 160)
     ):
         raise ValueError("cost_before_quality_drift")
+    if release["purpose"] == fair_acquisition.PROTOCOL:
+        from climate_rag.fair_replay import score as fair_score
+        if gold_path is None or digest(gold_path) != release["gold_sha256"]:
+            raise ValueError("fair_gold_hash_after_exit")
+        compact = fair_score(run, json.loads(gold_path.read_bytes()))
+        compact.update(source_git=release["source_git"], policy=release["policy"],
+            raw_run_sha256=digest(output / "inference/run.json"), cost_sha256=digest(output / "cost-before-quality.json"))
+        ordered_write(output / "compact.json", compact)
+        return
     claim_hashes = {r["task_id"]: r["immutable_claim_sha256"] for r in run["runs"]}
     protocol = json.loads((input_dir / "validation-protocol.json").read_bytes())
     # First and only real-gold read in this program, after worker death + audit.

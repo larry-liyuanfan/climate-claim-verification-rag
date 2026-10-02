@@ -1,5 +1,17 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+**CPU implementation update (2026-10-03, not a new model result):** the
+[fair three-arm package](docs/FAIR_THREE_ARM_CPU_20261003.md) connects strong
+upfront multiquery, deterministic workflow and optional autonomous acquisition
+to the same read/query/rerank executor and terminal verifier. A label-blind,
+component-disjoint **32-task / 96-slot development roster** is frozen; all of
+its parent validation population was previously retrieval-exposed. Full-text
+delivery and later physical prompts are audited, not inferred from tool counts.
+The scorer keeps official task labels separate from the explicitly limited
+official-evidence-ID citation proxy. The package is **unauthorized by default**;
+fresh exact release, cloud asset/runtime receipts and private recovery are
+required before any real model run. No independent-test or Agent gain is claimed.
+
 **Latest verified result (2026-10-03):** the Runpod replay completed and all
 **160 slots** were privately recovered. Autonomous acquisition selected stop in
 **32/32** tasks, with binary correctness **8/23 vs fixed multiquery14/23**; no

@@ -29,7 +29,7 @@ jobs:
           python -m ruff check src scripts tests
           python -m mypy src/climate_rag
           python -m mypy scripts/package_scifact_source.py
-          python -m mypy --follow-imports=silent scripts/cloud_replay_contract.py scripts/cloud_private_storage.py scripts/cloud_capacity.py scripts/cloud_destination.py scripts/cloud_deadline.py scripts/run_cloud_replay.py scripts/package_cloud_replay.py scripts/preflight_cloud_assets.py scripts/run_targeted_replay.py scripts/run_targeted_replay_operator.py
+          python -m mypy --follow-imports=silent scripts/cloud_replay_contract.py scripts/cloud_private_storage.py scripts/cloud_capacity.py scripts/cloud_destination.py scripts/cloud_deadline.py scripts/run_cloud_replay.py scripts/package_cloud_replay.py scripts/preflight_cloud_assets.py scripts/run_targeted_replay.py scripts/run_targeted_replay_operator.py scripts/prepare_fair_cohort.py
       - name: Run full test suite
         run: python -m pytest -q
       - name: Scan tracked text for secrets and PII

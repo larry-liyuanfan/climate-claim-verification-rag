@@ -165,6 +165,8 @@ def run_supervised(
     execution_identity: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     validate_fn(release)  # Must precede mkdir, extraction or any model access.
+    planned_slots = release["policy"]["planned_slots"]
+    max_generator_calls = release["policy"]["max_generator_calls"]
     output = Path(release["output"])
     output.mkdir(mode=0o700)
     allocation = output / "allocation"
@@ -174,8 +176,8 @@ def run_supervised(
         {
             "release_sha256": release_sha,
             "source_git": release["source_git"],
-            "planned_slots": 160,
-            "max_generator_calls": 800,
+            "planned_slots": planned_slots,
+            "max_generator_calls": max_generator_calls,
             "automatic_retry": False,
             **({"job_id": os.environ.get("SLURM_JOB_ID")} if execution_identity is None else execution_identity),
         },
@@ -217,7 +219,7 @@ def run_supervised(
             ordered_write(
                 output / "cost-before-quality.json",
                 {
-                    "planned_slots": 160,
+                    "planned_slots": planned_slots,
                     "completed_slots": len(
                         list((output / "inference").glob("slot-*/finished.json"))
                     ),
@@ -257,7 +259,7 @@ def run_supervised(
                 ordered_write(
                     output / "cost-before-quality.json",
                     {
-                        "planned_slots": 160,
+                        "planned_slots": planned_slots,
                         "completed_slots": len(
                             list((output / "inference").glob("slot-*/finished.json"))
                         ),
@@ -269,7 +271,7 @@ def run_supervised(
             result = {
                 "status": "completed" if scored else "failed_unscored",
                 "error_type": error,
-                "planned_slots": 160,
+                "planned_slots": planned_slots,
                 "source_git": release["source_git"],
                 "release_sha256": release_sha,
                 "automatic_retry": False,

@@ -18,6 +18,7 @@ from .scifact_utility_runtime import JournalProvider, ledger_cost
 from .targeted_query import PROTOCOL, ROUTES
 from .verification import normalise_claim
 from . import stop_acquire
+from . import fair_acquisition
 
 ROOT = Path(
     "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
@@ -108,6 +109,8 @@ def policy(protocol: str = PROTOCOL) -> dict[str, Any]:
 
 
 def route_protocol(protocol: str, route: str) -> str:
+    if protocol == fair_acquisition.PROTOCOL and route in fair_acquisition.ROUTES:
+        return protocol
     if protocol not in {PROTOCOL, stop_acquire.PROTOCOL} or route not in ROUTES:
         raise ValueError("unknown_matrix_protocol_or_route")
     return protocol if route == "adaptive" else PROTOCOL
@@ -154,12 +157,23 @@ def run_matrix(
     *,
     physical_guard: Any = None,
     protocol: str = PROTOCOL,
+    binding: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    route_protocol(protocol, "adaptive")
+    fair = protocol == fair_acquisition.PROTOCOL
+    routes = fair_acquisition.ROUTES if fair else ROUTES
+    if fair:
+        from .fair_replay import validate_binding, validate_tasks
+        validate_binding(binding)
+        assert binding is not None
+        validate_tasks(tasks, binding)
+        study_kind = binding["study_kind"]
+    else:
+        route_protocol(protocol, "adaptive")
+        study_kind = STUDY
     if not tasks or len(tasks) > 32 or len({t["id"] for t in tasks}) != len(tasks):
         raise ValueError("invalid_matrix_tasks")
     output.mkdir(mode=0o700)
-    slots = [{"task_id": t["id"], "route": route} for t in tasks for route in ROUTES]
+    slots = [{"task_id": t["id"], "route": route} for t in tasks for route in routes]
     ordered_write(
         output / "planned.json",
         {
@@ -178,10 +192,10 @@ def run_matrix(
         physical_guard=physical_guard,
     )
     agents = {r: SentenceAgentV3(journal, retrieve, rerank=rerank,
-                               protocol=route_protocol(protocol, r)) for r in ROUTES}
+                               protocol=route_protocol(protocol, r)) for r in routes}
     rows: list[dict[str, Any]] = []
     for task in tasks:
-        for route in ROUTES:
+        for route in routes:
             slot = f"slot-{len(rows):03d}"
             journal.slot = slot
             directory = output / slot
@@ -214,7 +228,8 @@ def run_matrix(
             )
             ordered_write(directory / "finished.json", row)
             rows.append(row)
-    run = {"protocol": protocol, "study_kind": STUDY, "budget": BUDGET, "runs": rows}
+    run = {"protocol": protocol, "study_kind": study_kind,
+           "budget": BUDGET, "runs": rows, **({"fair_binding": binding} if fair else {})}
     ordered_write(output / "run.json", run)
     return run
 

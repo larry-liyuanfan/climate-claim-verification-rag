@@ -10,7 +10,7 @@ from typing import Any, IO
 from cloud_capacity import COMPLETE_HOST, RUNPOD_VISIBLE
 from cloud_private_storage import SINGLE_ROOT, PRIVATE_POSIX, is_split
 
-from climate_rag import stop_acquire
+from climate_rag import stop_acquire, fair_acquisition
 from climate_rag.scifact_generation import frozen_contract
 from climate_rag.targeted_replay import (
     CORPUS_SHA, GOLD_SHA, INPUT_SHA, MANIFEST_BYTES, OLD_PROTOCOL_SHA,
@@ -55,7 +55,8 @@ def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
           run_id: str, input_sha: str = INPUT_SHA, capacity_contract: str = COMPLETE_HOST,
           provider_allocation_sha: str | None = None,
           provider_evidence_sha: str | None = None,
-          storage_contract: str = SINGLE_ROOT, private_root: str | None = None) -> dict[str, Any]:
+          storage_contract: str = SINGLE_ROOT, private_root: str | None = None,
+          fair_binding: dict[str, Any] | None = None, fair_gold_sha256: str | None = None) -> dict[str, Any]:
     base = linux_path(root)
     if len(base.parts) < 3 or not re.fullmatch(r"[a-z0-9][a-z0-9-]{5,79}", run_id):
         raise ValueError("dedicated_root_and_unique_run_id_required")
@@ -79,7 +80,7 @@ def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
     elif storage_contract != SINGLE_ROOT or private_root is not None:
         raise ValueError("storage_contract_or_private_root")
     work = base / "work" / run_id
-    return {
+    result = {
         "backend": BACKEND, "authorization": "none_draft", "model_execution_authorized": False,
         "source_git": source_git, "source_archive_sha256": source_sha, "entry_sha256": entry_sha,
         "root": root, "run_id": run_id,
@@ -116,6 +117,19 @@ def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
         "score_seconds": 300, "preparation_seconds": 600,
         "automatic_retry": False, "training_authorized": False, "protected_split_read": False,
     }
+    if fair_binding is not None:
+        from climate_rag.fair_replay import validate_binding, policy as fair_policy
+        validate_binding(fair_binding, execution=False)
+        if fair_gold_sha256 is None:
+            raise ValueError("fair_scorer_hash_required")
+        hex_id(fair_gold_sha256)
+        result.update(purpose=fair_acquisition.PROTOCOL, policy=fair_policy(fair_binding),
+            fair_binding=fair_binding, cohort_path=str(private / "assets" / "fair-cohort.json"),
+            exposure_audit_path=str(private / "assets" / "fair-exposure-audit.json"),
+            gold_path=str(private / "scoring" / "fair-gold.json"), gold_sha256=fair_gold_sha256)
+    elif fair_gold_sha256 is not None:
+        raise ValueError("gold_without_fair_binding")
+    return result
 
 
 def validate_release(value: dict[str, Any], *, execution: bool = True) -> None:
@@ -125,8 +139,12 @@ def validate_release(value: dict[str, Any], *, execution: bool = True) -> None:
                      root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"],
                      capacity_contract=value["capacity_contract"], provider_allocation_sha=value["provider_allocation_sha256"],
                      provider_evidence_sha=value["provider_evidence_sha256"],
-                     storage_contract=value["storage_contract"], private_root=value["private_root"])
+                     storage_contract=value["storage_contract"], private_root=value["private_root"],
+                     fair_binding=value.get("fair_binding"), fair_gold_sha256=value["gold_sha256"] if "fair_binding" in value else None)
     if execution:
+        if "fair_binding" in value:
+            from climate_rag.fair_replay import validate_binding
+            validate_binding(value["fair_binding"])
         if value.get("authorization") != "standalone_exact_hash_release" or value.get("model_execution_authorized") is not True:
             raise ValueError("unauthorized_draft_no_model_or_preparation")
         hex_id(value["runtime_receipt_sha256"])
@@ -175,6 +193,9 @@ def check_paths(value: dict[str, Any], *, new_run: bool) -> None:
         raise ValueError("environment_ancestor_symlink")
     if new_run and any(Path(value[key]).exists() for key in ("work", "output", "deadline_receipt")):
         raise ValueError("run_directory_already_exists")
+    for key in ("cohort_path", "exposure_audit_path"):
+        if key in value and (Path(value[key]).resolve() != Path(value[key]) or not Path(value[key]).is_relative_to(private)):
+            raise ValueError("fair_private_asset_path")
 
 
 def verify_source(value: dict[str, Any], source: Path) -> None:
@@ -204,6 +225,10 @@ def verify_source(value: dict[str, Any], source: Path) -> None:
         raise ValueError("source_revision_or_extra_code")
     if digest(source / ENTRY) != value["entry_sha256"] or digest(source / SELECTION) != SELECTION_SHA:
         raise ValueError("source_entry_or_selection_hash")
+    if "fair_binding" in value:
+        contract_sha = digest(source / "docs/protocols/fair-three-arm-20261003.json")
+        if any(value["fair_binding"][key] != contract_sha for key in ("scoring_contract_sha256", "initial_contract_sha256")):
+            raise ValueError("fair_contract_source_drift")
 
 
 def input_members(bundle: tarfile.TarFile) -> dict[str, str]:
@@ -288,7 +313,8 @@ def worker_projection(value: dict[str, Any], release_sha: str) -> dict[str, Any]
             "asset_receipt_sha256", "capacity_contract", "provider_allocation_receipt",
             "provider_allocation_sha256", "provider_evidence_sha256", "storage_contract",
             "private_root", "private_scratch", "storage_receipt", "storage_receipt_sha256")
-    return {**{key: value[key] for key in keys}, "parent_release_sha256": release_sha,
+    extra = {key: value[key] for key in ("fair_binding", "cohort_path", "exposure_audit_path") if key in value}
+    return {**{key: value[key] for key in keys}, **extra, "parent_release_sha256": release_sha,
             "authorization": "validated_worker_projection"}
 
 
@@ -298,7 +324,11 @@ def validate_projection(value: dict[str, Any], path: Path, expected_sha: str) ->
                  root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"],
                  capacity_contract=value["capacity_contract"], provider_allocation_sha=value["provider_allocation_sha256"],
                  provider_evidence_sha=value["provider_evidence_sha256"],
-                 storage_contract=value["storage_contract"], private_root=value["private_root"])
+                 storage_contract=value["storage_contract"], private_root=value["private_root"],
+                 fair_binding=value.get("fair_binding"),
+                 # Scorer identity is deliberately absent from the worker.
+                 # This local reconstruction is never an executable release.
+                 fair_gold_sha256="0" * 64 if "fair_binding" in value else None)
     full.update(authorization="standalone_exact_hash_release", model_execution_authorized=True,
                 runtime_receipt_sha256=value["runtime_receipt_sha256"],
                 asset_receipt_sha256=value["asset_receipt_sha256"],

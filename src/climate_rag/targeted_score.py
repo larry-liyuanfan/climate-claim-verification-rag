@@ -17,6 +17,7 @@ import numpy as np
 
 from .agent_v3 import Source, parse_action, action_schema
 from . import stop_acquire
+from . import fair_acquisition
 from .metrics import paired_bootstrap, per_claim_retrieval_metrics
 from .models import Claim, Prediction
 from .scifact_utility_runtime import ledger_cost, reranker_cost
@@ -166,10 +167,18 @@ def audit(
     generation_contract: Any = None,
     reranker_directory: Path | None = None,
 ) -> None:
-    expected = [(t["id"], route) for t in tasks for route in ROUTES]
+    fair = run.get("protocol") == fair_acquisition.PROTOCOL
+    routes = fair_acquisition.ROUTES if fair else ROUTES
+    study = STUDY
+    if fair:
+        from .fair_replay import validate_binding, validate_tasks, audit_state, STUDY as fair_study
+        validate_binding(run.get("fair_binding"))
+        validate_tasks(tasks, run["fair_binding"])
+        study = fair_study
+    expected = [(t["id"], route) for t in tasks for route in routes]
     if (
-        run["protocol"] not in {PROTOCOL, stop_acquire.PROTOCOL}
-        or run["study_kind"] != STUDY
+        run["protocol"] not in {PROTOCOL, stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL}
+        or run["study_kind"] != study
         or run["budget"] != BUDGET
         or [(r["task_id"], r["route"]) for r in run["runs"]] != expected
     ):
@@ -199,8 +208,10 @@ def audit(
             or (not synthetic and row["provider_kind"] != "local_model")
         ):
             raise ValueError("row_identity_or_unconfigured_provider")
-        gated = row["protocol"] == stop_acquire.PROTOCOL
-        if gated:
+        gated = row["protocol"] in {stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL}
+        if fair:
+            audit_state(row, sources)
+        elif gated:
             audit_acquisition(row, sources)
         if not math.isfinite(row["elapsed_ms"]) or row["elapsed_ms"] < 0:
             raise ValueError("invalid_elapsed")
@@ -228,7 +239,7 @@ def audit(
             rank_seen.update(rank_ids)
             if (
                 row["reranker_cost"] != reranker_cost(reranker_directory, rank_ids)
-                or len(rank_ids) > 1
+                or len(rank_ids) > (4 if fair else 1)
                 or sum(rank_requests[k]["requested_pairs"] for k in rank_ids)
                 != row["rerank_pairs"]
             ):
@@ -306,7 +317,14 @@ def audit(
                     raise ValueError("physical_usage_drift")
                 if a["status"] == "valid_decision":
                     payload = decode(response["raw"])
-                    actual = (
+                    if fair and a["stage"] == "plan":
+                        actual = fair_acquisition.validate_plan(payload, observation)
+                    elif fair and a["stage"] == "gate":
+                        actual = fair_acquisition.parse_gate(payload, observation, fully_shown=[
+                            alias for alias, real in aliases.items()
+                            if all(f"{alias}:{i}" in now for i in range(len(sources[real].sentences)))])
+                    else:
+                        actual = (
                         stop_acquire.parse_gate(payload, observation, fully_shown=[
                             alias for alias, real in aliases.items()
                             if all(f"{alias}:{i}" in now for i in range(len(sources[real].sentences)))])
@@ -400,8 +418,13 @@ def audit(
                     raise ValueError("citation_not_read_original_text")
     if seen != set(physical):
         raise ValueError("orphan_physical_calls")
-    if rank_seen != set(rank_requests) or len(rank_requests) > len(tasks) * 4:
+    if rank_seen != set(rank_requests) or len(rank_requests) > len(tasks) * (12 if fair else 4):
         raise ValueError("orphan_or_excess_rerank_requests")
+    if fair:
+        for task in tasks:
+            frames = [r["initial_frame"] for r in run["runs"] if r["task_id"] == task["id"] and r["initial_frame"] is not None]
+            if frames and not all(f == frames[0] for f in frames):
+                raise ValueError("unequal_initial_information")
 
 
 def score(
