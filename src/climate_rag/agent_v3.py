@@ -21,6 +21,7 @@ from .agent_protocol import ModelResponseValidationError
 from .tokenize import NEGATIONS, climate_tokenize
 from .verification import decompose_claim, extract_constraints, normalise_claim
 from . import targeted_query
+from . import stop_acquire
 
 
 class _Strict(BaseModel):
@@ -276,14 +277,17 @@ class SentenceAgentV3:
         clock: Callable[[], float] = time.monotonic,
         protocol: str = "sentence-id-v3",
     ):
-        if protocol not in {"sentence-id-v3", targeted_query.PROTOCOL}:
+        if protocol not in {"sentence-id-v3", targeted_query.PROTOCOL, stop_acquire.PROTOCOL}:
             raise ValueError("unknown controller protocol")
         self.provider, self.retrieve, self.rerank = provider, retrieve, rerank
         self.budget, self.clock = budget or V3Budget(), clock
         self.protocol = protocol
 
     def run(self, claim: str, route: str = "adaptive") -> dict[str, Any]:
-        targeted = self.protocol == targeted_query.PROTOCOL
+        gated = self.protocol == stop_acquire.PROTOCOL
+        if gated and route != "adaptive":
+            raise ValueError("stop_acquire_only_replaces_adaptive")
+        targeted = self.protocol in {targeted_query.PROTOCOL, stop_acquire.PROTOCOL}
         if route not in ({
             "fixed_retrieval",
             "fixed_rerank",
@@ -313,6 +317,7 @@ class SentenceAgentV3:
         retrieval_rankings: list[list[str]] = []
         citable_memory: dict[str, Any] = {}
         planning = targeted and route == "fixed_multiquery"
+        phase = "gate" if gated else "decide"
         if planning and b.max_calls < 2:
             raise ValueError("planning_requires_reserved_final_call")
 
@@ -340,6 +345,9 @@ class SentenceAgentV3:
                 next(key for key, value in aliases.items() if value == alias)
             ]
 
+        def fully_shown(alias: str, visible: Mapping[str, Any]) -> bool:
+            return all(f"{alias}:{i}" in visible for i in range(len(source(alias).sentences)))
+
         def tool(
             kind: str,
             ids: list[str] | None = None,
@@ -351,6 +359,14 @@ class SentenceAgentV3:
             nonlocal candidates, selected, tool_calls, rerank_pairs, rewritten, reranked
             if tool_calls >= b.max_tools or left() <= 0:
                 raise RuntimeError("tool_budget_or_deadline")
+            if gated and kind == "read":
+                if (not ids or len(ids) > b.context_k or len(set(ids)) != len(ids)
+                        or not set(ids) <= set(candidates)):
+                    raise ValueError("read_outside_candidate_or_duplicate")
+                if any(fully_shown(s, citable_memory) for s in ids):
+                    raise ValueError("read_already_fully_displayed")
+                if tuple(ids) in reads or ids == selected:
+                    raise ValueError("read_loop")
             before = list(selected)
             prior_candidates = list(candidates)
             known_aliases = set(aliases.values())
@@ -367,16 +383,26 @@ class SentenceAgentV3:
                 else None,
             }
             events.append(event)
+            if gated:
+                event["trigger_attempt"] = len(attempts) - 1
             if targeted:
                 event.update(query_purpose=purpose, selection_origin=selection_origin,
                              before_candidate_ids=prior_candidates,
                              immutable_claim_sha256=hashlib.sha256(claim.encode()).hexdigest())
             if kind in {"retrieve", "rewrite"}:
+                if gated and kind == "rewrite":
+                    seen_queries.append(query or claim)  # Failed searches are charged and not silently retried.
                 try:
                     rows = list(self.retrieve(query or claim, b.candidate_k))[
                         : b.candidate_k
                     ]
                 except Exception as exc:
+                    if gated and isinstance(exc, (TimeoutError, ConnectionError, OSError)) and left() > 0:
+                        event.update(status="failed", error_type=type(exc).__name__,
+                                     candidate_ids=list(candidates), requested_context=list(selected),
+                                     search_returned_ids=[], new_source_ids=[], search_empty=None,
+                                     elapsed_ms=(self.clock() - event.pop("started")) * 1000)
+                        return
                     raise RuntimeError("retrieval_failure") from exc
                 extra = register(rows)
                 if targeted:
@@ -385,7 +411,8 @@ class SentenceAgentV3:
                                  new_source_ids=[s for s in extra if s not in known_aliases])
                 if kind == "rewrite":
                     rewritten = True
-                    seen_queries.append(query or claim)
+                    if not gated:
+                        seen_queries.append(query or claim)
                     prior_rank: dict[str, float] = {}
                     rankings = retrieval_rankings if targeted else [candidates, extra]
                     for ranking in rankings:
@@ -454,11 +481,33 @@ class SentenceAgentV3:
             if targeted:
                 observation.update(protocol=self.protocol, remaining_queries=targeted_query.MAX_QUERIES-len(seen_queries)+1,
                                    prior_queries=list(seen_queries[1:]))
-                completed = [e for e in events if e.get("status") == "completed"]
+                completed = [e for e in events if e.get("status") == "completed" or (gated and e.get("status") == "failed" and "candidate_ids" in e)]
                 observation["tool_feedback"] = ({k: completed[-1].get(k) for k in (
                     "tool", "query_sha256", "query_purpose", "search_returned_ids", "search_empty",
                     "new_source_ids", "before_candidate_ids", "candidate_ids", "requested_context")}
                     if completed else None)
+                if gated:
+                    observation["phase"] = phase
+                    if completed:
+                        observation["tool_feedback"].update(status=completed[-1]["status"], error_type=completed[-1].get("error_type"))
+
+            def packed_schema(actions: list[str], visible_ids: Sequence[str]) -> dict[str, Any]:
+                if not gated:
+                    return action_schema(actions, candidates, visible_ids, b.context_k, targeted=targeted)
+                if phase == "verdict":
+                    result = action_schema(actions, candidates, visible_ids, b.context_k, targeted=True)
+                    for branch in result["anyOf"]:
+                        if "reason" in branch["properties"]:
+                            branch["properties"]["reason"]["enum"] = ["insufficient_evidence", "conflicting_evidence"]
+                    return result
+                shown = dict.fromkeys(visible_ids)
+                readable = [p["source_id"] for p in observation["preview_only"] if not fully_shown(p["source_id"], shown)]
+                can_acquire = b.max_calls - len(attempts) >= 3 and tool_calls < b.max_tools
+                can_query = len(seen_queries) <= targeted_query.MAX_QUERIES
+                observation.update(readable_source_ids=readable, read_limit=b.context_k, acquisition_available=can_acquire,
+                                   query_available=can_query,
+                                   allowed_actions=["stop"] + (["acquire"] if can_acquire and (can_query or readable) else []))
+                return stop_acquire.gate_schema(readable, can_acquire=can_acquire, can_query=can_query, max_read=b.context_k)
             if planning:
                 observation["allowed_actions"] = ["plan_queries"]
                 schema = targeted_query.planning_schema()
@@ -468,12 +517,12 @@ class SentenceAgentV3:
                 return observation, schema, {}, count
             visible: dict[str, Any] = {}
             bare = [a for a in allowed if a != "answer"]
-            schema = action_schema(bare, candidates, [], b.context_k, targeted=targeted)
+            schema = packed_schema(bare, [])
             if targeted and citable_memory:
                 visible.update(citable_memory)
                 observation["current_citable"] = [
                     {"sentence_id": sid, "text": v["text"]} for sid, v in visible.items()]
-                schema = action_schema(allowed, candidates, list(visible), b.context_k, targeted=True)
+                schema = packed_schema(allowed, list(visible))
             if self.provider.count_prompt(observation, schema) > b.max_input_tokens:
                 raise ValueError("retained_context_capacity" if targeted and citable_memory else "prompt_overhead_exceeds_budget")
             for alias in selected:
@@ -484,9 +533,7 @@ class SentenceAgentV3:
                         continue
                     entry = {"sentence_id": sid, "text": sentence}
                     observation["current_citable"].append(entry)
-                    next_schema = action_schema(
-                        allowed, candidates, [*visible, sid], b.context_k, targeted=targeted
-                    )
+                    next_schema = packed_schema(allowed, [*visible, sid])
                     if (
                         self.provider.count_prompt(observation, next_schema)
                         > b.max_input_tokens
@@ -508,10 +555,10 @@ class SentenceAgentV3:
                     }
             if not visible:
                 observation["allowed_actions"] = bare
-                schema = action_schema(bare, candidates, [], b.context_k, targeted=targeted)
+                schema = packed_schema(bare, [])
             # Previews get only remaining capacity, never displace full context.
             for alias in candidates:
-                if alias in selected:
+                if alias in selected or (gated and fully_shown(alias, visible)):
                     continue
                 doc = source(alias)
                 preview: dict[str, Any] = {
@@ -520,9 +567,12 @@ class SentenceAgentV3:
                     "citable": False,
                 }
                 observation["preview_only"].append(preview)
-                if self.provider.count_prompt(observation, schema) > b.max_input_tokens:
+                next_schema = packed_schema(allowed if visible else bare, list(visible))
+                if self.provider.count_prompt(observation, next_schema) > b.max_input_tokens:
                     observation["preview_only"].pop()
+                    schema = packed_schema(allowed if visible else bare, list(visible))
                     break
+                schema = next_schema
             count = self.provider.count_prompt(observation, schema)
             if count > b.max_input_tokens:
                 raise ValueError("packed_prompt_exceeds_budget")
@@ -555,8 +605,14 @@ class SentenceAgentV3:
                 if left() <= 0:
                     outcome = "deadline"
                     break
+                if gated and phase == "gate" and b.max_calls - len(attempts) < 2:
+                    events.append({"status": "budget_forced", "phase": "gate", "action": "fail", "reason": "reserved_verdict_capacity"})
+                    outcome = "generation_budget_exhausted"
+                    break
                 allowed = ["abstain"] + (["answer"] if selected or (targeted and citable_memory) else [])
                 if (
+                    not gated
+                    and
                     route == "adaptive"
                     and len(attempts) + 1 < b.max_calls
                     and tool_calls < b.max_tools
@@ -605,7 +661,7 @@ class SentenceAgentV3:
                 }
                 attempts.append(record)
                 if targeted:
-                    record.update(observation=observation, schema=schema, stage="plan" if planning else "decide")
+                    record.update(observation=observation, schema=schema, stage=phase if gated else "plan" if planning else "decide")
                     citable_memory.update(visible)
                 try:
                     response = self.provider.generate(
@@ -629,13 +685,38 @@ class SentenceAgentV3:
                     if left() <= 0:
                         raise RuntimeError("deadline_after_generation")
                     payload = targeted_query.decode(raw) if targeted else json.loads(raw)
-                    decision = (targeted_query.validate_plan(payload, seen_queries) if planning else
+                    if gated:
+                        record["proposed_decision"] = payload
+                    decision = (stop_acquire.parse_gate(payload, observation, fully_shown=[s for s in candidates if fully_shown(s, visible)])
+                        if gated and phase == "gate" else targeted_query.validate_plan(payload, seen_queries) if planning else
                         parse_action(payload, allowed, visible, candidates, b.context_k,
                                      targeted=targeted, seen_queries=seen_queries))
+                    if gated and phase == "verdict" and decision.get("reason") == "budget":
+                        raise ValueError("budget_is_failure_not_abstention")
                     record.update(status="valid_decision", action=decision["action"])
                     if targeted:
                         record["decision"] = decision
                     feedback = None
+                    if gated:
+                        record["decision_status"] = "validated"
+                        if phase == "gate":
+                            if decision["action"] == "stop":
+                                phase = "verdict"
+                                record["phase_transition"] = "verdict"
+                                feedback = "policy_stopped_acquisition_not_a_truth_or_sufficiency_claim"
+                                continue
+                            try:
+                                if decision["tool"] == "read":
+                                    tool("read", decision["source_ids"], model_selected=True, selection_origin="stop_acquire_gate")
+                                else:
+                                    tool("rewrite", query=decision["query"], purpose=decision["purpose"],
+                                         model_selected=True, selection_origin="stop_acquire_gate")
+                            finally:
+                                triggered = [e for e in events if e.get("trigger_attempt") == len(attempts) - 1]
+                                record["execution_status"] = triggered[-1]["status"] if triggered else "not_started"
+                            feedback = ("tool_failed:" + events[-1]["error_type"] if events[-1]["status"] == "failed"
+                                        else "tool_returned_empty" if events[-1].get("search_empty") else "tool_completed_inspect_actual_evidence")
+                            continue
                     if planning:
                         # The plan is frozen before the first retrieval; subsequent
                         # results cannot change its queries or fixed execution order.
@@ -710,7 +791,8 @@ class SentenceAgentV3:
                     repairs += 1
                     feedback = (
                         (feedback or "validation_failed")
-                        + "; choose a new legal action; read known preview candidates before citation"
+                        + ("; choose a legal action from this phase's schema; never cite preview-only text"
+                           if gated else "; choose a new legal action; read known preview candidates before citation")
                     )
         except Exception as exc:
             # Preserve failure + attempts/usage; no silent success or free retry.
@@ -724,6 +806,10 @@ class SentenceAgentV3:
             events.append({"failure_type": type(exc).__name__})
             if targeted:
                 events[-1]["failure_code"] = str(exc)[:160]
+            if gated and attempts and attempts[-1].get("decision", {}).get("action") == "acquire":
+                executed = [e for e in events if e.get("trigger_attempt") == len(attempts) - 1]
+                if executed:
+                    attempts[-1]["execution_status"] = executed[-1]["status"]
             if attempts and attempts[-1]["status"] in {"pending", "response_received"}:
                 attempts[-1]["status"] = "terminal_failure"
         return {

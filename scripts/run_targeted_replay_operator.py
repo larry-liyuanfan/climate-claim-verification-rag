@@ -15,6 +15,7 @@ from climate_rag.scifact_generation import frozen_contract
 from climate_rag.scifact_read_continuation import ordered_write
 from climate_rag.scifact_utility_runtime import ledger_cost, reranker_cost
 from climate_rag.targeted_query import PROTOCOL
+from climate_rag import stop_acquire
 from climate_rag.targeted_replay import (
     ROOT,
     INPUT_NAME,
@@ -39,17 +40,17 @@ RESOURCE = {
 }
 
 
-def draft(source_git: str, archive_sha: str, wrapper_sha: str) -> dict[str, Any]:
-    return {
+def draft(source_git: str, archive_sha: str, wrapper_sha: str, *, protocol: str = PROTOCOL) -> dict[str, Any]:
+    result: dict[str, Any] = {
         "authorization": "none_draft",
         "model_execution_authorized": False,
-        "purpose": PROTOCOL,
+        "purpose": protocol,
         "source_git": source_git,
         "source_archive_sha256": archive_sha,
         "wrapper_sha256": wrapper_sha,
         "output": (ROOT / "runs" / ("targeted-feedback-" + source_git[:12])).as_posix(),
-        "policy": policy(),
-        "resource_cap": RESOURCE,
+        "policy": policy(protocol),
+        "resource_cap": dict(RESOURCE),
         "generation_contract": frozen_contract(),
         "max_worker_seconds": 6000,
         "max_operator_seconds": 6900,
@@ -72,6 +73,34 @@ def draft(source_git: str, archive_sha: str, wrapper_sha: str) -> dict[str, Any]
         "runtime_files_sha256": "8d231f4980e0bf94fe26273074588a0f6c0ea67646117871fd97443ad1142697",
         "python_executable": "/apps/easybuild-2022/easybuild/software/Compiler/GCCcore/11.3.0/Python/3.10.4/bin/python",
     }
+    if protocol == stop_acquire.PROTOCOL:
+        result["output"] = (ROOT / "runs" / ("stop-acquire-" + source_git[:12])).as_posix()
+        result["resource_cap"]["host_ram_gib"] = 48
+        result["resource_basis"] = {
+            "job_id": "32030221",
+            "compact_sha256": "a07721e8f5a9cf477b2f3052dc65bfc64ebd7da8642f212af593c15ad8c3f19b",
+            "peak_host_ram_gib": 33530392 / 1024**2,
+            "ram_safety_factor": 1.5,
+            "generation_seconds_per_call": 276.610 / 194,
+            "rerank_seconds_per_request_including_swaps": 791.349 / 96,
+            "generation_bound": 800, "rerank_bound": 128,
+            "runtime_multiplier": 1.5,
+            "historical_scaled_seconds": (800 * 276.610 / 194 + 128 * 791.349 / 96) * 1.5,
+            "worker_seconds_ceiling": 6000,
+            "new_gate_latency_unmeasured": True,
+            "max_input_tokens_per_call": 8192, "max_output_tokens_per_call": 512,
+            "not_prediction_or_sla": True,
+            "cost_feasibility": ">=2 calls even when stopping; cannot claim efficiency vs fixed_rerank without total gate+verdict+repair measurements",
+        }
+    return result
+
+
+def wrapper_for(protocol: str) -> str:
+    if protocol == stop_acquire.PROTOCOL:
+        return "hpc/climate_stop_acquire.sbatch"
+    if protocol == PROTOCOL:
+        return WRAPPER
+    raise ValueError("unknown_release_protocol")
 
 
 def validate_release(value: dict[str, Any]) -> None:
@@ -81,7 +110,7 @@ def validate_release(value: dict[str, Any]) -> None:
     ):
         raise ValueError("unauthorized_draft_no_model_or_preparation")
     expected = draft(
-        value["source_git"], value["source_archive_sha256"], value["wrapper_sha256"]
+        value["source_git"], value["source_archive_sha256"], value["wrapper_sha256"], protocol=value["purpose"]
     )
     expected.update(
         authorization="coordinator_exact_hash_release", model_execution_authorized=True
@@ -107,7 +136,7 @@ def load_release(path: Path, expected_sha: str, source: Path) -> dict[str, Any]:
     validate_release(value)
     if (source / "SOURCE_REVISION").read_text().strip() != value[
         "source_git"
-    ] or digest(source / WRAPPER) != value["wrapper_sha256"]:
+    ] or digest(source / wrapper_for(value["purpose"])) != value["wrapper_sha256"]:
         raise ValueError("exact_source_wrapper")
     return dict(value)
 

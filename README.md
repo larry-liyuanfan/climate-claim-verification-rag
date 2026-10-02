@@ -1,5 +1,13 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [stop/acquire CPU package and whole-chain review](docs/STOP_ACQUIRE_CPU_REVIEW_20261002.md)
+adds an **opt-in acquisition gate followed by a separate verifier**; the four fixed
+controls and historical free-action adaptive remain unchanged. Synthetic controller,
+actual worker/scorer wiring, CPU Torch binding and real-tokenizer checks are not
+new model-quality results. Full gate/prefill/repair costs remain counted; the token
+check warns against assuming an efficiency win. **No new Slurm or model run is
+authorized by this package.**
+
 The [completed targeted-feedback experiment](docs/TARGETED_RETRIEVAL_FEEDBACK_RESULT_20261002.md)
 records **160 slots / 194 generator calls / 1,920 reranker pairs** on the same
 32 consumed CLIMATE validation claims and 5,240 evidence records. **Adaptive is

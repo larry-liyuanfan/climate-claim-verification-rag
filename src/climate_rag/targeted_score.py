@@ -15,16 +15,125 @@ from typing import Any
 
 import numpy as np
 
-from .agent_v3 import Source, parse_action
+from .agent_v3 import Source, parse_action, action_schema
+from . import stop_acquire
 from .metrics import paired_bootstrap, per_claim_retrieval_metrics
 from .models import Claim, Prediction
 from .scifact_utility_runtime import ledger_cost, reranker_cost
 from .targeted_query import PROTOCOL, ROUTES, decode, validate_plan
 from .scifact_utility_contract import identity
-from .targeted_replay import BUDGET, STUDY, sha
+from .targeted_replay import BUDGET, STUDY, sha, route_protocol
 from .verification import normalise_claim
 
 METRICS = ("recall@5", "mrr@10", "ndcg@10", "evidence_f1")
+
+
+def audit_acquisition(row: dict[str, Any], sources: dict[str, Source]) -> None:
+    """Replay only the new gate state; physical responses are checked below."""
+    aliases = row["visible_source_ids"]
+    tools = [e for e in row["events"] if "tool" in e]
+    if (len(tools) != row["tool_calls"] or any(e["status"] == "running" for e in tools)
+            or any(type(e.get("trigger_attempt")) is not int for e in tools)):
+        raise ValueError("gate_tool_accounting")
+    if not tools or tools[0]["tool"] != "retrieve" or tools[0]["trigger_attempt"] != -1:
+        raise ValueError("gate_initial_retrieval")
+    phase = "gate"
+    queries: list[str] = []
+    for ordinal, attempt in enumerate(row["generation_attempts"]):
+        obs = attempt["observation"]
+        before = [e for e in tools if e["trigger_attempt"] < ordinal]
+        feedback_tools = [e for e in before if "candidate_ids" in e]
+        if (attempt["stage"] != phase or obs.get("phase") != phase
+                or obs.get("protocol") != stop_acquire.PROTOCOL
+                or obs["remaining_calls"] != 5 - ordinal
+                or obs["remaining_tools"] != 5 - len(before)
+                or obs["prior_queries"] != queries):
+            raise ValueError("gate_phase_budget_or_query_state")
+        if feedback_tools:
+            expected = {k: feedback_tools[-1].get(k) for k in (
+                "tool", "query_sha256", "query_purpose", "search_returned_ids", "search_empty",
+                "new_source_ids", "before_candidate_ids", "candidate_ids", "requested_context",
+                "status", "error_type")}
+            if obs["tool_feedback"] != expected:
+                raise ValueError("gate_latest_feedback")
+        elif obs["tool_feedback"] is not None:
+            raise ValueError("gate_fabricated_feedback")
+        shown = {x["sentence_id"] for x in obs["current_citable"]}
+        fully = [alias for alias, real in aliases.items()
+                 if all(f"{alias}:{i}" in shown for i in range(len(sources[real].sentences)))]
+        if phase == "gate":
+            readable = [p["source_id"] for p in obs["preview_only"]]
+            candidates = feedback_tools[-1]["candidate_ids"] if feedback_tools else []
+            acquire, query = 5 - ordinal >= 3 and len(before) < 5, len(queries) < 2
+            if (len(set(readable)) != len(readable) or set(readable) & set(fully)
+                    or not set(readable) <= set(candidates)
+                    or obs.get("readable_source_ids") != readable or obs.get("read_limit") != 5
+                    or obs.get("acquisition_available") != acquire or obs.get("query_available") != query
+                    or obs["allowed_actions"] != ["stop"] + (["acquire"] if acquire and (query or readable) else [])):
+                raise ValueError("gate_read_mask_or_reservation")
+            expected_schema = stop_acquire.gate_schema(readable, can_acquire=acquire, can_query=query)
+        else:
+            # Sentence enum ordering is part of the physical prompt.
+            expected_schema = action_schema(["abstain"] + (["answer"] if shown else []),
+                [], [s["sentence_id"] for s in obs["current_citable"]], 5, targeted=True)
+            for branch in expected_schema["anyOf"]:
+                if "reason" in branch["properties"]:
+                    branch["properties"]["reason"]["enum"] = ["insufficient_evidence", "conflicting_evidence"]
+        if attempt["schema"] != expected_schema:
+            raise ValueError("gate_schema_state_drift")
+        triggered = [e for e in tools if e["trigger_attempt"] == ordinal]
+        if attempt["status"] != "valid_decision":
+            # Fatal tool exceptions may follow a validated proposal; still charged.
+            if triggered and not row["outcome"].startswith("controller_failure"):
+                raise ValueError("gate_tool_without_valid_decision")
+            continue
+        decision = attempt["decision"]
+        if attempt.get("decision_status") != "validated":
+            raise ValueError("gate_unvalidated_decision")
+        if phase == "gate":
+            if decision["action"] == "stop":
+                if triggered or attempt.get("phase_transition") != "verdict":
+                    raise ValueError("gate_stop_transition")
+                phase = "verdict"
+            else:
+                if (not triggered and ordinal == len(row["generation_attempts"]) - 1
+                        and attempt.get("execution_status") == "not_started"
+                        and row["outcome"] == "controller_failure:RuntimeError"
+                        and row["events"][-1].get("failure_code") == "tool_budget_or_deadline"
+                        and row["elapsed_ms"] >= BUDGET["timeout_seconds"] * 1000
+                        and row["answer"] is None):
+                    continue  # Physical gate charged; deadline prevented the tool from starting.
+                if len(triggered) != 1:
+                    raise ValueError("gate_missing_or_repeated_execution")
+                event = triggered[0]
+                kind = "read" if decision["tool"] == "read" else "rewrite"
+                if (event["tool"] != kind or event.get("selection_origin") != "stop_acquire_gate"
+                        or not event.get("model_selected")
+                        or attempt.get("execution_status") != event["status"]):
+                    raise ValueError("gate_execution_binding")
+                if kind == "read" and event.get("requested_context") != decision["source_ids"]:
+                    raise ValueError("gate_read_execution")
+                if kind == "rewrite":
+                    if (event["query_sha256"] != sha(decision["query"].encode())
+                            or event["query_purpose"] != decision["purpose"]):
+                        raise ValueError("gate_query_execution")
+                    queries.append(decision["query"])
+        elif triggered or decision["action"] not in {"answer", "abstain"} or decision.get("reason") == "budget":
+            raise ValueError("verdict_cannot_execute_or_hide_budget_failure")
+        elif ordinal != len(row["generation_attempts"]) - 1:
+            raise ValueError("verdict_must_terminate")
+    if any(e["trigger_attempt"] >= len(row["generation_attempts"]) for e in tools):
+        raise ValueError("gate_orphan_execution")
+    if row["answer"] is not None and (phase != "verdict" or row["generation_attempts"][-1]["stage"] != "verdict"):
+        raise ValueError("gate_not_a_verdict")
+    if row["outcome"] == "ids_validated_semantics_unmeasured" and row["answer"] is None:
+        raise ValueError("gate_answered_without_answer")
+    if row["outcome"].startswith("model_abstention:"):
+        final = row["generation_attempts"][-1] if row["generation_attempts"] else {}
+        if (final.get("stage") != "verdict" or final.get("status") != "valid_decision"
+                or final.get("decision", {}).get("action") != "abstain"
+                or row["outcome"] != "model_abstention:" + final["decision"]["reason"]):
+            raise ValueError("gate_failure_not_abstention")
 
 
 def terminal_category(outcome: str) -> str:
@@ -59,7 +168,7 @@ def audit(
 ) -> None:
     expected = [(t["id"], route) for t in tasks for route in ROUTES]
     if (
-        run["protocol"] != PROTOCOL
+        run["protocol"] not in {PROTOCOL, stop_acquire.PROTOCOL}
         or run["study_kind"] != STUDY
         or run["budget"] != BUDGET
         or [(r["task_id"], r["route"]) for r in run["runs"]] != expected
@@ -84,12 +193,15 @@ def audit(
     rank_seen: set[str] = set()
     for row in run["runs"]:
         if (
-            row["protocol"] != PROTOCOL
+            row["protocol"] != route_protocol(run["protocol"], row["route"])
             or row["budget"] != BUDGET
             or row["immutable_claim_sha256"] != task_hashes[row["task_id"]]
             or (not synthetic and row["provider_kind"] != "local_model")
         ):
             raise ValueError("row_identity_or_unconfigured_provider")
+        gated = row["protocol"] == stop_acquire.PROTOCOL
+        if gated:
+            audit_acquisition(row, sources)
         if not math.isfinite(row["elapsed_ms"]) or row["elapsed_ms"] < 0:
             raise ValueError("invalid_elapsed")
         ids = sorted(
@@ -195,7 +307,10 @@ def audit(
                 if a["status"] == "valid_decision":
                     payload = decode(response["raw"])
                     actual = (
-                        validate_plan(
+                        stop_acquire.parse_gate(payload, observation, fully_shown=[
+                            alias for alias, real in aliases.items()
+                            if all(f"{alias}:{i}" in now for i in range(len(sources[real].sentences)))])
+                        if gated and a["stage"] == "gate" else validate_plan(
                             payload,
                             [
                                 observation["immutable_claim"],
@@ -218,6 +333,8 @@ def audit(
                     )
                     if actual != a["decision"]:
                         raise ValueError("decision_not_physical_output")
+                    if gated and payload != a.get("proposed_decision"):
+                        raise ValueError("gate_proposal_not_physical_output")
             elif a["status"] == "valid_decision":
                 raise ValueError("decision_without_physical_return")
             if not synthetic:
@@ -458,7 +575,7 @@ def score(
             "cost_gate": cost,
         }
     return {
-        "protocol": PROTOCOL,
+        "protocol": run.get("protocol", PROTOCOL),
         "study_kind": "synthetic_fixture_not_quality_evidence" if synthetic else STUDY,
         "independent_test": False,
         "routes": aggregate,

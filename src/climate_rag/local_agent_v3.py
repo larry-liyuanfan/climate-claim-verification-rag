@@ -20,6 +20,7 @@ from typing import Any
 from .agent_protocol import ModelResponseValidationError
 from .agent_v3 import system_prompt_v3
 from . import targeted_query
+from . import stop_acquire
 from .local_agent_model import LocalQwenDecisionProvider
 from .model_diagnostics import response_diagnostics, validate_private_directory
 from .private_diagnostics_v3 import PrivateDiagnosticStore, PrivateLogHandler
@@ -58,7 +59,8 @@ def render_v3_prompt(
             [
                 {
                     "role": "system",
-                    "content": (targeted_query.system_prompt() if observation.get("protocol") == targeted_query.PROTOCOL
+                    "content": (stop_acquire.system_prompt(str(observation.get("phase"))) if observation.get("protocol") == stop_acquire.PROTOCOL
+                                else targeted_query.system_prompt() if observation.get("protocol") == targeted_query.PROTOCOL
                                 else system_prompt_v3())
                     + "\n"
                     + json.dumps(schema, separators=(",", ":")),

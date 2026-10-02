@@ -12,6 +12,7 @@ from .local_scifact_provider import LocalQwenSciFactProvider
 from .private_diagnostics_v3 import PrivateDiagnosticStore
 from .scifact_natural_contract import complete_wire
 from .targeted_query import PROTOCOL
+from . import stop_acquire
 
 
 class LocalTargetedProvider(LocalQwenSciFactProvider):
@@ -20,13 +21,14 @@ class LocalTargetedProvider(LocalQwenSciFactProvider):
     terminal_protocol = PROTOCOL
 
     def __init__(
-        self, model_dir: Path, manifest: dict[str, str], *, private_dir: Path
+        self, model_dir: Path, manifest: dict[str, str], *, private_dir: Path, protocol: str = PROTOCOL
     ) -> None:
         super().__init__(model_dir, manifest, private_dir=private_dir)
-        self.name = self.base.name + ":" + PROTOCOL
+        self.terminal_protocol = protocol
+        self.name = self.base.name + ":" + protocol
 
     def render(self, observation: Mapping[str, Any], schema: Mapping[str, Any]) -> str:
-        if observation.get("protocol") != PROTOCOL:
+        if observation.get("protocol") not in {PROTOCOL, stop_acquire.PROTOCOL}:
             raise ValueError("targeted_prompt_protocol")
         return render_v3_prompt(self.base.tokenizer, observation, schema)
 

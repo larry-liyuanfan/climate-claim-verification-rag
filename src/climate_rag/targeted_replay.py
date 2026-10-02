@@ -17,6 +17,7 @@ from .scifact_read_continuation import ordered_write
 from .scifact_utility_runtime import JournalProvider, ledger_cost
 from .targeted_query import PROTOCOL, ROUTES
 from .verification import normalise_claim
+from . import stop_acquire
 
 ROOT = Path(
     "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2"
@@ -42,9 +43,10 @@ def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def policy() -> dict[str, Any]:
-    return {
-        "protocol": PROTOCOL,
+def policy(protocol: str = PROTOCOL) -> dict[str, Any]:
+    route_protocol(protocol, "adaptive")
+    result = {
+        "protocol": protocol,
         "routes": list(ROUTES),
         "study_kind": STUDY,
         "tasks": 32,
@@ -92,6 +94,23 @@ def policy() -> dict[str, Any]:
         "training": False,
         "automatic_retry": False,
     }
+    if protocol == stop_acquire.PROTOCOL:
+        result.update(
+            controller_by_route={r: route_protocol(protocol, r) for r in ROUTES},
+            acquisition="stop or acquire unseen preview/targeted query, then separate verdict; stop always legal",
+            final_capacity="acquire only with >=3 remaining combined generations; repairs consume same reserve",
+            query_control="four fixed controls unchanged; only adaptive gate/verdict changes",
+            comparison_kind="whole_policy_not_causal_feedback_isolation",
+            retrieval_denominator=24, binary_label_denominator=23, cost_denominator=32,
+            legacy_adaptive_protocol=PROTOCOL,
+        )
+    return result
+
+
+def route_protocol(protocol: str, route: str) -> str:
+    if protocol not in {PROTOCOL, stop_acquire.PROTOCOL} or route not in ROUTES:
+        raise ValueError("unknown_matrix_protocol_or_route")
+    return protocol if route == "adaptive" else PROTOCOL
 
 
 def frozen_tasks(raw: bytes, selection_raw: bytes) -> list[dict[str, str]]:
@@ -134,7 +153,9 @@ def run_matrix(
     output: Path,
     *,
     physical_guard: Any = None,
+    protocol: str = PROTOCOL,
 ) -> dict[str, Any]:
+    route_protocol(protocol, "adaptive")
     if not tasks or len(tasks) > 32 or len({t["id"] for t in tasks}) != len(tasks):
         raise ValueError("invalid_matrix_tasks")
     output.mkdir(mode=0o700)
@@ -142,7 +163,7 @@ def run_matrix(
     ordered_write(
         output / "planned.json",
         {
-            "protocol": PROTOCOL,
+            "protocol": protocol,
             "slots": slots,
             "max_generations": len(slots) * 5,
             "warmups": 0,
@@ -153,10 +174,11 @@ def run_matrix(
         backend,
         output / "ledger",
         max_generations=len(slots) * 5,
-        protocol=PROTOCOL,
+        protocol=protocol,
         physical_guard=physical_guard,
     )
-    agent = SentenceAgentV3(journal, retrieve, rerank=rerank, protocol=PROTOCOL)
+    agents = {r: SentenceAgentV3(journal, retrieve, rerank=rerank,
+                               protocol=route_protocol(protocol, r)) for r in ROUTES}
     rows: list[dict[str, Any]] = []
     for task in tasks:
         for route in ROUTES:
@@ -179,7 +201,7 @@ def run_matrix(
             row = {
                 "task_id": task["id"],
                 "slot": slot,
-                **agent.run(task["claim_text"], route),
+                **agents[route].run(task["claim_text"], route),
             }
             ids = [
                 p.name.removesuffix(".reserved.json")
@@ -192,7 +214,7 @@ def run_matrix(
             )
             ordered_write(directory / "finished.json", row)
             rows.append(row)
-    run = {"protocol": PROTOCOL, "study_kind": STUDY, "budget": BUDGET, "runs": rows}
+    run = {"protocol": protocol, "study_kind": STUDY, "budget": BUDGET, "runs": rows}
     ordered_write(output / "run.json", run)
     return run
 

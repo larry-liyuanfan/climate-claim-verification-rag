@@ -101,7 +101,7 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
     started = time.monotonic()
     model_dir = input_dir / "models/generator/model"
     backend = LocalTargetedProvider(
-        model_dir, manifests["generator"], private_dir=private
+        model_dir, manifests["generator"], private_dir=private, protocol=release["purpose"]
     )
     backend.generation_binding = GenerationBinding(
         backend.base, model_dir, release["generation_contract"]
@@ -140,6 +140,7 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
         rerank,
         output / "inference",
         physical_guard=base_state,
+        protocol=release["purpose"],
     )
 
 
@@ -157,6 +158,8 @@ def score_after_exit(release: dict[str, Any], input_dir: Path) -> None:
         raise ValueError("missing_cost_before_gold")
     tasks, _, sources = load_inputs(input_dir)
     run = json.loads((output / "inference/run.json").read_bytes())
+    if run.get("protocol") != release["purpose"]:
+        raise ValueError("run_release_protocol_mismatch")
     # Tokenizer-only, not weights: bind physical prompt IDs and decoding receipts.
     from transformers.models.auto.tokenization_auto import AutoTokenizer
 
