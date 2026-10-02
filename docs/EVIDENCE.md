@@ -1,5 +1,23 @@
 # Evidence and claim boundaries
 
+## 2026-10-02 targeted retrieval feedback: completed, not promoted
+
+[Full result and five redacted cases](TARGETED_RETRIEVAL_FEEDBACK_RESULT_20261002.md)
+and [aggregate evidence](verified-runs/targeted-feedback-32030221.json): job
+**32030221 COMPLETED/0:0**, executed source `5004fa01a4d47f4ba7e73be8e33ec436bd06edf4`,
+160/160 slots, 194 generator calls and 1,920 reranker pairs. This reuses 32 consumed
+CLIMATE validation tasks; retrieval denominator is 24 but binary labels are **23**
+(17 SUPPORTS, 6 REFUTES; the remaining evidence-bearing label is DISPUTED).
+Adaptive performed no extra query/read/rerank. It matched fixed retrieval's
+Recall@5 .4319 / Evidence F1 .2578, with 12/23 correct binary labels and one
+validation exhaustion. Paired intervals against fixed rerank and fixed multiquery
+do not pass the frozen quality gate; both full-cost gates also fail. Its shorter
+latency excludes reranking and does not establish efficiency at preserved quality.
+Full original scores, physical cost, visible-versus-candidate evidence and errors
+are retained. No independent test, semantic entailment, causal feedback improvement,
+deployment or resume promotion claim is supported. Closeout only added CPU analysis;
+the original model, data, gold, parameters and scoring were not changed.
+
 ## 2026-10-02 evidence bottleneck completed negative result
 
 [Result and five-case diagnosis](SCIFACT_BOTTLENECK_RESULT_20261002.md),

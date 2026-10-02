@@ -1,14 +1,17 @@
 # Climate Evidence Retrieval and Grounded Verification
 
-The [targeted retrieval feedback CPU package](docs/TARGETED_RETRIEVAL_FEEDBACK_CPU_20261002.md)
-separates an immutable verification claim from subquestion/counter-evidence search.
-It connects **five routes** (including an upfront fixed-multiquery control) to
-the unchanged **32 consumed CLIMATE validation claims / 5,240 evidence records**.
-Real tool feedback and previously displayed full sentences are retained; capacity
-failures, rejected responses and physical generator/reranker costs remain visible.
-Only synthetic/CPU validation and metadata identity checks have run in this package.
-The source-bound execution draft is **unauthorized**: no new model result,
-independent test, deployment, or resume gain is claimed.
+The [completed targeted-feedback experiment](docs/TARGETED_RETRIEVAL_FEEDBACK_RESULT_20261002.md)
+records **160 slots / 194 generator calls / 1,920 reranker pairs** on the same
+32 consumed CLIMATE validation claims and 5,240 evidence records. **Adaptive is
+not promoted:** it executed no additional query/read/rerank, and one repeated-read
+slot exhausted validation repairs. Against fixed rerank, Evidence F1 changed
+.2563 → .2578 (paired 95% CI for difference −.0650 to .0747); neither quality nor
+efficiency gates passed. Retrieval uses 24 evidence-bearing tasks; binary accuracy
+uses **23** (one DISPUTED label is not silently relabeled). Full costs, candidate
+versus actual-text visibility, and five redacted cases are preserved. This is a
+negative development result, not independent-test, causal Agent-gain, or resume
+promotion evidence. The [CPU preparation](docs/TARGETED_RETRIEVAL_FEEDBACK_CPU_20261002.md)
+remains the historical setup for the now-completed separately authorized run.
 
 The [completed evidence-bottleneck result](docs/SCIFACT_BOTTLENECK_RESULT_20261002.md)
 records **72 route slots / 96 calls** from job 32006925, with no technical
