@@ -1,5 +1,17 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+**Latest verified result (2026-10-03):** the Runpod replay completed and all
+**160 slots** were privately recovered. Autonomous acquisition selected stop in
+**32/32** tasks, with binary correctness **8/23 vs fixed multiquery14/23**; no
+Agent quality/cost benefit is claimed. [Recovery and complete comparison](docs/RUNPOD_RECOVERY_AND_NEXT_DECISION_20261003.md)
+records source identities, availability, behavior and full physical cost.
+[Application case, architecture and STAR](docs/CLIMATE_APPLICATION_CASE_20261003.md)
+connects the defensible training/search results to the claim-checking problem.
+The new gold-free CPU replay and equal-capability comparison check are preparation,
+not model execution. Current work uses local materials and Runpod; unavailable
+Spartan originals are marked unrecovered, not lost. Historical runbooks below
+describe their own completed/preparation packages and are not current launch steps.
+
 The [Runpod private-storage CPU repair](docs/RUNPOD_PRIVATE_STORAGE_20261003.md)
 separates persistent MFS assets from owner-only POSIX run/scoring output after
 an observed pre-model permission failure (0/160 slots). It preserves strict

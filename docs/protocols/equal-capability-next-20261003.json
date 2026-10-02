@@ -1,0 +1,23 @@
+{
+  "schema": "climate-next-comparison-design-v1",
+  "status": "design_and_CPU_fairness_contract_only_not_GPU_ready",
+  "model_execution_authorized": false,
+  "hypothesis": "Equal optional ranking capability and a common terminal contract may change autonomous-vs-fixed quality/cost; reject if genuine acquisition and joint quality do not improve.",
+  "historical_source": "54031fa09ab0c3fc3ef610babd838b90784940fc",
+  "historical_run": "stop-acquire-private-20261003",
+  "historical_run_sha256": "79e9fad3580731a7ffba2363f4ca83585c0007772bbce28863c7a7e27a2c1aa0",
+  "arms": ["fixed_multiquery", "deterministic_workflow", "autonomous"],
+  "shared_tools": ["read", "query", "rerank"],
+  "shared_initial_information": "one frozen initial retrieval/frame per task, no answer masking",
+  "shared_final_verifier": true,
+  "force_model_acquisition": false,
+  "equal_actual_cost_assumed": false,
+  "cohort_selection": "all eligible preregistered development components; no favorable-outcome filter, no reuse of consumed32 for prompt/budget/label tuning; frozen test remains sealed",
+  "gold_in_worker": false,
+  "primary_evaluation": ["task_correctness", "citation_semantic_support", "joint_task_and_citation_correctness"],
+  "secondary_evaluation": ["Recall@5", "MRR@10", "nDCG@10", "Evidence F1", "5000 paired bootstrap", "valid proposal/execution/delivery/continuation counts", "stop cases and failed/empty recovery", "complete physical cost"],
+  "financial_contract": {"whole_round_USD_cap": 20, "new_budget": false, "auto_pay": false, "automatic_top_up": false, "parallel_GPU_jobs": 0},
+  "run_identity": {"run_id": null, "executed_source": null, "input_sha256": null, "cohort_sha256": null, "initial_frames_sha256": null, "terminal_contract_sha256": null, "model_manifest_sha256": null, "reranker_manifest_sha256": null, "configuration_sha256": null, "output_directory": null, "authorized_release_sha256": null},
+  "pending": ["three-arm runtime integration including optional rerank", "gold-isolated eligible local cohort and exposure audit", "shared terminal contract", "exact target assets and single-card resource/price verification", "preregistered thresholds and separate one-run authorization"],
+  "existing_infrastructure_to_reuse": ["run_cloud_replay.py", "cloud_private_storage.py", "cloud_deadline.py", "targeted_replay.py physical journals", "post-exit isolated scoring", "private recovery/hashing procedure"]
+}
