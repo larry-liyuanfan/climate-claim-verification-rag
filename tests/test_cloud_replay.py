@@ -23,7 +23,8 @@ def release():
 
 def approved(value):
     return {**value, "authorization": "standalone_exact_hash_release",
-            "model_execution_authorized": True, "runtime_receipt_sha256": "d" * 64}
+            "model_execution_authorized": True, "runtime_receipt_sha256": "d" * 64,
+            "asset_receipt_sha256": "e" * 64}
 
 
 def test_new_backend_draft_and_transport_separate_from_history():

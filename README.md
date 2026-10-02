@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [prelaunch CPU closeout delta](docs/CLOUD_PRELAUNCH_CLOSEOUT_20261002.md)
+adds effective ancestor quotas, isolated source bootstrap, destination asset/disk
+receipts and an independent total-deadline process. It changes no model, prompt,
+claim split or score. This is launch-contract verification, not a new experiment.
+
 The [standalone Linux CPU preparation](docs/CLOUD_REPLAY_CPU_PREPARATION_20261002.md)
 adds an explicit opt-in cloud backend while retaining the old Slurm entry.
 Feedback-conditioned synthetic branches are now tested. The original 16.12GB

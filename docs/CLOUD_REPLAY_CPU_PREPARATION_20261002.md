@@ -1,5 +1,9 @@
 # Standalone replay preparation — CPU delivery, not a model result
 
+Historical accepted baseline. For the later prelaunch repair and **current exact
+absolute commands**, use [the closeout delta](CLOUD_PRELAUNCH_CLOSEOUT_20261002.md).
+The old commands below are baseline provenance, not the current launch recipe.
+
 Baseline: `349c8c9e42142af8fb88e530faa580d989ffb248`. The feedback-conditioned
 regression was committed first as `35057c8`. The exact final source, archive,
 entry and unauthorized-release hashes are emitted by `package_cloud_replay.py`;
@@ -48,8 +52,9 @@ compute is a tradeoff, not an efficiency claim.
   synthetic instance. Actual runtime distribution bytes and import origins are
   checked as well as versions/Python/driver/GPU/machine identity.
 - Existing bounded worker supervisor, generation provider, controller and scorer
-  are reused. Successful child reaping, physical wire audit and complete cost
-  agreement precede the scorer's first gold read. Failure costs remain persisted.
+are reused. Successful child reaping, physical wire audit and complete cost
+agreement precede the scorer's first gold label parse. The later destination
+preflight hashes gold bytes without parsing labels. Failure costs remain persisted.
   Prelaunch is bounded to240s; operator6900s with worker6000s and scorer300s;
   no scheduler, hidden warmup, unbounded retry or fake `SLURM_JOB_ID`.
 

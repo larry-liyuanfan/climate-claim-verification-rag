@@ -22,7 +22,7 @@ DEPENDENCIES = {"torch": "2.7.1+cu126", "transformers": "4.51.3",
                 "lm-format-enforcer": "0.11.3", "interegular": "0.3.3",
                 "numpy": "1.26.4", "pydantic": "2.11.7",
                 "pydantic-core": "2.33.2", "tokenizers": "0.21.4",
-                "accelerate": "1.6.0", "safetensors": "0.5.3"}
+                "accelerate": "1.6.0", "safetensors": "0.5.3", "jsonschema": "4.23.0"}
 
 
 def stream_sha(stream: IO[bytes]) -> str:
@@ -72,6 +72,9 @@ def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
         "python_executable": str(base / "venv" / "bin" / "python"),
         "runtime_receipt": str(base / "runtime" / (run_id + ".json")),
         "runtime_receipt_sha256": None,
+        "asset_receipt": str(base / "runtime" / (run_id + "-assets.json")),
+        "asset_receipt_sha256": None,
+        "deadline_receipt": str(base / "runtime" / (run_id + "-deadline.json")),
         "purpose": stop_acquire.PROTOCOL, "policy": policy(stop_acquire.PROTOCOL),
         "generation_contract": frozen_contract(),
         "runtime_requirements": {"system": "Linux", "python_minor": "3.11",
@@ -94,8 +97,10 @@ def validate_release(value: dict[str, Any], *, execution: bool = True) -> None:
         if value.get("authorization") != "standalone_exact_hash_release" or value.get("model_execution_authorized") is not True:
             raise ValueError("unauthorized_draft_no_model_or_preparation")
         hex_id(value["runtime_receipt_sha256"])
+        hex_id(value["asset_receipt_sha256"])
         expected.update(authorization="standalone_exact_hash_release", model_execution_authorized=True,
-                        runtime_receipt_sha256=value["runtime_receipt_sha256"])
+                        runtime_receipt_sha256=value["runtime_receipt_sha256"],
+                        asset_receipt_sha256=value["asset_receipt_sha256"])
     if value != expected:
         raise ValueError("frozen_cloud_release_changed")
 
@@ -111,17 +116,23 @@ def load_release(path: Path, expected_sha: str, *, execution: bool = True) -> di
 def check_paths(value: dict[str, Any], *, new_run: bool) -> None:
     """Reject symlinks, including existing ancestors of not-yet-created children."""
     root = Path(value["root"])
-    for key in ("root", "source", "source_archive", "input_archive", "work", "input", "output", "gold_path", "runtime_receipt"):
+    for key in ("root", "source", "source_archive", "input_archive", "work", "input", "output", "gold_path", "runtime_receipt", "asset_receipt", "deadline_receipt"):
         path = Path(value[key])
         if path.resolve() != path or not path.is_relative_to(root):
             raise ValueError("path_escape_or_symlink:" + key)
     # venv/bin/python is normally a symlink to the base interpreter. Its lexical
     # location is bound and its resolved executable identity is recorded at preflight.
-    if new_run and (Path(value["work"]).exists() or Path(value["output"]).exists()):
+    if Path(value["python_executable"]).parent.resolve() != Path(value["python_executable"]).parent:
+        raise ValueError("environment_ancestor_symlink")
+    if new_run and any(Path(value[key]).exists() for key in ("work", "output", "deadline_receipt")):
         raise ValueError("run_directory_already_exists")
 
 
 def verify_source(value: dict[str, Any], source: Path) -> None:
+    for folder in ("src", "scripts"):
+        if any(p.suffix.lower() in {".pyc", ".pyo", ".so", ".pyd", ".dll", ".dylib"}
+               for p in (source / folder).rglob("*")):
+            raise ValueError("unbound_project_bytecode_or_extension")
     if source != Path(value["source"]) or digest(Path(value["source_archive"])) != value["source_archive_sha256"]:
         raise ValueError("source_location_or_archive_hash")
     names: set[str] = set()
@@ -186,6 +197,7 @@ def inspect_input(archive: Path, expected_sha: str, *, full: bool = False,
         raise ValueError("input_transport_hash")
     with tarfile.open(archive) as bundle:
         wanted = input_members(bundle)
+        extracted_bytes = sum(bundle.getmember(name).size for name in wanted)
         if target is not None:
             target.mkdir(mode=0o700)
         for name, expected in wanted.items():
@@ -213,6 +225,7 @@ def inspect_input(archive: Path, expected_sha: str, *, full: bool = False,
     return {"status": "verified" if full else "present_unverified_large_bytes",
             "bytes": archive.stat().st_size, "transport_sha256": expected_sha if full else None,
             "required_members": len(wanted), "gold_extracted": False,
+            "extracted_bytes": extracted_bytes,
             "model_weights_loaded": False, "historical_transport_sha256": INPUT_SHA,
             "logical_identity": {"corpus": CORPUS_SHA, "protocol": OLD_PROTOCOL_SHA,
                                  "generator": MODEL_SHA, "reranker": RERANKER_SHA}}
@@ -222,7 +235,8 @@ def worker_projection(value: dict[str, Any], release_sha: str) -> dict[str, Any]
     validate_release(value)
     keys = ("backend", "root", "run_id", "source_git", "source", "source_archive", "source_archive_sha256",
             "entry_sha256", "purpose", "generation_contract", "output", "input",
-            "input_transport_sha256", "python_executable", "runtime_receipt", "runtime_receipt_sha256")
+            "input_transport_sha256", "python_executable", "runtime_receipt", "runtime_receipt_sha256",
+            "asset_receipt_sha256")
     return {**{key: value[key] for key in keys}, "parent_release_sha256": release_sha,
             "authorization": "validated_worker_projection"}
 
@@ -232,7 +246,8 @@ def validate_projection(value: dict[str, Any], path: Path, expected_sha: str) ->
     full = draft(value["source_git"], value["source_archive_sha256"], value["entry_sha256"],
                  root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"])
     full.update(authorization="standalone_exact_hash_release", model_execution_authorized=True,
-                runtime_receipt_sha256=value["runtime_receipt_sha256"])
+                runtime_receipt_sha256=value["runtime_receipt_sha256"],
+                asset_receipt_sha256=value["asset_receipt_sha256"])
     hex_id(value["parent_release_sha256"])
     if value != worker_projection(full, value["parent_release_sha256"]):
         raise ValueError("frozen_worker_projection_changed")

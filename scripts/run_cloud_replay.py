@@ -2,21 +2,102 @@
 # ruff: noqa: E402 -- bind exact local source before importing project modules
 from __future__ import annotations
 
+import sys
+
+if __name__ == "__main__" and not sys.flags.isolated:
+    raise SystemExit("isolated_entry_required: use absolute venv/python -IB absolute/entry.py")
+
 import argparse
 import importlib
 import importlib.metadata
 import json
+import hashlib
 import os
 import platform
 import shutil
 import subprocess
-import sys
+import time
+import runpy
 from pathlib import Path
 from typing import Any
 
 # Always resolve source modules from this exact checkout/archive, not an editable
 # install or caller PYTHONPATH. The source tree is verified before model access.
 SOURCE = Path(__file__).resolve().parents[1]
+BOOT_STARTED = time.monotonic()
+sys.dont_write_bytecode = True
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+
+
+def early_supervised_run() -> None:
+    """Stdlib parent: model/project imports and source checks stay in child."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("stage", choices=("run",))
+    parser.add_argument("--release", type=Path, required=True)
+    parser.add_argument("--release-sha", required=True)
+    args = parser.parse_args()
+    with args.release.open("rb") as stream:
+        raw = stream.read(65537)
+    if len(raw) > 65536 or hashlib.sha256(raw).hexdigest() != args.release_sha:
+        raise ValueError("release_hash_or_size")
+    value = json.loads(raw)
+    if (value.get("authorization") != "standalone_exact_hash_release"
+            or value.get("model_execution_authorized") is not True
+            or value.get("backend") != "standalone-linux-v1"):
+        raise ValueError("unauthorized_draft_no_model_or_preparation")
+    root, receipt = Path(value["root"]), Path(value["deadline_receipt"])
+    run_id = value["run_id"]
+    if (not root.is_absolute() or root.resolve() != root or len(root.parts) < 3
+            or not isinstance(run_id, str) or not run_id or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-" for c in run_id)
+            or receipt != root / "runtime" / (run_id + "-deadline.json") or receipt.resolve() != receipt
+            or not receipt.parent.is_dir()):
+        raise ValueError("deadline_receipt_path")
+
+    def child() -> dict[str, Any]:
+        try:
+            runpy.run_path(str(SOURCE / "scripts/run_cloud_replay.py"), run_name="__main__",
+                           init_globals={"_CLOUD_SUPERVISED_CHILD": True})
+        except SystemExit as exc:
+            if exc.code not in (None, 0):
+                raise
+        return {"status": "completed"}
+
+    # Read this stdlib-only helper explicitly as source, not via an importable
+    # bytecode/native candidate. No project search path is installed in parent.
+    watchdog = runpy.run_path(str(SOURCE / "scripts/cloud_deadline.py"))
+    result = watchdog["supervise"](child, receipt, started=BOOT_STARTED,
+                                   identity={"release_sha256": args.release_sha,
+                                             "source_git": value["source_git"]})
+    # Receipt AND observed exit0 are required; never block the watchdog on a
+    # full stdout pipe. No automatic retry or quality promotion here.
+    raise SystemExit(0 if result["status"] == "completed" else 1)
+
+
+if (__name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "run"
+        and not globals().get("_CLOUD_SUPERVISED_CHILD")):
+    early_supervised_run()
+
+
+def reject_project_binaries(source: Path) -> None:
+    """Stdlib bootstrap: reject alternate executable bytes BEFORE project imports."""
+    def unreadable(error: OSError) -> None:
+        raise error
+
+    for folder in ("src", "scripts"):
+        base = source / folder
+        if base.is_symlink():
+            raise ValueError("project_symlink")
+        for directory, dirs, files in os.walk(base, onerror=unreadable, followlinks=False):
+            for name in dirs + files:
+                path = Path(directory) / name
+                if path.is_symlink():
+                    raise ValueError("project_symlink")
+                if path.suffix.lower() in {".pyc", ".pyo", ".so", ".pyd", ".dll", ".dylib"}:
+                    raise ValueError("unbound_project_bytecode_or_extension:" + str(path))
+
+
+if __name__ == "__main__":
+    reject_project_binaries(SOURCE)
 sys.path[:0] = [str(SOURCE / "src"), str(SOURCE / "scripts")]
 
 from climate_rag.scifact_read_continuation import ordered_write
@@ -27,6 +108,8 @@ from cloud_replay_contract import (
 from run_budget_agent_full_operator import read_only_tree
 from run_scifact_evidence_commit_paired import cpu_stage, supervisor_signals
 from run_targeted_replay_operator import run_supervised
+from cloud_capacity import observe_capacity
+from cloud_destination import destination_preflight, verify_destination
 
 
 def imported_runtime(runtime_files: dict[str, str]) -> dict[str, Any]:
@@ -34,7 +117,7 @@ def imported_runtime(runtime_files: dict[str, str]) -> dict[str, Any]:
     modules = ("torch", "torch._C", "transformers", "transformers.generation.utils",
                "transformers.models.qwen3.modeling_qwen3", "lmformatenforcer",
                "lmformatenforcer.integrations.transformers", "interegular", "numpy",
-               "pydantic", "pydantic_core", "tokenizers", "accelerate", "safetensors")
+               "pydantic", "pydantic_core", "tokenizers", "accelerate", "safetensors", "jsonschema")
     result = {}
     for name in modules:
         module = importlib.import_module(name)
@@ -71,18 +154,7 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
     props = torch.cuda.get_device_properties(0)
     if "A100" not in props.name or props.total_memory < 39 * 1024**3:
         raise ValueError("a100_capacity")
-    ram = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
-    limit = Path("/sys/fs/cgroup/memory.max")
-    if limit.is_file() and limit.read_text().strip() != "max":
-        ram = min(ram, int(limit.read_text()))
-    cpus = len(os.sched_getaffinity(0))
-    cpu_limit = Path("/sys/fs/cgroup/cpu.max")
-    if cpu_limit.is_file():
-        quota, period = cpu_limit.read_text().split()
-        if quota != "max":
-            cpus = min(cpus, int(quota) // int(period))
-    if ram < 64 * 1024**3 or cpus < 8:
-        raise ValueError("host_allocation_too_small")
+    capacity = observe_capacity()
     gpu = subprocess.run(["nvidia-smi", "--query-gpu=uuid,name,driver_version,memory.total",
                           "--format=csv,noheader,nounits"], capture_output=True, text=True,
                          timeout=15, check=True).stdout.strip()
@@ -105,7 +177,7 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
             "dependencies": versions, "runtime_files": runtime_files,
             "imported_runtime": imported_runtime(runtime_files),
             "cuda": torch.version.cuda, "gpu": gpu,
-            "gpu_bytes": props.total_memory, "host_ram_bytes": ram, "effective_cpus": cpus,
+            "gpu_bytes": props.total_memory, "effective_capacity": capacity,
             "weights_loaded": False}
 
 
@@ -141,7 +213,7 @@ def projection_command(value: dict[str, Any], release_path: Path, release_sha: s
         fingerprint = digest(path)
         ordered_write(Path(value["output"]) / "allocation/worker-projection-binding.json",
                       {"parent_release_sha256": release_sha, "projection_sha256": fingerprint})
-    return [value["python_executable"], "-B", str(Path(value["source"]) / ENTRY), stage,
+    return [value["python_executable"], "-IB", str(Path(value["source"]) / ENTRY), stage,
             "--release", str(path), "--release-sha", fingerprint]
 
 
@@ -151,11 +223,12 @@ def launch(value: dict[str, Any], release_path: Path, release_sha: str) -> dict[
     source = Path(__file__).resolve().parents[1]
     def prelaunch() -> dict[str, Any]:
         verify_source(value, source)
+        verify_destination(value)
         return verify_runtime(value)
 
     bounded: Any = cpu_stage
-    runtime = bounded(240, prelaunch)  # 240 + 6900 + bounded cleanup remains under 7200s
-    # Presence only: no gold bytes are read during inference preparation/launch.
+    runtime = bounded(240, prelaunch)  # Outer process enforces total including final writes.
+    # Gold is checksum-only at preflight; label parsing remains scorer-only.
     if not Path(value["gold_path"]).is_file() or not Path(value["input_archive"]).is_file():
         raise ValueError("needs_assets")
     for key in ("output", "work"):
@@ -196,7 +269,7 @@ def worker_stage(path: Path, expected_sha: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("runtime-preflight", "run", "worker", "score"))
+    parser.add_argument("stage", choices=("asset-preflight", "runtime-preflight", "run", "worker", "score"))
     parser.add_argument("--release", required=True, type=Path)
     parser.add_argument("--release-sha", required=True)
     parser.add_argument("--instance-id")
@@ -204,8 +277,15 @@ def main() -> None:
     if args.stage == "worker":
         worker_stage(args.release, args.release_sha)
         return
-    value = load_release(args.release, args.release_sha, execution=args.stage != "runtime-preflight")
-    if args.stage == "runtime-preflight":
+    value = load_release(args.release, args.release_sha, execution=args.stage not in ("asset-preflight", "runtime-preflight"))
+    if args.stage == "asset-preflight":
+        receipt = destination_preflight(value, SOURCE)
+        path = Path(value["asset_receipt"])
+        if path.exists():
+            raise ValueError("destination_receipt_already_exists")
+        ordered_write(path, receipt)
+        print(json.dumps({"asset_receipt_sha256": digest(path), "model_execution_authorized": False}))
+    elif args.stage == "runtime-preflight":
         check_paths(value, new_run=True)
         verify_source(value, Path(__file__).resolve().parents[1])
         receipt = observe_runtime(value, args.instance_id or "")
@@ -215,6 +295,9 @@ def main() -> None:
         ordered_write(path, receipt)
         print(json.dumps({"runtime_receipt_sha256": digest(path), "model_execution_authorized": False}))
     elif args.stage == "run":
+        if not globals().get("_CLOUD_SUPERVISED_CHILD"):
+            raise ValueError("independent_supervisor_required")
+        check_paths(value, new_run=True)
         result = launch(value, args.release, args.release_sha)
         print(json.dumps(result))
         if result["status"] != "completed":
