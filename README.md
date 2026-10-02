@@ -1,5 +1,10 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+The [Runpod namespace CPU compatibility delta](docs/RUNPOD_NAMESPACE_COMPATIBILITY_20261003.md)
+adds an explicit visible-limit/provider-allocation contract for the observed
+container layout. Hidden ancestors and exclusive resource availability remain
+unverified; this is not a model run or a new quality result.
+
 The [prelaunch CPU closeout delta](docs/CLOUD_PRELAUNCH_CLOSEOUT_20261002.md)
 adds effective ancestor quotas, isolated source bootstrap, destination asset/disk
 receipts and an independent total-deadline process. It changes no model, prompt,

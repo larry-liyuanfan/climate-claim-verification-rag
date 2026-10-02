@@ -108,7 +108,7 @@ from cloud_replay_contract import (
 from run_budget_agent_full_operator import read_only_tree
 from run_scifact_evidence_commit_paired import cpu_stage, supervisor_signals
 from run_targeted_replay_operator import run_supervised
-from cloud_capacity import observe_capacity
+from cloud_capacity import observe_capacity, check_provider_instance
 from cloud_destination import destination_preflight, verify_destination
 
 
@@ -154,7 +154,8 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
     props = torch.cuda.get_device_properties(0)
     if "A100" not in props.name or props.total_memory < 39 * 1024**3:
         raise ValueError("a100_capacity")
-    capacity = observe_capacity()
+    capacity = observe_capacity(value)
+    check_provider_instance(capacity["configuration"], instance_id)
     gpu = subprocess.run(["nvidia-smi", "--query-gpu=uuid,name,driver_version,memory.total",
                           "--format=csv,noheader,nounits"], capture_output=True, text=True,
                          timeout=15, check=True).stdout.strip()
@@ -169,6 +170,10 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
                 file = Path(str(distribution.locate_file(relative))).resolve()
                 runtime_files[str(file)] = digest(file)
     return {"backend": BACKEND, "status": "observed", "synthetic": False,
+            "runtime_identity_schema": "stable-configuration-v2",
+            "capacity_contract": value["capacity_contract"],
+            "provider_allocation_sha256": value["provider_allocation_sha256"],
+            "provider_evidence_sha256": value["provider_evidence_sha256"],
             "instance_id": instance_id, "machine_id_sha256": digest(machine),
             "source_git": value["source_git"], "source_archive_sha256": value["source_archive_sha256"],
             "entry_sha256": value["entry_sha256"], "python_executable": sys.executable,
@@ -177,8 +182,15 @@ def observe_runtime(value: dict[str, Any], instance_id: str) -> dict[str, Any]:
             "dependencies": versions, "runtime_files": runtime_files,
             "imported_runtime": imported_runtime(runtime_files),
             "cuda": torch.version.cuda, "gpu": gpu,
-            "gpu_bytes": props.total_memory, "effective_capacity": capacity,
+            "gpu_bytes": props.total_memory, "capacity_configuration": capacity["configuration"],
+            "observations": {"capacity": capacity["observations"]},
             "weights_loaded": False}
+
+
+def runtime_identity(receipt: dict[str, Any]) -> dict[str, Any]:
+    if receipt.get("runtime_identity_schema") != "stable-configuration-v2":
+        raise ValueError("runtime_identity_schema")
+    return {key: value for key, value in receipt.items() if key != "observations"}
 
 
 def verify_runtime(value: dict[str, Any]) -> dict[str, Any]:
@@ -188,9 +200,10 @@ def verify_runtime(value: dict[str, Any]) -> dict[str, Any]:
     receipt: dict[str, Any] = json.loads(receipt_path.read_bytes())
     if receipt.get("backend") != BACKEND or receipt.get("status") != "observed" or receipt.get("synthetic") is not False:
         raise ValueError("unobserved_or_legacy_runtime")
-    if receipt != observe_runtime(value, receipt["instance_id"]):
+    observed = observe_runtime(value, receipt["instance_id"])
+    if runtime_identity(receipt) != runtime_identity(observed):
         raise ValueError("runtime_changed_since_preflight")
-    return receipt
+    return observed
 
 
 def prepare(value: dict[str, Any], work: Path) -> None:

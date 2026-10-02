@@ -7,6 +7,7 @@ import re
 import tarfile
 from pathlib import Path, PurePosixPath
 from typing import Any, IO
+from cloud_capacity import COMPLETE_HOST, RUNPOD_VISIBLE
 
 from climate_rag import stop_acquire
 from climate_rag.scifact_generation import frozen_contract
@@ -50,12 +51,21 @@ def linux_path(value: str) -> PurePosixPath:
 
 
 def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
-          run_id: str, input_sha: str = INPUT_SHA) -> dict[str, Any]:
+          run_id: str, input_sha: str = INPUT_SHA, capacity_contract: str = COMPLETE_HOST,
+          provider_allocation_sha: str | None = None,
+          provider_evidence_sha: str | None = None) -> dict[str, Any]:
     base = linux_path(root)
     if len(base.parts) < 3 or not re.fullmatch(r"[a-z0-9][a-z0-9-]{5,79}", run_id):
         raise ValueError("dedicated_root_and_unique_run_id_required")
     for value, length in ((source_git, 40), (source_sha, 64), (entry_sha, 64), (input_sha, 64)):
         hex_id(value, length)
+    if capacity_contract == RUNPOD_VISIBLE:
+        if provider_allocation_sha is None or provider_evidence_sha is None or not base.is_relative_to("/workspace"):
+            raise ValueError("runpod_workspace_and_provider_binding_required")
+        hex_id(provider_allocation_sha)
+        hex_id(provider_evidence_sha)
+    elif capacity_contract != COMPLETE_HOST or provider_allocation_sha is not None or provider_evidence_sha is not None:
+        raise ValueError("capacity_contract_or_provider_binding")
     work = base / "work" / run_id
     return {
         "backend": BACKEND, "authorization": "none_draft", "model_execution_authorized": False,
@@ -72,6 +82,10 @@ def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
         "python_executable": str(base / "venv" / "bin" / "python"),
         "runtime_receipt": str(base / "runtime" / (run_id + ".json")),
         "runtime_receipt_sha256": None,
+        "capacity_contract": capacity_contract,
+        "provider_allocation_receipt": str(base / "runtime" / (run_id + "-provider-allocation.json")) if capacity_contract == RUNPOD_VISIBLE else None,
+        "provider_allocation_sha256": provider_allocation_sha,
+        "provider_evidence_sha256": provider_evidence_sha,
         "asset_receipt": str(base / "runtime" / (run_id + "-assets.json")),
         "asset_receipt_sha256": None,
         "deadline_receipt": str(base / "runtime" / (run_id + "-deadline.json")),
@@ -92,7 +106,9 @@ def validate_release(value: dict[str, Any], *, execution: bool = True) -> None:
     if value.get("backend") != BACKEND:
         raise ValueError("cross_backend_release")
     expected = draft(value["source_git"], value["source_archive_sha256"], value["entry_sha256"],
-                     root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"])
+                     root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"],
+                     capacity_contract=value["capacity_contract"], provider_allocation_sha=value["provider_allocation_sha256"],
+                     provider_evidence_sha=value["provider_evidence_sha256"])
     if execution:
         if value.get("authorization") != "standalone_exact_hash_release" or value.get("model_execution_authorized") is not True:
             raise ValueError("unauthorized_draft_no_model_or_preparation")
@@ -116,6 +132,10 @@ def load_release(path: Path, expected_sha: str, *, execution: bool = True) -> di
 def check_paths(value: dict[str, Any], *, new_run: bool) -> None:
     """Reject symlinks, including existing ancestors of not-yet-created children."""
     root = Path(value["root"])
+    if value.get("provider_allocation_receipt") is not None:
+        provider_path = Path(value["provider_allocation_receipt"])
+        if provider_path.resolve() != provider_path or not provider_path.is_relative_to(root):
+            raise ValueError("provider_path_escape_or_symlink")
     for key in ("root", "source", "source_archive", "input_archive", "work", "input", "output", "gold_path", "runtime_receipt", "asset_receipt", "deadline_receipt"):
         path = Path(value[key])
         if path.resolve() != path or not path.is_relative_to(root):
@@ -236,7 +256,8 @@ def worker_projection(value: dict[str, Any], release_sha: str) -> dict[str, Any]
     keys = ("backend", "root", "run_id", "source_git", "source", "source_archive", "source_archive_sha256",
             "entry_sha256", "purpose", "generation_contract", "output", "input",
             "input_transport_sha256", "python_executable", "runtime_receipt", "runtime_receipt_sha256",
-            "asset_receipt_sha256")
+            "asset_receipt_sha256", "capacity_contract", "provider_allocation_receipt",
+            "provider_allocation_sha256", "provider_evidence_sha256")
     return {**{key: value[key] for key in keys}, "parent_release_sha256": release_sha,
             "authorization": "validated_worker_projection"}
 
@@ -244,7 +265,9 @@ def worker_projection(value: dict[str, Any], release_sha: str) -> dict[str, Any]
 def validate_projection(value: dict[str, Any], path: Path, expected_sha: str) -> None:
     """Projection is not an authority token; bind it back to supervisor reservation."""
     full = draft(value["source_git"], value["source_archive_sha256"], value["entry_sha256"],
-                 root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"])
+                 root=value["root"], run_id=value["run_id"], input_sha=value["input_transport_sha256"],
+                 capacity_contract=value["capacity_contract"], provider_allocation_sha=value["provider_allocation_sha256"],
+                 provider_evidence_sha=value["provider_evidence_sha256"])
     full.update(authorization="standalone_exact_hash_release", model_execution_authorized=True,
                 runtime_receipt_sha256=value["runtime_receipt_sha256"],
                 asset_receipt_sha256=value["asset_receipt_sha256"])

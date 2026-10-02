@@ -138,7 +138,7 @@ def test_destination_exact_assets_and_receipt(tmp_path, monkeypatch, case):
     monkeypatch.setattr(assets, "GOLD_SHA", contract.digest(gold))
     monkeypatch.setattr(assets, "SELECTION_SHA", contract.digest(source / contract.SELECTION))
     monkeypatch.setattr(destination, "verify_source", lambda *args: None)
-    monkeypatch.setattr(destination, "observe_capacity", lambda: {"synthetic": True})
+    monkeypatch.setattr(destination, "observe_capacity", lambda *args: {"synthetic": True})
     tar = synthetic_tar(tmp_path, monkeypatch)
     tar.rename(value["input_archive"])
     value["input_transport_sha256"] = contract.digest(Path(value["input_archive"]))
