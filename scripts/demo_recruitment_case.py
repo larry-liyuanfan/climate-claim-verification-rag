@@ -11,6 +11,7 @@ import hashlib
 from html import escape
 import json
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,54 +86,126 @@ def historical_summary(root: Path = ROOT) -> dict[str, Any]:
     }
 
 
-def public_packets(evidence: Path | None, root: Path = ROOT) -> dict[str, Any]:
+def public_packets(
+    evidence: Path | None,
+    root: Path = ROOT,
+    *,
+    claim: str | None = None,
+    candidate_k: int = 10,
+    top_k: int = 3,
+) -> dict[str, Any]:
+    if not 1 <= top_k <= candidate_k <= 100:
+        raise ValueError("require 1 <= top_k <= candidate_k <= 100")
+    if claim is not None:
+        claim = claim.strip()
+        if not claim or len(claim) > 2000:
+            raise ValueError("claim must contain 1 to 2000 characters")
     if evidence is None:
+        if claim is not None or candidate_k != 10 or top_k != 3:
+            raise ValueError(
+                "new claims or ranking settings require --evidence, not saved replay"
+            )
         return load(root / "docs/verified-runs/recruitment-public-demo-20261003.json")
+    started = perf_counter()
     digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
     if digest != PUBLIC_CORPUS_SHA:
         raise ValueError("only the registered public evidence corpus is accepted")
+    validated = perf_counter()
     # Import no dense encoder, reranker, generator, LangSmith or model provider.
     from climate_rag.bm25 import BM25Index
     from climate_rag.io import iter_evidence
 
+    load_started = perf_counter()
     documents = list(iter_evidence(evidence))
     if len(documents) != 5240:
         raise ValueError("unexpected public corpus size")
+    loaded = perf_counter()
     index = BM25Index().fit(documents)
+    indexed = perf_counter()
+    provenance = {doc.evidence_id: dict(doc.metadata) for doc in documents}
+    setup_finished = perf_counter()
     cases: list[dict[str, Any]] = []
-    for query in MANUAL_QUERIES:
-        ranked = index.search(query, top_k=3)
+    queries = (claim,) if claim is not None else MANUAL_QUERIES
+    for query in queries:
+        query_started = perf_counter()
+        candidates = index.search(query, top_k=candidate_k)
+        searched = perf_counter()
+        ranked = candidates[:top_k]
+        items = [
+            {
+                "evidence_id": item.evidence_id,
+                "text": item.text,
+                "retrieval": {
+                    "rank": item.rank,
+                    "score": item.score,
+                    "route": "bm25",
+                },
+                "provenance": provenance[item.evidence_id],
+                "text_sha256": hashlib.sha256(item.text.encode()).hexdigest(),
+            }
+            for item in ranked
+        ]
+        candidates_summary = [
+            {"evidence_id": item.evidence_id, "rank": item.rank, "score": item.score}
+            for item in candidates
+        ]
+        packaged = perf_counter()
         cases.append(
             {
                 "claim_text": query,
                 "status": "evidence_found" if ranked else "empty_result",
                 "answer": None,
-                "items": [
-                    {
-                        "evidence_id": item.evidence_id,
-                        "text": item.text,
-                        "retrieval": {
-                            "rank": item.rank,
-                            "score": item.score,
-                            "route": "bm25",
-                        },
-                        "text_sha256": hashlib.sha256(item.text.encode()).hexdigest(),
-                    }
-                    for item in ranked
-                ],
+                "candidates": candidates_summary,
+                "selection": "BM25 score descending, evidence_id tie break; no second-stage reranker",
+                "items": items,
+                "timings_ms": {
+                    "search_and_rank": (searched - query_started) * 1000,
+                    "evidence_packet": (packaged - searched) * 1000,
+                    "request_total": (packaged - query_started) * 1000,
+                },
             }
         )
     return {
         "mode": "live_public_BM25_CPU_manual_queries_no_model_or_quality_evaluation",
         "document_count": len(documents),
         "corpus_sha256": digest,
+        "input_mode": "custom_claim"
+        if claim is not None
+        else "three_authored_demo_queries",
+        "configuration": {
+            "retriever": "BM25Index",
+            "k1": index.k1,
+            "b": index.b,
+            "candidate_k": candidate_k,
+            "evidence_top_k": top_k,
+            "dense": False,
+            "ltr": False,
+            "reranker": False,
+            "verdict_model": False,
+        },
+        "setup_timings_ms": {
+            "asset_validation": (validated - started) * 1000,
+            "document_load": (loaded - load_started) * 1000,
+            "index_build": (indexed - loaded) * 1000,
+            "setup_total": (setup_finished - started) * 1000,
+        },
+        "timing_scope": "single local invocation; request=search/rank/packet, excludes output serialization and CLI overhead; setup includes imports/hash/load/index/provenance; not P50/P95 or online SLA",
         "cases": cases,
     }
 
 
-def build_demo(evidence: Path | None = None, root: Path = ROOT) -> dict[str, Any]:
+def build_demo(
+    evidence: Path | None = None,
+    root: Path = ROOT,
+    *,
+    claim: str | None = None,
+    candidate_k: int = 10,
+    top_k: int = 3,
+) -> dict[str, Any]:
     result = historical_summary(root)
-    result["public_retrieval"] = public_packets(evidence, root)
+    result["public_retrieval"] = public_packets(
+        evidence, root, claim=claim, candidate_k=candidate_k, top_k=top_k
+    )
     return result
 
 
@@ -159,14 +232,36 @@ def render_text(result: dict[str, Any]) -> str:
             "Public retrieval mode: " + result["public_retrieval"]["mode"],
         ]
     )
+    live = result["public_retrieval"]
+    if "configuration" in live:
+        lines.append(
+            "Actual current configuration: " + json.dumps(live["configuration"])
+        )
+        lines.append("Setup timings(ms): " + json.dumps(live["setup_timings_ms"]))
+        lines.append("Timing scope: " + live["timing_scope"])
     for case in result["public_retrieval"]["cases"]:
         lines.append("\nQuery: " + case["claim_text"])
+        if "candidates" in case:
+            lines.append("  Candidate pool (BM25 order, not LTR/rerank):")
+            for item in case["candidates"]:
+                lines.append(
+                    f"    #{item['rank']} {item['evidence_id']} score={item['score']:.6f}"
+                )
+            lines.append("  Selected evidence:")
         for item in case["items"]:
             text = item.get(
                 "text", "[full text omitted; --evidence enables live public BM25]"
             )
             lines.append(
-                f"  #{item['retrieval']['rank']} {item['evidence_id']}: {text}"
+                f"  #{item['retrieval']['rank']} {item['evidence_id']} score={item['retrieval']['score']:.6f}: {text}"
+            )
+            if "provenance" in item:
+                lines.append(
+                    "    Source: " + json.dumps(item["provenance"], ensure_ascii=False)
+                )
+        if "timings_ms" in case:
+            lines.append(
+                "  Current request timings(ms): " + json.dumps(case["timings_ms"])
             )
         if not case["items"]:
             lines.append("  Empty result: return no evidence, not an invented answer.")
@@ -194,7 +289,9 @@ def render_html(result: dict[str, Any]) -> str:
             or "<li>空结果：不生成没有证据的回答。</li>"
         )
         packets.append(
-            f"<section><h3>{escape(case['claim_text'])}</h3><ol>{items}</ol></section>"
+            f"<section><h3>{escape(case['claim_text'])}</h3>"
+            f"<pre>{escape(json.dumps({'candidates': case.get('candidates', 'saved metadata only'), 'timings_ms': case.get('timings_ms', 'not recorded in saved replay')}, ensure_ascii=False, indent=2))}</pre>"
+            f"<ol>{items}</ol></section>"
         )
     train, agent = result["training"], result["agent"]
     return f"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
@@ -220,7 +317,8 @@ small{{color:#65758b}}li p{{margin-top:4px}}code{{overflow-wrap:anywhere}}
 <small>暖机、串行、进程内请求；排除模型加载/HTTP/并发。不是线上 SLA、统计等效或美元节省。
 历史完整 LTR 路线的 query encoder 使用 GPU，不是 CPU-only。</small></div>
 <div class="card"><h2>3 · 当前公共证据展示</h2><code>{escape(result["public_retrieval"]["mode"])}</code>
-<p>仅 BM25，3 条预先编写的检索查询；无标签、无模型调用、无 verdict。</p></div>
+<p>仅 BM25；默认三条预先编写的查询，或 --claim 输入声明；无标签、无模型调用、无 verdict。</p>
+<pre>{escape(json.dumps({key: result["public_retrieval"][key] for key in ("configuration", "setup_timings_ms", "timing_scope") if key in result["public_retrieval"]}, ensure_ascii=False, indent=2))}</pre></div>
 {"".join(packets)}
 <div class="card"><h2>4 · 自主方案未推广</h2><p>实际开发对照：stop {agent["stop"]} / acquire {agent["acquire"]}。</p>
 <p>保留负结果；引用合法不等于语义支持。当前展示不模拟自主补证据成功。</p></div>
@@ -236,9 +334,23 @@ def main() -> int:
         help="optional SHA-pinned public corpus for live CPU BM25",
     )
     parser.add_argument("--format", choices=("text", "html", "json"), default="text")
+    parser.add_argument(
+        "--claim",
+        help="a user-authored claim; requires --evidence, never answered from saved replay",
+    )
+    parser.add_argument("--candidate-k", type=int, default=10)
+    parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    result = build_demo(args.evidence)
+    try:
+        result = build_demo(
+            args.evidence,
+            claim=args.claim,
+            candidate_k=args.candidate_k,
+            top_k=args.top_k,
+        )
+    except (ValueError, OSError) as exc:
+        parser.error(str(exc))
     if args.format == "html":
         rendered = render_html(result)
     elif args.format == "json":

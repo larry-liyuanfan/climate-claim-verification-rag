@@ -22,12 +22,16 @@ team deliverable is my individual work.
 [Two-minute demo, architecture, real cases, STAR and resume candidates](docs/RECRUITMENT_DEMO_20261003.md)
 are the current recruitment entry. [Bounded self-execution prompt](docs/CLIMATE_RECRUITMENT_CLOSEOUT_20261003.md)
 closes this package without more training, model runs or infrastructure.
+[Interview readiness: completed work, training whiteboard, error taxonomy and personal practice](docs/CLIMATE_INTERVIEW_READINESS_20261003.md)
+separates prepared materials from the candidate's still-unverified independent code defence.
 
 ```sh
 # Saved aggregates + redacted public search metadata; no model, corpus or network.
 python scripts/demo_recruitment_case.py
 # Optional actual BM25 on the registered local public corpus; NOT live dense/LTR/LLM.
 python scripts/demo_recruitment_case.py --evidence /path/to/registered-public-evidence.jsonl
+# A new claim requires real assets; candidates, evidence/provenance and current stage timings.
+python scripts/demo_recruitment_case.py --evidence /path/to/registered-public-evidence.jsonl --claim "Atmospheric carbon dioxide absorbs infrared radiation." --candidate-k 10 --top-k 3
 ```
 
 Historical LTR weights/per-query traces are not recovered locally. The demo

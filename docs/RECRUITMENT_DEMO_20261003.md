@@ -23,9 +23,19 @@ Git 只保留手工查询、结果 ID/rank/score 与原文哈希，不发布证�
 .venv-validation/Scripts/python.exe -X utf8 scripts/demo_recruitment_case.py --evidence E:/Project/_climate_transfer/fair-three-arm-20261003/cpu-input/evidence.jsonl
 ```
 
+输入自己的声明并查看当前候选、排序分数、证据/来源与阶段耗时：
+
+```powershell
+.venv-validation/Scripts/python.exe -X utf8 scripts/demo_recruitment_case.py --evidence E:/Project/_climate_transfer/fair-three-arm-20261003/cpu-input/evidence.jsonl --claim "Atmospheric carbon dioxide absorbs infrared radiation." --candidate-k 10 --top-k 3
+```
+
+不提供真实语料时，新声明或新排序设置直接拒绝，不能靠历史回放回答。
+当次初始化和请求分别计时；请求仅含 BM25 搜索/排序与证据打包，不含输出序列化或 CLI 开销。
+Top3 来自同一 BM25 排名截断，不是第二阶段 reranker；不把这次计时当历史 LTR 或线上 SLA。
+
 该入口只接受已登记的 5,240 篇公开 evidence corpus SHA；查询为已有的
 两条手工主题查询和一条 OOV 查询，不读取 claims/gold 或任何 test。
-本轮实跑的 3 个证据包与旧公共展示的 ID/文本哈希一致。
+上一收口包实跑的 3 个证据包与旧公共展示的 ID/文本哈希一致；新增声明仅作手工检索演示。
 输出说明空结果，不生成 verdict；OOV 是人为接口演示，**不是真实模型
 空结果恢复案例或评测题**。
 
@@ -186,3 +196,6 @@ LTR 达到60.54% R@5、77.8ms离线P95；4B Top100更慢且Top5质量优势不�
 本包完成后用于投递/面试，不等待正的 Agent 实验。没有新增云费用、部署、
 独立测试提升、全量语义正确率、生产采用、ROI或求职通过率保证。
 只复用旧验收并验证本包展示/表述差量；不继续扩测试数或重建基础设施。
+
+后续窄补齐的真实声明入口、训练白板、六类错误讲解、未恢复项与本人练习，见
+[五点准备清单](CLIMATE_INTERVIEW_READINESS_20261003.md)。材料完成不等于本人独立防守已验收。

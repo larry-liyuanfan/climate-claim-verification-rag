@@ -130,3 +130,18 @@ def test_hard_negative_mining_excludes_gold_and_tracks_sources() -> None:
     assert [row["evidence_id"] for row in rows] == ["n1", "n2"]
     assert rows[0]["sources"] == {"bm25": 2, "dense": 1}
 
+
+def test_hard_negative_mining_preserves_explicit_noncontiguous_ranks() -> None:
+    rankings = {"bm25": [RankedDocument("a", 2, 50), RankedDocument("b", 1, 5)]}
+    rows = mine_hard_negatives(rankings, [], limit=2)
+    assert [row["evidence_id"] for row in rows] == ["b", "a"]
+    assert [row["best_rank"] for row in rows] == [5, 50]
+
+
+def test_hard_negative_mining_nonpositive_rank_uses_list_position() -> None:
+    rankings = {"bm25": [RankedDocument("b", 2, 0), RankedDocument("a", 1, -3)]}
+    rows = mine_hard_negatives(rankings, [], limit=2)
+    assert [row["evidence_id"] for row in rows] == ["b", "a"]
+    assert [row["best_rank"] for row in rows] == [1, 2]
+    assert rows[1]["sources"] == {"bm25": 2}
+
