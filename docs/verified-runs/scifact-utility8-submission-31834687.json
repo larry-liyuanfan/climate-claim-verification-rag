@@ -1,0 +1,62 @@
+{
+  "schema_version": "scifact-utility8-submission-v1",
+  "recorded_at": "2026-10-01T14:36:08+10:00",
+  "status": "submitted_pending",
+  "job_id": "31834687",
+  "test_only_id_not_a_submitted_job": "31834584",
+  "source_git": "e22143cc771a3e5d10959a2cb3cb2f9238505520",
+  "source_archive_sha256": "6654193644e279648b39707f9b8e136f3b2e8d48a1c7ea537758c432d446c888",
+  "source_archive_bytes": 4259840,
+  "wrapper_sha256": "b38e027c3da0ab0e2b9f53d6fb94d899c99ebbf546852f1a4c0f6fb9addc26d6",
+  "release_sha256": "a54626ab55aa63370cdb8bc035285630bc6af0ba34265edf0b41d82cf1c1d27b",
+  "preflight_receipt_sha256": "a04eb04bd7e623544dbaa643c99e4de9fdbae10df5546c4550c8f0cf848147f7",
+  "authorization": "coordinator_exact_hash_release",
+  "remote_release_directory": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/utility8-e22143c-release-20261001",
+  "remote_log": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/utility8-e22143c-release-20261001/slurm-31834687.out",
+  "expected_output_not_yet_created": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/runs/scifact-utility8-20261001-v1",
+  "preflight": {
+    "status": "passed",
+    "model_loaded": false,
+    "generation_calls": 0,
+    "dataset_read": false,
+    "python": "3.10.4",
+    "torch": "2.1.2",
+    "os_name": "posix",
+    "runtime_receipt_sha256": "9878d3e4d45735828b4260d87656fd2827481663266a875725bfe7abab7d390a",
+    "runtime_files_sha256": "8d231f4980e0bf94fe26273074588a0f6c0ea67646117871fd97443ad1142697",
+    "actual_import_identity_matched": true,
+    "full_inventory_rehashed": false,
+    "first_probe_failure": "Probe runner overwrote module-provided PYTHONPATH and could not import Torch. Original failure receipt retained. Probe v2 preserves the module path exactly as the already-frozen wrapper does; no experiment source, dependency or release changed."
+  },
+  "resources": {"gpu": "A100:1", "cpus": 8, "host_ram_gib": 32, "scratch_gib": 30, "walltime_seconds": 3600},
+  "caps": {"generator_calls_including_failures": 56, "warmup_generation_calls": 0, "rerank_requests": 16, "requested_rerank_pairs": 320},
+  "queue_snapshot": {
+    "state": "PENDING",
+    "reason": "Priority",
+    "estimated_start": null,
+    "priority": 13419,
+    "age": 0,
+    "fairshare": 13417,
+    "jobsize": 3,
+    "qos": "normal",
+    "nice": 0
+  },
+  "submission_controls": {
+    "duplicate_package_jobs_observed": 0,
+    "existing_output_observed": false,
+    "exclusive_submission_reservation": true,
+    "actual_sbatch_invocations": 1,
+    "automatic_retry": false,
+    "other_jobs_modified": false,
+    "new_polling_automation_created": false
+  },
+  "storage_check": {
+    "project_filesystem_available_gib_approx": 275,
+    "home_quota_full": true,
+    "home_writes_planned": false,
+    "cache_log_and_artifact_targets": "project storage and allocated scratch only"
+  },
+  "quality_results": null,
+  "scientific_scope": "Eight already-exposed outcome-selected TRAIN cases; no training, protected/tune/validation/dev300/frozen-test access or independent generalization claim.",
+  "terminal_acceptance_pending": true
+}

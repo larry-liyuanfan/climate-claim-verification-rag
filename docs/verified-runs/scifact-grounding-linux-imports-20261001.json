@@ -1,0 +1,45 @@
+{
+  "dependency_errors": [],
+  "finalize_script_sha256": "7e247ad684d3cf33a9cb4d9c15c994747c596b53a1191cdea0178d2fb2e4a646",
+  "generation_calls": 0,
+  "inherited_overlay_receipt_sha256": "f6083f95a53cade0a37b98e2ee9879621a2a8a103126c6c40c7e8fba98fcc216",
+  "module_files": {
+    "accelerate": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/accelerate/__init__.py",
+    "peft": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/peft/__init__.py",
+    "safetensors": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/safetensors/__init__.py",
+    "torch": "/apps/easybuild-2022/easybuild/software/MPI/GCC/11.3.0/OpenMPI/4.1.4/PyTorch/2.1.2-CUDA-12.2.0/lib/python3.10/site-packages/torch/__init__.py",
+    "transformers": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/transformers/__init__.py"
+  },
+  "numpy_wheel_sha256": "7ffe43c74893dbf38c2b0a1f5428760a1a9c98285553c89e12d70a96a7f3a4d6",
+  "ordered_sites": [
+    "envs/grounding-training-deps-20261001/numeric-site",
+    "envs/grounding-training-deps-20261001/site",
+    "envs/grounding-cpu-40d84a3/site",
+    "envs/scifact-component-cpu-426ff7343fb3/tokenizer-site"
+  ],
+  "os_name": "posix",
+  "python": "3.10.4",
+  "pytree_compat_applied": true,
+  "real_model_loaded": false,
+  "runtime_files_count": 11186,
+  "runtime_files_sha256": "8d231f4980e0bf94fe26273074588a0f6c0ea67646117871fd97443ad1142697",
+  "slurm_submissions": 0,
+  "status": "imports_verified",
+  "stderr_empty": true,
+  "torch": "2.1.2",
+  "training": false,
+  "versions": {
+    "accelerate": "1.6.0",
+    "huggingface-hub": "0.36.2",
+    "interegular": "0.3.3",
+    "lm-format-enforcer": "0.11.3",
+    "numpy": "1.24.4",
+    "peft": "0.15.2",
+    "psutil": "5.9.0",
+    "pydantic": "2.13.5",
+    "safetensors": "0.5.3",
+    "scipy": "1.8.1",
+    "tokenizers": "0.21.4",
+    "transformers": "4.51.3"
+  }
+}

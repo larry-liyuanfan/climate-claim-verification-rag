@@ -1,0 +1,218 @@
+{
+  "schema_version": "scifact-mixed-tune-closeout-v1",
+  "actual_job_id": "31865294",
+  "status": "COMPLETED",
+  "exit_code": "0:0",
+  "execution_source_git": "6f764f824125c3e47c6e3dce344f13e4ab07f5d8",
+  "source_archive_sha256": "f19966ac5581522835a28bf3d9798b62a22692033c4c17526893eda72b734c62",
+  "release_sha256": "2580535e8fc1122184e4d9838f73c804bc88c837c6c3c246b353c4278b330ad0",
+  "wrapper_sha256": "05c6ae027cc335646860f787d735bf241772059f2ef501a32f1040e696be92bf",
+  "training_source_git": "53d786ce6fca1ec981e9a3deda4a0771bb1fb553",
+  "model": {
+    "generator": "Qwen3-4B",
+    "base_manifest_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+    "archive_sha256": "563738f0be1f7bf7b99b8de20bcdeab552f7e893166dec260b8f7f1e7951c3c1",
+    "adapter_model_sha256": "56123684cf874dc70fde0589a4f0c2811af77fd0ff6699db93bdd4fa960c303d",
+    "checkpoint_binding_sha256": "94fe0dcb2e372ab2e42ac50a0400315ecd9f1dece6eb91993e2b98aec1b9babe",
+    "actual_PEFT_reload_tensor_count": 144,
+    "all_saved_LoRA_values_equal_at_loaded_dtype": true,
+    "not_full_base_parameter_comparison": true,
+    "not_per_call_active_state_probe": true
+  },
+  "resources": {
+    "start_scheduler_clock": "2026-10-01T18:21:30+10:00",
+    "end_scheduler_clock": "2026-10-01T18:23:40+10:00",
+    "elapsed_seconds": 130,
+    "total_cpu_seconds": 114.325,
+    "batch_MaxRSS_K": 9333660,
+    "allocated_cpus": 4,
+    "allocated_ram_gib": 32,
+    "allocated_gpu": "A100:1"
+  },
+  "evaluation": {
+    "kind": "previously_exposed_TRAIN_internal_tune12_terminal_comparison",
+    "same_input_sha256": "4e05451cc152ef5adb04b2662539d0e9ffc3cb32572aa29caa6503a5a223d169",
+    "claims_per_arm": 12,
+    "actual_calls": 24,
+    "warmup_calls": 0,
+    "decoding": "greedy",
+    "current_contract": "historical c1 terminal context; answer/abstain only; 0 tools",
+    "independent_test": false,
+    "paired_bootstrap_performed": false,
+    "statistical_gain_claimed": false,
+    "validation12_launched": false,
+    "dev300_or_retired_test_launched": false
+  },
+  "arms": {
+    "base": {
+      "attempted": 12,
+      "valid": 12,
+      "failed": 0,
+      "unknown_usage": 0,
+      "not_attempted": 0,
+      "input_tokens": 39400,
+      "output_tokens": 1844,
+      "sum_call_elapsed_ms": 55496.988439932466,
+      "abstract_rationalized": {
+        "correct": 1,
+        "predicted": 41,
+        "relevant": 9,
+        "precision": 0.024390243902439025,
+        "recall": 0.1111111111111111,
+        "f1": 0.04
+      },
+      "sentence_selection": {
+        "correct": 9,
+        "predicted": 211,
+        "relevant": 17,
+        "precision": 0.04265402843601896,
+        "recall": 0.5294117647058824,
+        "f1": 0.07894736842105263
+      },
+      "complete_alternative_any_position": 3,
+      "exact_alternative": 1,
+      "empty_evidence_predictions": 0,
+      "valid_NEI_abstention": 0,
+      "NEI_false_evidence": 4,
+      "NEI_claims": 4,
+      "unjudged_extra_documents_not_human_false": 32
+    },
+    "adapted": {
+      "attempted": 12,
+      "valid": 12,
+      "failed": 0,
+      "unknown_usage": 0,
+      "not_attempted": 0,
+      "input_tokens": 39400,
+      "output_tokens": 223,
+      "sum_call_elapsed_ms": 10235.567735508084,
+      "abstract_rationalized": {
+        "correct": 2,
+        "predicted": 3,
+        "relevant": 9,
+        "precision": 0.6666666666666666,
+        "recall": 0.2222222222222222,
+        "f1": 0.3333333333333333
+      },
+      "sentence_selection": {
+        "correct": 2,
+        "predicted": 3,
+        "relevant": 17,
+        "precision": 0.6666666666666666,
+        "recall": 0.11764705882352941,
+        "f1": 0.2
+      },
+      "complete_alternative_any_position": 2,
+      "exact_alternative": 2,
+      "empty_evidence_predictions": 9,
+      "valid_NEI_abstention": 4,
+      "NEI_false_evidence": 0,
+      "NEI_claims": 4,
+      "evidence_bearing_claims": 8,
+      "evidence_bearing_claims_with_empty_prediction": 5,
+      "unjudged_extra_documents_not_human_false": 0
+    }
+  },
+  "physical_audit": {
+    "PEFT_reload_receipt_verified_not_reexecuted": true,
+    "arms": {
+      "adapted": {
+        "empty_predictions": 9,
+        "failed": 0,
+        "frozen_visible_observation_identity_equal": true,
+        "not_attempted": 0,
+        "physical_files_verified": 49,
+        "predicted_documents": 3,
+        "raw_to_parsed_equal": true,
+        "unknown_usage": 0,
+        "valid_responses": 12
+      },
+      "base": {
+        "empty_predictions": 0,
+        "failed": 0,
+        "frozen_visible_observation_identity_equal": true,
+        "not_attempted": 0,
+        "physical_files_verified": 49,
+        "predicted_documents": 41,
+        "raw_to_parsed_equal": true,
+        "unknown_usage": 0,
+        "valid_responses": 12
+      }
+    },
+    "artifact_sha256": {
+      "runs/scifact-mixed-tune-6f764f824125-allocation/before-scoring.json": "98765a511bc02570922648ee1cfafbb74c118bd4e6d295ae6783d9574e0fdb04",
+      "runs/scifact-mixed-tune-6f764f824125-allocation/ended.json": "c1a1ce56cfc77b3efdd54da0e3c32072ae94b31e72891f85034246c55675bfd1",
+      "runs/scifact-mixed-tune-6f764f824125-allocation/inference-parent-exited.json": "58e979110d782a785fbb5e88b5c11e1c6e1b30cee592b982b6438202ef2e1b54",
+      "runs/scifact-mixed-tune-6f764f824125-allocation/runtime-observed.json": "a426580a2f65bd6afaead52d45158814e1ce395c16e0a458abf549c74df08bc3",
+      "runs/scifact-mixed-tune-6f764f824125-execution/worker-exit.json": "bf06139496860fdd48469057d7d2679e83792c2adf1898e20333478b27f92bfc",
+      "runs/scifact-mixed-tune-6f764f824125/adapted/complete.json": "45feca0cca0dfd942427e67f15433456faf7b9335d179b923bc3df51a9c07490",
+      "runs/scifact-mixed-tune-6f764f824125/adapter-integrity.json": "6afbeb69fec2980504dcdd9ff1fbc1aa97cb31c8b2ba0bda59196abc782957dd",
+      "runs/scifact-mixed-tune-6f764f824125/base/complete.json": "5e6527df6773e76c5955df9f8ae934bbd8aabae982d5da100ecdba1349769c2a",
+      "runs/scifact-mixed-tune-6f764f824125/cost-before-quality.json": "ee44d4b6b5ac078f6575dcbca90b74a65051c3a9d9b8e30322695c99cbaf00e6",
+      "runs/scifact-mixed-tune-6f764f824125/gate.json": "b2662c832cbe6552a92e2b0678cdc1b7563da0266e29afce01d9ff08f51700a8",
+      "runs/scifact-mixed-tune-6f764f824125/inference-terminated.json": "e867cde936a97b5d40efc91c4316a8e7771757ff7ab507c5ffca15418056630e",
+      "runs/scifact-mixed-tune-6f764f824125/score.json": "0bd4cd57a6385ba92226d571f08d99f832a985f0cc6ea3637ee5d641a5265368"
+    },
+    "file_order_mtime_ns": {
+      "scifact-mixed-tune-6f764f824125-allocation/before-scoring.json": 1790843018684030000,
+      "scifact-mixed-tune-6f764f824125-allocation/ended.json": 1790843020304298000,
+      "scifact-mixed-tune-6f764f824125-allocation/inference-parent-exited.json": 1790843018682164500,
+      "scifact-mixed-tune-6f764f824125-execution/worker-exit.json": 1790843018654140000,
+      "scifact-mixed-tune-6f764f824125/cost-before-quality.json": 1790843020074944000,
+      "scifact-mixed-tune-6f764f824125/gate.json": 1790843020259710500,
+      "scifact-mixed-tune-6f764f824125/inference-terminated.json": 1790843016949938200,
+      "scifact-mixed-tune-6f764f824125/score.json": 1790843020258595000
+    },
+    "filesystem_order_not_OS_access_audit": true,
+    "fit_exposure": {
+      "component_overlap_count": 0,
+      "direct_claim_overlap_count": 0,
+      "fit_claims": 144,
+      "not_independent_holdout": true,
+      "roster_sha256": "4fdae46c4c41d51f4e1c120b95881316577092bc6004b6d03b836da41d44d349"
+    },
+    "gold_read": false,
+    "job_id": "31865294",
+    "model_calls": 0,
+    "schema_version": "mixed-tune-readonly-physical-audit-v1",
+    "score_join": "all physical predictions/costs bound; no gold re-scoring",
+    "scorer_rerun": false,
+    "training_payload_read": false
+  },
+  "order_and_identity": {
+    "source_archive_and_all_extracted_source_files_verified": true,
+    "termination_to_exit_to_cost_hash_chain_verified": true,
+    "gate_to_score_hash_binding_verified": true,
+    "score_contains_cost_sha256": false,
+    "child_reaped_before_score": true,
+    "inference_returncode": 0,
+    "score_returncode": 0,
+    "actual_score_opened_gold_after_cost": "supported by frozen source, successful scorer receipt and nanosecond file order; not an OS file-access trace",
+    "local_recovery_gold_read": false,
+    "local_recovery_training_payload_read": false,
+    "local_recovery_model_calls": 0,
+    "local_recovery_scorer_runs": 0,
+    "actual_full_model_archive_and_manifest_check": "enforced before generation by frozen generator_only/model_manifest; not rehashed or reloaded during this closeout",
+    "probe_correction": "First read-only audit compared identity diagnostics to a full observation; corrected the probe to observation_identity. No runtime/output/source/release mutation."
+  },
+  "decision": {
+    "quality_interpretation": "Less over-citation and fewer NEI false-evidence cases, but more abstention and substantially lower sentence recall; not overall correctness or autonomous Agent gain.",
+    "mixed_gate_passed": false,
+    "mixed_gate_is_not_quality_selection_rule": true,
+    "next_validation_calls": 0,
+    "four_route_candidate": "unchanged; separate coordinator release granted after tune acceptance; actual submission recorded separately for 31871386",
+    "checkpoint_or_parameter_selection_from_tune": false,
+    "retry_or_retraining_launched": false,
+    "current_resume_modified": false
+  },
+  "boundaries": [
+    "Both arms evaluated the same historically exposed 12 TRAIN-internal tune inputs. Zero current-FIT direct/component overlap does not make this an independent test.",
+    "Correct rationalized-document count rose only 1 to 2; adapted omitted evidence on 5 of 8 evidence-bearing claims. Keep the negative recall/coverage trade-off.",
+    "41 and 3 are predicted document counts, not claims; 9 relevant documents and 17 relevant sentences are the official metric denominators.",
+    "Unjudged extra documents are not verified human false evidence. NEI false-evidence count is a separate claim-level diagnostic.",
+    "Claim-verdict accuracy and free-text entailment remain null/unmeasured, not zero performance.",
+    "Call elapsed sums and token counts are a fixed small offline terminal comparison, not online SLA, API spend savings or autonomous tool performance.",
+    "Raw gold, contexts and predictions stay on Spartan; only aggregate results, identities and audit hashes are public.",
+    "No model, scorer, training or sealed evaluation was rerun during recovery. This receipt itself does not authorize the separately released four-route launch."
+  ]
+}

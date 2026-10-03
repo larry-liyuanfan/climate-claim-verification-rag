@@ -1,0 +1,168 @@
+{
+  "additional_diagnostics": {
+    "formal_error_categories": {},
+    "formal_status_counts": {
+      "valid": 33
+    },
+    "rationale_failures": {
+      "complete_but_not_exact": 7,
+      "complete_but_not_in_first3": 1,
+      "no_complete_alternative": 1
+    },
+    "relation_confusion": {
+      "all": {
+        "CONTRADICT->CONTRADICT": 1,
+        "CONTRADICT->SUPPORT": 1,
+        "NOT_ENOUGH_INFO->NOT_ENOUGH_INFO": 3,
+        "SUPPORT->NOT_ENOUGH_INFO": 3,
+        "SUPPORT->SUPPORT": 4
+      },
+      "gold_document": {
+        "CONTRADICT->CONTRADICT": 1,
+        "CONTRADICT->SUPPORT": 1,
+        "SUPPORT->NOT_ENOUGH_INFO": 3,
+        "SUPPORT->SUPPORT": 4
+      },
+      "nei_control": {
+        "NOT_ENOUGH_INFO->NOT_ENOUGH_INFO": 3
+      }
+    },
+    "screening_pool_observations": {
+      "candidate_occurrences": 60,
+      "cases_with_no_annotated_gold_in_pool": 6,
+      "official_nei_claims": 3,
+      "selected_all_candidates_cases": 9,
+      "selected_on_official_nei_claims": 15
+    }
+  },
+  "analysis_script_sha256": "9fed774315f2d34925ad5148b3a89b5388a990b1261de2108370de820222079c",
+  "boundary": "already_consumed_TRAIN_component_diagnostic_not_Agent_or_generalization",
+  "cost_partition": {
+    "carried": {
+      "attempted": 1,
+      "slot_elapsed_ms": 1089.0493541955948,
+      "tokens": {
+        "input_tokens": 277,
+        "output_tokens": 15
+      },
+      "unknown_cost_attempts": 0
+    },
+    "cumulative": {
+      "attempted": 37,
+      "slot_elapsed_ms": 31901.030151173472,
+      "tokens": {
+        "input_tokens": 40697,
+        "output_tokens": 984
+      },
+      "unknown_cost_attempts": 0
+    },
+    "historical_jobs": {
+      "historical_allocated_a100_seconds": 177,
+      "historical_batch_cpu_seconds": 154.31,
+      "r2_allocated_a100_seconds": 96,
+      "r2_job": "31734906",
+      "r2_source": "81917f2c9a1b2060bd84a0688bd65a40b1c4e134",
+      "v1_allocated_a100_seconds": 81,
+      "v1_job": "31729507",
+      "v1_source": "79f069d2eb4c8db3b82b152fa8a698b5ae3230ad"
+    },
+    "new": {
+      "attempted": 36,
+      "slot_elapsed_ms": 30811.980796977878,
+      "tokens": {
+        "input_tokens": 40420,
+        "output_tokens": 969
+      },
+      "unknown_cost_attempts": 0
+    }
+  },
+  "execution_archive_sha256": "ad9ebf177ca03cf5bf8e44c38ee4fa3aa2e28c92af0b0178672bdc8d160be0e1",
+  "execution_source": "a104115ecc370223617ee3238fb7e5b24af526ea",
+  "exit_before_score_proved": true,
+  "job_id": "31743877",
+  "new_model_calls_in_audit": 0,
+  "new_physical_files": 218,
+  "new_physical_manifest_sha256": "011078dc2849557d45d400ea419f04c3c3ef3bc12364bd677fa32e7a59f0f696",
+  "new_reservations": 36,
+  "old_artifact_reference": {
+    "files": {
+      "compact.json": "5e21126d04dff703a3b5a294d207048e1b8254118b87c956d7bdb3f3349fac57",
+      "inference-exited.json": "453ce6ae649915d296296ad33af9ae43678145a6881816218763a319a5e797d0",
+      "inference/preflight-00/completed.json": "3a7dde5dd001cd2ae151b6d43e4fbd3fd9b7dfef094899cb595395a5ee6e4a79",
+      "inference/preflight-00/response.json": "befb197653cee7971c0169105b37c72a1dff829ddd684907140c55ab3d74eb50",
+      "inference/preflight-00/started.json": "4ac98c5256c6437761fa9852bda1b8b5c4d7c8b744d30c1f65cf07889eb996b0",
+      "inference/preflight-00/wire.json": "9b1f87d8d4833befb68bab93b611b322570c71a7e3a28d328de73f0ab1563b95",
+      "inference/run.json": "6f809e673e43ec5ffa7d1b0c72cac8f368203f9d4d97990e98f015515fe3971b",
+      "operator-status.json": "391a95cf25905da5c865afee7a99382bf0e15ef85b37da666a80f41f59c7f33b",
+      "worker-identity.json": "f5efe10472c923b45c366dc51a3221943281f57b344261ac287bfbaa1a1d421b"
+    },
+    "policy": {
+      "sha256": "8c21a3a7e8b6fdee400c95f1117195a2733c6b344c01f0ca7321428ebd29c798",
+      "version": "technical-preflight-semantic-measurement-v1"
+    },
+    "predecessor_archive": "a393a8e21c53542a851feae480ea42d7c331d7e91d1ce7e85b7a386fbe848a5e",
+    "predecessor_job": "31734906",
+    "predecessor_release": "scifact-component-single-attempt-20261001-r2",
+    "predecessor_source": "81917f2c9a1b2060bd84a0688bd65a40b1c4e134",
+    "record_sha256": "3a7dde5dd001cd2ae151b6d43e4fbd3fd9b7dfef094899cb595395a5ee6e4a79"
+  },
+  "operator_elapsed_seconds": 123.51574754714966,
+  "original_artifact_hashes": {
+    "compact.json": "96bbd5a9f754023894c5f19ef340fb8da4737533fce937639bcd9472b583f7dc",
+    "inference-exited.json": "5d0f218b921695e709058cf5ce8e332891d1afd07f9a7d0bca33fa5ee063895d",
+    "operator-status.json": "de6f8707c8e4e3d36241b8c66268cf58da47c9d676fe39748cabc09b7142ed09",
+    "private-score.json": "fc73b8e6ad90538c39732e0ecb5fcf99579eeb6cefa1546179cefce50919f6bb",
+    "worker-finished.json": "07c68913236b537e9937048a75ef19ebb6b779f9497515574cb582979a8842fc",
+    "worker-identity.json": "685b20ee11d6009d2ffedcbf257af3543d1310874f10479c257a8c401508bbcd"
+  },
+  "original_scorer_not_rerun": true,
+  "private_score_matches_physical_records": true,
+  "raw_or_gold_exported": false,
+  "reconciled_formal": 33,
+  "reconciled_preflight": 4,
+  "schema": "component-continuation-physical-closeout-v1",
+  "slurm_resources": [
+    {
+      "allocated_tres": "billing=212,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=33554432K,node=1",
+      "elapsed_seconds": "130",
+      "end": "2026-10-01T02:34:39",
+      "exit_code": "0:0",
+      "job_id": "31743877",
+      "max_rss": "",
+      "start": "2026-10-01T02:32:29",
+      "state": "COMPLETED",
+      "total_cpu": "01:55.452"
+    },
+    {
+      "allocated_tres": "cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=33554432K,node=1",
+      "elapsed_seconds": "130",
+      "end": "2026-10-01T02:34:39",
+      "exit_code": "0:0",
+      "job_id": "31743877.batch",
+      "max_rss": "10305912K",
+      "start": "2026-10-01T02:32:29",
+      "state": "COMPLETED",
+      "total_cpu": "01:55.452"
+    },
+    {
+      "allocated_tres": "billing=212,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=33554432K,node=1",
+      "elapsed_seconds": "130",
+      "end": "2026-10-01T02:34:39",
+      "exit_code": "0:0",
+      "job_id": "31743877.extern",
+      "max_rss": "",
+      "start": "2026-10-01T02:32:29",
+      "state": "COMPLETED",
+      "total_cpu": "00:00:00"
+    }
+  ],
+  "worker_resources": {
+    "carried_model_calls": 1,
+    "cumulative_model_calls_upper_bound": 37,
+    "gpu_peak_allocated_bytes": 8802492928,
+    "model_load_ms": 14894.817046821117,
+    "new_model_calls_upper_bound": 36,
+    "scoring_targets_loaded": false,
+    "status": "complete"
+  }
+}

@@ -1,6 +1,8 @@
 {
   "schema_version": 1,
-  "evidence_status": "verified-derived-decision-record",
+  "evidence_status": "retired-historical-stage-cost-proxy",
+  "retired": true,
+  "retirement_reason": "Legacy p95_ms combines component quantiles, not a measured request P95; Top-10 fields used Top-5 lists. Original values retained for audit only. Use same-query measured profiles for new Pareto decisions.",
   "profiles": [
     {
       "name": "HNSW + RRF latency default",

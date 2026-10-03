@@ -1,0 +1,74 @@
+{
+  "schema_version": "scifact-semantic-cpu-resource-receipt-v1",
+  "status": "cpu_prepared_not_model_evaluated",
+  "source_git": "779e49883570371ce6223cb2b4a8619df5924d3b",
+  "allocation": {
+    "job_id": 31698106,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "start_sydney": "2026-09-30T22:14:37",
+    "end_sydney": "2026-09-30T22:16:40",
+    "elapsed_seconds": 123,
+    "total_cpu_seconds": 105.408,
+    "batch_maxrss_kib": 1929304,
+    "cpus": 1,
+    "memory": "4G",
+    "walltime_cap": "00:10:00",
+    "gpus": 0,
+    "requeue": 0,
+    "restarts": 0,
+    "model_calls": 0
+  },
+  "source_archive": {
+    "sha256": "7c0544e70be876225ecd8b504f2ae1847cd6aeb355a0aff77c85f5eca86ce51a",
+    "bytes": 2672640,
+    "regular_files": 365,
+    "directories": 13,
+    "unchanged_git_blobs": 364,
+    "export_subst_source_revision_members": 1,
+    "expanded_source_revision_bytes": 41,
+    "marker_is_expanded_commit_plus_lf_not_literal_git_placeholder": true,
+    "normalized_members_unique": true,
+    "regular_files_directories_only_no_links_or_traversal": true,
+    "execution_verified_exact_extracted_tree": true
+  },
+  "private_input_archive": {
+    "sha256": "c4907db623b644c9c883a807f07597f87746595da7fc6435714452304e50a44d",
+    "bytes": 25406464,
+    "regular_files": 13,
+    "exact_input_allowlist": true,
+    "dev_test_weights_wire_included": false,
+    "published": false
+  },
+  "wrapper_sha256": "82bb5e222a7b46a6547ec5fb9e8ca16c45e6e580384acbcb02cac8dddf69c494",
+  "runtime_archive_sha256": "2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8",
+  "overlay_archive_sha256": "e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce",
+  "checks": {
+    "targeted_tests_passed": 64,
+    "clean_source_archive_targeted_tests_passed": 64,
+    "clean_source_archive_targeted_tests_seconds": 2.67,
+    "targeted_ruff": "passed",
+    "targeted_mypy_source_files": 6,
+    "targeted_mypy": "passed",
+    "local_and_remote_bash_syntax": "passed",
+    "remote_source_input_wrapper_hashes_equal_local": true,
+    "sbatch_test_only": "passed; 31697987 is a simulation, not an allocation",
+    "this_package_duplicate_job_check": "none before submission",
+    "full_suite_rerun_for_this_package": false
+  },
+  "output": {
+    "spartan_relative_path": "posthoc/scifact-semantic-preparation-779e49883570/compact.json",
+    "sha256": "4d73e0196fb64167798b89746020b15aca192ebdb94cf34a36d6bd274d7adadd",
+    "bytes": 3953,
+    "local_hash_matches": true,
+    "six_private_output_hashes_rechecked_remotely": true,
+    "new_claim_ids_gold_text_or_raw_wire_exported": false
+  },
+  "retained_log": {
+    "spartan_relative_path": "logs/scifact-semantic-prep-779e498-31698106.out",
+    "sha256": "feb7ef15e2de14a1a5fe523496919f8fb8792a6a66208a1c76c2a738b178c45a"
+  },
+  "boundary": "CPU contracts and selected train preparation only; no new model-quality result, independent test, online SLA or resume improvement.",
+  "further_gpu_or_model_run_authorized": false,
+  "automatic_retry_or_monitor_created": false
+}

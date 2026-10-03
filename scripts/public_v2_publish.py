@@ -41,9 +41,13 @@ def _object(path: str | Path) -> dict[str, Any]:
 
 
 def _metric_summary(metrics: dict[str, Any]) -> dict[str, Any]:
-    return {
+    summary = {
         name: metrics[name] for name in ("recall@5", "mrr@10", "ndcg@10", "evidence_f1")
     }
+    for name in ("recall@10", "recall@50", "evidence_f1@5", "evidence_k"):
+        if name in metrics:
+            summary[name] = metrics[name]
+    return summary
 
 
 def _assert_redacted(value: Any, location: str = "root") -> None:

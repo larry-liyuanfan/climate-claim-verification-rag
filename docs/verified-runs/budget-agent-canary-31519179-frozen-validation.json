@@ -1,0 +1,89 @@
+{
+  "job_id": "31519179",
+  "pydantic_version": "2.13.5",
+  "class_source_sha256": "d482b922ada5f3d080143d8060df2bbd1a97afb226281120d99763f4cfd194c2",
+  "validation": "Unmodified original JSON and exact frozen class AST; no raw text exported",
+  "records": [
+    {
+      "output_sha256": "64e10eb7b31f12e51838087affd2489477514b8b0fd7dbbcdf8f961beb5c1f26",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "f1a6e698ee34339f4be2ea0b2c03821abbb7ed767b38e84ecd9527b38d37e62b",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "053d80604e1966b54d864f36bc60a683790276d51ddf0fada2da1b42230bd010",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "333e6352d2954bc5fb0b890872cacb1ce1635a1944713d27940753c4172aa9cf",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "2ccd9b8f6594320c0d5cb753e19155412a7dcf7d9e7c65eb553ba9d2efab48d5",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    },
+    {
+      "output_sha256": "1ebcf0fc5677b1fcdbc1e1f0e02f06dab3795caf677d6119fdf468f8d339726c",
+      "valid": false,
+      "error_count": 1,
+      "query_only_rule_confirmed": true,
+      "error_types": [
+        "value_error"
+      ]
+    }
+  ]
+}

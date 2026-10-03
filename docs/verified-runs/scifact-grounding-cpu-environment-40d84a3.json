@@ -1,0 +1,17 @@
+{
+  "model_calls": 0,
+  "overlay_archive_sha256": "e7223ac2f4c08a736e763d485a47dcb088ce62c28fb9f1da556661a3f71da0ce",
+  "returncode": 0,
+  "slurm_submissions": 0,
+  "source_archive_sha256": "0a8832579d9798510bb5fab53421d7892ce50e857478fec4d4ad1c0bb3c90546",
+  "source_git": "40d84a377bd1223de5817a69818ac5f5aa63b384",
+  "stage_script_sha256": "54a06e8e08549ebfb5dc334451cdbeb0bc8ad6cd04165b2111873b68749aafbd",
+  "training": false,
+  "wheel_sha256": {
+    "annotated_types-0.8.0-py3-none-any.whl": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+    "pydantic-2.13.5-py3-none-any.whl": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73",
+    "pydantic_core-2.46.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "850a08d167dde16db8702c274f320c7be9d7da6f6dff2b58b18f9e815bd94f5b",
+    "typing_extensions-4.16.0-py3-none-any.whl": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+    "typing_inspection-0.4.4-py3-none-any.whl": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147"
+  }
+}

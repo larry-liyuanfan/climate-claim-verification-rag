@@ -1,0 +1,37 @@
+{
+  "version": "scifact-nei47-submission-v1-20261001",
+  "actual_job_id": "31843230",
+  "test_only_reference": "31843090",
+  "test_only_reference_is_actual_job": false,
+  "actual_sbatch_calls": 1,
+  "submitted_at_utc": "2026-10-01T06:22:04.364475+00:00",
+  "source_git": "782892d57365be62095fe3e31a7ee6f2a2f40b94",
+  "source_archive_sha256": "2a75a3d1a472f2722d740e9e36b8883344c19f01c29951924fc296d14eec4a26",
+  "source_archive_bytes": 4464640,
+  "actual_wrapper_sha256": "e05962499c0bf3c72046c62b692f3e6c0ea24115658d71b96b71a69129ff1eb1",
+  "release_sha256": "b9841a5db73e826c2780829560fa82520a70e1dcba69e6537a34da4154c4b674",
+  "resource_request": {"cpus": 1, "memory_GiB": 4, "minutes": 15, "gpus": 0, "partition": "sapphire", "requeue": false},
+  "source_stage_basename": "nei47-source-782892d57365",
+  "output_basename": "scifact-nei47-program-782892d57365",
+  "offline_preflight": {
+    "substantive_checks_passed": true,
+    "first_command_tail_error": "NameError from trailing heredoc delimiter after successful checks; no sbatch attempted",
+    "corrected_confirmation_passed": true,
+    "python": "3.10.4",
+    "packages": {"numpy": "1.24.4", "pydantic": "2.13.5", "tokenizers": "0.21.4", "transformers": "4.51.3"},
+    "torch_imported": false,
+    "model_weights_loaded": false,
+    "gold_deserialized_during_preflight": false
+  },
+  "remote_receipt_sha256": {
+    "offline-preflight.json": "704ed4f466b36a13583021ae468af2361c9673ace2b0d379090093159e713d50",
+    "offline-preflight-confirmation.json": "216fd0674cadc5f7524f8e7b6b27a7546eb76c69f15498dd18d2f971d7f5e437",
+    "sbatch-test-only.json": "7174c4a68e2468c0536fe926b2a79266f80d56e8906f9449a4466d50a9558405",
+    "submission-reservation.json": "11d7df259f0f416963e7f22747cdfc380717ca07bd67eb3f498c64c2110a5d5e",
+    "submission-result.json": "8963bf757392eb6c1c0792279e4f03a7f336292e9d15cdcf1ff9b9b8273ed3a2"
+  },
+  "redacted_closeout_sha256": "1f7cf1afa34433d2b707dfd673c28384e75f03245659b16e0f2946b0f80a8d61",
+  "automatic_retry": false,
+  "training_authorized": false,
+  "raw_gold_and_claim_artifacts_remain_on_spartan": true
+}

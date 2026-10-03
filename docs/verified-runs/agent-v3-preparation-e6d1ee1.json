@@ -1,0 +1,45 @@
+{
+  "schema_version": "sentence-v3-preparation-receipt",
+  "date": "2026-09-30",
+  "status": "prepared_test_only_no_real_submission",
+  "release_id": "climate-sentence-v3-20260930-pilot-r1",
+  "source_git": "e6d1ee159516bf7a24e86e9a06b26745abf4a42d",
+  "source_archive_sha256": "bd718a1650f63648267d6da9ba247423363adf7636ada6e63c8c6db33df60681",
+  "protocol_sha256": "9e0ccfaf32979cb9e93bbda059bf9d094f1c2a85f190041548472a60f1492d07",
+  "grammar_bundle_sha256": "36ed51e0a9a71ded058cc0e7290a78a7f5f638b91bff517d49ad6ea83c70e410",
+  "wrapper_sha256": "fbe1b73f846bf3cfb0e7b314ab0aae57312b6e87b64f58837ed54f00383d41ab",
+  "submission_guard_sha256": "01ba334191a74dea93fe8481f28432ca6b331396f6305c2603aadcf704aafd6f",
+  "ci": {
+    "runs": [36667345055, 36667347991],
+    "conclusion": "success",
+    "passed": 392,
+    "skipped": 1,
+    "skip": "optional Torch",
+    "ruff": "passed",
+    "strict_mypy_source_modules": 43,
+    "tracked_secret_pii_scan": "passed"
+  },
+  "clean_archive_reproduction": {"targeted_pilot_tests_passed": 9},
+  "local_v3_targeted_tests": {"passed": 40, "skipped_posix_only_on_windows": 1},
+  "remote": {
+    "expected_ssh_identity_verified": true,
+    "bash_syntax": "passed",
+    "guard_mode": "--test-only",
+    "exit_code": 0,
+    "inherited_sbatch_time_pollution": "00:01:00 removed before explicit 01:00:00 request",
+    "scheduler_estimate_local": "2026-10-05T18:02:07",
+    "estimate_not_guaranteed": true,
+    "test_only_identifier_not_submitted_job": "31601348",
+    "postcheck_submission_lock_absent": true,
+    "postcheck_run_directory_absent": true,
+    "postcheck_no_queued_v3_job": true
+  },
+  "resources_proposed_only": {
+    "gpu": "A100:1", "cpus": 8, "ram_gib": 32,
+    "scratch_gib": 30, "walltime_minutes": 60, "qos": "normal", "requeue": false
+  },
+  "model_runs": 0,
+  "official_dev_model_runs": 0,
+  "new_quality_evidence": null,
+  "boundary": "CPU repair/preparation only. Six already-consumed authored questions, four routes; real runtime and model-selected actions remain unmeasured. No independent-test or Agent improvement claim."
+}

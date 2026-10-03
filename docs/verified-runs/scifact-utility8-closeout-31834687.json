@@ -1,0 +1,33 @@
+{
+  "schema": "redacted-utility8-coordinator-audited-closeout-v1",
+  "job_id": 31834687,
+  "source_git": "e22143cc771a3e5d10959a2cb3cb2f9238505520",
+  "scope": "eight_already_exposed_TRAIN_cases_not_independent_generalization",
+  "source_hash_confirmation": "hash-only SSH check; no gold or individual predictions downloaded in this closeout",
+  "artifacts": {
+    "cost-before-gold.json": "d3228e4c8cb0df7423678d5287f5fa8d5966e5213484216e6a483d29e4840ffc",
+    "quality.json": "b9b97dee4e498680c3b705e542fd6aed9bb430af238e7531e33d10a515fd6cfa"
+  },
+  "valid_terminal_slots": 24,
+  "planned_terminal_slots": 24,
+  "physical_generator_calls": 24,
+  "input_tokens": 81509,
+  "output_tokens": 3007,
+  "generation_seconds": 93.618682,
+  "arms": {
+    "A": {"answers": 8, "autonomous_tools": 0, "strict_correct": 0, "complete_rationale_documents": 0, "NEI_false_evidence": {"count": 2, "denominator": 2}, "input_tokens": 31957, "output_tokens": 1280},
+    "B": {"scripted_reads": 8, "answers": 7, "official_NEI_abstains": 1, "added_citable_sentences": 0, "removed_citable_sentences": 276, "strict_correct": 1, "complete_rationale_documents": 0, "NEI_false_evidence": {"count": 1, "denominator": 2}, "input_tokens": 16599, "output_tokens": 383},
+    "C": {"scripted_reranks": 8, "context_changed": true, "complete_rationale_gain": false, "strict_correct": 0, "complete_rationale_documents": 0, "NEI_false_evidence": {"count": 2, "denominator": 2}, "input_tokens": 32953, "output_tokens": 1344}
+  },
+  "reranking": {"calls": 8, "pairs": 160, "actual_tokens": 70177, "seconds": 77.249925, "unknown_usage": 0},
+  "allocation": {"elapsed_seconds": 281, "total_cpu_seconds": 265.845, "batch_MaxRSS_K": 33530364},
+  "physical_audit": "24 unique calls; each B/C logical path includes shared A0, not 40 physical calls",
+  "conclusion": "No pure-tool-benefit candidate. Supports one grounding/NEI adaptation candidate, not Agent success.",
+  "boundaries": [
+    "B/C actions are scripted, not autonomous model-selected decisions.",
+    "A/C filled the 20-sentence cap in 7/8 cases each; prompt inducement remains a hypothesis.",
+    "B adding zero sentences does not invalidate the original three legal read opportunities.",
+    "Changed context, semantic rerank utility, complete rationale and terminal correctness are separate quantities.",
+    "No private gold, individual predictions, raw model responses or trajectories are published here."
+  ]
+}

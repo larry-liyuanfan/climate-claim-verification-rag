@@ -1,0 +1,19 @@
+{
+  "protocol": "scifact-document-verifier-v1-20261001",
+  "stage": "CPU_tokenizer_only_no_model_calls",
+  "claims": 24,
+  "initial_inventory_sha256": "0c4b663184acabc0a4b0421f37f92182a5aea2ab414dcad7d3a5840e3b57c028",
+  "maximum_tokens": 5511,
+  "overflow_claims": [],
+  "initial_probe_maximum_tokens": 9202,
+  "initial_probe_overflow_count": 5,
+  "original_sentences_removed": 0,
+  "model_calls": 0,
+  "gold_read": false,
+  "complete_probe_sha256": "c1d152e416001ac3201cd852ba3bb05cb50292bddae09fbe782be6de9ddaca09",
+  "initial_probe_sha256": "9ff095875d5a6893258113f530af02b5fb4041a4fbc172dc615071b955db46a3",
+  "executed_probe_script_sha256": "1db97984b108a923cbfffe4a4ed59f64deab0404c6c900e2a37c17f0a97cc8e1",
+  "executed_protocol_module_sha256": "c8082d9b181afea3cac738ef61b3b5080e91d1a9f254006592d5092acdfa3015",
+  "scope": "synthetic maximal-citation/failure feedback envelopes on actual inputs; runtime retains overflow guard",
+  "tokenizer_identity": "TOKENIZER_SHA in src/climate_rag/scifact_semantic_contract.py, all four files checked"
+}

@@ -1,0 +1,11 @@
+# Linux overlay for this single generator-grounding candidate.
+# Reuse the frozen Spartan PyTorch 2.1.2 module; do not pip-replace shared Torch.
+# CPU fixture validation: existing isolated Windows Torch 2.7.1+cpu.
+peft==0.15.2
+accelerate==1.6.0
+transformers==4.51.3
+tokenizers==0.21.4
+safetensors==0.5.3
+lm-format-enforcer==0.11.3
+interegular==0.3.3
+numpy==1.24.4

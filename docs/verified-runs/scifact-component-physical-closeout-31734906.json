@@ -1,0 +1,65 @@
+{
+  "all_37_statuses_physically_reconciled": true,
+  "diagnostic_component_counts": {
+    "rationale": 9,
+    "relation": 12,
+    "screening": 12
+  },
+  "diagnostic_status_counts": {
+    "not_attempted_after_stop": 33
+  },
+  "frozen_screening_gold_coverage": "6/9 from Stage A, not inferred from zero attempted screening rows",
+  "hashes": {
+    "compact.json": "5e21126d04dff703a3b5a294d207048e1b8254118b87c956d7bdb3f3349fac57",
+    "inference-exited.json": "453ce6ae649915d296296ad33af9ae43678145a6881816218763a319a5e797d0",
+    "inference/preflight-00/completed.json": "3a7dde5dd001cd2ae151b6d43e4fbd3fd9b7dfef094899cb595395a5ee6e4a79",
+    "inference/preflight-00/response.json": "befb197653cee7971c0169105b37c72a1dff829ddd684907140c55ab3d74eb50",
+    "inference/preflight-00/started.json": "4ac98c5256c6437761fa9852bda1b8b5c4d7c8b744d30c1f65cf07889eb996b0",
+    "inference/preflight-00/wire.json": "9b1f87d8d4833befb68bab93b611b322570c71a7e3a28d328de73f0ab1563b95",
+    "inference/run.json": "6f809e673e43ec5ffa7d1b0c72cac8f368203f9d4d97990e98f015515fe3971b",
+    "operator-status.json": "391a95cf25905da5c865afee7a99382bf0e15ef85b37da666a80f41f59c7f33b",
+    "worker-finished.json": "ad5263b25948786cb58d534f9b3c8c7f6ceeca70c0f2b3e55b565d19fec8c889",
+    "worker-identity.json": "f5efe10472c923b45c366dc51a3221943281f57b344261ac287bfbaa1a1d421b"
+  },
+  "job": "31734906",
+  "model_logits_or_generation_token_ids_available": false,
+  "new_model_calls_in_this_audit": 0,
+  "preflight_attempted": 1,
+  "preflight_remaining_unattempted": 3,
+  "private_targets_read_by_this_audit": false,
+  "raw_real_claims_or_targets_exported": false,
+  "schema_version": "component-physical-closeout-v1",
+  "source_archive_sha256": "a393a8e21c53542a851feae480ea42d7c331d7e91d1ce7e85b7a386fbe848a5e",
+  "source_git": "81917f2c9a1b2060bd84a0688bd65a40b1c4e134",
+  "synthetic_record_only_export": {
+    "actual": {
+      "decision": "abstain",
+      "document_ids": []
+    },
+    "eos_observed": true,
+    "expected": {
+      "decision": "select",
+      "document_ids": [
+        1
+      ]
+    },
+    "grammar_log_empty": true,
+    "packing": {
+      "input_sha256": "7e820b2fdd08ff2650c81f04ccf36f0b785f08a02a488798dfab94775a4ef81a",
+      "input_tokens": 277,
+      "prompt_sha256": "b49e0108e331ac0b9478fffcb5faaa270a35e253aab1a0b0e235b8215fedba4f",
+      "schema_sha256": "22dabede39884fc934a1b920252c283f864ec8a5fb3d498e70a259075d24da74",
+      "status": "prepared"
+    },
+    "physical_receipt_check": "passed",
+    "raw": "{\"decision\": \"abstain\", \"document_ids\": []}",
+    "raw_sha256": "a94069134a063ab1f4767eaadad508c6fa7c6d882cd2d26ab78f4c79fdd828c5",
+    "status": "valid",
+    "truncated": false,
+    "usage": {
+      "input_tokens": 277,
+      "output_tokens": 15
+    }
+  },
+  "unknown_cost_attempts": 0
+}

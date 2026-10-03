@@ -108,7 +108,7 @@ def main() -> int:
         documents,
         claims,
         batch_size=args.batch_size,
-        search_width=5,
+        search_width=100,
         final_k=5,
     )
     del base_encoder, base_vectors, base_index
@@ -136,7 +136,7 @@ def main() -> int:
         documents,
         claims,
         batch_size=args.batch_size,
-        search_width=5,
+        search_width=100,
         final_k=5,
     )
     paired, tagged = evaluate_representation_pair(
@@ -146,6 +146,7 @@ def main() -> int:
         predictions_from_rows(candidate_rows),
         bootstrap_samples=int(protocol["evaluation"]["bootstrap_samples"]),
         seed=int(protocol["seed"]),
+        evidence_k=5,
     )
     metrics = {
         "schema_version": 1,

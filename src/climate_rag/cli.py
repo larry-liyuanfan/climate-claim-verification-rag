@@ -24,6 +24,7 @@ from .climate_fever import (
     prepare_public_benchmark,
 )
 from .dense import (
+    DenseEncoder,
     DenseRetriever,
     FaissANNIndex,
     HashDenseEncoder,
@@ -41,6 +42,7 @@ from .fusion import (
     DEFAULT_FEATURES,
     LightGBMLambdaMART,
     LinearPairwiseLTR,
+    Ranker,
     build_candidate_features,
     reciprocal_rank_fusion,
     train_ranker,
@@ -67,6 +69,7 @@ from .rerank import (
     DeterministicFeatureReranker,
     ModelStudioReranker,
     Qwen3CausalLMReranker,
+    Reranker,
 )
 from .verification import AbstainingVerifier, ModelStudioStructuredVerifier
 
@@ -156,6 +159,8 @@ def command_index(args: argparse.Namespace) -> int:
         )
     if args.backend in {"dense", "both"}:
         route_started = time.perf_counter()
+        encoder: DenseEncoder
+        ann: NumpyFlatIndex | FaissANNIndex
         if args.encoder == "hash":
             encoder = HashDenseEncoder(args.dimension)
             notes.append(
@@ -555,7 +560,7 @@ def command_mine_negatives(args: argparse.Namespace) -> int:
 
 
 def _pairwise_accuracy(
-    scores: np.ndarray, labels: np.ndarray, groups: list[str]
+    scores: np.ndarray[Any, Any], labels: np.ndarray[Any, Any], groups: list[str]
 ) -> float:
     correct = 0
     total = 0
@@ -588,6 +593,7 @@ def command_train_fusion(args: argparse.Namespace) -> int:
     )
     labels = np.asarray([float(row["relevance"]) for row in rows], dtype=np.float64)
     groups = [str(row["query_id"]) for row in rows]
+    model: Ranker
     if args.algorithm == "linear":
         model = LinearPairwiseLTR(feature_names, seed=args.seed)
         model.fit(matrix, labels, groups)
@@ -636,6 +642,8 @@ def command_evaluate(args: argparse.Namespace) -> int:
     _required(args, "claims", "output_dir")
     started_at = _started_at_utc()
     if args.experiment_config:
+        if args.evidence_k is not None:
+            raise ValueError("--evidence-k applies to prediction-file evaluation; five-stage configs use final_k")
         metrics, rows = run_five_stage_benchmark(
             claims_path=args.claims,
             config_path=args.experiment_config,
@@ -652,7 +660,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
             inputs=[args.claims, args.experiment_config],
             predictions=rows,
             notes=[
-                "All configured systems use the same claims and final_k.",
+                "All systems share claims/evidence cutoff; full metric ranks and served evidence files are separate.",
                 "The reranker base stage is recorded; RRF and LTR candidates are not interchangeable.",
                 "The configured reranker name is recorded; deterministic fallback results must not be described as Qwen3.",
             ],
@@ -664,10 +672,16 @@ def command_evaluate(args: argparse.Namespace) -> int:
     claims = load_claims(args.claims)
     predictions = load_predictions(args.predictions)
     ks = tuple(int(item) for item in str(args.ks).split(",") if item)
-    metrics, rows, errors = evaluate_predictions(claims, predictions, ks)
+    metrics, rows, errors = evaluate_predictions(
+        claims, predictions, ks, evidence_k=args.evidence_k,
+        evaluate_labels=not args.retrieval_only,
+    )
     if args.baseline_predictions:
         baseline = load_predictions(args.baseline_predictions)
-        _, baseline_rows, _ = evaluate_predictions(claims, baseline, ks)
+        _, baseline_rows, _ = evaluate_predictions(
+            claims, baseline, ks, evidence_k=args.evidence_k,
+            evaluate_labels=not args.retrieval_only,
+        )
         baseline_by_id = {row["claim_id"]: row for row in baseline_rows}
         comparisons: dict[str, Any] = {}
         compare_metrics = [
@@ -682,12 +696,15 @@ def command_evaluate(args: argparse.Namespace) -> int:
             comparisons[metric] = paired_bootstrap(
                 left, right, samples=args.bootstrap_samples, seed=args.seed
             )
-        metrics["paired_bootstrap"] = comparisons
+        metrics_with_comparisons: dict[str, Any] = dict(metrics)
+        metrics_with_comparisons["paired_bootstrap"] = comparisons
+    else:
+        metrics_with_comparisons = dict(metrics)
     write_run_artifacts(
         args.output_dir,
         command="evaluate",
         arguments=_recorded_arguments(args),
-        metrics=metrics,
+        metrics=metrics_with_comparisons,
         started_at=started_at,
         inputs=[
             args.claims,
@@ -702,7 +719,7 @@ def command_evaluate(args: argparse.Namespace) -> int:
         ],
         repository=_repository(),
     )
-    print(json.dumps(metrics, indent=2, sort_keys=True))
+    print(json.dumps(metrics_with_comparisons, indent=2, sort_keys=True))
     return 0
 
 
@@ -720,6 +737,7 @@ def command_serve(args: argparse.Namespace) -> int:
         if args.dense_index
         else None
     )
+    reranker: Reranker | None
     if args.reranker == "none":
         reranker = None
     elif args.reranker == "deterministic":
@@ -944,6 +962,8 @@ def command_build_pareto(args: argparse.Namespace) -> int:
     _required(args, "profiles", "output_dir")
     started_at = _started_at_utc()
     payload = read_json(args.profiles)
+    if isinstance(payload, dict) and payload.get("retired"):
+        raise ValueError(f"retired profiles cannot support a new Pareto decision: {payload.get('retirement_reason', '')}")
     profiles = payload.get("profiles") if isinstance(payload, dict) else payload
     if not isinstance(profiles, list) or not all(
         isinstance(profile, dict) for profile in profiles
@@ -1069,6 +1089,8 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--baseline-predictions")
     evaluate.add_argument("--output-dir")
     evaluate.add_argument("--ks", default="5,10,50")
+    evaluate.add_argument("--evidence-k", type=int, help="evidence cutoff independent of saved ranking depth")
+    evaluate.add_argument("--retrieval-only", action="store_true", help="do not score absent verdict labels")
     evaluate.add_argument("--bootstrap-samples", type=int, default=2000)
     evaluate.add_argument("--seed", type=int, default=17)
     evaluate.set_defaults(handler=command_evaluate)

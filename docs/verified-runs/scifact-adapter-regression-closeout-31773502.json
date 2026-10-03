@@ -1,0 +1,444 @@
+{
+  "active_adapter": {
+    "active_adapters": [
+      "default"
+    ],
+    "enabled": true,
+    "lora_layers": 72,
+    "merged": false,
+    "trainable_parameters": 0
+  },
+  "adapter_tensors_verified": 144,
+  "boundary": "All 12 exposed TRAIN-internal inputs retained; same adapter across routes, no heldout gain or isolated LoRA causal claim; no autonomous tool execution.",
+  "costs": {
+    "actual_model_calls": 48,
+    "all_slots_retained": true,
+    "calls": 48,
+    "completed_slot_records": 48,
+    "generation_ms_known_sum": 59800.03767646849,
+    "generation_ms_missing": 0,
+    "known_tokens_including_failures": {
+      "input_tokens": 172572,
+      "output_tokens": 1376
+    },
+    "missing_fields": {},
+    "model_calls_known_lower_bound": 48,
+    "not_reserved_slots": 0,
+    "planned_slots": 48,
+    "rerank_by_route": {
+      "adaptive": {
+        "completed_operations": 0,
+        "elapsed_ms_known_sum": 0,
+        "elapsed_ms_missing": 0,
+        "failed_or_uncompleted_operations": 0,
+        "requested_pairs_known_lower_bound": 0,
+        "status_counts": {}
+      },
+      "deterministic_extra": {
+        "completed_operations": 12,
+        "elapsed_ms_known_sum": 9732.359766960144,
+        "elapsed_ms_missing": 0,
+        "failed_or_uncompleted_operations": 0,
+        "requested_pairs_known_lower_bound": 240,
+        "status_counts": {
+          "completed": 12
+        }
+      },
+      "fixed_rerank": {
+        "completed_operations": 12,
+        "elapsed_ms_known_sum": 9858.912333846092,
+        "elapsed_ms_missing": 0,
+        "failed_or_uncompleted_operations": 0,
+        "requested_pairs_known_lower_bound": 240,
+        "status_counts": {
+          "completed": 12
+        }
+      },
+      "fixed_retrieval": {
+        "completed_operations": 0,
+        "elapsed_ms_known_sum": 0,
+        "elapsed_ms_missing": 0,
+        "failed_or_uncompleted_operations": 0,
+        "requested_pairs_known_lower_bound": 0,
+        "status_counts": {}
+      }
+    },
+    "rerank_operations_known_lower_bound": 24,
+    "rerank_pair_boundary": "requested_pairs_include_failed_operations_not_completed_forward_count",
+    "rerank_requested_pairs_known_lower_bound": 480,
+    "reranker_tokens": null,
+    "reranker_tokens_status": "not_measured_not_zero",
+    "reserved_slots": 48,
+    "token_totals_are_lower_bounds": false,
+    "unknown_usage_attempts": 0,
+    "unresolved_reserved_slots": 0,
+    "warmup_or_preflight_calls": 0
+  },
+  "hashes": {
+    "allocation/ended.json": "f7e816e5fb03262b9e2944656750244e5f1146bfb87df4a282ffb87d6832b712",
+    "allocation/worker-exit.json": "ea41acfe8d22affb7a352299fe108d7fd45e206c54ed3bb0c2bcff00146381d4",
+    "cost-before-quality.json": "87910b370e6265170957c991c6c6750e3f8c43d46983e2ee12722e13db551c9e",
+    "inference/adapter-integrity.json": "26827bdebb92a941a3ba4abe3e21d45214fff5a35a13aecd6187452ad312d257",
+    "inference/run.json": "7ebffe6edf98e1dbbf255dee5e47461f884a43c4562d54d3a85b1e737d9daade",
+    "score.json": "1d75e03a26f7a0fd107a7d082895497726f21a71aee3dd448f8342235e6c84b7"
+  },
+  "job_id": "31773502",
+  "model_load_ms": 19440.136320888996,
+  "physical_index_files_rehashed": 195,
+  "physical_wire_audits_verified": 48,
+  "raw_slot_records_verified": 48,
+  "read_opportunity_fit_subgroups": {
+    "read_opportunity_fit_overlap": {
+      "claims": 1,
+      "routes": {
+        "adaptive": {
+          "document_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          }
+        },
+        "deterministic_extra": {
+          "document_rationalized": {
+            "correct": 1,
+            "f1": 1,
+            "precision": 1,
+            "predicted": 1,
+            "recall": 1,
+            "relevant": 1
+          }
+        },
+        "fixed_rerank": {
+          "document_rationalized": {
+            "correct": 1,
+            "f1": 1,
+            "precision": 1,
+            "predicted": 1,
+            "recall": 1,
+            "relevant": 1
+          }
+        },
+        "fixed_retrieval": {
+          "document_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          }
+        }
+      }
+    },
+    "read_opportunity_no_direct_fit_overlap": {
+      "claims": 2,
+      "routes": {
+        "adaptive": {
+          "document_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 2
+          }
+        },
+        "deterministic_extra": {
+          "document_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 2
+          }
+        },
+        "fixed_rerank": {
+          "document_rationalized": {
+            "correct": 1,
+            "f1": 0.5,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 0.5,
+            "relevant": 2
+          }
+        },
+        "fixed_retrieval": {
+          "document_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 2
+          }
+        }
+      }
+    }
+  },
+  "reranker_load_ms": 1754.2650122195482,
+  "routes": {
+    "adaptive": {
+      "actual_tools": {
+        "model_selected_event_status": {},
+        "offered_per_attempt": {
+          "read": 12,
+          "rerank": 12,
+          "rewrite": 12
+        },
+        "proposed": {},
+        "slots_with_model_selected_event": 0,
+        "slots_with_tool_opportunity": 12
+      },
+      "chain": {
+        "added_citable_evidence": 0,
+        "execution_success": 0,
+        "model_events": 0,
+        "newly_seen_evidence": 0,
+        "newly_seen_then_final_cites": 0,
+        "newly_seen_then_gold_label_complete_rationale": 0,
+        "newly_seen_then_legal_decision": 0,
+        "newly_seen_then_strict_whole_final_answer_correct": 0,
+        "next_observation_available": 0,
+        "strict_whole_final_answer_correct_slots": 2,
+        "structural_whole_gold_match_slots": 2,
+        "success_without_observable_next_context": 0,
+        "successful_event_with_next_legal_decision": 0,
+        "then_final_cites_added": 0,
+        "then_gold_label_complete_rationale": 0,
+        "then_legal_decision": 0,
+        "then_strict_whole_final_answer_correct": 0,
+        "unique_final_correct_docs_associated_with_chain": 0,
+        "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+      },
+      "document_rationalized": {
+        "correct": 1,
+        "f1": 0.09999999999999999,
+        "precision": 0.09090909090909091,
+        "predicted": 11,
+        "recall": 0.1111111111111111,
+        "relevant": 9
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 44626,
+        "output_tokens": 332
+      },
+      "raw_action_proposals": {
+        "abstain": 1,
+        "answer": 11
+      },
+      "terminal_decisions": {
+        "boundary": "Empty fallback is not a correct NEI decision; document F1 is separate.",
+        "claim_verdict_accuracy": null,
+        "failure_or_budget_termination": 0,
+        "nei_claims": 3,
+        "nei_failure_empty_prediction": 0,
+        "nei_false_evidence": 2,
+        "nei_valid_model_abstention": 1,
+        "nonempty_answer_coverage": 0.9166666666666666,
+        "selected_claims": 12,
+        "valid_model_abstention": 1,
+        "validated_nonempty_answer": 11
+      },
+      "whole_question_p50_ms": 1919.059713371098,
+      "whole_question_p95_ms": 2161.51015041396
+    },
+    "deterministic_extra": {
+      "actual_tools": {
+        "model_selected_event_status": {},
+        "offered_per_attempt": {},
+        "proposed": {},
+        "slots_with_model_selected_event": 0,
+        "slots_with_tool_opportunity": 0
+      },
+      "chain": {
+        "added_citable_evidence": 0,
+        "execution_success": 0,
+        "model_events": 0,
+        "newly_seen_evidence": 0,
+        "newly_seen_then_final_cites": 0,
+        "newly_seen_then_gold_label_complete_rationale": 0,
+        "newly_seen_then_legal_decision": 0,
+        "newly_seen_then_strict_whole_final_answer_correct": 0,
+        "next_observation_available": 0,
+        "strict_whole_final_answer_correct_slots": 3,
+        "structural_whole_gold_match_slots": 3,
+        "success_without_observable_next_context": 0,
+        "successful_event_with_next_legal_decision": 0,
+        "then_final_cites_added": 0,
+        "then_gold_label_complete_rationale": 0,
+        "then_legal_decision": 0,
+        "then_strict_whole_final_answer_correct": 0,
+        "unique_final_correct_docs_associated_with_chain": 0,
+        "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+      },
+      "document_rationalized": {
+        "correct": 3,
+        "f1": 0.28571428571428575,
+        "precision": 0.25,
+        "predicted": 12,
+        "recall": 0.3333333333333333,
+        "relevant": 9
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 42890,
+        "output_tokens": 348
+      },
+      "raw_action_proposals": {
+        "answer": 12
+      },
+      "terminal_decisions": {
+        "boundary": "Empty fallback is not a correct NEI decision; document F1 is separate.",
+        "claim_verdict_accuracy": null,
+        "failure_or_budget_termination": 0,
+        "nei_claims": 3,
+        "nei_failure_empty_prediction": 0,
+        "nei_false_evidence": 3,
+        "nei_valid_model_abstention": 0,
+        "nonempty_answer_coverage": 1,
+        "selected_claims": 12,
+        "valid_model_abstention": 0,
+        "validated_nonempty_answer": 12
+      },
+      "whole_question_p50_ms": 2648.7071197479963,
+      "whole_question_p95_ms": 3128.073783032596
+    },
+    "fixed_rerank": {
+      "actual_tools": {
+        "model_selected_event_status": {},
+        "offered_per_attempt": {},
+        "proposed": {},
+        "slots_with_model_selected_event": 0,
+        "slots_with_tool_opportunity": 0
+      },
+      "chain": {
+        "added_citable_evidence": 0,
+        "execution_success": 0,
+        "model_events": 0,
+        "newly_seen_evidence": 0,
+        "newly_seen_then_final_cites": 0,
+        "newly_seen_then_gold_label_complete_rationale": 0,
+        "newly_seen_then_legal_decision": 0,
+        "newly_seen_then_strict_whole_final_answer_correct": 0,
+        "next_observation_available": 0,
+        "strict_whole_final_answer_correct_slots": 4,
+        "structural_whole_gold_match_slots": 4,
+        "success_without_observable_next_context": 0,
+        "successful_event_with_next_legal_decision": 0,
+        "then_final_cites_added": 0,
+        "then_gold_label_complete_rationale": 0,
+        "then_legal_decision": 0,
+        "then_strict_whole_final_answer_correct": 0,
+        "unique_final_correct_docs_associated_with_chain": 0,
+        "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+      },
+      "document_rationalized": {
+        "correct": 4,
+        "f1": 0.380952380952381,
+        "precision": 0.3333333333333333,
+        "predicted": 12,
+        "recall": 0.4444444444444444,
+        "relevant": 9
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 42914,
+        "output_tokens": 350
+      },
+      "raw_action_proposals": {
+        "answer": 12
+      },
+      "terminal_decisions": {
+        "boundary": "Empty fallback is not a correct NEI decision; document F1 is separate.",
+        "claim_verdict_accuracy": null,
+        "failure_or_budget_termination": 0,
+        "nei_claims": 3,
+        "nei_failure_empty_prediction": 0,
+        "nei_false_evidence": 3,
+        "nei_valid_model_abstention": 0,
+        "nonempty_answer_coverage": 1,
+        "selected_claims": 12,
+        "valid_model_abstention": 0,
+        "validated_nonempty_answer": 12
+      },
+      "whole_question_p50_ms": 2659.0583818033338,
+      "whole_question_p95_ms": 3109.999869670719
+    },
+    "fixed_retrieval": {
+      "actual_tools": {
+        "model_selected_event_status": {},
+        "offered_per_attempt": {},
+        "proposed": {},
+        "slots_with_model_selected_event": 0,
+        "slots_with_tool_opportunity": 0
+      },
+      "chain": {
+        "added_citable_evidence": 0,
+        "execution_success": 0,
+        "model_events": 0,
+        "newly_seen_evidence": 0,
+        "newly_seen_then_final_cites": 0,
+        "newly_seen_then_gold_label_complete_rationale": 0,
+        "newly_seen_then_legal_decision": 0,
+        "newly_seen_then_strict_whole_final_answer_correct": 0,
+        "next_observation_available": 0,
+        "strict_whole_final_answer_correct_slots": 1,
+        "structural_whole_gold_match_slots": 1,
+        "success_without_observable_next_context": 0,
+        "successful_event_with_next_legal_decision": 0,
+        "then_final_cites_added": 0,
+        "then_gold_label_complete_rationale": 0,
+        "then_legal_decision": 0,
+        "then_strict_whole_final_answer_correct": 0,
+        "unique_final_correct_docs_associated_with_chain": 0,
+        "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+      },
+      "document_rationalized": {
+        "correct": 1,
+        "f1": 0.09523809523809525,
+        "precision": 0.08333333333333333,
+        "predicted": 12,
+        "recall": 0.1111111111111111,
+        "relevant": 9
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 42142,
+        "output_tokens": 346
+      },
+      "raw_action_proposals": {
+        "answer": 12
+      },
+      "terminal_decisions": {
+        "boundary": "Empty fallback is not a correct NEI decision; document F1 is separate.",
+        "claim_verdict_accuracy": null,
+        "failure_or_budget_termination": 0,
+        "nei_claims": 3,
+        "nei_failure_empty_prediction": 0,
+        "nei_false_evidence": 3,
+        "nei_valid_model_abstention": 0,
+        "nonempty_answer_coverage": 1,
+        "selected_claims": 12,
+        "valid_model_abstention": 0,
+        "validated_nonempty_answer": 12
+      },
+      "whole_question_p50_ms": 1921.3910857215524,
+      "whole_question_p95_ms": 2105.0450280308723
+    }
+  },
+  "slurm": {
+    "elapsed_seconds": 201,
+    "exit_code": "0:0",
+    "maxrss_kib": 17338364,
+    "state": "COMPLETED",
+    "total_cpu_seconds": 183.559
+  },
+  "source_git": "bd7af701fcca654383f1907520612f79d5516e3b",
+  "status": "completed_negative_agent_regression",
+  "this_audit_loaded_gold": false,
+  "this_audit_model_calls": 0,
+  "this_audit_reran_scoring": false,
+  "validation_launched": false,
+  "worker_exit_before_cost_before_quality": true
+}

@@ -1,0 +1,80 @@
+{
+  "release_id": "climate-scifact-bounded-gap-pair-20260930-v1",
+  "scope": "biased_eligible_train_diagnostic_not_dev_test",
+  "status": "cpu_prepared_gpu_not_released",
+  "arms": [
+    "format_repaired",
+    "format_repaired_gap"
+  ],
+  "ordered_claim_ids": [
+    1393,
+    977,
+    241,
+    1289,
+    227,
+    210,
+    174,
+    224,
+    26,
+    469,
+    331,
+    455
+  ],
+  "routes": [
+    "fixed_retrieval",
+    "fixed_rerank",
+    "deterministic_extra",
+    "adaptive"
+  ],
+  "slots_per_arm": 48,
+  "total_slots": 96,
+  "order": "claim-major, route-minor; F batch then afterok F+G batch; no between-arm policy edits",
+  "budget": {
+    "candidate_k": 20,
+    "context_k": 5,
+    "max_calls": 5,
+    "max_input_tokens": 8192,
+    "max_output_tokens": 512,
+    "max_repairs": 2,
+    "max_tools": 5,
+    "timeout_seconds": 120
+  },
+  "resources_per_arm": {
+    "gpu": "A100:1",
+    "cpus": 8,
+    "memory_gib": 32,
+    "walltime_seconds": 7200
+  },
+  "resource_basis": "48*120=5760s question cap + 1440s staging/load/4*45s synthetic-preflight margin. Prior job31645005 MaxRSS18527100K, 8CPU/32G/1A100 elapsed842s. Two serial batches; 96*120=11520s cannot fit one 2h allocation.",
+  "corpus_documents": 5183,
+  "pythonhashseed": "0",
+  "official_dev_read": false,
+  "retired_climate_test_read": false,
+  "inference_tar_sha256": "92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca",
+  "parent_protocol_sha256": "306e8a61eef6fb279c56ccfc2b496281df9cc8710e194d2272e6978a23dbe802",
+  "inference_file_sha256": {
+    "claims.jsonl": "b38d076b1f22a9c586faf6d2286bac361b8ceb3fcae86349d7283f153749c97a",
+    "corpus.jsonl": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76"
+  },
+  "scoring_tar_sha256": "174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444",
+  "generator_manifest_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+  "reranker_manifest_sha256": "de1d4ac39101816774439e68881e2308c5e5f1bd94d0b0dc4c492a56c2681052",
+  "common_packing": "max(original F prompt, empty-history G prompt, active actual prompt); actual billed tokens are not padded",
+  "initial_pair_gate": "ordered visible sentence ID/hash and preview ID/hash exact equality; missing or unequal => no paired quality report, retain all costs",
+  "r2_comparison_boundary": "Common packing is an additional predeclared change versus r2. Compare visible ordered IDs/hashes and token counts; r2 exact preview IDs were not recorded, so never claim full prompt equivalence or attribute F-r2 change only to grammar.",
+  "terminal_limits": {
+    "documents": 5,
+    "sentences_per_document": 8,
+    "sentences_total": 20,
+    "unique_document_ids": true,
+    "unique_sentence_ids_per_document": true,
+    "unique_read_ids": true
+  },
+  "gap_policy": "existing zero-shot evidence_gap_candidate, max160-character empty/exact immutable claim substring; no forced tool, answer/abstain legal; invalid span charged with concrete repair feedback",
+  "raw_storage": "separate exclusive preflight and each slot; per slot 10 files; bytes=5*(wire_bound+16384); wire_bound=max(32768,512*max_token_UTF8_bytes+16); truncated/missing raw => reject audit and stop batch after durable cost record",
+  "preflight_calls_per_arm": 4,
+  "training_model_change": false,
+  "scoring": "After both inference children exit; original SciFact scorer, point diagnostic only, no bootstrap/p-value/independent-test claim; include failures/costs and raw->strict->event->next-feedback audit",
+  "source_identity": "Both arms must use identical frozen source git/archive SHA recorded in externally approved submission receipt before first model call",
+  "actual_gpu_submission": false
+}

@@ -1,0 +1,178 @@
+{
+  "action_counts": {
+    "answer": 93
+  },
+  "allowlisted_file_sha256": {
+    "fit/records.json": "70e40db85b0e51292ee1235be6bb708272846a0fcd4be2d123cfb4f2238d15a5",
+    "inference/corpus.jsonl": "5df96a227847260d2877931d62e58288472902db605c5eacb31d9d9703165f76",
+    "private/families.json": "8b151a3a031b3cf7937c6394632a26dc64d9e7284bf976fffcdffc50d74e70cc",
+    "private/selection-before-packing.json": "578f57ec2955e9d51c1da7d4d219c15c339be7aa0790f283e3872221f3fb432a"
+  },
+  "answer_document_counts": {
+    "1": 83,
+    "2": 4,
+    "3": 6
+  },
+  "available_target_combinations_per_claim": {
+    "1": 20,
+    "2": 17,
+    "3": 5,
+    "4": 3,
+    "5": 1,
+    "6": 1,
+    "8": 1
+  },
+  "boundary": "program_teacher_supervision_preparation_not_model_quality_or_Agent_success",
+  "cited_original_sentence_positions": {
+    "0": 9,
+    "1": 5,
+    "10": 7,
+    "11": 7,
+    "12": 6,
+    "14": 1,
+    "15": 1,
+    "16": 2,
+    "17": 3,
+    "2": 7,
+    "3": 16,
+    "4": 12,
+    "5": 8,
+    "6": 9,
+    "7": 8,
+    "8": 9,
+    "9": 5
+  },
+  "cited_retrieval_ranks": {
+    "1": 89,
+    "2": 12,
+    "3": 6,
+    "5": 2
+  },
+  "claims": 48,
+  "claims_with_alternative_cap": 3,
+  "claims_with_gaps": 0,
+  "claims_with_more_original_alternatives_than_old_records": 3,
+  "components": 48,
+  "config": {
+    "annotation_view": "complete_original_annotations_for_frozen_48_FIT_only",
+    "candidate_k": 20,
+    "candidate_pool": "frozen_family_component_partition_fit_including_background",
+    "capture": "run_bounded_slot_adaptive_CommonPacking_unchanged",
+    "claim_weight": 1,
+    "claims": 48,
+    "claims_per_optimizer_step": 4,
+    "decision_origin": "program_teacher",
+    "epoch_normalizer": 48,
+    "loss": "causal_assistant_token_mean*record_weight/48_no_chunk_renormalization",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 512,
+    "max_records": 192,
+    "max_records_per_claim": 4,
+    "model_calls": 0,
+    "new_nei_claims": false,
+    "teacher": "direct_if_any_complete_document_else_one_existing_preview_read_else_context_abstain",
+    "training_authorized": false,
+    "version": "scifact-production-state-supervision-fit-v2-20261001",
+    "weight_hierarchy": "claim/trajectory/alternative/state_frozen_before_tokenization"
+  },
+  "config_sha256": "c112096fee911daf48de79acc6f1fb40fc7a15936964f976260d009c1a7e2e4e",
+  "corpus_documents": 5183,
+  "cpu_seconds": 100.976089,
+  "decision_records": 93,
+  "elapsed_seconds": 104.02189314551651,
+  "final_complete_documents_per_claim": {
+    "1": 45,
+    "2": 1,
+    "3": 2
+  },
+  "fit_components_sha256": "e8c25bc8cd4069dbe056763987f5d89a016f89f28ad18a46b60244bc476ca086",
+  "fit_ids_sha256": "22fab53c7ab0be1c1e3d53bb2c00a19300d72334696eb8cf2ecf87c2f3ff739c",
+  "fit_pool_doc_ids_sha256": "4efed64fec48aaab16886e3cf8ac04a9835151a8b01e6f04c732f71e0548e137",
+  "fit_pool_documents": 256,
+  "gap_categories": {},
+  "initial_complete_documents_per_claim": {
+    "1": 45,
+    "2": 1,
+    "3": 2
+  },
+  "initial_complete_witness_claims": 48,
+  "input_archive_sha256": "c4907db623b644c9c883a807f07597f87746595da7fc6435714452304e50a44d",
+  "maxrss_kib": 257076,
+  "model_calls": 0,
+  "model_tool_executions": 0,
+  "new_claims": 0,
+  "non_fit_bytes_streamed_not_deserialized_or_persisted": true,
+  "non_fit_gold_parsed": false,
+  "official_alternatives_per_claim": {
+    "1": 19,
+    "2": 17,
+    "3": 5,
+    "4": 4,
+    "5": 2,
+    "6": 1
+  },
+  "official_documents_per_claim": {
+    "1": 44,
+    "2": 2,
+    "3": 2
+  },
+  "old_input_tokens_sum": 106927,
+  "old_manifest_sha256": "28de2c5d1d531aabdb757ccb45db0b91232a54ac7089ac7dc5ebf42e65ba3b2f",
+  "old_rationale_lengths": {
+    "1": 90,
+    "2": 6
+  },
+  "old_record_steps": 24,
+  "old_records": 96,
+  "old_records_per_claim": {
+    "1": 19,
+    "2": 17,
+    "3": 5,
+    "4": 7
+  },
+  "old_target_tokens_sum": 2791,
+  "optimization_trajectory_equivalence_claimed": false,
+  "optimizer_steps_executed": 0,
+  "original_manifest_sha256": "3cd6bc1e1c299ece9195098a3853ebb05bb3401507d8b467c1596ba6afb6e138",
+  "planned_claim_group_steps_if_released": 12,
+  "post_read_complete_witness_claims": 0,
+  "private_file_sha256": {
+    "captured-frames.json": "1a2dcc53c55c2013ed11b8b3818ca364d0b4ecc223f14ba1a1128713ecd6c7fa",
+    "claim-reports.json": "3914f74b68e3116b70b93df0972055a33c49f7394452fc9bdbf20f2bc5cf625c",
+    "complete-fit-gold.json": "8daf2e74e74ec7f656be7c0b8234d7e36b7581f969c35b20a52554c5fb78e72f",
+    "fit-records.json": "d33769569ff4d2460575d5f35e3e04abd0876335582ada77b26e64b147438df9"
+  },
+  "program_teacher_reads": 0,
+  "rationale_lengths": {
+    "1": 103,
+    "2": 6
+  },
+  "records_per_claim": {
+    "1": 20,
+    "2": 17,
+    "3": 5,
+    "4": 6
+  },
+  "retained_claim_masses": {
+    "1/1": 48
+  },
+  "scripted_responses": 48,
+  "source_archive_sha256": "f4079a80d4e74a8d8f988cc04a7bbb787de7b6b4eb6b6c6c2e3282ab7e78dab9",
+  "source_git": "9bf5fdad2ec9b010cb6a305b3e3462e0c7ac0ab1",
+  "supervised_input_tokens_max": 6453,
+  "supervised_input_tokens_sum": 418425,
+  "supervised_target_tokens_max": 71,
+  "supervised_target_tokens_sum": 3028,
+  "tokenizer_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "train_member_sha256": "9e07864a797dd515391fa1c3f3573249b70399f95ff6c740bf536ad11c8aa6ca",
+  "training_authorized": false,
+  "training_data_ready": true,
+  "tune_validation_dev_test_gold_parsed": false,
+  "version": "scifact-production-state-supervision-fit-v2-20261001",
+  "whole_gold_covered_by_target_claims": 47
+}

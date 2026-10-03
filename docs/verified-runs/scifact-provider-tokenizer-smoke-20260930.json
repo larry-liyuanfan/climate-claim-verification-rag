@@ -1,0 +1,60 @@
+{
+  "boundary": "Real frozen tokenizer/core LMFE only; selected synthetic A/B/A paths, not GPU generation or arbitrary-input certification.",
+  "grammar_config": {
+    "alphabet_characters": 92,
+    "alphabet_sha256": "783a32e655eabdbba779da3e4f8b16050d94ab84bd4083d3d6a0149e67e6d3c9",
+    "force_json_field_order": false,
+    "lmfe_version": "0.11.3",
+    "max_consecutive_whitespaces": 12,
+    "max_json_array_length": 20
+  },
+  "hf_torch_generate_or_prefix_bridge_executed": false,
+  "lmfe_core_token_prefix_executed": true,
+  "model_generation_calls": 0,
+  "official_data_read": false,
+  "quality_evaluation": false,
+  "records": [
+    {
+      "cross_doc_prefix_rejected": true,
+      "input_tokens": 680,
+      "output_tokens": 78,
+      "stale_document_prefix_rejected": true,
+      "valid_prefix_accepted": true
+    },
+    {
+      "cross_doc_prefix_rejected": true,
+      "input_tokens": 680,
+      "output_tokens": 78,
+      "stale_document_prefix_rejected": true,
+      "valid_prefix_accepted": true
+    },
+    {
+      "cross_doc_prefix_rejected": true,
+      "input_tokens": 680,
+      "output_tokens": 78,
+      "stale_document_prefix_rejected": true,
+      "valid_prefix_accepted": true
+    }
+  ],
+  "schema_version": "scifact-cached-tokenizer-prefix-smoke-v1",
+  "source_git": "9a426fa968600f8c635dd403e1bc70f8526811f9",
+  "source_worktree_dirty": false,
+  "status": "passed",
+  "tokenizer_files_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "tokenizer_prefix_setup_seconds": 1.4599707000888884,
+  "tokenizer_revision": "350135a4de9a3407be836fa238cccc1d61503a85",
+  "versions": {
+    "interegular": "0.3.3",
+    "jinja2": "3.1.6",
+    "lm-format-enforcer": "0.11.3",
+    "tokenizers": "0.21.4",
+    "transformers": "4.51.3"
+  },
+  "vocab_size": 151669,
+  "weights_loaded": false
+}

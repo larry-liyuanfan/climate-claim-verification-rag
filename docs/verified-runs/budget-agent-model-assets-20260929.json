@@ -1,0 +1,24 @@
+{
+  "generator": {
+    "repo": "Qwen/Qwen3-4B",
+    "revision": "350135a4de9a3407be836fa238cccc1d61503a85",
+    "files": 13,
+    "loadable_files": 12,
+    "bytes": 8060913981,
+    "model_manifest_sha256": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+    "source_metadata_sha256": "e09c0c320343d808f82f97e010570b3ca29d0020fc488831ed250d0126285214",
+    "weights_executed": false,
+    "download_authentication": "none"
+  },
+  "reranker": {
+    "repo": "Qwen/Qwen3-Reranker-4B",
+    "revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+    "files": 16,
+    "loadable_files": 15,
+    "bytes": 8059546851,
+    "model_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed",
+    "source_metadata_sha256": "406a2b3ff25b5f455793d0fd2ff45d45231dbaa3aeb6a3c90fbeb6f641192889",
+    "weights_executed": false,
+    "download_authentication": "none"
+  }
+}

@@ -4,7 +4,10 @@ import threading
 import time
 import uuid
 from collections import defaultdict
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
 
 try:
     from pydantic import BaseModel, Field
@@ -26,9 +29,9 @@ from .verification import (
 )
 
 
-class RetrievalRequest(BaseModel):  # type: ignore[misc,valid-type]
-    claim_text: str = Field(min_length=1, max_length=10_000) if Field else ""  # type: ignore[misc]
-    top_k: int = Field(default=5, ge=1, le=100) if Field else 5  # type: ignore[misc]
+class RetrievalRequest(BaseModel):
+    claim_text: str = Field(min_length=1, max_length=10_000) if Field is not None else ""
+    top_k: int = Field(default=5, ge=1, le=100) if Field is not None else 5
 
 
 class _TraceStore:
@@ -91,7 +94,7 @@ def create_app(
     re_retrieval_coverage_threshold: float = 0.45,
     verification_coverage_threshold: float = 0.15,
     trace_limit: int = 1_000,
-):
+) -> FastAPI:
     try:
         from fastapi import FastAPI, HTTPException, Response
     except ImportError as exc:

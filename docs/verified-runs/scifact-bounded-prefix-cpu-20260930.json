@@ -1,0 +1,216 @@
+{
+  "differential": [
+    {
+      "elapsed_ms": 14393.038500100374,
+      "eos_allowed": false,
+      "prefix_sha256": "c3ffb85dc5a846fa505a4116a080dabef4af467407f3cbddcd88f3f77eb5eafa",
+      "same_allowed_tokens": 147143
+    },
+    {
+      "elapsed_ms": 15806.429399875924,
+      "eos_allowed": false,
+      "prefix_sha256": "51078a88836384e1aa3398e33d8895d28473417d2389f78681ebf04ad60f7512",
+      "same_allowed_tokens": 4477
+    }
+  ],
+  "gpu_calls": 0,
+  "model_calls": 0,
+  "rows": [
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 11.311099864542484,
+      "measured_prefix_ms": 118.85719909332693,
+      "name": "total20_8_8_4_A1",
+      "prefix_calls": 159,
+      "rejected_token_index": null,
+      "wire_tokens": 158
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 10.760199977084994,
+      "measured_prefix_ms": 21.79530030116439,
+      "name": "read_c1_c10_B",
+      "prefix_calls": 16,
+      "rejected_token_index": null,
+      "wire_tokens": 15
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 10.167300002649426,
+      "measured_prefix_ms": 117.43310000747442,
+      "name": "total20_8_8_4_A2",
+      "prefix_calls": 159,
+      "rejected_token_index": null,
+      "wire_tokens": 158
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 10.335899889469147,
+      "measured_prefix_ms": 115.85780046880245,
+      "name": "total20_8_7_5",
+      "prefix_calls": 160,
+      "rejected_token_index": null,
+      "wire_tokens": 159
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 9.931899840012193,
+      "measured_prefix_ms": 135.88859932497144,
+      "name": "five_documents",
+      "prefix_calls": 190,
+      "rejected_token_index": null,
+      "wire_tokens": 189
+    },
+    {
+      "accepted": false,
+      "effective_field_order": false,
+      "expected": false,
+      "max_single_prefix_ms": 9.417899884283543,
+      "measured_prefix_ms": 101.46969999186695,
+      "name": "total21_rejected",
+      "prefix_calls": 157,
+      "rejected_token_index": 156,
+      "wire_tokens": 164
+    },
+    {
+      "accepted": false,
+      "effective_field_order": false,
+      "expected": false,
+      "max_single_prefix_ms": 9.930099826306105,
+      "measured_prefix_ms": 43.668100610375404,
+      "name": "doc9_rejected",
+      "prefix_calls": 61,
+      "rejected_token_index": 60,
+      "wire_tokens": 67
+    },
+    {
+      "accepted": false,
+      "effective_field_order": false,
+      "expected": false,
+      "max_single_prefix_ms": 10.102800093591213,
+      "measured_prefix_ms": 31.593500636518,
+      "name": "duplicate_doc_rejected",
+      "prefix_calls": 32,
+      "rejected_token_index": 31,
+      "wire_tokens": 47
+    },
+    {
+      "accepted": false,
+      "effective_field_order": false,
+      "expected": false,
+      "max_single_prefix_ms": 10.201600147411227,
+      "measured_prefix_ms": 26.73730021342635,
+      "name": "duplicate_sid_rejected",
+      "prefix_calls": 30,
+      "rejected_token_index": 29,
+      "wire_tokens": 32
+    },
+    {
+      "accepted": false,
+      "effective_field_order": false,
+      "expected": false,
+      "max_single_prefix_ms": 10.804800083860755,
+      "measured_prefix_ms": 18.106200033798814,
+      "name": "duplicate_read_rejected",
+      "prefix_calls": 14,
+      "rejected_token_index": 13,
+      "wire_tokens": 14
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 9.58719989284873,
+      "measured_prefix_ms": 15.139599796384573,
+      "name": "rerank",
+      "prefix_calls": 7,
+      "rejected_token_index": null,
+      "wire_tokens": 6
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 10.43060002848506,
+      "measured_prefix_ms": 20.658099791035056,
+      "name": "abstain",
+      "prefix_calls": 15,
+      "rejected_token_index": null,
+      "wire_tokens": 14
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 94.04410002753139,
+      "measured_prefix_ms": 526.9240997731686,
+      "name": "rewrite",
+      "prefix_calls": 15,
+      "rejected_token_index": null,
+      "wire_tokens": 14
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 99.44380004890263,
+      "measured_prefix_ms": 386.77119999192655,
+      "name": "rewrite_unicode",
+      "prefix_calls": 13,
+      "rejected_token_index": null,
+      "wire_tokens": 12
+    },
+    {
+      "accepted": true,
+      "effective_field_order": false,
+      "expected": true,
+      "max_single_prefix_ms": 523.6180000938475,
+      "measured_prefix_ms": 3070.201099384576,
+      "name": "rewrite_unicode_escaped",
+      "prefix_calls": 27,
+      "rejected_token_index": null,
+      "wire_tokens": 26
+    },
+    {
+      "accepted": true,
+      "effective_field_order": true,
+      "expected": true,
+      "max_single_prefix_ms": 4.555299878120422,
+      "measured_prefix_ms": 123.86570149101317,
+      "name": "gap_answer20",
+      "prefix_calls": 188,
+      "rejected_token_index": null,
+      "wire_tokens": 187
+    },
+    {
+      "accepted": true,
+      "effective_field_order": true,
+      "expected": true,
+      "max_single_prefix_ms": 67.49230017885566,
+      "measured_prefix_ms": 610.5078000109643,
+      "name": "gap_rewrite",
+      "prefix_calls": 43,
+      "rejected_token_index": null,
+      "wire_tokens": 42
+    }
+  ],
+  "schema_version": "bounded-scifact-prefix-real-tokenizer-smoke-v1",
+  "scope": "synthetic CPU token constraints, no model quality",
+  "tokenizer_data_build_ms": 2778.145599877462,
+  "tokenizer_sha256": {
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "5a7303fcb1a27ede63134a2cbd61d5282c247ca6d769ce4746d4ffa124aedd63",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  }
+}

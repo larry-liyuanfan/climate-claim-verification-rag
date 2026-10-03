@@ -14,8 +14,11 @@ def _dcg(relevances: Sequence[int]) -> float:
 
 
 def per_claim_retrieval_metrics(
-    claim: Claim, prediction: Prediction, ks: Sequence[int] = (5, 10, 50)
+    claim: Claim, prediction: Prediction, ks: Sequence[int] = (5, 10, 50),
+    *, evidence_k: int | None = None,
 ) -> dict[str, float]:
+    if evidence_k is not None and evidence_k <= 0:
+        raise ValueError("evidence_k must be positive")
     gold = set(claim.evidence_ids)
     ranked = list(prediction.evidence_ids)
     result: dict[str, float] = {}
@@ -34,14 +37,17 @@ def per_claim_retrieval_metrics(
     ideal = [1] * min(len(gold), 10)
     denominator = _dcg(ideal)
     result["ndcg@10"] = _dcg(relevances) / denominator if denominator else 0.0
-    correct = len(gold & set(ranked))
-    precision = correct / len(ranked) if ranked else 0.0
+    evidence = ranked[:evidence_k]
+    correct = len(gold & set(evidence))
+    precision = correct / len(evidence) if evidence else 0.0
     recall = correct / len(gold) if gold else 0.0
     result["evidence_precision"] = precision
     result["evidence_recall"] = recall
     result["evidence_f1"] = (
         2.0 * precision * recall / (precision + recall) if precision + recall else 0.0
     )
+    if evidence_k is not None:
+        result[f"evidence_f1@{evidence_k}"] = result["evidence_f1"]
     return result
 
 
@@ -49,15 +55,16 @@ def evaluate_predictions(
     claims: Mapping[str, Claim],
     predictions: Mapping[str, Prediction],
     ks: Sequence[int] = (5, 10, 50),
+    *, evidence_k: int | None = None, evaluate_labels: bool = True,
 ) -> tuple[dict[str, float | int], list[dict[str, Any]], list[dict[str, Any]]]:
     rows: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
     for claim_id in sorted(claims):
         claim = claims[claim_id]
         prediction = predictions.get(claim_id, Prediction(claim_id, ()))
-        metrics = per_claim_retrieval_metrics(claim, prediction, ks)
+        metrics = per_claim_retrieval_metrics(claim, prediction, ks, evidence_k=evidence_k)
         label_correct: float | None = None
-        if claim.label is not None:
+        if evaluate_labels and claim.label is not None:
             label_correct = float(prediction.label == claim.label)
         row: dict[str, Any] = {
             "claim_id": claim_id,
@@ -71,7 +78,9 @@ def evaluate_predictions(
             row["label_correct"] = label_correct
         rows.append(row)
         categories: list[str] = []
-        if claim.evidence_ids and not (set(claim.evidence_ids) & set(prediction.evidence_ids)):
+        if claim.evidence_ids and not (
+            set(claim.evidence_ids) & set(prediction.evidence_ids[:evidence_k])
+        ):
             categories.append("retrieval_miss")
         elif metrics["evidence_f1"] < 1.0:
             categories.append("partial_or_over_retrieval")
@@ -89,6 +98,9 @@ def evaluate_predictions(
         "evidence_f1",
     ]
     aggregate: dict[str, float | int] = {"claim_count": len(rows)}
+    if evidence_k is not None:
+        metric_names.append(f"evidence_f1@{evidence_k}")
+        aggregate["evidence_k"] = evidence_k
     for metric in metric_names:
         aggregate[metric] = float(np.mean([row[metric] for row in rows])) if rows else 0.0
     labelled = [row for row in rows if "label_correct" in row]

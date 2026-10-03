@@ -1,0 +1,167 @@
+{
+  "causal_ablation": false,
+  "caution": "Available full context is not verified entailment; parsed actions need not pass final validation. Citation partition uses final snapshot, valid here because no model-selected tool ran.",
+  "claim_text_or_evidence_ids_exported": false,
+  "diagnostic_script_sha256": "e01b144fa90988da103aa3bc0632117af46931b1ab2018c86ca3582c4d4137d1",
+  "private_raw_file_count": 33,
+  "private_run_sha256": "2e1445d88e64f69fa3a0472fdd678e6f1e490669fd531f8e502ce4f48d45df2b",
+  "routes": {
+    "adaptive": {
+      "abstain_reason_shape": {
+        "exact_prompt_example_reason": 4,
+        "other_reason": 1
+      },
+      "counts": {
+        "answer_citation_in_context": 4,
+        "answer_citation_outside_candidates": 0,
+        "answer_citation_preview_only": 2,
+        "contains_think_tag": 0,
+        "eos_true": 8,
+        "repair_then_abstain_rows": 3,
+        "rows_with_5_full_context_docs": 5,
+        "rows_with_nonempty_full_context": 5,
+        "token_cap_reached": 3
+      },
+      "first_allowed_actions": {
+        "abstain,answer,rewrite,rerank": 5,
+        "abstain,rewrite": 1
+      },
+      "first_response_action_before_validation": {
+        "abstain": 2,
+        "answer": 3,
+        "unparsed_json": 1
+      },
+      "output_tokens": {
+        "max": 512,
+        "median": 227,
+        "min": 23
+      },
+      "output_tokens_by_category": {
+        "json_decode": [
+          512,
+          512,
+          512
+        ],
+        "schema_validation": [
+          296
+        ],
+        "validated": [
+          23,
+          251,
+          30,
+          23,
+          23,
+          227,
+          23
+        ]
+      },
+      "schema_errors": {
+        "too_many_answer_statements": 1
+      }
+    },
+    "fixed_rerank": {
+      "abstain_reason_shape": {
+        "exact_prompt_example_reason": 5
+      },
+      "counts": {
+        "contains_think_tag": 0,
+        "eos_true": 8,
+        "repair_then_abstain_rows": 3,
+        "rows_with_5_full_context_docs": 5,
+        "rows_with_nonempty_full_context": 5,
+        "token_cap_reached": 3
+      },
+      "first_allowed_actions": {
+        "abstain": 1,
+        "abstain,answer": 5
+      },
+      "first_response_action_before_validation": {
+        "abstain": 2,
+        "answer": 3,
+        "unparsed_json": 1
+      },
+      "output_tokens": {
+        "max": 512,
+        "median": 386,
+        "min": 23
+      },
+      "output_tokens_by_category": {
+        "json_decode": [
+          512,
+          512,
+          512
+        ],
+        "schema_validation": [
+          386,
+          434,
+          412
+        ],
+        "validated": [
+          23,
+          23,
+          23,
+          23,
+          23
+        ]
+      },
+      "schema_errors": {
+        "too_many_answer_statements": 3
+      }
+    },
+    "fixed_retrieval": {
+      "abstain_reason_shape": {
+        "exact_prompt_example_reason": 4,
+        "other_reason": 1
+      },
+      "counts": {
+        "answer_citation_in_context": 4,
+        "answer_citation_outside_candidates": 0,
+        "answer_citation_preview_only": 2,
+        "contains_think_tag": 0,
+        "eos_true": 8,
+        "repair_then_abstain_rows": 3,
+        "rows_with_5_full_context_docs": 5,
+        "rows_with_nonempty_full_context": 5,
+        "token_cap_reached": 3
+      },
+      "first_allowed_actions": {
+        "abstain": 1,
+        "abstain,answer": 5
+      },
+      "first_response_action_before_validation": {
+        "abstain": 2,
+        "answer": 3,
+        "unparsed_json": 1
+      },
+      "output_tokens": {
+        "max": 512,
+        "median": 227,
+        "min": 23
+      },
+      "output_tokens_by_category": {
+        "json_decode": [
+          512,
+          512,
+          512
+        ],
+        "schema_validation": [
+          296
+        ],
+        "validated": [
+          23,
+          249,
+          30,
+          23,
+          23,
+          227,
+          23
+        ]
+      },
+      "schema_errors": {
+        "too_many_answer_statements": 1
+      }
+    }
+  },
+  "schema_version": "feedback-v2-failure-shapes-v1",
+  "semantic_support_assessed": false
+}

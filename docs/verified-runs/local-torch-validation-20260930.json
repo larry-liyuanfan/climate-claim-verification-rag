@@ -1,0 +1,58 @@
+{
+  "schema_version": "local-optional-dependency-validation-v1",
+  "date": "2026-09-30",
+  "scope": "Existing isolated Windows validation venv only; no global or Spartan runtime changes",
+  "initial_full_suite_source_git": "80fcd07faed28890b70096386c5897f0343d3104",
+  "typing_compatibility_source_git": "d7aad104deb64f5b65c203d7c63df350e4569de1",
+  "documentation_head_before_run": "f58b98d774bc5c9438219af38107fa1f3d6fc7f4",
+  "python": "3.12.14",
+  "packages": {
+    "torch": "2.7.1+cpu",
+    "peft": "0.15.2",
+    "transformers": "4.51.3",
+    "safetensors": "0.5.3",
+    "accelerate": "1.6.0",
+    "numpy": "1.26.4"
+  },
+  "torch_index": "https://download.pytorch.org/whl/cpu",
+  "cuda_build": null,
+  "cpu_tensor_smoke_passed": true,
+  "pip_check": "No broken requirements found",
+  "test_environment": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1"
+  },
+  "full_tests": {
+    "passed": 516,
+    "skipped": 1,
+    "seconds": 41.52,
+    "remaining_skip": "test_symlink_in_diagnostic_root_fails_closed: POSIX owner and symlink invariant on Windows",
+    "real_peft_checkpoint_values_and_toggle": "passed (previously skipped for missing optional Torch)",
+    "real_peft_fixture": "synthetic 4x4 Linear model with 16 LoRA parameters; no downloaded weights or benchmark inputs"
+  },
+  "complementary_linux_posix_validation": {
+    "run_id": 36684713686,
+    "source_git": "80fcd07faed28890b70096386c5897f0343d3104",
+    "conclusion": "success",
+    "posix_test": "passed",
+    "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36684713686"
+  },
+  "typing_compatibility": {
+    "original_strict_errors_after_install": 8,
+    "cause": "Previously absent optional libraries now expose PEFT untyped callable and Transformers lazy-export typing boundaries",
+    "mypy_after_local_boundary_fix_source_files": 54,
+    "ruff_passed": true,
+    "affected_entry_and_real_dependency_tests_passed": 24,
+    "final_offline_full_tests_passed": 516,
+    "final_offline_full_tests_skipped": 1,
+    "final_offline_full_test_seconds": 44.19,
+    "independent_readonly_review": "passed",
+    "global_type_ignores_added": false,
+    "runtime_models_arguments_or_computation_changed": false,
+    "included_in_spartan_source_80fcd07": false
+  },
+  "os_or_wsl_installed": false,
+  "spartan_environment_changed": false,
+  "frozen_experiment_assets_changed": false,
+  "benchmark_or_holdout_inference_run": false
+}

@@ -110,7 +110,7 @@ def main() -> int:
         documents,
         claims,
         batch_size=args.batch_size,
-        search_width=5,
+        search_width=100,
         final_k=5,
     )
     del base_encoder, base_flat
@@ -123,6 +123,16 @@ def main() -> int:
         revision=str(model["revision"]),
         adapter_path=str(adapter_path),
     )
+    # Integrity probes are fixed, label-free strings, not validation-selected examples.
+    probe = candidate_encoder.probe_adapter_effect(
+        ["How has global mean temperature changed?", "What affects Antarctic sea ice?"],
+        ["Carbon dioxide absorbs infrared radiation.", "Ocean heat content varies over time."],
+    )
+    write_json(output / "adapter_integrity.json", {
+        "weights": candidate_encoder.adapter_integrity, "output_probe": probe,
+    })
+    if not probe["effect_verified"]:
+        raise RuntimeError("adapter output effect not verified; stopping before corpus encoding")
     candidate_vectors, vector_metrics = build_dense_vectors(
         candidate_encoder, documents, batch_size=args.batch_size
     )
@@ -138,7 +148,7 @@ def main() -> int:
         documents,
         claims,
         batch_size=args.batch_size,
-        search_width=5,
+        search_width=100,
         final_k=5,
     )
     base_predictions = predictions_from_rows(base_rows)
@@ -150,6 +160,7 @@ def main() -> int:
         candidate_predictions,
         bootstrap_samples=int(protocol["evaluation"]["bootstrap_samples"]),
         seed=int(protocol["seed"]),
+        evidence_k=5,
     )
     decision = (
         pilot_advancement_decision(paired)
@@ -177,6 +188,8 @@ def main() -> int:
         "candidate_embeddings_sha256": file_sha256(embedding_path),
         "candidate_flat_index_path": str(flat_path),
         "adapter_parameter_count": candidate_encoder.adapter_parameter_count,
+        "adapter_integrity": candidate_encoder.adapter_integrity,
+        "adapter_output_probe": probe,
         "adapter_path": str(adapter_path),
         "adapter_sha256": tree_sha256(adapter_path),
         "training_record_sha256": file_sha256(args.training_record),

@@ -1,0 +1,10 @@
+# Exact Linux overlay wheels, installed with --no-deps; shared Torch is excluded.
+# Inherited dependencies are separately bound by runtime-files.json.
+accelerate==1.6.0 --hash=sha256:1aee717d3d3735ad6d09710a7c26990ee4652b79b4e93df46551551b5227c2aa
+interegular==0.3.3 --hash=sha256:b0c07007d48c89d6d19f7204972d369b2a77222722e126b6aa63aa721dc3b19c
+lm-format-enforcer==0.11.3 --hash=sha256:cf586350875def1ae7a8fba84fcbbfc8371424b6c9d05c1fcba70aa233fbf06f
+peft==0.15.2 --hash=sha256:0dfc942b03b7af4b7267cd4e30b15e3a4a1d277adc581ce6245fc13f1f93d0a0
+safetensors==0.5.3 --hash=sha256:cead1fa41fc54b1e61089fa57452e8834f798cb1dc7a09ba3524f1eb08e0317a
+tokenizers==0.21.4 --hash=sha256:51b7eabb104f46c1c50b486520555715457ae833d5aee9ff6ae853d1130506ff
+transformers==4.51.3 --hash=sha256:fd3279633ceb2b777013234bbf0b4f5c2d23c4626b05497691f00cfda55e8a83
+numpy==1.24.4 --hash=sha256:7ffe43c74893dbf38c2b0a1f5428760a1a9c98285553c89e12d70a96a7f3a4d6

@@ -1,0 +1,102 @@
+{
+  "schema": "fair-acquisition-saved-receipt-census-v1",
+  "protocol": "fair-acquisition-three-arm-v1-20261003",
+  "run_sha256": "3c9eafaa159321bcc202d5f5f18ddcdd8548917dde7e894f3b19def44e1cb7c3",
+  "total_slots": 96,
+  "routes": {
+    "fixed_multiquery": {
+      "slots": 32,
+      "counts": {
+        "tool_retrieve_completed": 32,
+        "tool_read_completed": 32,
+        "additional_full_text_delivery_events": 59,
+        "additional_sentences_delivered": 207,
+        "tool_rewrite_completed": 64,
+        "tool_rerank_completed": 32,
+        "additional_delivery_events_in_later_model_prompt": 59,
+        "slots_with_additional_text_received": 32,
+        "recorded_model_calls": 64
+      },
+      "validated_actions": {
+        "plan_queries": 32,
+        "answer": 26,
+        "abstain": 6
+      },
+      "validation_errors": {}
+    },
+    "deterministic_workflow": {
+      "slots": 32,
+      "counts": {
+        "tool_retrieve_completed": 32,
+        "tool_read_completed": 32,
+        "additional_full_text_delivery_events": 58,
+        "additional_sentences_delivered": 205,
+        "tool_rewrite_completed": 64,
+        "tool_rerank_completed": 32,
+        "additional_delivery_events_in_later_model_prompt": 58,
+        "slots_with_additional_text_received": 32,
+        "recorded_model_calls": 33
+      },
+      "validated_actions": {
+        "answer": 27,
+        "abstain": 5
+      },
+      "validation_errors": {
+        "duplicate_sentence_reference": 1
+      }
+    },
+    "autonomous": {
+      "slots": 32,
+      "counts": {
+        "gate_calls": 32,
+        "gate_with_acquisition_available": 32,
+        "gate_with_query_available": 32,
+        "gate_with_rerank_available": 32,
+        "gate_with_unread_initial_or_new_sources": 32,
+        "tool_retrieve_completed": 32,
+        "additional_delivery_events_in_later_model_prompt": 0,
+        "slots_with_additional_text_received": 0,
+        "recorded_model_calls": 68
+      },
+      "validated_actions": {
+        "stop": 32,
+        "answer": 26,
+        "abstain": 4
+      },
+      "validation_errors": {
+        "duplicate_sentence_reference": 6
+      }
+    }
+  },
+  "first_cases_by_behavior_only": {
+    "deterministic_workflow:validation_error": {
+      "route": "deterministic_workflow",
+      "frozen_task_position": 26,
+      "attempt_ordinal": 0,
+      "error_kind": "duplicate_sentence_reference"
+    },
+    "autonomous:stop_then_verdict": {
+      "route": "autonomous",
+      "frozen_task_position": 0,
+      "stop_attempt": 0,
+      "final_outcome_kind": "answered"
+    },
+    "autonomous:validation_error": {
+      "route": "autonomous",
+      "frozen_task_position": 19,
+      "attempt_ordinal": 1,
+      "error_kind": "duplicate_sentence_reference"
+    },
+    "autonomous:validation_repair_exhausted": {
+      "route": "autonomous",
+      "frozen_task_position": 19
+    }
+  },
+  "case_selection": "first occurrence within each route/behavior in frozen task order; no score/gold filter",
+  "model_calls_made": 0,
+  "gold_read": false,
+  "scores_recomputed": false,
+  "semantic_support": "unmeasured",
+  "reasonable_stop": "not_adjudicated_by_action_validity",
+  "feedback_causality": "whole_policy_only; prompt receipt is not causal or semantic use"
+}

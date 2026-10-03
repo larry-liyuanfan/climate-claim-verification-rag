@@ -1,0 +1,31 @@
+{
+  "source_git": "631aae70000ca4940c8225e046669dc85b1731e4",
+  "source_archive_sha256": "4c9386edbd965a2e88629932cdaad11e9c8b43e90af6f9383b6d7d90a3ca650a",
+  "training_wrapper_sha256": "d88db6806c1d725866df303a63dcdd4493de0a74b8c7fc2de148a79e1de6af9a",
+  "release_draft_sha256": "dff04c8a53c8f527bcc939f68963b9527aa467b03866c77e012ec5b8377bde88",
+  "release_authorized": false,
+  "validation": {
+    "clean_source_related_tests": 154,
+    "pytest_seconds": 8.03,
+    "fixture_warnings": 1,
+    "ruff": "passed",
+    "strict_mypy": "passed",
+    "bash_syntax": "passed",
+    "source_and_actual_training_wrapper_guards": "passed",
+    "tracked_secret_scan": "passed",
+    "runtime_actual_imports": "passed_no_model_loading",
+    "scope": "existing_isolated_dependencies_clean_exact_Git_source_export"
+  },
+  "test_only_project_directory": {
+    "exit_code": 0,
+    "output": "sbatch: Job 31757011 to start at 2026-10-05T07:44:16 a using 4 processors on nodes spartan-gpgpu104 in partition gpu-a100",
+    "reservation_numbers_are_not_submitted_job_ids": true,
+    "start_is_scheduler_estimate_not_guarantee": true,
+    "explicit_chdir_used": true
+  },
+  "job_submitted": false,
+  "real_training": false,
+  "generation_calls": 0,
+  "official_dev_test_read": false,
+  "training_data_rerun": false
+}

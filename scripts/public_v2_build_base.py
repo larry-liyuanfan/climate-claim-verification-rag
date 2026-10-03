@@ -57,12 +57,14 @@ def _bm25_validation(
     latencies: list[float] = []
     for claim_id in sorted(claims):
         started = time.perf_counter()
-        ranked = index.search(claims[claim_id].text, final_k)
+        ranked = index.search(claims[claim_id].text, 100)
         latencies.append((time.perf_counter() - started) * 1000.0)
         ids = tuple(row.evidence_id for row in ranked)
         predictions[claim_id] = Prediction(claim_id, ids)
         rows.append({"claim_id": claim_id, "evidence_ids": list(ids)})
-    metrics, _, _ = evaluate_predictions(claims, predictions, ks=(5, 10))
+    metrics, _, _ = evaluate_predictions(
+        claims, predictions, ks=(5, 10, 50), evidence_k=final_k, evaluate_labels=False
+    )
     metrics.update(
         {
             "search_p50_ms": percentile(latencies, 50),
@@ -146,10 +148,10 @@ def main() -> int:
         documents,
         validation,
         batch_size=args.batch_size,
-        search_width=final_k,
+        search_width=100,
         final_k=final_k,
     )
-    dense_predictions = predictions_from_rows(dense_rows, final_k=final_k)
+    dense_predictions = predictions_from_rows(dense_rows)
     pair_metrics, tagged_rows = evaluate_representation_pair(
         validation,
         documents,
@@ -157,6 +159,7 @@ def main() -> int:
         dense_predictions,
         bootstrap_samples=int(protocol["evaluation"]["bootstrap_samples"]),
         seed=int(protocol["seed"]),
+        evidence_k=final_k,
     )
 
     train_decisive = decisive_claims(train)

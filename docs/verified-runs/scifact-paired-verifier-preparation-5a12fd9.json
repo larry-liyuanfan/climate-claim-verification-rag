@@ -1,0 +1,88 @@
+{
+  "schema_version": "scifact-paired-verifier-preparation-v1",
+  "package": "relation_verifier_paired_cpu",
+  "status": "cpu_prepared_awaiting_exact_release_acceptance",
+  "execution_source_git": "5a12fd9f398afb1af772111253600e68410e885a",
+  "source_archive_sha256": "978ebecddea29d939852f85444e988d9d6f6ca3cbd894050b810180645e6b85e",
+  "source_archive_bytes": 5591040,
+  "source_regular_files": 682,
+  "source_marker_count": 1,
+  "source_marker_bytes": 41,
+  "wrapper_sha256": "85a8cf576f552d848ff425fd32c407c13536ad41bbedd285859f12e71fd0001f",
+  "parent_draft_sha256": "cd4c2767766604e8b95e40ba0c25f21a44a9baa000eeed95e1595b987ad0e620",
+  "child_draft_sha256": {
+    "v2": "62ff8ed492b18025a0b8e5554372db589e96972f30139ac90916a2d8b0460c83",
+    "v3": "38227237e8ae744e39db773cd6a9a37463116374afd00ba954de77ac2c3edd88"
+  },
+  "runtime_preflight_sha256": "46fbc47025f2b81a641fcc4457308dd96120ff15732f9f1269196c1b4a7e85da",
+  "generation_contract_sha256": "cabb40116532c43724f8bad01ae121a74bbe3f0bb732c2027e9bf8369d00b384",
+  "generation_defaults_fields": 70,
+  "spartan_runtime": {
+    "python": "3.10.4",
+    "torch": "2.1.2",
+    "transformers": "4.51.3",
+    "lm_format_enforcer": "0.11.3",
+    "os": "posix",
+    "accepted_runtime_receipt_matched": true
+  },
+  "input_preflight_reused": {
+    "job_id": "31969505",
+    "sha256": "7e21b603c225374723122763f700f73dacc04f4005cde7784e23e837814cb388",
+    "prompt_semantics_and_preflight_source_unchanged": true
+  },
+  "planned": {
+    "frames": 24,
+    "protocols": 2,
+    "arms_per_protocol": 3,
+    "slots": 144,
+    "max_calls_per_protocol": 240,
+    "max_total_calls": 480,
+    "phase_seconds": 2400,
+    "total_slurm_seconds": 5400,
+    "gpu": "A100:1",
+    "cpus": 8,
+    "ram_gib": 32,
+    "scratch_gib": 30
+  },
+  "validation": {
+    "clean_archive_tests_passed": 60,
+    "clean_archive_posix_test_skipped_on_windows": 1,
+    "ruff": "passed",
+    "source_type_checked_files": 108,
+    "secret_pii_scan": "passed",
+    "bash_syntax": "passed",
+    "actual_archive_guard": "passed",
+    "draft_execution_rejected": true,
+    "in_memory_contract_validation_passed": true,
+    "exact_source_linux_ci": {
+      "run_id": "36900289223",
+      "status": "success",
+      "tests_passed": 1393,
+      "warnings": 14,
+      "seconds": 105.43,
+      "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36900289223"
+    }
+  },
+  "review": {
+    "independent_read_only_reviewers": 2,
+    "open_blockers": 0,
+    "closed_defects": [
+      "single shared model extraction and non-nested serial worker supervision",
+      "explicit effective decode binding against model-default refill",
+      "attempt-scoped binding release after all early failures",
+      "original scorer string/null metadata excluded from numeric differences",
+      "supervisor preparation timeout and complete 144-slot failure cost",
+      "trusted-tokenizer parser audit rejects jointly altered self-reports"
+    ]
+  },
+  "execution": {
+    "new_slurm_jobs": 0,
+    "experiment_model_calls": 0,
+    "training_steps": 0,
+    "new_sampling": false,
+    "protected_split_read": false,
+    "authorized_release_written": false,
+    "resume_changed": false
+  },
+  "scope": "Previously consumed TRAIN diagnostic preparation, not an independent test, model quality improvement or GPU authorization."
+}

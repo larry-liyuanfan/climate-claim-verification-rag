@@ -1,0 +1,113 @@
+{
+  "schema_version": "scifact-bounded-cpu-closeout-v1",
+  "observed_at_utc": "2026-09-30T11:02:36Z",
+  "status": "cpu_prepared_gpu_not_released",
+  "job_submitted": false,
+  "model_weight_calls": 0,
+  "execution_source": {
+    "git_sha": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+    "archive_sha256": "dbc3ef071b4144934f568fa728a51ac3f07e770c0a9acf3a83e17861279a7bbb",
+    "archive_bytes": 2478080,
+    "regular_files": 348,
+    "directories": 13,
+    "source_revision_members": 1,
+    "source_revision_bytes": 41,
+    "complete_git_blob_allowlist": true,
+    "local_package": "artifacts/bounded-source-b248fe7/source.tar",
+    "remote_archive": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/scifact-bounded-source-b248fe7f43b175b15b90ec6143538d5dab8e2f35.tar",
+    "difference_from_fd33425": "CI-only CPU dependency installation; inference source, paired protocol and budgets unchanged",
+    "paired_wrapper_sha256": "8275b87c94c5862f410e6b2318f4c3f5e129b3bbb829a863d614544234ec313a",
+    "paired_wrapper_source_path": "hpc/scifact_bounded_pair.sbatch",
+    "paired_wrapper_remote_path": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/scifact-bounded-pair-8275b87c.sbatch",
+    "excluded_legacy_packager_wrapper": {
+      "path": "artifacts/bounded-source-b248fe7/wrapper.sbatch",
+      "sha256": "f6f3868262dadc81d0d6ececa068dbafddf29eb687af27fa6d90f25edf454f2f",
+      "archive_member": "hpc/scifact_train_diagnostic.sbatch",
+      "use_for_this_pair": false,
+      "reason": "The old packager exports its historical wrapper; only the separately guarded paired wrapper above is a valid entry point for this release."
+    },
+    "local_and_remote_paired_wrapper_archive_guard": "passed"
+  },
+  "validation": {
+    "local_full_suite": {
+      "passed": 587,
+      "skipped": 1,
+      "seconds": 35.1,
+      "skip_reason": "POSIX owner/symlink invariant on Windows"
+    },
+    "clean_source_archive": {
+      "git_sha": "fd33425940088785ffc5936d2be043b251bf179c",
+      "archive_sha256": "7097f352dc74146111c9ac4df10d343cc58fa50ae91e414a90a6f1a8311b1dfb",
+      "passed": 587,
+      "skipped": 1,
+      "seconds": 36.59,
+      "scope": "Fresh archive extraction and verified import path, using the existing pinned isolated venv; not a newly installed empty environment"
+    },
+    "linux_ci": {
+      "run_id": 36705532161,
+      "url": "https://github.com/larry-liyuanfan/climate-claim-verification-rag/actions/runs/36705532161",
+      "git_sha": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+      "passed": 588,
+      "skipped": 0,
+      "seconds": 12.02,
+      "torch": "2.7.1+cpu",
+      "transformers": "4.51.3",
+      "peft": "0.15.2",
+      "accelerate": "1.6.0",
+      "safetensors": "0.5.3",
+      "pip_check": "passed",
+      "ruff": "passed",
+      "mypy_source_files": 61,
+      "mypy_packager": "passed",
+      "tracked_secret_pii_scan": "passed",
+      "posix_test": "executed and passed"
+    },
+    "historical_linux_ci": {
+      "run_id": 36705240355,
+      "git_sha": "fd33425940088785ffc5936d2be043b251bf179c",
+      "passed": 579,
+      "skipped": 9,
+      "skip_reason": "Torch was absent; superseded by 588/0 Linux validation, not silently re-labelled"
+    },
+    "tokenizer_cpu_smoke": {
+      "report": "scifact-bounded-prefix-cpu-20260930.json",
+      "synthetic_cases": 17,
+      "model_weights_loaded": false,
+      "real_vocab_differential_probes": 2,
+      "allowed_token_sets_equal": true
+    }
+  },
+  "paired_protocol": {
+    "path": "../protocols/scifact-bounded-gap-pair-20260930.json",
+    "sha256": "4cc5033928a0833ee99ad64ecd5a7b10c7a1fde7ac4f219d6334d2349d9daaf6",
+    "slots": 96,
+    "serial_arms": 2,
+    "slots_per_arm": 48,
+    "quality_or_generalization_result": false
+  },
+  "final_remote_preflight": {
+    "exit_code": 0,
+    "stdout_stderr": "2026-09-30T11:02:36Z\ndbc3ef071b4144934f568fa728a51ac3f07e770c0a9acf3a83e17861279a7bbb  /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/scifact-bounded-source-b248fe7f43b175b15b90ec6143538d5dab8e2f35.tar\n36ed51e0a9a71ded058cc0e7290a78a7f5f638b91bff517d49ad6ea83c70e410  /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/agent-v3-grammar-36ed51e0a9a71ded058cc0e7290a78a7f5f638b91bff517d49ad6ea83c70e410.tar\n92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca  /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/scifact-train-inference-92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca.tar\n174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444  /data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/scifact-train-scoring-174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444.tar\n8275b87c94c5862f410e6b2318f4c3f5e129b3bbb829a863d614544234ec313a  scifact-bounded-pair-8275b87c.sbatch\nsource_and_wrapper_guard=passed\nsbatch: Job 31685002 to start at 2026-10-06T06:27:36 a using 8 processors on nodes spartan-gpgpu102 in partition gpu-a100\ntest_only_exit=0\nmatching_active_jobs_begin\nmatching_active_jobs_end\nrun_dir_format_repaired=absent\nrun_dir_format_repaired_gap=absent\n",
+    "test_only_exit_code": 0,
+    "simulation_id": "31685002",
+    "simulation_is_submitted_job": false,
+    "scheduler_estimate": "2026-10-06T06:27:36",
+    "estimate_is_reservation": false,
+    "matching_active_job_count": 0,
+    "both_run_directories_absent": true,
+    "asset_hashes_checked": [
+      "source",
+      "grammar",
+      "inference",
+      "scoring",
+      "paired_wrapper"
+    ],
+    "actual_compute_submitted": false
+  },
+  "boundaries": [
+    "No GPU submission, training, dev300 or retired test evaluation in this package.",
+    "Synthetic grammar/tool validation is not model-quality evidence or an online SLA.",
+    "POSIX is operating-system semantics; Linux validation supplies coverage without pretending a pip package installs POSIX.",
+    "This evidence receipt may live in a later documentation-only commit; execution source remains explicitly frozen above."
+  ]
+}

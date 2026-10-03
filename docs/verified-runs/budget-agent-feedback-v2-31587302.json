@@ -1,0 +1,166 @@
+{
+  "audit_script_sha256": "f468a6723db7cf011d1c193b749ecde8cba4185cc82f282fa846465223de108e",
+  "boundary": "Consumed authored development tasks; not independent gold. Mechanical acceptance, tool execution and semantic quality are distinct. All failed/repair attempts count; fixed routes share limits not equal actual work. No raw text or task/evidence IDs exported.",
+  "budget": {
+    "candidate_k": 20,
+    "context_k": 5,
+    "controller_protocol": "feedback-v2",
+    "max_input_tokens_per_call": 8192,
+    "max_model_calls": 5,
+    "max_output_tokens_per_call": 512,
+    "max_tool_calls": 3,
+    "max_validation_repairs": 2,
+    "timeout_seconds": 120.0
+  },
+  "complete_slots": 18,
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "model_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+  "private_run_receipt": {
+    "bytes": 256095,
+    "sha256": "2e1445d88e64f69fa3a0472fdd678e6f1e490669fd531f8e502ce4f48d45df2b"
+  },
+  "prompt_identity": {
+    "pydantic_version": "2.13.5",
+    "schema_json_sha256": "2fea3c228647fe8decdf946fa0f23c6dfcc4efb96136c9cb39ebedea3e311c54",
+    "scope": "UTF-8 static system message; excludes observation and tokenizer chat template",
+    "system_prompt_sha256": "3b12eba216c3599021145512a22aa3a5858c36e41cb4007feba619d4199c3f58"
+  },
+  "protocol_sha256": "fd9f25ae9e64bfe0c0c5bfb8c73a88a1884267da70c01d8e896abc81b4e112d3",
+  "reranker_sha256": "de1d4ac39101816774439e68881e2308c5e5f1bd94d0b0dc4c492a56c2681052",
+  "retrieval_quality": null,
+  "routes": {
+    "adaptive": {
+      "budget_violation_counts": {},
+      "completed_model_selected_tools": {},
+      "controller_validation_feedback": {
+        "answer_validation:unknown_citation": 2,
+        "json_decode": 3,
+        "schema_validation": 1
+      },
+      "generation_attempt_status": {
+        "response_invalid": 4,
+        "valid_decision": 7
+      },
+      "generation_attempts": 11,
+      "generation_diagnostic_categories": {
+        "json_decode": 3,
+        "schema_validation": 1,
+        "validated": 7
+      },
+      "input_tokens": 34959,
+      "invalid_response_tokens": {
+        "input_tokens": 13767,
+        "output_tokens": 1832
+      },
+      "latency_ms_p50": 7251.4037461951375,
+      "latency_ms_p95": 33291.94617830217,
+      "model_selected_tools_changing_context_order": 0,
+      "outcomes": {
+        "model_requested_abstention": 5,
+        "validation_repair_exhausted": 1
+      },
+      "output_tokens": 2432,
+      "parsed_model_actions": {
+        "abstain": 5,
+        "answer": 2
+      },
+      "request_elapsed_ms_sum": 66146.97362482548,
+      "rerank_elapsed_ms_sum": 0,
+      "rerank_pairs": 0,
+      "rows_with_tool_then_mechanically_accepted_answer": 0,
+      "rows_with_tool_then_terminal_model_decision": 0,
+      "tasks": 6,
+      "tool_calls": 6,
+      "unknown_usage_attempts": 0
+    },
+    "fixed_rerank": {
+      "budget_violation_counts": {},
+      "completed_model_selected_tools": {},
+      "controller_validation_feedback": {
+        "json_decode": 3,
+        "schema_validation": 3
+      },
+      "generation_attempt_status": {
+        "response_invalid": 6,
+        "valid_decision": 5
+      },
+      "generation_attempts": 11,
+      "generation_diagnostic_categories": {
+        "json_decode": 3,
+        "schema_validation": 3,
+        "validated": 5
+      },
+      "input_tokens": 35789,
+      "invalid_response_tokens": {
+        "input_tokens": 19882,
+        "output_tokens": 2768
+      },
+      "latency_ms_p50": 11814.540434628725,
+      "latency_ms_p95": 34747.401606757194,
+      "model_selected_tools_changing_context_order": 0,
+      "outcomes": {
+        "model_requested_abstention": 5,
+        "validation_repair_exhausted": 1
+      },
+      "output_tokens": 2883,
+      "parsed_model_actions": {
+        "abstain": 5
+      },
+      "request_elapsed_ms_sum": 80512.73590140045,
+      "rerank_elapsed_ms_sum": 2779.3105840682983,
+      "rerank_pairs": 100,
+      "rows_with_tool_then_mechanically_accepted_answer": 0,
+      "rows_with_tool_then_terminal_model_decision": 0,
+      "tasks": 6,
+      "tool_calls": 12,
+      "unknown_usage_attempts": 0
+    },
+    "fixed_retrieval": {
+      "budget_violation_counts": {},
+      "completed_model_selected_tools": {},
+      "controller_validation_feedback": {
+        "answer_validation:unknown_citation": 2,
+        "json_decode": 3,
+        "schema_validation": 1
+      },
+      "generation_attempt_status": {
+        "response_invalid": 4,
+        "valid_decision": 7
+      },
+      "generation_attempts": 11,
+      "generation_diagnostic_categories": {
+        "json_decode": 3,
+        "schema_validation": 1,
+        "validated": 7
+      },
+      "input_tokens": 34884,
+      "invalid_response_tokens": {
+        "input_tokens": 13739,
+        "output_tokens": 1832
+      },
+      "latency_ms_p50": 7199.11620952189,
+      "latency_ms_p95": 33461.07747172937,
+      "model_selected_tools_changing_context_order": 0,
+      "outcomes": {
+        "model_requested_abstention": 5,
+        "validation_repair_exhausted": 1
+      },
+      "output_tokens": 2430,
+      "parsed_model_actions": {
+        "abstain": 5,
+        "answer": 2
+      },
+      "request_elapsed_ms_sum": 66595.83328850567,
+      "rerank_elapsed_ms_sum": 0,
+      "rerank_pairs": 0,
+      "rows_with_tool_then_mechanically_accepted_answer": 0,
+      "rows_with_tool_then_terminal_model_decision": 0,
+      "tasks": 6,
+      "tool_calls": 6,
+      "unknown_usage_attempts": 0
+    }
+  },
+  "schema_version": "feedback-development-audit-v2",
+  "semantic_support_quality": null,
+  "source_git": "d7d5bf3b2fd79b90f1d47218bbe88adb991910cb"
+}

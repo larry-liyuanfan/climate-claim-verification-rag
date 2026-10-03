@@ -1,0 +1,44 @@
+{
+  "protocol": "fair-acquisition-three-arm-v1-20261003",
+  "status": "cpu_contract_only_not_model_authorization",
+  "arms": ["fixed_multiquery", "deterministic_workflow", "autonomous"],
+  "selection": {
+    "population": "public-v2 validation230 already exposed to retrieval selection",
+    "exclude": "every validation component containing any consumed32 ID",
+    "graph": "all annotated candidate IDs, normalized/0.90 Jaccard claim and evidence variants; official labels/positive IDs excluded from graph selection",
+    "salt": "fair-three-arm-components-20261003-v1",
+    "order": "domain-separated SHA of sorted component IDs, then first SHA-ranked claim within each component",
+    "cap": 32,
+    "no_replacement_no_opportunity_filter": true,
+    "development_not_independent_validation": true,
+    "test_read": false
+  },
+  "initial_information": {
+    "retrieve": "original immutable claim BM25 Top20 of identical 5240-document corpus",
+    "full_context": "first five candidates complete sentences, retained once shown",
+    "previews": "remaining capacity only; same payload packed against maximum initial gate/plan prompt size",
+    "no_answer_masking": true
+  },
+  "tools": ["read", "query", "rerank"],
+  "tools_shared": "same typed executor, RRF k60 query fusion, full Top20 rerank, actual complete sentence delivery, empty/error fields",
+  "fixed": "one model upfront plan using initial frame, up to five initial reads then up to two queries then rerank; no feedback replanning",
+  "deterministic": "up to five unread initial sources then existing deterministic two-query transformation then rerank",
+  "autonomous": "optional read/query/rerank or stop gate; stop legal regardless of evidence; separate common verifier",
+  "terminal": "identical system/schema: SUPPORTS/REFUTES with at most three unique displayed sentence citations, or insufficient/conflicting evidence abstention; no terminal tools",
+  "ceilings": {"model_calls": 5, "tools": 5, "queries": 2, "repairs": 2, "input_tokens": 8192, "output_tokens": 512, "slot_seconds": 120},
+  "cost": "all physical plan/gate/repair/verdict attempts, input/output tokens, tool counts/latency, rerank requested/completed pairs/tokens/swaps, loader/preparation/scoring/operator wall clock; unknown attempts not free; no rerank on empty pool",
+  "scoring": {
+    "official_task": "SUPPORTS/REFUTES exact label; NEI only intentional insufficient-evidence abstention; DISPUTED only intentional conflicting-evidence abstention; errors/exhaustion never correct abstentions",
+    "all_task_denominator": "all frozen tasks per arm; no dropped empty/error/budget cases; incomplete matrix unscored",
+    "legality": "deterministic schema/citation bytes/source provenance only",
+    "citation_proxy": "every cited source in official decisive evidence-ID set; NOT semantic support of the specific verdict",
+    "joint_proxy": "task correct AND nonempty official-ID-concordant citations, all-task denominator; abstentions score zero here and separately count task correctness",
+    "true_semantic_support_and_joint": "unmeasured; no human blind labels, author assessment or automated entailment judge",
+    "retrieval_secondary": "Recall@5, MRR@10, nDCG@10 and Top5 Evidence F1 over final ranked Top20 candidates (legacy delivered_evidence_ids includes preview-only/not-read sources), NOT complete-text delivery; official evidence-bearing tasks incl errors/empty outcomes; separate denominator from all-task correctness; 5000 paired bootstrap, NOT citation/entailment F1",
+    "paired_bootstrap": {"samples": 5000, "seed": 20261003, "unit": "one frozen query per component"},
+    "behavior": "proposal, validation, execution, full-text delivery, later physical prompt, later validated decision, final citations separately; opportunity/use proxy NOT causal effect",
+    "no_pure_feedback_causal_claim": true
+  },
+  "models": {"generator": "Qwen/Qwen3-4B@350135a4de9a3407be836fa238cccc1d61503a85", "reranker": "Qwen/Qwen3-Reranker-4B@22e683669bc0f0bd69640a1354a6d0aebcfeede5"},
+  "execution": {"model_execution_authorized": false, "new_exact_release_required": true, "no_spartan": true, "private_recovery_before_stop": true}
+}

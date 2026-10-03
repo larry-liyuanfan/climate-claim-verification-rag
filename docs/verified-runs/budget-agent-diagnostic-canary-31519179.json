@@ -1,0 +1,369 @@
+{
+  "job_id": "31519179",
+  "release_id": "climate-response-diagnostic-6a764a1-20260929",
+  "kind": "actual protocol diagnosis, not a successful Agent or quality evaluation",
+  "source_git_sha": "6a764a1b4f9137cf8e8c29abfbc14572c3a1039d",
+  "operator_sha256": "c257d8b49a1e2c2112cb209fbca0e86e8ae6ca1989c7c18f4d2f860c15e30dd6",
+  "archive_sha256": "12ad6f9db73b52a272afe7f17df995aab6e8ab43558cffaaa9229a2ac635e095",
+  "archive_bytes": 3866,
+  "run_sha256": "5e381cc7d990f11e1f017ed31cf8ae71d53713e5f407fbd0991bd573ae352293",
+  "run_bytes": 33028,
+  "log_sha256": "2652390ea7a6db2b931ea7206d3f2662d16f266a6a995fffd26453e6ea338c9b",
+  "operator_status_sha256": "75a3856e4d281ee7b4ac3e36cdfd79f34f0f093a7681a7dd6a55d3497cd5135b",
+  "execution_manifest": {
+    "dense_file_hashes": null,
+    "model_manifest_sha256": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+    "protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+    "reranker_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed"
+  },
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "rows": 9,
+  "usage_known": true,
+  "generation_attempts": 9,
+  "usage": {
+    "input_tokens": 10531,
+    "output_tokens": 2165
+  },
+  "error_categories": {
+    "schema_validation": 9
+  },
+  "eos_observed_count": 9,
+  "token_cap_reached_count": 0,
+  "private_raw_saved_count": 9,
+  "whole_response_cpu_json_parse_successes": 9,
+  "exact_frozen_pydantic_query_rule_failures": 9,
+  "frozen_validation_receipt_sha256": "cf372520d23c56d99a41e9f36e29f738dea850c73485930acb677f1865d00e6f",
+  "rejected_raw_action_candidates": {
+    "answer": 6,
+    "abstain": 3
+  },
+  "accepted_decisions": 0,
+  "published_answers": 0,
+  "observed_conflict": "All9 non-rewrite actions contain a non-null, nonempty query; unchanged payload validator rejects them. Candidate actions are not accepted model/tool actions.",
+  "citation_supportability": null,
+  "gpu_memory_peak": null,
+  "slurm": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 142,
+    "total_cpu_seconds": 125.008,
+    "batch_maxrss_kib": 18102124,
+    "batch_maxrss_gib": 17.263530731201172,
+    "cpus": 8,
+    "ram_gib": 32,
+    "gpu": "1 full A100"
+  },
+  "operator": {
+    "job_id": "31519179",
+    "exit_status": 0,
+    "elapsed_seconds": 139,
+    "gpu_memory_measured": false
+  },
+  "query_elapsed_seconds_sum": 59.29865371249616,
+  "generation_call_elapsed_seconds_sum": 58.057687072083354,
+  "rows_compact": [
+    {
+      "task_id": "pilot-ice",
+      "strategy": "fixed_retrieval",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 1328,
+        "output_tokens": 228
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 0,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 7303.284741938114,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 7266.271559521556,
+        "output_bytes": 875,
+        "output_characters": 875,
+        "output_sha256": "053d80604e1966b54d864f36bc60a683790276d51ddf0fada2da1b42230bd010",
+        "output_tokens": 228,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-ice",
+      "strategy": "fixed_rerank",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 1380,
+        "output_tokens": 318
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 1,
+      "rerank_candidate_pairs": 20,
+      "elapsed_ms": 8916.163511574268,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 8334.629697725177,
+        "output_bytes": 1152,
+        "output_characters": 1152,
+        "output_sha256": "2ccd9b8f6594320c0d5cb753e19155412a7dcf7d9e7c65eb553ba9d2efab48d5",
+        "output_tokens": 318,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-ice",
+      "strategy": "adaptive",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 1333,
+        "output_tokens": 228
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 0,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 6019.818475469947,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 6008.781274780631,
+        "output_bytes": 875,
+        "output_characters": 875,
+        "output_sha256": "1ebcf0fc5677b1fcdbc1e1f0e02f06dab3795caf677d6119fdf468f8d339726c",
+        "output_tokens": 228,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-multi",
+      "strategy": "fixed_retrieval",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 1430,
+        "output_tokens": 253
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 0,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 6649.827716872096,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 6637.691406533122,
+        "output_bytes": 1136,
+        "output_characters": 1136,
+        "output_sha256": "f1a6e698ee34339f4be2ea0b2c03821abbb7ed767b38e84ecd9527b38d37e62b",
+        "output_tokens": 253,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-multi",
+      "strategy": "fixed_rerank",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 1480,
+        "output_tokens": 450
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 1,
+      "rerank_candidate_pairs": 20,
+      "elapsed_ms": 12314.419304952025,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 11746.816268190742,
+        "output_bytes": 1984,
+        "output_characters": 1984,
+        "output_sha256": "333e6352d2954bc5fb0b890872cacb1ce1635a1944713d27940753c4172aa9cf",
+        "output_tokens": 450,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-multi",
+      "strategy": "adaptive",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 1435,
+        "output_tokens": 460
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 0,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 12023.536127060652,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 12013.127364218235,
+        "output_bytes": 1993,
+        "output_characters": 1993,
+        "output_sha256": "64e10eb7b31f12e51838087affd2489477514b8b0fd7dbbcdf8f961beb5c1f26",
+        "output_tokens": 460,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-empty",
+      "strategy": "fixed_retrieval",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 714,
+        "output_tokens": 76
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 0,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 2032.6859783381224,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 2025.2994392067194,
+        "output_bytes": 251,
+        "output_characters": 251,
+        "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+        "output_tokens": 76,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-empty",
+      "strategy": "fixed_rerank",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 714,
+        "output_tokens": 76
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 1,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 2018.7696069478989,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 2011.1053567379713,
+        "output_bytes": 251,
+        "output_characters": 251,
+        "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+        "output_tokens": 76,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    },
+    {
+      "task_id": "pilot-empty",
+      "strategy": "adaptive",
+      "status": "abstained",
+      "reason": "stage_failed",
+      "usage": {
+        "input_tokens": 717,
+        "output_tokens": 76
+      },
+      "usage_known": true,
+      "generation_calls": 1,
+      "retrieval_calls": 1,
+      "rerank_calls": 0,
+      "rerank_candidate_pairs": 0,
+      "elapsed_ms": 2020.1482493430376,
+      "diagnostics": {
+        "category": "schema_validation",
+        "eos_observed": true,
+        "errors": [
+          {
+            "loc": [],
+            "type": "value_error"
+          }
+        ],
+        "generation_elapsed_ms": 2013.964705169201,
+        "output_bytes": 251,
+        "output_characters": 251,
+        "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+        "output_tokens": 76,
+        "private_attachment": "saved_owner_only",
+        "reached_max_new_tokens": false
+      }
+    }
+  ],
+  "private_originals_exported": false,
+  "private_directory_actual_mode": "2700 (inherited setgid); access bits0700; files0600",
+  "old_pilot_root_cause_retroactively_assigned": false,
+  "behavior_fix_present_in_this_canary": false,
+  "scope": "Terminal diagnosis receipt, not the state of subsequent CPU-only repairs or releases.",
+  "recommended_fix": "Explicitly describe conditional fields in the prompt while preserving strict validation; new CPU contract tests and a separately released small canary, never post-hoc query deletion or tolerant parsing."
+}

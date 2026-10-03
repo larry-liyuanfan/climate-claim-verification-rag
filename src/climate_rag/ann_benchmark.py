@@ -13,7 +13,7 @@ import numpy as np
 from .dense import l2_normalize
 
 
-def recall_at_k(exact: np.ndarray, candidate: np.ndarray, k: int) -> list[float]:
+def recall_at_k(exact: np.ndarray[Any, Any], candidate: np.ndarray[Any, Any], k: int) -> list[float]:
     """Return per-query set recall against exact top-k row positions."""
 
     if k <= 0:
@@ -48,7 +48,7 @@ def _configure_search(index: Any, *, hnsw_ef_search: int, ivf_nprobe: int) -> di
 
 
 def benchmark_faiss_indices(
-    query_vectors: np.ndarray,
+    query_vectors: np.ndarray[Any, Any],
     index_paths: Mapping[str, str | Path],
     *,
     top_ks: Sequence[int] = (5, 10, 50),

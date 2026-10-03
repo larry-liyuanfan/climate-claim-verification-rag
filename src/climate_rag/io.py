@@ -81,7 +81,7 @@ def iter_evidence(path: str | Path) -> Iterator[EvidenceDocument]:
         return
 
     try:
-        import ijson  # type: ignore[import-not-found]
+        import ijson
     except ImportError:
         payload = read_json(source)
         if isinstance(payload, dict):

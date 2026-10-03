@@ -1,0 +1,58 @@
+{
+  "job_id": "31542525",
+  "release_id": "climate-full-72eaa90-20260930-r1",
+  "diagnosis_date": "2026-09-30",
+  "scope": "CPU-only infrastructure diagnosis; no model-quality claim",
+  "original_private_operator_status_bytes": 1763,
+  "original_private_operator_status_sha256": "0212cff0e3b83fcc22c0b610ba768bd3ed8d014cb2a44d3b1fa432afaf2a7eea",
+  "root_cause": "runtime member prefix mismatch selects empty list and raises ValueError(empty_archive)",
+  "root_cause_basis": [
+    "remote status has verified runtime archive hash but no runtime extracted_bytes",
+    "validation and vnext remain not_started, file_receipts empty",
+    "actual runtime archive metadata has zero raw prefix matches and 39292 normalized matches",
+    "old source requires a nonempty filtered member list before extraction"
+  ],
+  "runtime_archive": {
+    "bytes": 348977995,
+    "sha256": "2423a755979c426ecae5d17deead154393de712efd10e84884d8c87ff00d29f8",
+    "members": 39371,
+    "raw_prefix_selected": 0,
+    "normalized_prefix_selected": 39292,
+    "normalized_files": 34834,
+    "normalized_file_bytes": 1088034827,
+    "normalized_link_or_special_count": 0,
+    "normalized_parent_traversal_count": 0,
+    "normalized_duplicate_path_count": 0,
+    "normalized_absolute_path_count": 0,
+    "metadata_inspection_elapsed_seconds": 4.221100900089368,
+    "elapsed_scope": "local download already complete; streamed SHA and tar metadata inspection only",
+    "extracted_for_diagnosis": false
+  },
+  "script_identity": {
+    "original_git_sha": "0fa11b580b6ac7d7af1d1861da179acda1f7d9fc",
+    "original_archive_sha256": "0965c471b2f13197ae0eaffa30ada17745734fc5cf77e4ff06f853830da73cef",
+    "archive_member_and_executed_sha256": "09e438a6496499b0da47d8b2b08ccd404bbb6d1105722febe12af31857e4a654",
+    "archive_member_bytes": 17115,
+    "archive_member_crlf_count": 314,
+    "working_lf_sha256": "f442ec5c638c14c1a4ede7ef55d1cc300f88536c07a91397e42cac1990e39796",
+    "working_lf_bytes": 16801,
+    "normalized_archive_equals_working_bytes": true,
+    "line_ending_difference_is_root_cause": false
+  },
+  "repair": {
+    "prefix_selection": "PurePosixPath normalization before the exact site-packages prefix filter",
+    "preserved_checks": ["resolved containment", "file-or-directory only", "duplicate paths", "free scratch capacity"],
+    "additional_checks": ["explicit parent traversal rejection", "allowlisted error code", "durable preparation/phase stage"],
+    "python_operator_lf_pinned": true,
+    "targeted_cpu_tests_passed": 30,
+    "read_only_peer_review": "no substantive defect found"
+  },
+  "frozen_inference_git_sha": "72eaa90567e3603a3b940edffbb21b684bf1d1ba",
+  "frozen_scorer_git_sha": "208ff931badff270cbbc9593c8ab54f5c79aec9e",
+  "models_data_prompt_schema_budgets_questions_labels_changed": false,
+  "input_16gb_rehashed_or_reextracted_in_diagnosis": false,
+  "r1_overwritten_or_resumed": false,
+  "new_gpu_or_cpu_job_submitted": false,
+  "full_comparison_results": null,
+  "r2_requires_separate_coordinator_release": true
+}

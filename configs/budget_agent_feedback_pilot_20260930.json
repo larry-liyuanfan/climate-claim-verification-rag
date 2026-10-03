@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "study_kind": "consumed_authored_development_feedback_v2_no_generalization_claim",
+  "source": "Six previously exposed author-written questions; not new official gold or an independent test",
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "official_gold_available": false,
+  "budget": {
+    "controller_protocol": "feedback-v2",
+    "max_model_calls": 5,
+    "max_validation_repairs": 2,
+    "max_tool_calls": 3,
+    "max_output_tokens_per_call": 512,
+    "max_input_tokens_per_call": 8192,
+    "candidate_k": 20,
+    "context_k": 5,
+    "timeout_seconds": 120.0
+  },
+  "strategies": ["fixed_retrieval", "fixed_rerank", "adaptive"],
+  "pilot": [
+    {"id": "dev-ice", "claim_text": "Arctic sea ice has declined."},
+    {"id": "dev-multi", "claim_text": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide."},
+    {"id": "dev-empty", "claim_text": "zxqv_nonexistent_term_20260929"},
+    {"id": "dev-sea", "claim_text": "Sea level rise can result from both thermal expansion and melting land ice."},
+    {"id": "dev-number", "claim_text": "Atmospheric carbon dioxide was exactly 800 ppm in 2010."},
+    {"id": "dev-infrared", "claim_text": "The greenhouse effect depends on infrared radiation, not just incoming sunlight."}
+  ],
+  "predeclared_checks": {
+    "schema": "Separate valid-attempt fraction, eventual legal action and mechanically accepted answer",
+    "agency": "A valid model tool action followed by a completed tool event, changed/unchanged feedback and another model action; no scripted selection",
+    "retrieval": "Candidate and context deltas are descriptive; no official gold in this pilot",
+    "support": "Exact quote checks are not entailment; qualitative review is not blind human annotation",
+    "accounting": "Every failed and repaired generation counts against the same five-call budget; fixed routes have the same upper limit, report actual work separately",
+    "promotion": "No generalization or deployment claim; hand off before a separately reviewed grouped external experiment"
+  }
+}

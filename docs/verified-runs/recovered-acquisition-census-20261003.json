@@ -1,0 +1,154 @@
+{
+  "schema": "recovered-acquisition-census-v1",
+  "protocol": "sentence-stop-acquire-v1-20261002",
+  "study_kind": "public_v2_repeatedly_used_validation_replay_not_independent_test",
+  "run_sha256": "79e9fad3580731a7ffba2363f4ca83585c0007772bbce28863c7a7e27a2c1aa0",
+  "total_slots": 160,
+  "routes": {
+    "adaptive": {
+      "slots": 32,
+      "recorded_model_calls": 68,
+      "validated_actions": {
+        "stop": 32,
+        "answer": 19,
+        "abstain": 13
+      },
+      "validation_errors": {
+        "duplicate_sentence_reference": 4
+      },
+      "tool_events": {
+        "retrieve:completed": 32
+      },
+      "acquisition_feedback_followed_by_model": 0,
+      "feedback_with_additional_citable_text": 0,
+      "event_link_scope": "trigger-bound adaptive transitions",
+      "gate_opportunities": {
+        "count": 32,
+        "acquisition_available": 32,
+        "query_branch": 32,
+        "read_branch": 32,
+        "rerank_branch": 0,
+        "readable_source_count_min": 15,
+        "readable_source_count_max": 15,
+        "remaining_calls_min": 5,
+        "remaining_calls_max": 5
+      }
+    },
+    "deterministic_extra": {
+      "slots": 32,
+      "recorded_model_calls": 32,
+      "validated_actions": {
+        "answer": 19,
+        "abstain": 13
+      },
+      "validation_errors": {},
+      "tool_events": {
+        "retrieve:completed": 32,
+        "rewrite:completed": 64,
+        "rerank:completed": 32
+      },
+      "acquisition_feedback_followed_by_model": null,
+      "feedback_with_additional_citable_text": null,
+      "event_link_scope": "control events lack per-attempt triggers; not counted",
+      "gate_opportunities": {
+        "count": 0,
+        "acquisition_available": 0,
+        "query_branch": 0,
+        "read_branch": 0,
+        "rerank_branch": 0,
+        "readable_source_count_min": 0,
+        "readable_source_count_max": 0,
+        "remaining_calls_min": 0,
+        "remaining_calls_max": 0
+      }
+    },
+    "fixed_multiquery": {
+      "slots": 32,
+      "recorded_model_calls": 64,
+      "validated_actions": {
+        "plan_queries": 32,
+        "answer": 28,
+        "abstain": 4
+      },
+      "validation_errors": {},
+      "tool_events": {
+        "retrieve:completed": 32,
+        "rewrite:completed": 64,
+        "rerank:completed": 32
+      },
+      "acquisition_feedback_followed_by_model": null,
+      "feedback_with_additional_citable_text": null,
+      "event_link_scope": "control events lack per-attempt triggers; not counted",
+      "gate_opportunities": {
+        "count": 0,
+        "acquisition_available": 0,
+        "query_branch": 0,
+        "read_branch": 0,
+        "rerank_branch": 0,
+        "readable_source_count_min": 0,
+        "readable_source_count_max": 0,
+        "remaining_calls_min": 0,
+        "remaining_calls_max": 0
+      }
+    },
+    "fixed_rerank": {
+      "slots": 32,
+      "recorded_model_calls": 32,
+      "validated_actions": {
+        "answer": 21,
+        "abstain": 11
+      },
+      "validation_errors": {},
+      "tool_events": {
+        "retrieve:completed": 32,
+        "rerank:completed": 32
+      },
+      "acquisition_feedback_followed_by_model": null,
+      "feedback_with_additional_citable_text": null,
+      "event_link_scope": "control events lack per-attempt triggers; not counted",
+      "gate_opportunities": {
+        "count": 0,
+        "acquisition_available": 0,
+        "query_branch": 0,
+        "read_branch": 0,
+        "rerank_branch": 0,
+        "readable_source_count_min": 0,
+        "readable_source_count_max": 0,
+        "remaining_calls_min": 0,
+        "remaining_calls_max": 0
+      }
+    },
+    "fixed_retrieval": {
+      "slots": 32,
+      "recorded_model_calls": 32,
+      "validated_actions": {
+        "abstain": 18,
+        "answer": 14
+      },
+      "validation_errors": {},
+      "tool_events": {
+        "retrieve:completed": 32
+      },
+      "acquisition_feedback_followed_by_model": null,
+      "feedback_with_additional_citable_text": null,
+      "event_link_scope": "control events lack per-attempt triggers; not counted",
+      "gate_opportunities": {
+        "count": 0,
+        "acquisition_available": 0,
+        "query_branch": 0,
+        "read_branch": 0,
+        "rerank_branch": 0,
+        "readable_source_count_min": 0,
+        "readable_source_count_max": 0,
+        "remaining_calls_min": 0,
+        "remaining_calls_max": 0
+      }
+    }
+  },
+  "gold_read": false,
+  "model_calls_made": 0,
+  "scores_recomputed": false,
+  "semantic_support": "not_measured_by_this_replay",
+  "reasonable_stop": "not_adjudicated_by_action_validity",
+  "boundary": "Recorded physical transitions only; not a new model experiment. Fixed control feedback is not autonomous acquisition benefit."
+}

@@ -1,0 +1,1180 @@
+{
+  "audit": {
+    "adaptive_first_observation_matches_frozen_sampling": true,
+    "all_actual_visible_sentence_hashes_match": true,
+    "complete_matrix": true,
+    "cost_ledger_match": true,
+    "independent_score_counts_match": true,
+    "new_inference_or_prompt_replay": false,
+    "raw_preview_id_trace_available": false,
+    "useful_post_tool_feedback_behavior_measurable": false
+  },
+  "audit_script_sha256": "7ed8f2d60959946c3703f544e518b0347c1b37b04d913363c9df04739c1e4883",
+  "bootstrap_replicates": 0,
+  "claims": 12,
+  "components": 12,
+  "corpus_documents": 5183,
+  "diagnostics_receipts": {
+    "synthetic_preflight": {
+      "affected_attempts_union": 0,
+      "grammar_log": {
+        "attempted_bytes": 0,
+        "dropped_bytes": 0,
+        "io_failed": 0,
+        "missing": 0,
+        "present": 4,
+        "stored_bytes": 0,
+        "truncated": 0
+      },
+      "private_attachment": {
+        "attempted_bytes": 596,
+        "dropped_bytes": 0,
+        "io_failed": 0,
+        "missing": 0,
+        "present": 4,
+        "stored_bytes": 596,
+        "truncated": 0
+      }
+    },
+    "train": {
+      "affected_attempts_union": 0,
+      "grammar_log": {
+        "attempted_bytes": 0,
+        "dropped_bytes": 0,
+        "io_failed": 0,
+        "missing": 0,
+        "present": 107,
+        "stored_bytes": 0,
+        "truncated": 0
+      },
+      "private_attachment": {
+        "attempted_bytes": 50667,
+        "dropped_bytes": 0,
+        "io_failed": 0,
+        "missing": 0,
+        "present": 107,
+        "stored_bytes": 50667,
+        "truncated": 0
+      }
+    }
+  },
+  "independent_test": false,
+  "inference_tar_sha256": "92846f0904992e7b7137e550c46cd0c76b2f77b4f808a6d6be25482f90bf1cca",
+  "input_sha256": {
+    "inference/run.json": "23566957ed986dde054b61a74529350984b1f018a27f69ec771bc4223dcd1c2b",
+    "inference/runtime-preflight.json": "ee9c3eda11fd0194536bb704a3faad863eb4de253d615fc04632784fd9e19121",
+    "operator-status.json": "caae8c0367ff898872ca54d5ed7d747d6276c8413465ceeded761dda51be2a42",
+    "score.json": "535460dfef5430444fedeb46f980ed5fa090d4299ac885deee5c8b964ea4d844"
+  },
+  "model_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+  "official_dev_read": false,
+  "private_storage_audit": {
+    "physical_bytes": 51263,
+    "physical_files": 111,
+    "preflight_response_recovery_verified": 4,
+    "receipt_file_hash_multiplicity_match": true
+  },
+  "protocol_sha256": "306e8a61eef6fb279c56ccfc2b496281df9cc8710e194d2272e6978a23dbe802",
+  "reranker_sha256": "de1d4ac39101816774439e68881e2308c5e5f1bd94d0b0dc4c492a56c2681052",
+  "routes": {
+    "adaptive": {
+      "actual_tool_events": {
+        "fixed_retrieve_completed": 12
+      },
+      "attempt_status": {
+        "valid_decision": 7,
+        "validation_failed": 17
+      },
+      "by_stratum": {
+        "gold_absent_top20": {
+          "first_preview_payload_tokens": 2002,
+          "first_prompt_tokens": 11729,
+          "first_visible_gold_doc_opportunities": 0,
+          "gold_docs_outside_candidates": 3,
+          "ids_validated_semantics_unmeasured": 1,
+          "model_abstention:insufficient_evidence": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 1
+        },
+        "initial_doc_opportunity": {
+          "first_preview_payload_tokens": 1875,
+          "first_prompt_tokens": 11934,
+          "first_visible_gold_doc_opportunities": 3,
+          "gold_docs_requested_all_sentences_visible": 3,
+          "gold_docs_requested_incomplete_sentence_visibility": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2,
+          "visible_opportunity_ids_validated_semantics_unmeasured": 1,
+          "visible_opportunity_slots": 3,
+          "visible_opportunity_validation_repair_exhausted": 2
+        },
+        "nei": {
+          "first_preview_payload_tokens": 1930,
+          "first_prompt_tokens": 11992,
+          "first_visible_gold_doc_opportunities": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "model_abstention:insufficient_evidence": 2,
+          "slots": 3
+        },
+        "top20_doc_replenishable": {
+          "first_preview_payload_tokens": 1929,
+          "first_prompt_tokens": 11345,
+          "first_visible_gold_doc_opportunities": 0,
+          "gold_docs_candidate_not_requested": 3,
+          "model_abstention:insufficient_evidence": 1,
+          "preparation_legal_read_witness_matches_initial_state": 3,
+          "slots": 3,
+          "validation_repair_exhausted": 2
+        }
+      },
+      "counts": {
+        "model_calls": 24,
+        "model_tool_links": 0,
+        "parsed_tool_proposals": 0,
+        "rerank_pairs": 0,
+        "successful_parsed_tool_decisions": 0,
+        "tool_offered_attempts": 24,
+        "unknown_usage_attempts": 0,
+        "validation_repairs": 12
+      },
+      "error_counts": {
+        "duplicate_or_excess_documents": 3,
+        "total_sentence_budget": 14
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 92738,
+        "output_tokens": 4448
+      },
+      "metrics": {
+        "abstract_label_only": {
+          "correct": 1,
+          "f1": 0.09523809523809523,
+          "precision": 0.08333333333333333,
+          "predicted": 12,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "abstract_rationalized": {
+          "correct": 1,
+          "f1": 0.09523809523809523,
+          "precision": 0.08333333333333333,
+          "predicted": 12,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "sentence_label": {
+          "correct": 1,
+          "f1": 0.029411764705882353,
+          "precision": 0.018518518518518517,
+          "predicted": 54,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        },
+        "sentence_selection": {
+          "correct": 1,
+          "f1": 0.029411764705882353,
+          "precision": 0.018518518518518517,
+          "predicted": 54,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        }
+      },
+      "metrics_by_stratum": {
+        "gold_absent_top20": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 14,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 14,
+            "recall": 0,
+            "relevant": 4
+          }
+        },
+        "initial_doc_opportunity": {
+          "abstract_label_only": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.2,
+            "predicted": 5,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.2,
+            "predicted": 5,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 1,
+            "f1": 0.07692307692307693,
+            "precision": 0.05,
+            "predicted": 20,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          },
+          "sentence_selection": {
+            "correct": 1,
+            "f1": 0.07692307692307693,
+            "precision": 0.05,
+            "predicted": 20,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          }
+        },
+        "nei": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          }
+        },
+        "top20_doc_replenishable": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          }
+        }
+      },
+      "nei_claims": 3,
+      "nei_false_evidence_claims": 1,
+      "outcomes": {
+        "ids_validated_semantics_unmeasured": 3,
+        "model_abstention:insufficient_evidence": 4,
+        "validation_repair_exhausted": 5
+      },
+      "repair_feedback_transitions": {
+        "identical_full_output_hash": 8,
+        "next_valid_answer": 1,
+        "next_valid_decision": 1,
+        "same_error_code": 11,
+        "subsequent_attempts": 12
+      },
+      "unsuccessful_attempt_wire_action": {
+        "answer": 17
+      },
+      "whole_question_p50_ms": 10669.028772041202,
+      "whole_question_p95_ms": 22359.252050332725,
+      "wire_action_position_1based": {
+        "1": 24
+      },
+      "wire_first_field": {
+        "action": 24
+      },
+      "wire_top_level_action": {
+        "abstain": 4,
+        "answer": 20
+      }
+    },
+    "deterministic_extra": {
+      "actual_tool_events": {
+        "fixed_deterministic_extra_query_skipped": 2,
+        "fixed_rerank_completed": 12,
+        "fixed_retrieve_completed": 12,
+        "fixed_rewrite_completed": 10
+      },
+      "attempt_status": {
+        "valid_decision": 3,
+        "validation_failed": 27
+      },
+      "by_stratum": {
+        "gold_absent_top20": {
+          "first_preview_payload_tokens": 1904,
+          "first_prompt_tokens": 10664,
+          "first_visible_gold_doc_opportunities": 0,
+          "gold_docs_outside_candidates": 3,
+          "slots": 3,
+          "validation_repair_exhausted": 3
+        },
+        "initial_doc_opportunity": {
+          "first_preview_payload_tokens": 1831,
+          "first_prompt_tokens": 11927,
+          "first_visible_gold_doc_opportunities": 3,
+          "gold_docs_requested_all_sentences_visible": 3,
+          "gold_docs_requested_incomplete_sentence_visibility": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2,
+          "visible_opportunity_ids_validated_semantics_unmeasured": 1,
+          "visible_opportunity_slots": 3,
+          "visible_opportunity_validation_repair_exhausted": 2
+        },
+        "nei": {
+          "first_preview_payload_tokens": 1934,
+          "first_prompt_tokens": 9672,
+          "first_visible_gold_doc_opportunities": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "model_abstention:insufficient_evidence": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 1
+        },
+        "top20_doc_replenishable": {
+          "first_preview_payload_tokens": 1921,
+          "first_prompt_tokens": 10484,
+          "first_visible_gold_doc_opportunities": 3,
+          "gold_docs_requested_all_sentences_visible": 3,
+          "gold_docs_requested_incomplete_sentence_visibility": 0,
+          "slots": 3,
+          "validation_repair_exhausted": 3,
+          "visible_opportunity_slots": 3,
+          "visible_opportunity_validation_repair_exhausted": 3
+        }
+      },
+      "counts": {
+        "model_calls": 30,
+        "model_tool_links": 0,
+        "parsed_tool_proposals": 0,
+        "rerank_pairs": 240,
+        "successful_parsed_tool_decisions": 0,
+        "tool_offered_attempts": 0,
+        "unknown_usage_attempts": 0,
+        "validation_repairs": 18
+      },
+      "error_counts": {
+        "total_sentence_budget": 27
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 106293,
+        "output_tokens": 7410
+      },
+      "metrics": {
+        "abstract_label_only": {
+          "correct": 1,
+          "f1": 0.10526315789473684,
+          "precision": 0.1,
+          "predicted": 10,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "abstract_rationalized": {
+          "correct": 1,
+          "f1": 0.10526315789473684,
+          "precision": 0.1,
+          "predicted": 10,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "sentence_label": {
+          "correct": 1,
+          "f1": 0.037037037037037035,
+          "precision": 0.025,
+          "predicted": 40,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        },
+        "sentence_selection": {
+          "correct": 1,
+          "f1": 0.037037037037037035,
+          "precision": 0.025,
+          "predicted": 40,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        }
+      },
+      "metrics_by_stratum": {
+        "gold_absent_top20": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          }
+        },
+        "initial_doc_opportunity": {
+          "abstract_label_only": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.2,
+            "predicted": 5,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.2,
+            "predicted": 5,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 1,
+            "f1": 0.07692307692307693,
+            "precision": 0.05,
+            "predicted": 20,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          },
+          "sentence_selection": {
+            "correct": 1,
+            "f1": 0.07692307692307693,
+            "precision": 0.05,
+            "predicted": 20,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          }
+        },
+        "nei": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          }
+        },
+        "top20_doc_replenishable": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          }
+        }
+      },
+      "nei_claims": 3,
+      "nei_false_evidence_claims": 1,
+      "outcomes": {
+        "ids_validated_semantics_unmeasured": 2,
+        "model_abstention:insufficient_evidence": 1,
+        "validation_repair_exhausted": 9
+      },
+      "repair_feedback_transitions": {
+        "identical_full_output_hash": 8,
+        "next_valid_decision": 0,
+        "same_error_code": 18,
+        "subsequent_attempts": 18
+      },
+      "unsuccessful_attempt_wire_action": {
+        "answer": 27
+      },
+      "whole_question_p50_ms": 21783.7368324399,
+      "whole_question_p95_ms": 27476.390000153333,
+      "wire_action_position_1based": {
+        "1": 30
+      },
+      "wire_first_field": {
+        "action": 30
+      },
+      "wire_top_level_action": {
+        "abstain": 1,
+        "answer": 29
+      }
+    },
+    "fixed_rerank": {
+      "actual_tool_events": {
+        "fixed_rerank_completed": 12,
+        "fixed_retrieve_completed": 12
+      },
+      "attempt_status": {
+        "valid_decision": 4,
+        "validation_failed": 25
+      },
+      "by_stratum": {
+        "gold_absent_top20": {
+          "first_preview_payload_tokens": 1940,
+          "first_prompt_tokens": 13420,
+          "first_visible_gold_doc_opportunities": 0,
+          "gold_docs_outside_candidates": 3,
+          "ids_validated_semantics_unmeasured": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2
+        },
+        "initial_doc_opportunity": {
+          "first_preview_payload_tokens": 1842,
+          "first_prompt_tokens": 11938,
+          "first_visible_gold_doc_opportunities": 3,
+          "gold_docs_requested_all_sentences_visible": 3,
+          "gold_docs_requested_incomplete_sentence_visibility": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2,
+          "visible_opportunity_ids_validated_semantics_unmeasured": 1,
+          "visible_opportunity_slots": 3,
+          "visible_opportunity_validation_repair_exhausted": 2
+        },
+        "nei": {
+          "first_preview_payload_tokens": 1935,
+          "first_prompt_tokens": 9673,
+          "first_visible_gold_doc_opportunities": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "model_abstention:insufficient_evidence": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 1
+        },
+        "top20_doc_replenishable": {
+          "first_preview_payload_tokens": 1923,
+          "first_prompt_tokens": 10486,
+          "first_visible_gold_doc_opportunities": 3,
+          "gold_docs_requested_all_sentences_visible": 3,
+          "gold_docs_requested_incomplete_sentence_visibility": 0,
+          "slots": 3,
+          "validation_repair_exhausted": 3,
+          "visible_opportunity_slots": 3,
+          "visible_opportunity_validation_repair_exhausted": 3
+        }
+      },
+      "counts": {
+        "model_calls": 29,
+        "model_tool_links": 0,
+        "parsed_tool_proposals": 0,
+        "rerank_pairs": 240,
+        "successful_parsed_tool_decisions": 0,
+        "tool_offered_attempts": 0,
+        "unknown_usage_attempts": 0,
+        "validation_repairs": 17
+      },
+      "error_counts": {
+        "duplicate_or_excess_documents": 3,
+        "total_sentence_budget": 22
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 110515,
+        "output_tokens": 6953
+      },
+      "metrics": {
+        "abstract_label_only": {
+          "correct": 1,
+          "f1": 0.08333333333333333,
+          "precision": 0.06666666666666667,
+          "predicted": 15,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "abstract_rationalized": {
+          "correct": 1,
+          "f1": 0.08333333333333333,
+          "precision": 0.06666666666666667,
+          "predicted": 15,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "sentence_label": {
+          "correct": 1,
+          "f1": 0.028985507246376812,
+          "precision": 0.01818181818181818,
+          "predicted": 55,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        },
+        "sentence_selection": {
+          "correct": 1,
+          "f1": 0.028985507246376812,
+          "precision": 0.01818181818181818,
+          "predicted": 55,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        }
+      },
+      "metrics_by_stratum": {
+        "gold_absent_top20": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 15,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 15,
+            "recall": 0,
+            "relevant": 4
+          }
+        },
+        "initial_doc_opportunity": {
+          "abstract_label_only": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.2,
+            "predicted": 5,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.2,
+            "predicted": 5,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 1,
+            "f1": 0.07692307692307693,
+            "precision": 0.05,
+            "predicted": 20,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          },
+          "sentence_selection": {
+            "correct": 1,
+            "f1": 0.07692307692307693,
+            "precision": 0.05,
+            "predicted": 20,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          }
+        },
+        "nei": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          }
+        },
+        "top20_doc_replenishable": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          }
+        }
+      },
+      "nei_claims": 3,
+      "nei_false_evidence_claims": 1,
+      "outcomes": {
+        "ids_validated_semantics_unmeasured": 3,
+        "model_abstention:insufficient_evidence": 1,
+        "validation_repair_exhausted": 8
+      },
+      "repair_feedback_transitions": {
+        "identical_full_output_hash": 10,
+        "next_valid_answer": 1,
+        "next_valid_decision": 1,
+        "same_error_code": 16,
+        "subsequent_attempts": 17
+      },
+      "unsuccessful_attempt_wire_action": {
+        "answer": 25
+      },
+      "whole_question_p50_ms": 23159.088626503944,
+      "whole_question_p95_ms": 27103.577535506338,
+      "wire_action_position_1based": {
+        "1": 29
+      },
+      "wire_first_field": {
+        "action": 29
+      },
+      "wire_top_level_action": {
+        "abstain": 1,
+        "answer": 28
+      }
+    },
+    "fixed_retrieval": {
+      "actual_tool_events": {
+        "fixed_retrieve_completed": 12
+      },
+      "attempt_status": {
+        "valid_decision": 6,
+        "validation_failed": 18
+      },
+      "by_stratum": {
+        "gold_absent_top20": {
+          "first_preview_payload_tokens": 2002,
+          "first_prompt_tokens": 11108,
+          "first_visible_gold_doc_opportunities": 0,
+          "gold_docs_outside_candidates": 3,
+          "ids_validated_semantics_unmeasured": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2
+        },
+        "initial_doc_opportunity": {
+          "first_preview_payload_tokens": 1875,
+          "first_prompt_tokens": 11313,
+          "first_visible_gold_doc_opportunities": 3,
+          "gold_docs_requested_all_sentences_visible": 3,
+          "gold_docs_requested_incomplete_sentence_visibility": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2,
+          "visible_opportunity_ids_validated_semantics_unmeasured": 1,
+          "visible_opportunity_slots": 3,
+          "visible_opportunity_validation_repair_exhausted": 2
+        },
+        "nei": {
+          "first_preview_payload_tokens": 1930,
+          "first_prompt_tokens": 11371,
+          "first_visible_gold_doc_opportunities": 0,
+          "ids_validated_semantics_unmeasured": 1,
+          "model_abstention:insufficient_evidence": 2,
+          "slots": 3
+        },
+        "top20_doc_replenishable": {
+          "first_preview_payload_tokens": 1929,
+          "first_prompt_tokens": 10724,
+          "first_visible_gold_doc_opportunities": 0,
+          "gold_docs_candidate_not_requested": 3,
+          "model_abstention:insufficient_evidence": 1,
+          "slots": 3,
+          "validation_repair_exhausted": 2
+        }
+      },
+      "counts": {
+        "model_calls": 24,
+        "model_tool_links": 0,
+        "parsed_tool_proposals": 0,
+        "rerank_pairs": 0,
+        "successful_parsed_tool_decisions": 0,
+        "tool_offered_attempts": 0,
+        "unknown_usage_attempts": 0,
+        "validation_repairs": 12
+      },
+      "error_counts": {
+        "duplicate_or_excess_documents": 3,
+        "total_sentence_budget": 15
+      },
+      "known_tokens_including_failures": {
+        "input_tokens": 87906,
+        "output_tokens": 4670
+      },
+      "metrics": {
+        "abstract_label_only": {
+          "correct": 1,
+          "f1": 0.10526315789473684,
+          "precision": 0.1,
+          "predicted": 10,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "abstract_rationalized": {
+          "correct": 1,
+          "f1": 0.10526315789473684,
+          "precision": 0.1,
+          "predicted": 10,
+          "recall": 0.1111111111111111,
+          "relevant": 9
+        },
+        "sentence_label": {
+          "correct": 1,
+          "f1": 0.03333333333333333,
+          "precision": 0.021739130434782608,
+          "predicted": 46,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        },
+        "sentence_selection": {
+          "correct": 1,
+          "f1": 0.03333333333333333,
+          "precision": 0.021739130434782608,
+          "predicted": 46,
+          "recall": 0.07142857142857142,
+          "relevant": 14
+        }
+      },
+      "metrics_by_stratum": {
+        "gold_absent_top20": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 14,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 14,
+            "recall": 0,
+            "relevant": 4
+          }
+        },
+        "initial_doc_opportunity": {
+          "abstract_label_only": {
+            "correct": 1,
+            "f1": 0.3333333333333333,
+            "precision": 0.3333333333333333,
+            "predicted": 3,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 1,
+            "f1": 0.3333333333333333,
+            "precision": 0.3333333333333333,
+            "predicted": 3,
+            "recall": 0.3333333333333333,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 1,
+            "f1": 0.1111111111111111,
+            "precision": 0.08333333333333333,
+            "predicted": 12,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          },
+          "sentence_selection": {
+            "correct": 1,
+            "f1": 0.1111111111111111,
+            "precision": 0.08333333333333333,
+            "predicted": 12,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          }
+        },
+        "nei": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 5,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 20,
+            "recall": 0,
+            "relevant": 0
+          }
+        },
+        "top20_doc_replenishable": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 3
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 0,
+            "recall": 0,
+            "relevant": 4
+          }
+        }
+      },
+      "nei_claims": 3,
+      "nei_false_evidence_claims": 1,
+      "outcomes": {
+        "ids_validated_semantics_unmeasured": 3,
+        "model_abstention:insufficient_evidence": 3,
+        "validation_repair_exhausted": 6
+      },
+      "repair_feedback_transitions": {
+        "identical_full_output_hash": 7,
+        "next_valid_decision": 0,
+        "same_error_code": 12,
+        "subsequent_attempts": 12
+      },
+      "unsuccessful_attempt_wire_action": {
+        "answer": 18
+      },
+      "whole_question_p50_ms": 10348.806910216808,
+      "whole_question_p95_ms": 23365.58376178145,
+      "wire_action_position_1based": {
+        "1": 24
+      },
+      "wire_first_field": {
+        "action": 24
+      },
+      "wire_top_level_action": {
+        "abstain": 3,
+        "answer": 21
+      }
+    }
+  },
+  "schema_version": "scifact-train-r2-posthoc-audit-v1",
+  "scoring_tar_sha256": "174ea64c476fc3abdd5575d53e9a1808c8fd5e402e07cf327e58295346d41444",
+  "separate_load_ms": {
+    "bm25_build_ms": 881.5350607037544,
+    "model_load_ms": 21478.041741997004,
+    "reranker_load_ms": 1686.5396667271852
+  },
+  "separate_preflight": {
+    "elapsed_ms": 7300.630550831556,
+    "input_tokens": 2720,
+    "model_calls": 4,
+    "output_tokens": 238
+  },
+  "slots": 48,
+  "source_git": "80fcd07faed28890b70096386c5897f0343d3104"
+}

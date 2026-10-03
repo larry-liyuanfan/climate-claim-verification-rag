@@ -1,0 +1,448 @@
+{
+  "active_adapter": {
+    "active_adapters": [
+      "default"
+    ],
+    "enabled": true,
+    "lora_layers": 72,
+    "merged": false,
+    "trainable_parameters": 0
+  },
+  "actual_prompt_schema_and_token_count_reverified": true,
+  "anonymous_mechanisms": [
+    {
+      "anonymous_case": "case-1",
+      "complete_rationale": true,
+      "correct_document": true,
+      "correct_document_label": true,
+      "first_three_truncation_explains_failure": false,
+      "fit_overlap": false,
+      "gold_sentence_overlap_count": 1,
+      "initial_complete_rationale_reachable": false,
+      "mechanism": "complete_alternative",
+      "minimum_complete_alternative_length": 1,
+      "minimum_missing_sentences_for_an_alternative": 0,
+      "model_tool_executions": 0,
+      "original_adaptive_complete_rationale": 0,
+      "original_adaptive_correct_label": 0,
+      "post_scripted_read_complete_rationale_reachable": true,
+      "predicted_document_is_scripted_read_document": true,
+      "predicted_sentences": 1,
+      "scripted_read_is_not_model_behavior": true,
+      "strict_whole_answer": true
+    },
+    {
+      "anonymous_case": "case-2",
+      "complete_rationale": false,
+      "correct_document": true,
+      "correct_document_label": true,
+      "first_three_truncation_explains_failure": false,
+      "fit_overlap": false,
+      "gold_sentence_overlap_count": 0,
+      "initial_complete_rationale_reachable": false,
+      "mechanism": "no_annotated_rationale_sentence_selected",
+      "minimum_complete_alternative_length": 1,
+      "minimum_missing_sentences_for_an_alternative": 1,
+      "model_tool_executions": 0,
+      "original_adaptive_complete_rationale": 0,
+      "original_adaptive_correct_label": 0,
+      "post_scripted_read_complete_rationale_reachable": true,
+      "predicted_document_is_scripted_read_document": true,
+      "predicted_sentences": 1,
+      "scripted_read_is_not_model_behavior": true,
+      "strict_whole_answer": false
+    },
+    {
+      "anonymous_case": "case-3",
+      "complete_rationale": false,
+      "correct_document": true,
+      "correct_document_label": true,
+      "first_three_truncation_explains_failure": false,
+      "fit_overlap": true,
+      "gold_sentence_overlap_count": 0,
+      "initial_complete_rationale_reachable": false,
+      "mechanism": "no_annotated_rationale_sentence_selected",
+      "minimum_complete_alternative_length": 1,
+      "minimum_missing_sentences_for_an_alternative": 1,
+      "model_tool_executions": 0,
+      "original_adaptive_complete_rationale": 0,
+      "original_adaptive_correct_label": 0,
+      "post_scripted_read_complete_rationale_reachable": true,
+      "predicted_document_is_scripted_read_document": true,
+      "predicted_sentences": 1,
+      "scripted_read_is_not_model_behavior": true,
+      "strict_whole_answer": false
+    }
+  ],
+  "audit_script_sha256": "254a0d273365714012f1fca9ba0e799942525250019e68568383940613537d55",
+  "boundary": "Oracle/scripted read conditional answering, not retrieval capability, autonomous Agent gain or heldout performance.",
+  "checkpoint_tensors_verified": 144,
+  "conditional_quality": {
+    "claim_count": 3,
+    "metrics": {
+      "abstract_label_only": {
+        "correct": 3,
+        "f1": 1,
+        "precision": 1,
+        "predicted": 3,
+        "recall": 1,
+        "relevant": 3
+      },
+      "abstract_rationalized": {
+        "correct": 1,
+        "f1": 0.3333333333333333,
+        "precision": 0.3333333333333333,
+        "predicted": 3,
+        "recall": 0.3333333333333333,
+        "relevant": 3
+      },
+      "sentence_label": {
+        "correct": 1,
+        "f1": 0.2,
+        "precision": 0.3333333333333333,
+        "predicted": 3,
+        "recall": 0.14285714285714285,
+        "relevant": 7
+      },
+      "sentence_selection": {
+        "correct": 1,
+        "f1": 0.2,
+        "precision": 0.3333333333333333,
+        "predicted": 3,
+        "recall": 0.14285714285714285,
+        "relevant": 7
+      }
+    },
+    "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+    "schema_version": "scifact-original-gold-score-v1",
+    "separate_diagnostics_not_official_f1": {
+      "claim_verdict_accuracy": null,
+      "empty_evidence_predictions": 0,
+      "free_text_entailment": null,
+      "mixed_label_claim_count": 0,
+      "nei_claim_count": 0,
+      "nei_claims_with_false_evidence": 0,
+      "nei_false_evidence_rate": null
+    }
+  },
+  "conditional_raw_audits": 3,
+  "costs": {
+    "calls": 3,
+    "generation_ms_known_sum": 3903.87218631804,
+    "generation_ms_missing": 0,
+    "known_slot_records": 3,
+    "known_tokens_including_failures": {
+      "input_tokens": 6044,
+      "output_tokens": 90
+    },
+    "missing_fields": {},
+    "model_calls": 3,
+    "model_calls_known_lower_bound": 3,
+    "model_tool_executions": 0,
+    "new_call_seconds_not_original_episode_remainder": 120,
+    "not_reserved_slots": 0,
+    "physical_hash_errors": {},
+    "planned_slots": 3,
+    "repair_calls": 0,
+    "reranker_calls": 0,
+    "reserved_slots": 3,
+    "token_totals_are_lower_bounds": false,
+    "unknown_usage_attempts": 0,
+    "unresolved_reserved_slots": 0,
+    "warmup_calls": 0
+  },
+  "fit_subgroups": {
+    "fit_overlap": {
+      "conditional": {
+        "claim_count": 1,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 1,
+            "f1": 1,
+            "precision": 1,
+            "predicted": 1,
+            "recall": 1,
+            "relevant": 1
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 0,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 0,
+          "nei_claims_with_false_evidence": 0,
+          "nei_false_evidence_rate": null
+        }
+      },
+      "original_adaptive": {
+        "claim_count": 1,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 1,
+            "recall": 0,
+            "relevant": 1
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 0,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 0,
+          "nei_claims_with_false_evidence": 0,
+          "nei_false_evidence_rate": null
+        }
+      }
+    },
+    "no_direct_fit_overlap": {
+      "conditional": {
+        "claim_count": 2,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 2,
+            "f1": 1,
+            "precision": 1,
+            "predicted": 2,
+            "recall": 1,
+            "relevant": 2
+          },
+          "abstract_rationalized": {
+            "correct": 1,
+            "f1": 0.5,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 0.5,
+            "relevant": 2
+          },
+          "sentence_label": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          },
+          "sentence_selection": {
+            "correct": 1,
+            "f1": 0.25,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 0.16666666666666666,
+            "relevant": 6
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 0,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 0,
+          "nei_claims_with_false_evidence": 0,
+          "nei_false_evidence_rate": null
+        }
+      },
+      "original_adaptive": {
+        "claim_count": 2,
+        "metrics": {
+          "abstract_label_only": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 2
+          },
+          "abstract_rationalized": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 2
+          },
+          "sentence_label": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 6
+          },
+          "sentence_selection": {
+            "correct": 0,
+            "f1": 0,
+            "precision": 0,
+            "predicted": 2,
+            "recall": 0,
+            "relevant": 6
+          }
+        },
+        "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+        "schema_version": "scifact-original-gold-score-v1",
+        "separate_diagnostics_not_official_f1": {
+          "claim_verdict_accuracy": null,
+          "empty_evidence_predictions": 0,
+          "free_text_entailment": null,
+          "mixed_label_claim_count": 0,
+          "nei_claim_count": 0,
+          "nei_claims_with_false_evidence": 0,
+          "nei_false_evidence_rate": null
+        }
+      }
+    }
+  },
+  "followup_decision": "limited_conditional_capacity_but_grounding_weak; CPU_state_supervision_proposal_only_no_new_training",
+  "gpu_allocation_seconds_not_kernel_time": 76,
+  "hashes": {
+    "allocation/ended.json": "46dd47deacf4188c9c65eb116b20b4e0363738fafec96e02f0a9af78e297e9d0",
+    "allocation/worker-exit.json": "5294116f77806a2a283f4cb26cfa80f2f58b8dab1582bcb76922b63add30e8b0",
+    "cost-before-quality.json": "4f8170e588939bad502b1a9cb19726b4fd10768aa3526449cb562835377f3373",
+    "inference/adapter-integrity.json": "124ba0e6a60629ad2d23bfdcc62d68ec67ffe6061079957e47ba68a7983e580f",
+    "inference/run.json": "b7ea2e1c50e3bdc8a965477284e205007f668c9039806403bc53df4e00e71281",
+    "score.json": "1dea7d5dcec2bbd2d766d4b378f5ff3f887879202f5ca2d2c7470dfc403ecb1b"
+  },
+  "independent_test": false,
+  "initial_complete_rationale_reachable": 0,
+  "job_id": "31781591",
+  "mechanism_counts": {
+    "complete_alternative": 1,
+    "no_annotated_rationale_sentence_selected": 2
+  },
+  "new_gold_or_validation_read": false,
+  "old_artifacts_modified": false,
+  "original_adaptive_quality": {
+    "claim_count": 3,
+    "metrics": {
+      "abstract_label_only": {
+        "correct": 0,
+        "f1": 0,
+        "precision": 0,
+        "predicted": 3,
+        "recall": 0,
+        "relevant": 3
+      },
+      "abstract_rationalized": {
+        "correct": 0,
+        "f1": 0,
+        "precision": 0,
+        "predicted": 3,
+        "recall": 0,
+        "relevant": 3
+      },
+      "sentence_label": {
+        "correct": 0,
+        "f1": 0,
+        "precision": 0,
+        "predicted": 3,
+        "recall": 0,
+        "relevant": 7
+      },
+      "sentence_selection": {
+        "correct": 0,
+        "f1": 0,
+        "precision": 0,
+        "predicted": 3,
+        "recall": 0,
+        "relevant": 7
+      }
+    },
+    "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+    "schema_version": "scifact-original-gold-score-v1",
+    "separate_diagnostics_not_official_f1": {
+      "claim_verdict_accuracy": null,
+      "empty_evidence_predictions": 0,
+      "free_text_entailment": null,
+      "mixed_label_claim_count": 0,
+      "nei_claim_count": 0,
+      "nei_claims_with_false_evidence": 0,
+      "nei_false_evidence_rate": null
+    }
+  },
+  "original_adaptive_raw_audits": 3,
+  "original_adaptive_subset_costs": {
+    "calls": 3,
+    "generation_ms_known_sum": 3855.7046987116337,
+    "generation_ms_missing": 0,
+    "known_tokens_including_failures": {
+      "input_tokens": 10821,
+      "output_tokens": 88
+    },
+    "missing_fields": {},
+    "token_totals_are_lower_bounds": false,
+    "unknown_usage_attempts": 0
+  },
+  "physical_index_files_rehashed": 12,
+  "post_read_complete_first3_rationale_reachable": 3,
+  "release_sha256": "6638761114eb51b98b5f8db95121f13ae05c873fdd2c69e9abb5896382ea8d69",
+  "scored_only_previously_consumed_claims": 3,
+  "slurm": {
+    "elapsed_seconds": 76,
+    "exit_code": "0:0",
+    "maxrss_kib": 17164576,
+    "state": "COMPLETED",
+    "total_cpu_seconds": 64.313
+  },
+  "source_git": "fc4ffd61a7615682911556838c66f47aa33d0293",
+  "status": "completed_limited_conditional_grounding_not_autonomous_success",
+  "this_audit_model_calls": 0,
+  "validation_gate": false,
+  "worker_exit_before_cost_before_quality": true
+}

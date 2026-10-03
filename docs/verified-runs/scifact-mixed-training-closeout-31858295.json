@@ -1,0 +1,69 @@
+{
+  "schema_version": "scifact-mixed-training-closeout-v1",
+  "status": "training_accepted_evaluation_not_released",
+  "job_id": "31858295",
+  "slurm_state": "COMPLETED",
+  "exit_code": "0:0",
+  "independent_coordinator_acceptance": true,
+  "checkpoint_binding": {
+    "kind": "mixed_claim_mean_144_223_36_v1",
+    "directory": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/runs/scifact-mixed-training-53d786ce6fca",
+    "training_source_git": "53d786ce6fca1ec981e9a3deda4a0771bb1fb553",
+    "training_source_archive_sha256": "ff545a053b6f4450ce68e2dad548970f2901e2fd187d1bf4fff4a6068e8b2f83",
+    "training_release_file": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/mixed-training-53d786ce6fca/mixed-train-release-candidate.json",
+    "training_release_sha256": "23621f482c5558dbdcb387e11775363a31f8c450e662599bcd0e3f92a7b18cf2",
+    "training_complete_sha256": "c7b2f15c6cdb86de86dccad0e74e9a6f05e1bbf80ceff4a6aba8f51da207cdfc",
+    "started_sha256": "73b5a099db2b3038a2b527be02bad71eb426e0df4ca9fceebaba264e1ea28199",
+    "training_runtime_sha256": "bf3db5ca31bb0faeaa085013e0727ab83bffcbc18930c7758e1c4fd8e535cf83",
+    "worker_exit_sha256": "09b74db4089973d388c73a1c18b53b1e8a8b49a4f38d7bd3ede84ade128b052c",
+    "prepared_envelope_sha256": "8c435ccf0657325460602baa3cc3e1126d06d6af7db4cf5555acf54f01f77e63",
+    "plan_envelope_sha256": "a5437254798d415697f41ec41be343617d35dc99268cbab6dffe1c9bdcc2f670",
+    "prepared_file_sha256": "8e782bb73628a2a240f9f909a3e97abcece061d350a66a963a6dd2c67ffb3669",
+    "plan_file_sha256": "54808db4d47f0d33602f0e04862a9f8924eb3746f055aaa29b4ec50e13efdd48",
+    "roster_file_sha256": "4fdae46c4c41d51f4e1c120b95881316577092bc6004b6d03b836da41d44d349",
+    "adapter_files": {
+      "README.md": "d699e2eb0e6f1c2a2291d292cb9ef8dfa8b1b099627a90cc38dd91e38ec49c52",
+      "adapter_config.json": "4bb1201a214b6620fe4cc002ddce0cef25162ebd2eff89b8da5ae7a3b6fd28f5",
+      "adapter_model.safetensors": "56123684cf874dc70fde0589a4f0c2811af77fd0ff6699db93bdd4fa960c303d"
+    }
+  },
+  "denominators": {"claims": 144, "decision_records": 223, "optimizer_updates": 36},
+  "audit": {
+    "all_claim_and_record_indices_exactly_once": true,
+    "all_36_reservations_equal_frozen_plan": true,
+    "all_36_completed_groups_equal_final_receipt": true,
+    "forward_backward_started_and_completed": 223,
+    "clip_optimizer_started_and_completed": 36,
+    "all_group_losses_and_gradients_finite": true,
+    "epoch_loss_recomputed_as_claim_weighted_mean": true,
+    "complete_pending_same_inode": true,
+    "child_started_reaped_exit_zero": true,
+    "first_pilot_is_update_one_of_36_not_extra": true,
+    "fresh_base_and_adapter_optimizer_not_reinitialized": true,
+    "saved_safetensors_full_F32_data_scan_finite": true,
+    "saved_tensors": 144,
+    "saved_trainable_elements": 2949120,
+    "full_PEFT_reload": "required_in_actual_evaluation_not_claimed_here"
+  },
+  "measurements": {
+    "training_observed_loss_not_quality": 0.2840036816067166,
+    "slurm_elapsed_seconds": 394,
+    "slurm_total_cpu_seconds": 378.046,
+    "slurm_batch_maxrss_K": 9432296,
+    "training_kernel_elapsed_seconds": 267.2126493267715,
+    "training_runtime_elapsed_seconds": 287.8284303639084,
+    "cuda_peak_allocated_bytes": 16790491136,
+    "cuda_peak_reserved_bytes": 31314673664,
+    "runtime_host_maxrss_kib_linux": 4802108,
+    "runtime_host_cpu_seconds": 318.150243,
+    "first_pilot_elapsed_seconds": 7.564633142203093
+  },
+  "first_pilot_sha256": "c5b53b9278f398b663085d8ae6bd45a0dac26e8528fba247d564ec919fe4fb1d",
+  "boundaries": [
+    "Training loss is not retrieval, grounding, independent-test or online Agent quality.",
+    "No new tune, four-route, validation12, dev300 or retired test evaluation has run.",
+    "Prepared/plan logical envelope identities differ from physical serialized file hashes.",
+    "Raw records, model weights and detailed run artifacts remain private on Spartan.",
+    "The existing utility8 negative result is unchanged; no automatic replay or promotion."
+  ]
+}

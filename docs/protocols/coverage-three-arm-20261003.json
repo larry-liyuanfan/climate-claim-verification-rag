@@ -1,0 +1,37 @@
+{
+  "protocol": "fair-acquisition-coverage-v2-20261003",
+  "status": "cpu_implementation_no_model_result",
+  "purpose": "one bounded falsification of relation-coverage-guided acquisition, not repeated optimization to positive results",
+  "study_kind": "consumed_fair32_coverage_regression_not_independent_quality_validation",
+  "selection": {
+    "cohort_file_sha256": "f2b7c55b1e91f297a613df5762f44d46c2df7666cca8e234d77d5ca53488ec56",
+    "canonical_tasks_sha256": "de088bac5fb93beafd2393a438cbc42ac0f99479ff173817a734c01d071e5b25",
+    "cohort": "exact previously consumed fair32; raw file and normalized tasks hashes have distinct definitions",
+    "replacements": false,
+    "answer_masking": false,
+    "performance_based_selection": false,
+    "test_read": false,
+    "claim": "regression/implementation diagnosis only; no independent test/generalization gain"
+  },
+  "arms": ["fixed_multiquery", "deterministic_workflow", "autonomous"],
+  "shared": {
+    "initial": "identical BM25 Top20, complete first5, previews only in remaining capacity; pack against largest complete policy prompt",
+    "tools": ["read", "query", "rerank"],
+    "query_fusion": "same RRF k60 Top20",
+    "generator": "Qwen/Qwen3-4B@350135a4de9a3407be836fa238cccc1d61503a85",
+    "reranker": "Qwen/Qwen3-Reranker-4B@22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+    "terminal": "byte-identical v1 common verifier; unique displayed citations or insufficient/conflicting abstention; no terminal tools",
+    "ceilings": {"model_calls": 5, "tools": 5, "queries": 2, "repairs": 2, "input_tokens": 8192, "output_tokens": 512, "slot_seconds": 120}
+  },
+  "change": "autonomous gate returns 1-3 exact claim spans, relation/time/quantity/scope, covered/partial/missing/uncertain, actual displayed sentence IDs, one existing action and explicit stop reason; no forced acquisition",
+  "falsifier": "all-stop, irrelevant acquisition, no new full-text delivery to later physical prompts, or no quality support invalidates promotion; more calls/IDs alone never qualify",
+  "measurement": {
+    "official": "existing post-exit official task scoring; all32/arm, no failure dropping; prior original scores not overwritten",
+    "semantic": "separate pinned automatic NLI citation-support proxy; not human labels or ground truth, no calibration on these32",
+    "behavior": "proposal -> validated arguments -> execution -> delivery -> next physical prompt -> decision -> common verdict/citations",
+    "bootstrap": {"samples": 5000, "unit": "paired consumed task", "seed": 20261003},
+    "cost": "all real gate/plan, tool/rerank, repair, verdict attempts, failures, tokens, loading, scoring, operator and GPU/storage fees",
+    "feedback_causality": "whole policy comparison only; no pure feedback-causal claim"
+  },
+  "execution": {"source_review_required": true, "source_data_models_output_bound_before_launch": true, "parallel_gpu": false, "no_spartan": true, "new_model_execution_result": false, "original_budget_usd": 20, "autopay": false, "no_test": true}
+}

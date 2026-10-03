@@ -1,0 +1,54 @@
+{
+  "kind": "post_exit_author_assisted_diagnosis_not_new_benchmark",
+  "run_id": "fair-three-arm-20261003",
+  "execution_git_commit": "e826a4d2178983365c87184e259f7ad43ba7b17a",
+  "run_sha256": "3c9eafaa159321bcc202d5f5f18ddcdd8548917dde7e894f3b19def44e1cb7c3",
+  "selection": "first_12_unique_tasks_in_fixed_multiquery_frozen_run_order; all_three_routes",
+  "selection_sha256": "585482f0342e53465a24583e9551fe95dc801126c8ed2978629859653ff13ad0",
+  "private_note_sha256": [
+    "b80e02015ec3405aba243687feb934981fd79e4667d1c96f937b074489f436b9",
+    "3f142b6f2294d7fda0e2a3cbeac34f7be4d201336c28cd0cc421c25760b4c458"
+  ],
+  "task_count": 12,
+  "output_count": 36,
+  "answered_outputs": 31,
+  "abstained_outputs": 5,
+  "method": "assistant_author_review_of_saved_claim_all_citations_and_visible_packet; complete_compound_proposition_rubric",
+  "human_blind_annotation": false,
+  "gold_read": false,
+  "selection_uses_model_scores": false,
+  "new_inference_or_official_rescoring": false,
+  "official_scores_unchanged": true,
+  "citation_assessment_counts": {
+    "unsupported_as_written": 27,
+    "uncertain": 4,
+    "abstention_consistent_with_packet": 4,
+    "abstention_uncertain": 1
+  },
+  "initial_packet_counts_unique_tasks": {
+    "partial": 4,
+    "insufficient": 6,
+    "uncertain": 2
+  },
+  "primary_issue_counts_outputs": {
+    "missing_decisive_relation": 6,
+    "relation_scope": 8,
+    "ambiguous_claim_context": 7,
+    "appropriate_abstention": 4,
+    "time_number": 11
+  },
+  "route_counts": {
+    "fixed_multiquery": {"unsupported_as_written": 9, "uncertain": 1, "abstention_consistent_with_packet": 2},
+    "deterministic_workflow": {"unsupported_as_written": 9, "uncertain": 1, "abstention_consistent_with_packet": 1, "abstention_uncertain": 1},
+    "autonomous": {"unsupported_as_written": 9, "uncertain": 2, "abstention_consistent_with_packet": 1}
+  },
+  "decision": "finish recruitment search case; do not force acquisition or start another run; any future research should test relation/coverage sufficiency rather than tool-count gains",
+  "limitations": [
+    "No representative population rate, new accuracy, route superiority, causal feedback effect, or overall semantic-grounding score.",
+    "Assistant-authored judgments may be wrong; not independent human adjudication or gold replacement.",
+    "Unsupported means the cited set does not establish the whole returned judgment, not that the claim or label is necessarily false.",
+    "The rubric is strict about all parts of compound claims; partial relevance is not automatically full semantic support.",
+    "Missing context remains uncertain; abstention consistency refers only to the saved visible packet, not universal unanswerability.",
+    "New semantic diagnosis applies only to this fixed 12-task slice; original 32-task run still lacks independently measured semantic quality."
+  ]
+}

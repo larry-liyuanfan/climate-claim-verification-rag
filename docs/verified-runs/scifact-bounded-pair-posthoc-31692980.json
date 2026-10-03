@@ -1,0 +1,888 @@
+{
+  "arms": {
+    "format_repaired": {
+      "initial_fallible_self_report_counts_route_stratum_need_relevance_support_action": {},
+      "preflight_wire_receipts": {
+        "bytes": 596,
+        "complete_responses": 4,
+        "empty_grammar_receipts": 4,
+        "grammar_logs": 0
+      },
+      "repairs": 0,
+      "routes": {
+        "adaptive": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 2,
+            "structural_whole_gold_match_slots": 2,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "retrieve:completed": 12
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 3,
+                "f1": 0.15000000000000002,
+                "precision": 0.0967741935483871,
+                "predicted": 31,
+                "recall": 0.3333333333333333,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.09999999999999999,
+                "precision": 0.06451612903225806,
+                "predicted": 31,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 4,
+                "f1": 0.04597701149425287,
+                "precision": 0.025,
+                "predicted": 160,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 4,
+                "f1": 0.04597701149425287,
+                "precision": 0.025,
+                "predicted": 160,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 4,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 1,
+              "nei_false_evidence_rate": 0.3333333333333333
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 4,
+            "answer": 8
+          }
+        },
+        "deterministic_extra": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 1,
+            "structural_whole_gold_match_slots": 1,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "deterministic_extra_query:skipped": 2,
+            "rerank:completed": 12,
+            "retrieve:completed": 12,
+            "rewrite:completed": 10
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 5,
+                "f1": 0.19230769230769232,
+                "precision": 0.11627906976744186,
+                "predicted": 43,
+                "recall": 0.5555555555555556,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 1,
+                "f1": 0.038461538461538464,
+                "precision": 0.023255813953488372,
+                "predicted": 43,
+                "recall": 0.1111111111111111,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 5,
+                "f1": 0.04273504273504274,
+                "precision": 0.022727272727272728,
+                "predicted": 220,
+                "recall": 0.35714285714285715,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 6,
+                "f1": 0.05128205128205128,
+                "precision": 0.02727272727272727,
+                "predicted": 220,
+                "recall": 0.42857142857142855,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 1,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 2,
+              "nei_false_evidence_rate": 0.6666666666666666
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 1,
+            "answer": 11
+          }
+        },
+        "fixed_rerank": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 1,
+            "structural_whole_gold_match_slots": 1,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "rerank:completed": 12,
+            "retrieve:completed": 12
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 5,
+                "f1": 0.18867924528301888,
+                "precision": 0.11363636363636363,
+                "predicted": 44,
+                "recall": 0.5555555555555556,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.07547169811320754,
+                "precision": 0.045454545454545456,
+                "predicted": 44,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 4,
+                "f1": 0.034188034188034185,
+                "precision": 0.01818181818181818,
+                "predicted": 220,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 5,
+                "f1": 0.04273504273504274,
+                "precision": 0.022727272727272728,
+                "predicted": 220,
+                "recall": 0.35714285714285715,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 1,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 2,
+              "nei_false_evidence_rate": 0.6666666666666666
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 1,
+            "answer": 11
+          }
+        },
+        "fixed_retrieval": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 2,
+            "structural_whole_gold_match_slots": 2,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "retrieve:completed": 12
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 3,
+                "f1": 0.15000000000000002,
+                "precision": 0.0967741935483871,
+                "predicted": 31,
+                "recall": 0.3333333333333333,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.09999999999999999,
+                "precision": 0.06451612903225806,
+                "predicted": 31,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 4,
+                "f1": 0.044444444444444446,
+                "precision": 0.024096385542168676,
+                "predicted": 166,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 4,
+                "f1": 0.044444444444444446,
+                "precision": 0.024096385542168676,
+                "predicted": 166,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 3,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 1,
+              "nei_false_evidence_rate": 0.3333333333333333
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 3,
+            "answer": 9
+          }
+        }
+      },
+      "slots": 48,
+      "synthetic_preflight_cost": {
+        "calls": 4,
+        "generation_ms_known_sum": 7082.983078435063,
+        "generation_ms_missing": 0,
+        "known_tokens_including_failures": {
+          "input_tokens": 2720,
+          "output_tokens": 238
+        },
+        "missing_fields": {},
+        "token_totals_are_lower_bounds": false,
+        "unknown_usage_attempts": 0
+      },
+      "timing_ms_overlapping_not_additive": {
+        "bm25_build": 845.8874989300966,
+        "model_load": 20747.357163578272,
+        "operator": 361274.2409706116,
+        "reranker_load": 1708.7296824902296,
+        "synthetic_preflight": 7117.411844432354,
+        "tool_events_sum": 20152.456672862172,
+        "train_questions_sum": 265719.05020810664
+      },
+      "train_cost": {
+        "calls": 48,
+        "generation_ms_known_sum": 207583.4071598947,
+        "generation_ms_missing": 0,
+        "known_tokens_including_failures": {
+          "input_tokens": 179780,
+          "output_tokens": 6867
+        },
+        "missing_fields": {},
+        "token_totals_are_lower_bounds": false,
+        "unknown_usage_attempts": 0
+      },
+      "train_wire_receipts": {
+        "bytes": 15658,
+        "complete_responses": 48,
+        "empty_grammar_receipts": 48,
+        "grammar_logs": 0
+      }
+    },
+    "format_repaired_gap": {
+      "initial_fallible_self_report_counts_route_stratum_need_relevance_support_action": {
+        "adaptive|gold_absent_top20|not_needed|relevant|sufficient|answer": 3,
+        "adaptive|initial_doc_opportunity|not_needed|relevant|sufficient|answer": 3,
+        "adaptive|nei|not_needed|irrelevant|missing|abstain": 2,
+        "adaptive|nei|not_needed|relevant|sufficient|answer": 1,
+        "adaptive|top20_doc_replenishable|not_needed|irrelevant|missing|abstain": 1,
+        "adaptive|top20_doc_replenishable|not_needed|relevant|sufficient|answer": 2,
+        "deterministic_extra|gold_absent_top20|not_needed|relevant|sufficient|answer": 3,
+        "deterministic_extra|initial_doc_opportunity|not_needed|relevant|sufficient|answer": 3,
+        "deterministic_extra|nei|not_needed|irrelevant|missing|abstain": 1,
+        "deterministic_extra|nei|not_needed|relevant|sufficient|answer": 2,
+        "deterministic_extra|top20_doc_replenishable|not_needed|relevant|sufficient|answer": 3,
+        "fixed_rerank|gold_absent_top20|not_needed|relevant|sufficient|answer": 3,
+        "fixed_rerank|initial_doc_opportunity|not_needed|relevant|sufficient|answer": 3,
+        "fixed_rerank|nei|not_needed|irrelevant|missing|abstain": 1,
+        "fixed_rerank|nei|not_needed|relevant|sufficient|answer": 2,
+        "fixed_rerank|top20_doc_replenishable|not_needed|relevant|sufficient|answer": 3,
+        "fixed_retrieval|gold_absent_top20|not_needed|relevant|missing|abstain": 1,
+        "fixed_retrieval|gold_absent_top20|not_needed|relevant|sufficient|answer": 2,
+        "fixed_retrieval|initial_doc_opportunity|not_needed|relevant|sufficient|answer": 3,
+        "fixed_retrieval|nei|not_needed|irrelevant|missing|abstain": 2,
+        "fixed_retrieval|nei|not_needed|relevant|sufficient|answer": 1,
+        "fixed_retrieval|top20_doc_replenishable|not_needed|irrelevant|missing|abstain": 1,
+        "fixed_retrieval|top20_doc_replenishable|not_needed|relevant|sufficient|answer": 2
+      },
+      "preflight_wire_receipts": {
+        "bytes": 1568,
+        "complete_responses": 4,
+        "empty_grammar_receipts": 4,
+        "grammar_logs": 0
+      },
+      "repairs": 0,
+      "routes": {
+        "adaptive": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 2,
+            "structural_whole_gold_match_slots": 2,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "retrieve:completed": 12
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 3,
+                "f1": 0.16216216216216214,
+                "precision": 0.10714285714285714,
+                "predicted": 28,
+                "recall": 0.3333333333333333,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.10810810810810811,
+                "precision": 0.07142857142857142,
+                "predicted": 28,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 4,
+                "f1": 0.046511627906976744,
+                "precision": 0.02531645569620253,
+                "predicted": 158,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 4,
+                "f1": 0.046511627906976744,
+                "precision": 0.02531645569620253,
+                "predicted": 158,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 3,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 1,
+              "nei_false_evidence_rate": 0.3333333333333333
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 3,
+            "answer": 9
+          }
+        },
+        "deterministic_extra": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 1,
+            "structural_whole_gold_match_slots": 1,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "deterministic_extra_query:skipped": 2,
+            "rerank:completed": 12,
+            "retrieve:completed": 12,
+            "rewrite:completed": 10
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 5,
+                "f1": 0.1818181818181818,
+                "precision": 0.10869565217391304,
+                "predicted": 46,
+                "recall": 0.5555555555555556,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.07272727272727274,
+                "precision": 0.043478260869565216,
+                "predicted": 46,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 5,
+                "f1": 0.05076142131979696,
+                "precision": 0.0273224043715847,
+                "predicted": 183,
+                "recall": 0.35714285714285715,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 6,
+                "f1": 0.06091370558375635,
+                "precision": 0.03278688524590164,
+                "predicted": 183,
+                "recall": 0.42857142857142855,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 1,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 2,
+              "nei_false_evidence_rate": 0.6666666666666666
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 1,
+            "answer": 11
+          }
+        },
+        "fixed_rerank": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 1,
+            "structural_whole_gold_match_slots": 1,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "rerank:completed": 12,
+            "retrieve:completed": 12
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 5,
+                "f1": 0.18867924528301888,
+                "precision": 0.11363636363636363,
+                "predicted": 44,
+                "recall": 0.5555555555555556,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.07547169811320754,
+                "precision": 0.045454545454545456,
+                "predicted": 44,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 5,
+                "f1": 0.05208333333333333,
+                "precision": 0.028089887640449437,
+                "predicted": 178,
+                "recall": 0.35714285714285715,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 6,
+                "f1": 0.06249999999999999,
+                "precision": 0.033707865168539325,
+                "predicted": 178,
+                "recall": 0.42857142857142855,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 1,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 2,
+              "nei_false_evidence_rate": 0.6666666666666666
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 1,
+            "answer": 11
+          }
+        },
+        "fixed_retrieval": {
+          "attempt_statuses": {
+            "valid_decision": 12
+          },
+          "chain": {
+            "added_citable_evidence": 0,
+            "execution_success": 0,
+            "model_events": 0,
+            "newly_seen_evidence": 0,
+            "newly_seen_then_final_cites": 0,
+            "newly_seen_then_gold_label_complete_rationale": 0,
+            "newly_seen_then_legal_decision": 0,
+            "newly_seen_then_strict_whole_final_answer_correct": 0,
+            "next_observation_available": 0,
+            "strict_whole_final_answer_correct_slots": 2,
+            "structural_whole_gold_match_slots": 2,
+            "success_without_observable_next_context": 0,
+            "successful_event_with_next_legal_decision": 0,
+            "then_final_cites_added": 0,
+            "then_gold_label_complete_rationale": 0,
+            "then_legal_decision": 0,
+            "then_strict_whole_final_answer_correct": 0,
+            "unique_final_correct_docs_associated_with_chain": 0,
+            "unique_final_correct_docs_associated_with_newly_seen_chain": 0
+          },
+          "fixed_tools": {
+            "retrieve:completed": 12
+          },
+          "official_point_score": {
+            "claim_count": 12,
+            "metrics": {
+              "abstract_label_only": {
+                "correct": 3,
+                "f1": 0.18181818181818182,
+                "precision": 0.125,
+                "predicted": 24,
+                "recall": 0.3333333333333333,
+                "relevant": 9
+              },
+              "abstract_rationalized": {
+                "correct": 2,
+                "f1": 0.12121212121212122,
+                "precision": 0.08333333333333333,
+                "predicted": 24,
+                "recall": 0.2222222222222222,
+                "relevant": 9
+              },
+              "sentence_label": {
+                "correct": 4,
+                "f1": 0.05925925925925926,
+                "precision": 0.03305785123966942,
+                "predicted": 121,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              },
+              "sentence_selection": {
+                "correct": 4,
+                "f1": 0.05925925925925926,
+                "precision": 0.03305785123966942,
+                "predicted": 121,
+                "recall": 0.2857142857142857,
+                "relevant": 14
+              }
+            },
+            "official_reference_sha": "68b98a56d93e0f9da0d2aab4e6c3294699a0f72e",
+            "schema_version": "scifact-original-gold-score-v1",
+            "separate_diagnostics_not_official_f1": {
+              "claim_verdict_accuracy": null,
+              "empty_evidence_predictions": 4,
+              "free_text_entailment": null,
+              "mixed_label_claim_count": 0,
+              "nei_claim_count": 3,
+              "nei_claims_with_false_evidence": 1,
+              "nei_false_evidence_rate": 0.3333333333333333
+            }
+          },
+          "raw_action_proposals": {
+            "abstain": 4,
+            "answer": 8
+          }
+        }
+      },
+      "slots": 48,
+      "synthetic_preflight_cost": {
+        "calls": 4,
+        "generation_ms_known_sum": 22171.59915715456,
+        "generation_ms_missing": 0,
+        "known_tokens_including_failures": {
+          "input_tokens": 4260,
+          "output_tokens": 535
+        },
+        "missing_fields": {},
+        "token_totals_are_lower_bounds": false,
+        "unknown_usage_attempts": 0
+      },
+      "timing_ms_overlapping_not_additive": {
+        "bm25_build": 871.0697405040264,
+        "model_load": 22225.324504077435,
+        "operator": 562460.7839584351,
+        "reranker_load": 1610.9751593321562,
+        "synthetic_preflight": 22237.38668113947,
+        "tool_events_sum": 20357.583418488503,
+        "train_questions_sum": 446491.9555094093
+      },
+      "train_cost": {
+        "calls": 48,
+        "generation_ms_known_sum": 378244.41832490265,
+        "generation_ms_missing": 0,
+        "known_tokens_including_failures": {
+          "input_tokens": 198260,
+          "output_tokens": 10401
+        },
+        "missing_fields": {},
+        "token_totals_are_lower_bounds": false,
+        "unknown_usage_attempts": 0
+      },
+      "train_wire_receipts": {
+        "bytes": 28157,
+        "complete_responses": 48,
+        "empty_grammar_receipts": 48,
+        "grammar_logs": 0
+      }
+    }
+  },
+  "boundaries": [
+    "Biased eligible-train diagnostic; not dev/test or causal proof of tool benefit.",
+    "then_* counts form event-level funnels; successful_event_with_next_legal_decision is independent of new-evidence discovery. Unique credited documents are deduplicated within each slot.",
+    "Immediate added evidence differs from newly seen evidence (outside all prior citable views); rereading A after A->B->A is not a discovery.",
+    "Observed evidence-use closure is not proof that the tool caused correctness; post-tool decisions or self-reports alone do not count.",
+    "Strict whole-answer correctness additionally requires a legal final answer/abstain with matching termination outcome: exact gold document set, correct labels, complete alternative rationale within first three sentences per document, and no nongold rationale sentences. Failed empty predictions are not successful NEI. Structural matching and partial official document credit are separate.",
+    "Preview hashes and self-reports are never citable evidence.",
+    "Physical full-wire receipts bind reported token ledgers; no independent tokenizer retokenization is claimed.",
+    "Generation/tool/question/operator/Slurm times overlap and must not be added.",
+    "Blank Slurm values remain null, not zero; GPU allocation time is not GPU utilization.",
+    "Raw wire, gold, row-level evidence and IDs remain on Spartan."
+  ],
+  "execution_source_git": "b248fe7f43b175b15b90ec6143538d5dab8e2f35",
+  "identity_checks_passed": true,
+  "independent_official_counts_equal": true,
+  "initial_contexts_comparable": true,
+  "job_ids": [
+    31686182,
+    31686183
+  ],
+  "pair_protocol_sha256": "4cc5033928a0833ee99ad64ecd5a7b10c7a1fde7ac4f219d6334d2349d9daaf6",
+  "posthoc_audit_git": "a347233b88c103cb23c76845527278f960a48406",
+  "posthoc_script_sha256": "1d18a54e883fc2c5e7a70af25fc6c469b38abcd11144b451c01f86451981fde9",
+  "run_sha256": {
+    "format_repaired": "473c0d153f73115cacf03e10875993aa947d6687c317f15ee6bf285675cd77b3",
+    "format_repaired_gap": "e9842c9bc5b8169a8a3b5cfcabfa164155da2cd74f8fdd9ac738b84c4e9809da"
+  },
+  "schema_version": "scifact-bounded-posthoc-closeout-v1",
+  "score_recomputed_equal": true,
+  "score_sha256": "dc46ac5f1db851e4ea0373f7f546eba42b106e6ba602553d1e7ea2de52c73459",
+  "slurm": [
+    {
+      "AllocTRES": "billing=212,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "CPUTimeRAW": "2912",
+      "ElapsedRaw": "364",
+      "ExitCode": "0:0",
+      "JobIDRaw": "31686182",
+      "MaxRSS": null,
+      "ReqTRES": "billing=112,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "State": "COMPLETED",
+      "TotalCPU": "05:53.758"
+    },
+    {
+      "AllocTRES": "cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "CPUTimeRAW": "2912",
+      "ElapsedRaw": "364",
+      "ExitCode": "0:0",
+      "JobIDRaw": "31686182.batch",
+      "MaxRSS": "18534620K",
+      "ReqTRES": null,
+      "State": "COMPLETED",
+      "TotalCPU": "05:53.758"
+    },
+    {
+      "AllocTRES": "billing=212,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "CPUTimeRAW": "2912",
+      "ElapsedRaw": "364",
+      "ExitCode": "0:0",
+      "JobIDRaw": "31686182.extern",
+      "MaxRSS": null,
+      "ReqTRES": null,
+      "State": "COMPLETED",
+      "TotalCPU": "00:00:00"
+    },
+    {
+      "AllocTRES": "billing=212,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "CPUTimeRAW": "4536",
+      "ElapsedRaw": "567",
+      "ExitCode": "0:0",
+      "JobIDRaw": "31686183",
+      "MaxRSS": null,
+      "ReqTRES": "billing=112,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "State": "COMPLETED",
+      "TotalCPU": "09:11.861"
+    },
+    {
+      "AllocTRES": "cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "CPUTimeRAW": "4536",
+      "ElapsedRaw": "567",
+      "ExitCode": "0:0",
+      "JobIDRaw": "31686183.batch",
+      "MaxRSS": "18567812K",
+      "ReqTRES": null,
+      "State": "COMPLETED",
+      "TotalCPU": "09:11.861"
+    },
+    {
+      "AllocTRES": "billing=212,cpu=8,gres/gpu:a100=1,gres/gpu=1,mem=32G,node=1",
+      "CPUTimeRAW": "4536",
+      "ElapsedRaw": "567",
+      "ExitCode": "0:0",
+      "JobIDRaw": "31686183.extern",
+      "MaxRSS": null,
+      "ReqTRES": null,
+      "State": "COMPLETED",
+      "TotalCPU": "00:00:00"
+    }
+  ],
+  "source_archive_sha256": "dbc3ef071b4144934f568fa728a51ac3f07e770c0a9acf3a83e17861279a7bbb",
+  "status": "audited_compact"
+}

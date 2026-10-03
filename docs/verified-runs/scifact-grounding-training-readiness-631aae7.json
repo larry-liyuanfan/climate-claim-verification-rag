@@ -1,0 +1,43 @@
+{
+  "actual_import_probe_sha256": "104156a548a495d45583207ce02dfe8a6dc7c1341da8bf5125ba81b9912acf88",
+  "generation_calls": 0,
+  "job_submitted": false,
+  "official_dev_test_read": false,
+  "release_draft_sha256": "dff04c8a53c8f527bcc939f68963b9527aa467b03866c77e012ec5b8377bde88",
+  "runtime_observed": {
+    "generation_calls": 0,
+    "model_loaded": false,
+    "module_files": {
+      "accelerate": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/accelerate/__init__.py",
+      "peft": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/peft/__init__.py",
+      "safetensors": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/safetensors/__init__.py",
+      "torch": "/apps/easybuild-2022/easybuild/software/MPI/GCC/11.3.0/OpenMPI/4.1.4/PyTorch/2.1.2-CUDA-12.2.0/lib/python3.10/site-packages/torch/__init__.py",
+      "transformers": "/data/gpfs/projects/punim2936/portfolio_20260903/climate-public-retrieval-v2/envs/grounding-training-deps-20261001/site/transformers/__init__.py"
+    },
+    "os_name": "posix",
+    "python": "3.10.4",
+    "python_executable": "/apps/easybuild-2022/easybuild/software/Compiler/GCCcore/11.3.0/Python/3.10.4/bin/python",
+    "torch": "2.1.2",
+    "versions": {
+      "accelerate": "1.6.0",
+      "huggingface-hub": "0.36.2",
+      "interegular": "0.3.3",
+      "lm-format-enforcer": "0.11.3",
+      "numpy": "1.24.4",
+      "peft": "0.15.2",
+      "psutil": "5.9.0",
+      "pydantic": "2.13.5",
+      "safetensors": "0.5.3",
+      "scipy": "1.8.1",
+      "tokenizers": "0.21.4",
+      "transformers": "4.51.3"
+    }
+  },
+  "source_archive_sha256": "4c9386edbd965a2e88629932cdaad11e9c8b43e90af6f9383b6d7d90a3ca650a",
+  "source_git": "631aae70000ca4940c8225e046669dc85b1731e4",
+  "test_only_log_sha256": "c84a403e677e3c6ca1d001f0a46fd99b9086feffa1c564326f6416e2fbc28afc",
+  "test_only_output": "sbatch: You are submitting jobs from your home directory.\nsbatch: We recommend to submit jobs from your project directory to improve IO performance of your job.\nsbatch: Job 31756901 to start at 2026-10-05T07:44:16 a using 4 processors on nodes spartan-gpgpu104 in partition gpu-a100\n",
+  "test_only_returncode": 0,
+  "training": false,
+  "wrapper_sha256": "d88db6806c1d725866df303a63dcdd4493de0a74b8c7fc2de148a79e1de6af9a"
+}

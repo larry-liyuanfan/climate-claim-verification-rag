@@ -1,0 +1,327 @@
+{
+  "boundary": {
+    "corpus_text_deserialized": false,
+    "model_calls": 0,
+    "new_claim_text_or_gold_read": false,
+    "new_cohort_selected": false,
+    "no_safe_background_proof_is_not_proof_that_none_exists": true,
+    "protected_metadata_only": true,
+    "retrieval_executions": 0,
+    "training_steps": 0
+  },
+  "decision": "metadata_only_protocol_change_pending_no_pool_expansion_or_cohort_selection_authorized",
+  "family_inventory": {
+    "complete_dev_quarantined_test_family_inventory_persisted": false,
+    "corpus_documents": 5183,
+    "eligible_train_dev_components_disjoint": true,
+    "eligible_train_only_family_owner_mapping": true,
+    "missing_proof": "complete family-to-claim edges for dev/quarantined/other heldout; official test not inventoried",
+    "partition_components": {
+      "fit": {
+        "count": 229,
+        "sha256": "ad6f87f281addad0b28799ff589b2420504cfc38a47008574045878110a64c5b"
+      },
+      "tune": {
+        "count": 48,
+        "sha256": "649c2e5e777dab8781baeb62e6e1c8b9ff81e118c679a60917594db7ccb0e610"
+      },
+      "validation": {
+        "count": 48,
+        "sha256": "71d28a2821f9479acc640c3718f1e77c46e0093485c8f7d6733952da8694b6ed"
+      }
+    },
+    "pools": {
+      "fit": {
+        "count": 256,
+        "sha256": "4efed64fec48aaab16886e3cf8ac04a9835151a8b01e6f04c732f71e0548e137"
+      },
+      "tune": {
+        "count": 58,
+        "sha256": "0c2066d619bc2b482783f05d0279d898f91ee3790f93343fcaf22897752e93a9"
+      },
+      "unowned": {
+        "count": 4811,
+        "sha256": "227dda2aa886627904219028abbf708bfc440bd7852a17166c3fa49b480dad16"
+      },
+      "validation": {
+        "count": 58,
+        "sha256": "a61a1dd6d5d9ac5634fc91b4b66f618acdcf70b8949a7ffbf07651dbe0470411"
+      }
+    },
+    "protection_scope": "saved lexical claim/family grouping, not semantic or pretraining decontamination",
+    "provable_additional_safe_documents_outside_current_fit_pool": {
+      "count": 0,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "unowned_does_not_mean_safe": true
+  },
+  "input_sha256": {
+    "envs/scifact-semantic-inputs-c4907db6.tar": "c4907db623b644c9c883a807f07597f87746595da7fc6435714452304e50a44d",
+    "envs/scifact-semantic-inputs-c4907db6.tar::data/scifact-original-20260930/prepared-r1/preparation-manifest.json": "3cd6bc1e1c299ece9195098a3853ebb05bb3401507d8b467c1596ba6afb6e138",
+    "envs/scifact-semantic-inputs-c4907db6.tar::data/scifact-original-20260930/prepared-r1/private-group-assignment.json": "6d79861daef5d385878913fe10681dff95df444e6f7b1b76ab7c07f4d4d70a12",
+    "posthoc/scifact-grounding-candidate-40d84a377bd1/manifest.json": "28de2c5d1d531aabdb757ccb45db0b91232a54ac7089ac7dc5ebf42e65ba3b2f",
+    "posthoc/scifact-grounding-candidate-40d84a377bd1/private/families.json": "8b151a3a031b3cf7937c6394632a26dc64d9e7284bf976fffcdffc50d74e70cc",
+    "posthoc/scifact-grounding-candidate-40d84a377bd1/private/ledger.json": "df55427ad67f1f45f3c9d37929b756d948f2dbb94f02d2f9a3f3b7f0584923c7",
+    "posthoc/scifact-grounding-candidate-40d84a377bd1/private/selection-before-packing.json": "578f57ec2955e9d51c1da7d4d219c15c339be7aa0790f283e3872221f3fb432a",
+    "posthoc/scifact-selected-read-opportunity-dcbe368c1c02/private/diagnosis.json": "a0e95cd626430a365599579948d6f5ea22630f457c6fe3c4a968fc52cc6cebd0",
+    "posthoc/scifact-selected-read-opportunity-dcbe368c1c02/private/states-before-gold.json": "5a49b53aa6ab7790231b224b5966f3e8e6f2fff1856219c1c177af16ded714b8",
+    "posthoc/scifact-state-supervision-fit-v2-9bf5fdad2ec9/captured-frames.json": "1a2dcc53c55c2013ed11b8b3818ca364d0b4ecc223f14ba1a1128713ecd6c7fa",
+    "posthoc/scifact-state-supervision-fit-v2-9bf5fdad2ec9/compact.json": "3cfc8acffcb001488ce841310349fa05a806a2216d66336afe331d9cd04e1bde",
+    "posthoc/scifact-state-supervision-fit-v2-9bf5fdad2ec9/fit-records.json": "d33769569ff4d2460575d5f35e3e04abd0876335582ada77b26e64b147438df9",
+    "runs/scifact-adapter-bare-regression-20261001-v1/cost-before-quality.json": "87910b370e6265170957c991c6c6750e3f8c43d46983e2ee12722e13db551c9e",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-01-reserved.json": "5cdcb8972f2087864b176f2ce0e83c630e6618fc05e18aa0f99b155fcdfdb104",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-02-reserved.json": "03d43ea10551bb2a8ab8869cbe6e314e7f85511b9fff42dfa78041d08dd2d1cf",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-03-reserved.json": "bb6536975305cf5254e2d8aa77d0bb36ab2966f6c5dae06741988f23367241cf",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-04-reserved.json": "f17e79a3920eefa7223e4faa08737f9d12449f19693c50f0f25128687a217e06",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-05-reserved.json": "0495103aa09234ec04f45cd3e8c7d447f8cbd8d01280b3b1359e532a5d786e81",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-06-reserved.json": "ca7a379b9cdab13e7d622a2bad1cfff029a19864dceb305d227f6df957650edf",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-07-reserved.json": "a741ded6f2dbbac44a91610fae2ba4dfeb43df48b0e9cbcec0b8a65bfd5f9f84",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-08-reserved.json": "8e4fe4a8c071e0c1fc617bd93d273e2a3d7cc26231cd394512046632b3d4c276",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-09-reserved.json": "b2312a0f54c3eb29a7279136a430e751efca13385136b74a8fd61d976318e8ca",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-10-reserved.json": "65d6b2b3ce92f37c2e4a6bf5efaff4cae1a71f25eb0e3d4326ecf10bbe70a935",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-11-reserved.json": "b19297bc0bccfcfd372a9b7ed67d429b271944dd27d5572bbe59e8e3a813a147",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-12-reserved.json": "90bc38fe0be7239db4a079152dd63a823ae5906903bc2eac7fcb5a41f9865bdd",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-13-reserved.json": "c4b7047f60a996ba40765ffcfc01e982d452f5529b509457b96e841e40c6c361",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-14-reserved.json": "c07657694fe8e765ccb55145a966399ed85c1c16e2fb6892132194813710e661",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-15-reserved.json": "be29ba336012f05a103ca218ff9f662efa2763860ca2fc2b2b1a80c55f5c9d60",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-16-reserved.json": "881b5f0d56c3b239a013e14eaa922039dae2658327ca684e7540f1b766de75ac",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-17-reserved.json": "2ae8a2f6106aeb1f3a5d987fffeca160a1236ad2e1b7214143740cccd77bd83b",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-18-reserved.json": "8d25157299d8d5ff663ef6876bb63453aeccd9f59e09f517e5809f6f6bf124d7",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-19-reserved.json": "fda699e838d21aa3932e178f1d8ce304058767d5bb19387d1dee1a5ee61e5ca6",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-20-reserved.json": "aa9002fe6d7f0374c9ebd323458637b95563d8f51bddbf91aebb61fdbba181cd",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-21-reserved.json": "64e03a40d30b3f263e774c4458f9b48fe3580ff763d888fa2884d7f68cff92da",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-22-reserved.json": "41af9b7414b55a01f7b757a28e2843421bc296d502f10cc332365bd0992e2e09",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-23-reserved.json": "a33244bde2dbcfb8e132279311a5ac556f1eaf23faa1005c9463a56744e9ac35",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-24-reserved.json": "ce80afdaa893f86acefb2be31368f477ebc7180d2645b6ed374a40400f0c18be",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-25-reserved.json": "f603e455d578d979ef9cb17bd956e9a38db12798fe86ba8c776973518f5e9a95",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-26-reserved.json": "2f1d921c948250fa2b1eb7a55973748ac6d57c92a6850f86e87e5fecd99e9b0f",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-27-reserved.json": "1b59d282925c5cd9ecdacee07085fc9d2f0325aaf9620f61d5b52b5455d44964",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-28-reserved.json": "f92dfa661a7141699d0a6f0e464c1701663e94fb3ae2f9c77308b2bd7338ad6e",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-29-reserved.json": "86510923bf5f80186b5127e295b6ee8959591e4ed1d4770aee3c4cd388325f27",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-30-reserved.json": "e626a92f5a1fa1b679c381395a4be8a673d1712949b292e1a11e8304e3ca1a65",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-31-reserved.json": "ab2a833743b5b5e2393012690b17d71518fbe41b7e2e4dd6c9dac2a8a601d130",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-32-reserved.json": "00dfd3fb4feb58f0390d6c749373d5294e8a2959b21ac3fe65202337602026a5",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-33-reserved.json": "6b082a5e171d3a0faae3eb1b33cc7c7e61f8eec9de5ddb3a86da41226e5756bd",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-34-reserved.json": "de33dab5c5024e24651c02ee1cbc82ac5380ce7ee12e5b64e19fa58e960ec736",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-35-reserved.json": "6ddef700f68b3c9d64f484152cc3847c89065004543b681c3899f06725364d75",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-36-reserved.json": "0b70d45675faef5a80aa25699ce9ee0e0ed5b527b71169bbdbe2d88032dc72cf",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-37-reserved.json": "a4349c3804f8a92cba8b21c712999924e429b501e62cda21837fe121e3214687",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-38-reserved.json": "e4b85feb2c53908c6adf35d4408501c33909d0ad287e186987a2c7c9711f4c16",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-39-reserved.json": "03bc814c58a822ae3d7fb75b22f755925212703e6666923b70edf3b3df78d5b9",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-40-reserved.json": "4aa958e9bcd36950d24095f06976a343ff313d22ab06836078df890a2f65bd3e",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-41-reserved.json": "dc928ae77295ac606f893f819f9165517869bf6c2b8809429e30c53f5522ceee",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-42-reserved.json": "6ba54e66c61352c96e5e800d3d20bcbc41f9c649e4c7902896cd42fec886540e",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-43-reserved.json": "f1fce133ff0f6df1be89f1d99d541227e6ac3972944785cdab905fa60c937734",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-44-reserved.json": "cf9d6817d115fc325a0b0944e43f74848b98e35fca4e7728dbb9014a9ffbce04",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-45-reserved.json": "bb9c4f7e08848b3f916884ea828767939c0443aab09aa63764c4bda128170605",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-46-reserved.json": "8fe1ef4f2e75cc06584b26adcf51caa00a6a512667f13ffe797028365f0a7c7f",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-47-reserved.json": "a2b46650f0189dbcde05da44a81f1ee59111aa75f83cfc7684a013f3648ec45a",
+    "runs/scifact-adapter-bare-regression-20261001-v1/inference/slot-48-reserved.json": "b80d9f3ace616920d3fcacce706e49d3d2cf59e02b458f58db90d0751885a279",
+    "runs/scifact-grounding-training-20261001-v1/complete.json": "f5e6a865ec09cb67a520e36ba4646fb297a381383d4d0357208488ef6e9168a0",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/complete.json": "ad4dc447ba4d50dfdf5fa44a67d8c3365fd164a86ef92cb952f81a5189b91799",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-00/started.json": "e39f5d3ea570bc7de678b590255b287364065f05616ce4f12f1426d0760695ab",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-01/started.json": "04b7c69fe7e3f1141032fd415e3187dfa2dd17213624a05038602ded447d6bde",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-02/started.json": "34d38459b0c7a28fed8dc90d5437bc0e8432f41c7fbf8cb023b30722bffe823b",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-03/started.json": "ef3191400302a91374924933bb5a3fa842e963e35e7348eb15106dc9b99c825a",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-04/started.json": "1847ff092ad941093e55cd572b7972c6547f1cd9ada64cafd60f57abe35c45bf",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-05/started.json": "17effbb602bd3bad8549e8ebf1282203290dc3bfa3752341634a00ffbab22a60",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-06/started.json": "56f3ce4fbb5a1f3895c06b29340d019271967c6d9d39998cb236a8ea3e8570e8",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-07/started.json": "229a2a0ef7a6f0b13624681bc96dbf87e322f58b34d538b97138da35b45f17cf",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-08/started.json": "cdbd4d9c4322322b9de3c4a12e62ca7759bbc1e046ce872868cf21e91bac9c33",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-09/started.json": "28a2ab11869b4a7c3d0e226312aa118eab3cabb64b5e1531f4ad53d4bcba1dae",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-10/started.json": "f2fce070946766405daaa19f9615a8e909da35f7fc8b661c22d50c412eeef739",
+    "runs/scifact-grounding-tune-20261001-v1/adapted/slot-11/started.json": "d1d0539bd9e53ab734bd8dde2d0e941fddf63f4270e46d4d79c1f451edb9dd6f",
+    "runs/scifact-grounding-tune-20261001-v1/base/complete.json": "a3a5ca96365b1eef12bb5102a15aab422912070a0cef29266877999c9be2c652",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-00/started.json": "95dc19f47714540505c1f31be881de9dc1671ec142a7d67c7249c44663991929",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-01/started.json": "95ad685c573afc2b73782bee8ebde86bb8c67bd4bf131d945909b619c7decdbc",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-02/started.json": "0ce7ed2c625f4a1a514c618b234570f60002d3087a1dada41153d379b6c7994b",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-03/started.json": "0135bae00f6c9f795bbc3959a40594f318bd35d3412a028afc2d218c73d6e298",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-04/started.json": "ac5f629acb16f089dfd97dfd5dad1449f20f4014c1856eb4c631ceeb42ce3e8c",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-05/started.json": "25c2090ba5fd975e3244e185385ee8dea902f1b68578635192984e583d78815b",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-06/started.json": "96b2ed34ae53d25369490eb3fa67b4f00e66d415e057577ca4c7592bbe621daf",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-07/started.json": "9a18be44b93f8c6e7489413866b1302c65ae40ff76fdf0845513ea3b352bfbbf",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-08/started.json": "769a1ce74034f949d0fabf5ed517d4716488ab388ab1782b79cd9c39b5b4fbd9",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-09/started.json": "34c1feb1e4343b0f2f8cdff7bce64c49c11baa953169794a0a514d5462df10f1",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-10/started.json": "9b17ca99107f84139f8926c1856490fbde848925192899c784f9c0857cb97b2e",
+    "runs/scifact-grounding-tune-20261001-v1/base/slot-11/started.json": "6e1a568748f271697f03562411c247dbe08007d31947d0d838fa05ccef785247",
+    "runs/scifact-read-conditional-20261001-v1/cost-before-quality.json": "4f8170e588939bad502b1a9cb19726b4fd10768aa3526449cb562835377f3373",
+    "runs/scifact-read-conditional-20261001-v1/inference/slot-01-reserved.json": "4e24f8fd6ad40be9a266befcf0142f5696f33484954ef3843e3d3a25ebd9e2e2",
+    "runs/scifact-read-conditional-20261001-v1/inference/slot-02-reserved.json": "39dbe57b3896d6ab1d40f49d5e1e3c72d7e7fc5759e13cec7dbdf8189ce61a03",
+    "runs/scifact-read-conditional-20261001-v1/inference/slot-03-reserved.json": "93c1691564348f8a787a196d9de73fd948293e568844e4d42f5fee7038c1f50a"
+  },
+  "overlap_case": {
+    "case": "only_original_fit_overlap_of_three_saved_reads",
+    "causal_effect_identified": false,
+    "common_candidate_count": 3,
+    "common_relative_order_unchanged": true,
+    "common_source_hashes_unchanged": true,
+    "existing_new_target_rationale_sets": 1,
+    "existing_target_fits_new_initial": 1,
+    "existing_target_fits_old_after_read": 1,
+    "new_candidate_count": 20,
+    "new_initial_citable_positions": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "new_initial_sentence_map_sha256": "cfa70bc1c3f689f0b7becf5100c0ef7a310a8872623f019ee7eed666762a5b92",
+    "new_rank": 1,
+    "newly_scored_witnesses": 0,
+    "old_after_read_citable_positions": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "old_after_read_sentence_map_sha256": "cfa70bc1c3f689f0b7becf5100c0ef7a310a8872623f019ee7eed666762a5b92",
+    "old_candidate_count": 20,
+    "old_initial_citable_positions": [],
+    "old_initial_preview_present": true,
+    "old_initial_sentence_map_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "old_preceding_candidates_by_partition": {
+      "fit": 0,
+      "tune": 0,
+      "unowned": 6,
+      "validation": 0
+    },
+    "old_rank": 7,
+    "old_top20_fit_filter_rank_without_rescoring": 1,
+    "saved_old_diagnosis_after_read_eligible": true,
+    "saved_old_diagnosis_initial_eligible": false,
+    "witness_source_sha256": "b14c4c7549e79fb22edb2b58d76974c9ab4d76ba9ba54e9779e1aa04667d4dea"
+  },
+  "script_sha256": "37279d90f65fd9163235300c8788846315baca718a91ee30aeb20d49ff3683e4",
+  "train_metadata_eligibility": {
+    "checked_receipt_exposures_outside_original_fit_tune_and_old_selected": 0,
+    "eligible_claim_ids_in_remaining_components": {
+      "count": 256,
+      "sha256": "e44bd95cf584e095d3ff3dbb2c911b7a8ce1e16af2f7b3548c4e970e540aede5"
+    },
+    "gold_preparation_seen_eligible_claims": 531,
+    "initial": {
+      "count": 229,
+      "sha256": "ad6f87f281addad0b28799ff589b2420504cfc38a47008574045878110a64c5b"
+    },
+    "label_or_read_opportunity_eligibility_checked": false,
+    "original_ledger_gold_preparation_count_matches": true,
+    "remaining": {
+      "count": 160,
+      "sha256": "c4d37c0dc6419ade25f130184f68a4d5d3b10f385d56d1726d11f964c48ada85"
+    },
+    "scope": "conditional_on_listed_hash_bound_ledger_and_receipts_not_global_exposure_attestation",
+    "sequential_exclusions": [
+      {
+        "newly_removed": {
+          "count": 48,
+          "sha256": "8eb0e5663530127f8eef8cc72588926426e267d99d44f5cbfcb1060538cd3a24"
+        },
+        "overlap_with_original_fit_partition": 48,
+        "reason": "original_fit48"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 0,
+        "reason": "reserved_tune"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 0,
+        "reason": "reserved_validation"
+      },
+      {
+        "newly_removed": {
+          "count": 21,
+          "sha256": "1e42ac4e8ef4dcd2458cfeb109a9eaa28a879696098a38f3a9e98bd02ee45aee"
+        },
+        "overlap_with_original_fit_partition": 24,
+        "reason": "prior_model_consumed"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 0,
+        "reason": "prior_uncertain"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 48,
+        "reason": "later_training"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 0,
+        "reason": "later_tune"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 12,
+        "reason": "later_regression"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 3,
+        "reason": "later_conditional"
+      },
+      {
+        "newly_removed": {
+          "count": 0,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "overlap_with_original_fit_partition": 9,
+        "reason": "failed_or_unknown_attempt"
+      }
+    ]
+  },
+  "version": "scifact-pool-metadata-audit-20261001-v1"
+}

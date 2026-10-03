@@ -1,0 +1,168 @@
+{
+  "schema_version": "scifact-mixed-four-route-closeout-v1",
+  "job_id": "31871386",
+  "slurm_state": "COMPLETED",
+  "exit_code": "0:0",
+  "execution_source_git": "6f764f824125c3e47c6e3dce344f13e4ab07f5d8",
+  "scope": "all12_previously_exposed_TRAIN_queries_four_routes_not_independent_test",
+  "resources": {
+    "elapsed_seconds": 189,
+    "total_cpu_seconds": 169.578,
+    "batch_maxrss_K": 17356984
+  },
+  "denominators": {
+    "queries": 12,
+    "routes": 4,
+    "slots": 48,
+    "physical_generation_calls": 48,
+    "rerank_operations": 24,
+    "requested_rerank_pairs": 480
+  },
+  "artifact_sha256": {
+    "allocation/ended.json": "36d7be7e853cd2e7c07379833ff0ed4cdbbe745c76def6f64e182e445c45446b",
+    "allocation/worker-exit.json": "07b39c67c65fd3193fde17a2b0c6669035d87bc89a514e85b8364ed6a0fb7959",
+    "cost-before-quality.json": "649a1aac7b71570503b1a522251d017de0e12cae764ab3e295e32c353ba96ddb",
+    "inference/adapter-integrity.json": "7130eeb3fd8c686511a27db6397fde379fa46f8ce9668a919ea8aa8464a7bc56",
+    "inference/run.json": "9680efeee449a7d444d6d3c8fa450ce01a3049533c01753b6dd68da42bf92575",
+    "score.json": "ff103f1db57b55c30f32121e1ef639e32b68eb6b9140f64c0a07ef5015fcbc23"
+  },
+  "physical_audit": {
+    "files_verified": 195,
+    "wire_responses_verified": 48,
+    "raw_parse_render_prediction_equal_slots": 48,
+    "active_144_tensor_reload_and_48_call_bindings_verified": true,
+    "unknown_usage_attempts": 0
+  },
+  "routes": {
+    "adaptive": {
+      "strict_correct": 3,
+      "actions": {
+        "abstain": 9,
+        "answer": 3
+      },
+      "rationalized": {
+        "correct": 0,
+        "f1": 0,
+        "precision": 0,
+        "predicted": 3,
+        "recall": 0,
+        "relevant": 9
+      },
+      "sentence_selection": {
+        "correct": 1,
+        "f1": 0.09523809523809525,
+        "precision": 0.3333333333333333,
+        "predicted": 3,
+        "recall": 0.05555555555555555,
+        "relevant": 18
+      },
+      "p50_ms": 1614.097699522972,
+      "p95_ms": 1914.327970892191,
+      "tokens": {
+        "input_tokens": 44626,
+        "output_tokens": 222
+      }
+    },
+    "deterministic_extra": {
+      "strict_correct": 4,
+      "actions": {
+        "abstain": 7,
+        "answer": 5
+      },
+      "rationalized": {
+        "correct": 1,
+        "f1": 0.14285714285714285,
+        "precision": 0.2,
+        "predicted": 5,
+        "recall": 0.1111111111111111,
+        "relevant": 9
+      },
+      "sentence_selection": {
+        "correct": 2,
+        "f1": 0.1739130434782609,
+        "precision": 0.4,
+        "predicted": 5,
+        "recall": 0.1111111111111111,
+        "relevant": 18
+      },
+      "p50_ms": 2414.662734605372,
+      "p95_ms": 2973.0719123966987,
+      "tokens": {
+        "input_tokens": 42890,
+        "output_tokens": 251
+      }
+    },
+    "fixed_rerank": {
+      "strict_correct": 5,
+      "actions": {
+        "abstain": 7,
+        "answer": 5
+      },
+      "rationalized": {
+        "correct": 2,
+        "f1": 0.2857142857142857,
+        "precision": 0.4,
+        "predicted": 5,
+        "recall": 0.2222222222222222,
+        "relevant": 9
+      },
+      "sentence_selection": {
+        "correct": 3,
+        "f1": 0.2608695652173913,
+        "precision": 0.6,
+        "predicted": 5,
+        "recall": 0.16666666666666666,
+        "relevant": 18
+      },
+      "p50_ms": 2463.4730564430356,
+      "p95_ms": 2986.364832706749,
+      "tokens": {
+        "input_tokens": 42914,
+        "output_tokens": 253
+      }
+    },
+    "fixed_retrieval": {
+      "strict_correct": 3,
+      "actions": {
+        "abstain": 9,
+        "answer": 3
+      },
+      "rationalized": {
+        "correct": 0,
+        "f1": 0,
+        "precision": 0,
+        "predicted": 3,
+        "recall": 0,
+        "relevant": 9
+      },
+      "sentence_selection": {
+        "correct": 1,
+        "f1": 0.09523809523809525,
+        "precision": 0.3333333333333333,
+        "predicted": 3,
+        "recall": 0.05555555555555555,
+        "relevant": 18
+      },
+      "p50_ms": 1601.6075974330306,
+      "p95_ms": 1830.620210338384,
+      "tokens": {
+        "input_tokens": 42142,
+        "output_tokens": 222
+      }
+    }
+  },
+  "costs": {
+    "input_tokens": 172572,
+    "output_tokens": 948,
+    "generation_ms": 45444.226171821356,
+    "reranker_tokens": null
+  },
+  "interpretation": [
+    "Adaptive offered read/rewrite/rerank but proposed/executed none; no autonomous tool-loop or feedback-utilization gain.",
+    "Fixed-retrieval and adaptive first visible sentences/order/aliases match on all12; adaptive prompts add207 tokens; only11/12 predictions identical.",
+    "Both insufficient acquisition and sufficient-evidence grounding errors exist; fixed-rerank strict correctness5/12 is not autonomous success.",
+    "One query/component overlaps current144 FIT; remaining11 are still historically exposed, not heldout.",
+    "Deterministic-extra had10 completed rewrites and2 skips, not12 successful rewrites.",
+    "Raw notes/predictions/gold remain private; no new model call or gold rescoring during this audit; cost-before-gold chronology is not an OS access-control proof."
+  ]
+}

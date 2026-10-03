@@ -1,0 +1,198 @@
+{
+  "job_id": "31519179",
+  "inspection": "whole unmodified decoded strings parsed read-only in place; no raw text exported",
+  "directory_mode": "0o2700",
+  "directory_access_bits": "0700",
+  "file_count": 9,
+  "records": [
+    {
+      "output_sha256": "64e10eb7b31f12e51838087affd2489477514b8b0fd7dbbcdf8f961beb5c1f26",
+      "bytes": 1993,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "answer",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": false,
+      "label_is_none": false,
+      "has_statements": true,
+      "assessment_sufficient": true,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+      "bytes": 251,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "abstain",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": true,
+      "label_is_none": true,
+      "has_statements": false,
+      "assessment_sufficient": false,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+      "bytes": 251,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "abstain",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": true,
+      "label_is_none": true,
+      "has_statements": false,
+      "assessment_sufficient": false,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "b0fdb78ead1916cbc8b0a9563a7bc5a3f49b8d00cd0298a92ba71901388c9d11",
+      "bytes": 251,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "abstain",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": true,
+      "label_is_none": true,
+      "has_statements": false,
+      "assessment_sufficient": false,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "f1a6e698ee34339f4be2ea0b2c03821abbb7ed767b38e84ecd9527b38d37e62b",
+      "bytes": 1136,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "answer",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": false,
+      "label_is_none": false,
+      "has_statements": true,
+      "assessment_sufficient": true,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "053d80604e1966b54d864f36bc60a683790276d51ddf0fada2da1b42230bd010",
+      "bytes": 875,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "answer",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": false,
+      "label_is_none": false,
+      "has_statements": true,
+      "assessment_sufficient": true,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "333e6352d2954bc5fb0b890872cacb1ce1635a1944713d27940753c4172aa9cf",
+      "bytes": 1984,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "answer",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": false,
+      "label_is_none": false,
+      "has_statements": true,
+      "assessment_sufficient": true,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "2ccd9b8f6594320c0d5cb753e19155412a7dcf7d9e7c65eb553ba9d2efab48d5",
+      "bytes": 1152,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "answer",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": false,
+      "label_is_none": false,
+      "has_statements": true,
+      "assessment_sufficient": true,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    },
+    {
+      "output_sha256": "1ebcf0fc5677b1fcdbc1e1f0e02f06dab3795caf677d6119fdf468f8d339726c",
+      "bytes": 875,
+      "mode": "0600",
+      "starts_markdown_fence": false,
+      "ends_markdown_fence": false,
+      "starts_json_object": true,
+      "starts_think_marker": false,
+      "category": "json_valid",
+      "object": true,
+      "action": "answer",
+      "query_is_none": false,
+      "query_is_empty_string": false,
+      "query_equals_original_claim": true,
+      "label_is_none": false,
+      "has_statements": true,
+      "assessment_sufficient": true,
+      "cross_field_conflicts_by_unchanged_rules": [
+        "query_only_allowed_for_rewrite"
+      ]
+    }
+  ]
+}

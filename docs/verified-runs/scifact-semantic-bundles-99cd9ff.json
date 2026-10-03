@@ -1,0 +1,42 @@
+{
+  "bundles": {
+    "inference": {
+      "bytes": 8325120,
+      "members": [
+        "claims.jsonl",
+        "corpus.jsonl",
+        "protocol.json"
+      ],
+      "sha256": "def10d4030d402ef5294680e0426ba1ed05ac42cb9b1d7bf4e8daa0a328961c9"
+    },
+    "scoring": {
+      "bytes": 460800,
+      "members": [
+        "consumption-ledger.json",
+        "current-opportunity.json",
+        "gold.jsonl",
+        "manifest.json",
+        "preparation-draft.json",
+        "selected-strata.json",
+        "selection-freeze.json"
+      ],
+      "sha256": "7e2303364b69be920de017179485bbb6f9d0e5d48367717576b3411c92c8ca8e"
+    }
+  },
+  "execution_source_git": "99cd9ff707697ea395a9bc067f3ce91395071cdb",
+  "gpu_authorized": false,
+  "model_calls": 0,
+  "policy_prompt_sha256": {
+    "scifact-gap-original-v1": "b4a6b1e5accd5a6b427dfe278245580c9ff16598c03d876c8920324cc2d30dfd",
+    "scifact-gap-semantic-policy-v1": "2be482d567d0e57a546eebae440e9b04f86995a0724260b95c7d31278f834fab"
+  },
+  "preparation_compact_sha256": "4d73e0196fb64167798b89746020b15aca192ebdb94cf34a36d6bd274d7adadd",
+  "preparation_source_git": "779e49883570371ce6223cb2b4a8619df5924d3b",
+  "protocol_sha256": "5595143cfb6d276184e91f40856efa388ab440dc78527fe7fcffd52c12bb296d",
+  "release_id": "climate-scifact-semantic-pair-20260930-v1",
+  "reselected": false,
+  "schema_version": "scifact-semantic-bundles-v1",
+  "scoring_manifest_sha256": "9bb6b831360130a11b4bb17621d26a0bf1c5b41110a697c74c6ce6b5e2e8aa04",
+  "selected_queries": 12,
+  "slots_per_arm": 48
+}

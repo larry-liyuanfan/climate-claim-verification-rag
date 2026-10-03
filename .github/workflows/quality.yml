@@ -17,7 +17,20 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install test, serving and LTR dependencies
-        run: python -m pip install -e ".[test,serve,ltr]"
+      - name: Install pinned validation dependencies
+        run: python -m pip install "numpy==1.26.4" -e ".[test,serve,ltr,dev,langchain,grammar]"
+      - name: Install CPU-only model-contract validation dependencies
+        run: |
+          python -m pip install "torch==2.7.1" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "transformers==4.51.3" "peft==0.15.2" "accelerate==1.6.0" "safetensors==0.5.3"
+          python -m pip check
+      - name: Lint and source type checks
+        run: |
+          python -m ruff check src scripts tests
+          python -m mypy src/climate_rag
+          python -m mypy scripts/package_scifact_source.py
+          python -m mypy --follow-imports=silent scripts/cloud_replay_contract.py scripts/cloud_private_storage.py scripts/cloud_capacity.py scripts/cloud_destination.py scripts/cloud_deadline.py scripts/run_cloud_replay.py scripts/package_cloud_replay.py scripts/preflight_cloud_assets.py scripts/run_targeted_replay.py scripts/run_targeted_replay_operator.py scripts/prepare_fair_cohort.py
       - name: Run full test suite
         run: python -m pytest -q
+      - name: Scan tracked text for secrets and PII
+        run: python scripts/scan_tracked_secrets.py --repository .

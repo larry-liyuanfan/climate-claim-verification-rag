@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "code_sha": "6aa28f838f85e740e344ed1b1840970384ba8e4b",
+  "package": "langchain-core",
+  "package_version": "1.6.5",
+  "evidence_track": "manual_application_demo_not_retrieval_quality_or_verdict_evaluation",
+  "mode": "BM25_only_small_public_corpus_CPU",
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "document_count": 5240,
+  "output_sha256": "6fa54d04600892260ef2c92ed4099cfbdba96e29739e0c69a96ca73899525491",
+  "tool_calls": 3,
+  "chain_consistency_calls": 1,
+  "telemetry": "LangSmith tracing disabled; no LLM or external model call",
+  "cases": [
+    {
+      "query": "Arctic sea ice decline",
+      "status": "candidates_only",
+      "evidence_ids": [
+        "Arctic sea ice decline:271",
+        "Arctic sea ice decline:17",
+        "Climate change in the Arctic:34"
+      ],
+      "citation_ids": [
+        "sha256:c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71:Arctic%20sea%20ice%20decline%3A271",
+        "sha256:c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71:Arctic%20sea%20ice%20decline%3A17",
+        "sha256:c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71:Climate%20change%20in%20the%20Arctic%3A34"
+      ],
+      "answer": null,
+      "verdict": {
+        "label": null,
+        "status": "not_evaluated"
+      }
+    },
+    {
+      "query": "carbon dioxide greenhouse effect",
+      "status": "candidates_only",
+      "evidence_ids": [
+        "Greenhouse effect:54",
+        "Paleoclimatology:145",
+        "Christopher Monckton, 3rd Viscount Monckton of Brenchley:72"
+      ],
+      "citation_ids": [
+        "sha256:c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71:Greenhouse%20effect%3A54",
+        "sha256:c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71:Paleoclimatology%3A145",
+        "sha256:c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71:Christopher%20Monckton%2C%203rd%20Viscount%20Monckton%20of%20Brenchley%3A72"
+      ],
+      "answer": null,
+      "verdict": {
+        "label": null,
+        "status": "not_evaluated"
+      }
+    },
+    {
+      "query": "zxqv_nonexistent_term_20260927",
+      "status": "no_evidence",
+      "evidence_ids": [],
+      "citation_ids": [],
+      "answer": null,
+      "verdict": {
+        "label": null,
+        "status": "not_evaluated"
+      }
+    }
+  ],
+  "validation": {
+    "mypy": "passed_2_modules",
+    "secret_scan": "passed",
+    "targeted_tests_passed": 15,
+    "ruff": "passed_changed_python_files",
+    "full_local_suite": "not_run_bounded_package"
+  }
+}

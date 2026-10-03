@@ -36,8 +36,8 @@ that architectural mistake.
 - Code: `src/climate_rag/reranker.py`, `src/climate_rag/fusion.py` and the
   fixed-dev evaluation scripts.
 - Evidence: balanced RRF/Qwen3-Reranker-4B fusion reached Recall@5/F1
-  `0.3153/0.2131` versus RRF `0.2709/0.1785`; four paired intervals were
-  positive. The 8B pilot tied Recall/F1 and raised P95 by 60.8%, so it stopped.
+  `0.3153/0.2131` versus RRF `0.2709/0.1785`; both Recall@5/F1@5 intervals were
+  positive. Legacy downstream Top-10 fields were censored by Top-5 storage. The 8B pilot tied Recall/F1 and raised P95 by 60.8%, so it stopped.
 - Boundary: the project uses Qwen3 pointwise relevance scores plus rank fusion,
   not RankZephyr itself, and the selected weights are same-dev model selection.
 
@@ -79,8 +79,10 @@ than reported as “LambdaMART failed”.
 - Follow-up: commit `b47e437` records the serving RRF score/rank in training,
   expands hard negatives from 20 to the 100-candidate serving width and adds a
   predeclared 4:1 rank-preserving RRF/LambdaMART fusion. CPU job `29504398`
-  completed 120,146 rows and recovered MRR@10/nDCG@10 from RRF
-  `0.3446/0.2495` to `0.3648/0.2605`, with paired intervals above zero. Its
+  completed 120,146 rows and recovered MRR@5 from RRF
+  `0.3446` to `0.3648`, with its paired interval above zero. The original
+  MRR@10 field used five ranks; nDCG@10 was also censored and cannot simply
+  be renamed nDCG@5. Its
   Recall@5/F1 intervals crossed zero and absolute quality remained below the 4B
   reranker fusion, so it is retained as a low-latency rank-position profile
   rather than the main quality profile.
@@ -102,12 +104,20 @@ with the base encoder only.
   test-set sealing, training/serving-contract checks and disciplined negative
   result publication under HPC resource constraints.
 - Candidate bullet: Executed a six-configuration, validation-only
-  CLIMATE-FEVER LoRA retrieval gate on Spartan; preserved an exact-tie negative
-  result, traced an adapter-key integrity failure, stopped promotion/SciFact by
+  CLIMATE-FEVER LoRA retrieval gate on Spartan; preserved inconclusive pilot
+  ties, traced an adapter-key integrity failure, stopped promotion/SciFact by
   policy, and published content-addressed base-only ranking evidence with 5,000
   paired-bootstrap samples.
 - Boundary: this is validation-only engineering evidence. It is not an adapter
   improvement, independent-test generalisation or online A/B result.
+
+The 2026-09-27 repair verified all 392 restored tensors and fixed-probe output
+changes; this establishes loading integrity, not quality. A separate base-only
+three-route validation benchmark then measured complete requests. LTR is the
+latency-sensitive candidate (77.8 ms P95); Top-100 4B remains optional (9.30 s),
+with Top-5 paired differences crossing zero. Top-20 did not establish useful
+benefit over LTR. [Measured report](SEARCH_TRADEOFFS_20260927.md) records why
+practical model choice differs from a naive point-estimate Pareto frontier.
 
 ## 6. Sparse neural retrieval is a future candidate, not a hidden feature
 

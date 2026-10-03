@@ -1,0 +1,160 @@
+{
+  "arms": {
+    "A": {
+      "NEI_endpoints": {
+        "wrong": 9
+      },
+      "NEI_planned": 9,
+      "attribution_status_counts": {},
+      "coverage_transitions": 0,
+      "endpoints": {
+        "wrong": 24
+      },
+      "event_count": 0,
+      "event_origin_counts": {},
+      "first3_transitions": 0,
+      "planned": 24,
+      "positive_endpoints": {
+        "wrong": 15
+      },
+      "positive_planned": 15,
+      "transition_outcomes": {},
+      "unexecuted_tool_proposals": 0
+    },
+    "B": {
+      "NEI_endpoints": {
+        "correct": 7,
+        "wrong": 2
+      },
+      "NEI_planned": 9,
+      "attribution_status_counts": {
+        "NEI_not_applicable": 9,
+        "observed": 15
+      },
+      "coverage_transitions": 0,
+      "endpoints": {
+        "correct": 7,
+        "wrong": 17
+      },
+      "event_count": 24,
+      "event_origin_counts": {
+        "scripted": 24
+      },
+      "first3_transitions": 0,
+      "planned": 24,
+      "positive_endpoints": {
+        "wrong": 15
+      },
+      "positive_planned": 15,
+      "transition_outcomes": {
+        "not_applicable": 24
+      },
+      "unexecuted_tool_proposals": 0
+    },
+    "C": {
+      "NEI_endpoints": {
+        "correct": 3,
+        "wrong": 6
+      },
+      "NEI_planned": 9,
+      "attribution_status_counts": {
+        "NEI_not_applicable": 9,
+        "observed": 15
+      },
+      "coverage_transitions": 0,
+      "endpoints": {
+        "correct": 3,
+        "wrong": 21
+      },
+      "event_count": 24,
+      "event_origin_counts": {
+        "scripted": 24
+      },
+      "first3_transitions": 0,
+      "planned": 24,
+      "positive_endpoints": {
+        "wrong": 15
+      },
+      "positive_planned": 15,
+      "transition_outcomes": {
+        "not_applicable": 24
+      },
+      "unexecuted_tool_proposals": 0
+    }
+  },
+  "attribution_sha256": "8046d7dfe1871fa8104694aa6ef0077c4298dce992bb3ab0f5ef3db3de726829",
+  "audit_job": "31904484",
+  "audit_source_git": "4b27d6aab6bce9f0492058db039cd9dc16b3e436",
+  "causal_effect": "not_identified",
+  "execution_source_git": "723c6a8fc4f0956ba91497b278d5f8fe65dc9fee",
+  "exported_claim_ids": 0,
+  "exported_gold_rows": 0,
+  "initial_categories": {
+    "candidate_pool_not_complete_under_frozen_contract": 1,
+    "initial_sufficient_legal_wrong_answer": 14,
+    "official_NEI_separate": 9
+  },
+  "new_model_calls": 0,
+  "original_cost_sha256_unchanged": "4ab434c72afeda0a105c0e78e5feab6161695125a4aff3d3c254f3a1da40a7aa",
+  "original_quality_sha256_unchanged": "babc1a70c316f91f60f2679864335f458eb1c7d81510993447aef0fe2e41d24b",
+  "physical_generation_cost": {
+    "api_currency_cost": null,
+    "elapsed_ms": 261552.57400497794,
+    "known_token_lower_bound": {
+      "input_tokens": 253288,
+      "output_tokens": 8009
+    },
+    "total_tokens": {
+      "input_tokens": 253288,
+      "output_tokens": 8009
+    },
+    "unique_physical_calls": 72,
+    "unknown_usage_attempts": 0
+  },
+  "planned_slots": 72,
+  "positive_coverage": {
+    "candidate_fulltext": {
+      "document_opportunities_histogram": {
+        "1": 14,
+        "2": 1
+      },
+      "first3_reachable": 14,
+      "gold_document_count_histogram": {
+        "1": 13,
+        "2": 2
+      },
+      "observed_positive_claims": 15,
+      "semantic_complete": 14
+    },
+    "initial_visible": {
+      "document_opportunities_histogram": {
+        "1": 14,
+        "2": 1
+      },
+      "first3_reachable": 14,
+      "gold_document_count_histogram": {
+        "1": 13,
+        "2": 2
+      },
+      "observed_positive_claims": 15,
+      "semantic_complete": 14
+    }
+  },
+  "receipt_sha256": "706f489228efa2f57b25110c1ef88cf35cc8d2f171a5b956e06b0b4da141e960",
+  "reranker_cost": {
+    "api_currency_cost": null,
+    "completed_pairs": 480,
+    "elapsed_ms_including_swaps": 215809.13252756,
+    "generator_calls": 0,
+    "known_token_lower_bound": 219220,
+    "nonpadding_tokens": 219220,
+    "physical_requests": 24,
+    "requested_pairs": 480,
+    "unknown_requests": 0
+  },
+  "schema": "scifact-natural-posthoc-aggregate-closeout-v1",
+  "scope": "fixed_exposed_TRAIN24_posthoc_not_independent_evaluation",
+  "training_updates": 0,
+  "unexecuted_tool_reachability": "unknown",
+  "worker_exit_sha256": "662ae0e76f24f37d8659ecb06d4e368c2af929dc10793d6c51cdbd27b14e2ce9"
+}

@@ -1,0 +1,391 @@
+{
+  "job_id": "31510619",
+  "kind": "authored real-model integration pilot; failed structured decisions",
+  "source_git_sha": "ca9fa53f2d4b70091fd08a8a1512e263f329fc61",
+  "operator_git_sha": "ae5166b872c9e0f71be09df1dd557c1804c01bf7",
+  "operator_wrapper_sha256": "569d824e10645c0fa0ce4604e33810a95085969bdf730adc182e5483227780a8",
+  "archive_sha256": "808c7ae89af7c135b601295da87a2acb7727345c6429ccd4e220b658abd89a48",
+  "archive_bytes": 3105,
+  "run_sha256": "1b147faa5e84440f2fadc4d4f50a946575460254f54197c3b50f9e97f164c6d8",
+  "run_bytes": 27422,
+  "log_sha256": "3a7052bbdf5648fafeed1b6b046609412f8c70c42bb3bd5cf501007d5d3a5fb0",
+  "operator_status_sha256": "10ae17a0a281fa17035022aea6a512d35539068ff5c32faf8a7277aa05b4b981",
+  "execution_manifest": {
+    "dense_file_hashes": null,
+    "model_manifest_sha256": "8bff1d6532f4c1e29eb87c3d2230da9b718a353b6d8039cdec93ca9a566bf917",
+    "protocol_sha256": "6ee90b8479192335fc543c3425c3fbbb89fea2d65ba9698fb54d86564bc3c3c2",
+    "reranker_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed"
+  },
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "documents": 5240,
+  "model_canonical_manifest_sha256": "d1dd9783afdf4e0fbd21eee824834d71b86982f5a5d5f6f371fe07f2f76f3cf6",
+  "reranker_canonical_manifest_sha256": "de1d4ac39101816774439e68881e2308c5e5f1bd94d0b0dc4c492a56c2681052",
+  "rows": 9,
+  "unique_task_route_pairs": 9,
+  "real_weights_loaded_basis": "Both checkpoint loads completed; GPU provider generated tokens and nonempty reranker stages completed.",
+  "generation_attempts": 9,
+  "usage": {
+    "input_tokens": 10533,
+    "output_tokens": 1955
+  },
+  "all_usage_known": true,
+  "failure_types": {
+    "GeneratedResponseError": 9
+  },
+  "validated_decisions": 0,
+  "answers_published": 0,
+  "model_chosen_actions": [],
+  "retrieval_calls": 9,
+  "rerank_calls": 3,
+  "reranker_pair_attempts": 40,
+  "completed_nonempty_rerank_stages": 2,
+  "successful_forwards_direct_counter": null,
+  "forward_inference": "Two completed 20-pair stages imply 40 successful batch-size-1 forwards by frozen code; this is not a separately instrumented counter.",
+  "route_elapsed_seconds_sum": 56.33686345349997,
+  "operator": {
+    "job_id": "31510619",
+    "started_utc": "2026-09-29T05:39:18Z",
+    "ended_utc": "2026-09-29T05:41:48Z",
+    "elapsed_seconds": 150,
+    "exit_status": 0,
+    "result_archive_exists": true,
+    "gpu_sample_interval_seconds": 1,
+    "precise_cuda_peak_measured": false,
+    "separate_model_load_time_measured": false
+  },
+  "slurm": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 153,
+    "total_cpu_seconds": 124.678,
+    "batch_maxrss_kib": 18192068,
+    "batch_maxrss_gib": 17.349308013916016,
+    "cpus": 8,
+    "memory_gib": 32,
+    "gpu": "1 full A100",
+    "start_scheduler_time": "2026-09-29T15:39:16",
+    "end_scheduler_time": "2026-09-29T15:41:49"
+  },
+  "gpu_sampling": {
+    "sha256": "acf9af51e626eb74296d0b3e543e4e40b8123e71eed48344541f0d265aea3308",
+    "lines": 148,
+    "valid_samples": 0,
+    "sampled_max_memory_mib": null,
+    "no_device_lines": 148,
+    "stderr_bytes": 0
+  },
+  "citation_precision": null,
+  "citation_completeness": null,
+  "semantic_supportability": null,
+  "negative_conclusion": "All nine outputs failed JSON/schema processing before any accepted action; controller abstention is not model-chosen abstention. Lost raw text prevents subtype/root-cause diagnosis.",
+  "full_evaluation_ready": false,
+  "full_evaluation_released": false,
+  "cases": [
+    {
+      "task_id": "pilot-ice",
+      "authored_question": "Arctic sea ice has declined.",
+      "source": "result/run.json runs filtered by task_id; no lost text reconstructed",
+      "runs": [
+        {
+          "strategy": "fixed_retrieval",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 1329,
+            "output_tokens": 228
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 8075.814767740667,
+          "events": [
+            {
+              "elapsed_ms": 7.447381503880024,
+              "query": "Arctic sea ice has declined.",
+              "stage": "retrieve"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "answer": null
+        },
+        {
+          "strategy": "fixed_rerank",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 1380,
+            "output_tokens": 318
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "elapsed_ms": 9268.752408213913,
+          "events": [
+            {
+              "elapsed_ms": 4.2575206607580185,
+              "query": "Arctic sea ice has declined.",
+              "stage": "retrieve"
+            },
+            {
+              "candidate_count": 20,
+              "elapsed_ms": 616.3886822760105,
+              "stage": "rerank"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "answer": null
+        },
+        {
+          "strategy": "adaptive",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 1333,
+            "output_tokens": 228
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 6259.1685596853495,
+          "events": [
+            {
+              "elapsed_ms": 4.290377721190453,
+              "query": "Arctic sea ice has declined.",
+              "stage": "retrieve"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "answer": null
+        }
+      ]
+    },
+    {
+      "task_id": "pilot-multi",
+      "authored_question": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide.",
+      "source": "result/run.json runs filtered by task_id; no lost text reconstructed",
+      "runs": [
+        {
+          "strategy": "fixed_retrieval",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 1431,
+            "output_tokens": 255
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 6994.241169653833,
+          "events": [
+            {
+              "elapsed_ms": 5.439640022814274,
+              "query": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide.",
+              "stage": "retrieve"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "answer": null
+        },
+        {
+          "strategy": "fixed_rerank",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 1480,
+            "output_tokens": 450
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 20,
+          "elapsed_ms": 12742.84923542291,
+          "events": [
+            {
+              "elapsed_ms": 4.6285707503557205,
+              "query": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide.",
+              "stage": "retrieve"
+            },
+            {
+              "candidate_count": 20,
+              "elapsed_ms": 580.1052823662758,
+              "stage": "rerank"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "answer": null
+        },
+        {
+          "strategy": "adaptive",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 1435,
+            "output_tokens": 248
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 6749.788062646985,
+          "events": [
+            {
+              "elapsed_ms": 4.332445561885834,
+              "query": "Carbon dioxide absorbs infrared radiation and ocean acidity increases with carbon dioxide.",
+              "stage": "retrieve"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 20,
+          "context_count": 5,
+          "delivered_count": 0,
+          "answer": null
+        }
+      ]
+    },
+    {
+      "task_id": "pilot-empty",
+      "authored_question": "zxqv_nonexistent_term_20260929",
+      "source": "result/run.json runs filtered by task_id; no lost text reconstructed",
+      "runs": [
+        {
+          "strategy": "fixed_retrieval",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 714,
+            "output_tokens": 76
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 2075.2541245892644,
+          "events": [
+            {
+              "elapsed_ms": 2.293248660862446,
+              "query": "zxqv_nonexistent_term_20260929",
+              "stage": "retrieve"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 0,
+          "context_count": 0,
+          "delivered_count": 0,
+          "answer": null
+        },
+        {
+          "strategy": "fixed_rerank",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 714,
+            "output_tokens": 76
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 1,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 2084.2341696843505,
+          "events": [
+            {
+              "elapsed_ms": 2.1918779239058495,
+              "query": "zxqv_nonexistent_term_20260929",
+              "stage": "retrieve"
+            },
+            {
+              "candidate_count": 0,
+              "elapsed_ms": 0.003703869879245758,
+              "stage": "rerank"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 0,
+          "context_count": 0,
+          "delivered_count": 0,
+          "answer": null
+        },
+        {
+          "strategy": "adaptive",
+          "status": "abstained",
+          "reason": "stage_failed",
+          "generation_calls": 1,
+          "usage": {
+            "input_tokens": 717,
+            "output_tokens": 76
+          },
+          "usage_known": true,
+          "retrieval_calls": 1,
+          "rerank_calls": 0,
+          "rerank_candidate_pairs": 0,
+          "elapsed_ms": 2086.760955862701,
+          "events": [
+            {
+              "elapsed_ms": 2.332848496735096,
+              "query": "zxqv_nonexistent_term_20260929",
+              "stage": "retrieve"
+            },
+            {
+              "error_type": "GeneratedResponseError",
+              "stage": "failure"
+            }
+          ],
+          "candidate_count": 0,
+          "context_count": 0,
+          "delivered_count": 0,
+          "answer": null
+        }
+      ]
+    }
+  ]
+}
