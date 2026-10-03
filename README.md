@@ -19,7 +19,21 @@ team deliverable is my individual work.
   subsequent fixed 12-task author-assisted diagnosis finds relation/quantity/
   time coverage gaps; it is not new accuracy or independent semantic evaluation.
 
-**Latest bounded extension (2026-10-03):** human blind labeling is no longer a
+**Latest real comparison (2026-10-03):** the authorized coverage-gate regression
+completed **96/96 slots** on the same previously consumed32 tasks. Official task
+correctness is fixed13/32, workflow14/32, autonomous3/32. Autonomous performs
+two real acquisitions whose four new sentences reach later physical prompts,
+but27/32 tasks fail validation; the one acquired task with a final answer does
+not select the newly delivered sentence. No feedback-use or quality gain is
+claimed. Saved-output diagnosis identifies non-current sentence references and
+non-verbatim claim spans, not an infrastructure failure. The coverage policy
+is **not promoted** and this cohort will not be retuned to obtain positive results.
+[Complete result, costs, real cases and recruitment decision](docs/COVERAGE_REGRESSION_RESULT_20261003.md)
+and [portable recovery identities](docs/PORTABLE_COVERAGE_RECOVERY_20261003.md)
+preserve the full negative result and separate earlier experiments. GPU compute
+is stopped after hash-verified recovery; retained volumes still incur storage fees.
+
+**Earlier bounded preparation (2026-10-03):** human blind labeling is no longer a
 delivery prerequisite. A pinned local NLI sidecar has scored all96 saved outputs;
 combined-premise NLI proxy pass counts are3/32,2/32,5/32 with crossing-zero paired
 intervals, not a proven Agent gain. A relation-coverage gate is implemented in
@@ -56,7 +70,7 @@ are changed.
 <details>
 <summary>Historical execution and recovery records (not the current demo workflow)</summary>
 
-**Latest real result (2026-10-03):** the [equal-capability three-arm run](docs/FAIR_THREE_ARM_RESULT_20261003.md)
+**Earlier v1 real result (2026-10-03):** the [equal-capability three-arm run](docs/FAIR_THREE_ARM_RESULT_20261003.md)
 completed and privately recovered **96/96 slots**. Fixed multiquery and
 deterministic workflow each achieve **14/32** official task correctness;
 autonomous achieves **12/32**, selecting **stop32/32** with no extra evidence

@@ -1,0 +1,94 @@
+{
+  "contract": "saved-fair-citation-nli-proxy-v1",
+  "model": "cross-encoder/nli-deberta-v3-small",
+  "revision": "fa2804872c3b4bd748f38c0185cc85775361e735",
+  "threshold": 0.8,
+  "all_tasks_per_arm": 32,
+  "routes": {
+    "fixed_multiquery": {
+      "denominator_all_tasks": 32,
+      "status": {
+        "scored": 27,
+        "abstained": 5
+      },
+      "joint_citation_proxy_pass_count": 4,
+      "joint_citation_proxy_pass_all_tasks": 0.125,
+      "joint_citation_proxy_pass_scored_answers": 0.14814814814814814,
+      "individual_citations_scored": 79,
+      "individual_citation_proxy_pass_count": 9
+    },
+    "deterministic_workflow": {
+      "denominator_all_tasks": 32,
+      "status": {
+        "scored": 27,
+        "abstained": 5
+      },
+      "joint_citation_proxy_pass_count": 2,
+      "joint_citation_proxy_pass_all_tasks": 0.0625,
+      "joint_citation_proxy_pass_scored_answers": 0.07407407407407407,
+      "individual_citations_scored": 80,
+      "individual_citation_proxy_pass_count": 7
+    },
+    "autonomous": {
+      "denominator_all_tasks": 32,
+      "status": {
+        "execution_failure": 27,
+        "scored": 5
+      },
+      "joint_citation_proxy_pass_count": 1,
+      "joint_citation_proxy_pass_all_tasks": 0.03125,
+      "joint_citation_proxy_pass_scored_answers": 0.2,
+      "individual_citations_scored": 15,
+      "individual_citation_proxy_pass_count": 1
+    }
+  },
+  "scope": "posthoc automatic NLI proxy on previously consumed development outputs",
+  "human_annotations": false,
+  "official_scores_changed": false,
+  "gold_read": false,
+  "causal_feedback_gain": false,
+  "abstention_semantic_correctness": "unmeasured; no answer != correct NEI",
+  "limitation": "general SNLI/MNLI model; uncalibrated climate entailment, numbers, time and multi-evidence errors possible; not a truth oracle",
+  "paired_bootstrap": {
+    "autonomous-minus-fixed_multiquery": {
+      "pair_count": 32,
+      "samples": 5000,
+      "baseline_mean": 0.125,
+      "candidate_mean": 0.03125,
+      "mean_difference": -0.09375,
+      "ci_lower": -0.21875,
+      "ci_upper": 0.0,
+      "two_sided_p": 0.084
+    },
+    "autonomous-minus-deterministic_workflow": {
+      "pair_count": 32,
+      "samples": 5000,
+      "baseline_mean": 0.0625,
+      "candidate_mean": 0.03125,
+      "mean_difference": -0.03125,
+      "ci_lower": -0.15625,
+      "ci_upper": 0.0625,
+      "two_sided_p": 0.7904
+    }
+  },
+  "measurement_cost": {
+    "nli_calls": 232,
+    "input_tokens": 17545,
+    "cpu_wall_seconds": 44.18785539991222,
+    "paid_api_calls": 0,
+    "agent_cost_reused_not_recomputed": true
+  },
+  "run_sha256": "48d597d3abc82b8309cf2952895c787ff388c589371c37c1cecd6609cca778a6",
+  "model_manifest_sha256": "acdf21ba8b03afc80194d3ef136fd49b46bc22445f3b16122f2ec14061ddb37e",
+  "source_sha256": "b01db0bdbccab94723f338b26cc32efacb9a07d8a5f43ef75e2304e257ce1592",
+  "reused_accepted_physical_delivery_audit_run_sha256": "48d597d3abc82b8309cf2952895c787ff388c589371c37c1cecd6609cca778a6",
+  "execution_source_git": "f792b9e0c09f95ddc46c7e613541b90eeded3edc",
+  "semantic_proxy_source_sha256": "c858aeeb7ccd543a5f10ef9d2b5436d1a0d646def4a3c46554173766d5e40dde",
+  "protocol": "fair-acquisition-coverage-v2-20261003",
+  "model_load_seconds": 12.091503100004047,
+  "versions": {
+    "torch": "2.7.1+cpu",
+    "transformers": "4.51.3",
+    "numpy": "1.26.4"
+  }
+}

@@ -100,3 +100,6 @@ scripts/replay_recovered_acquisition.py text eol=lf
 src/climate_rag/acquisition_comparison.py text eol=lf
 tests/test_acquisition_comparison.py text eol=lf
 tests/test_recovered_acquisition_replay.py text eol=lf
+docs/verified-runs/coverage-regression32-result-20261003.json -text
+docs/verified-runs/coverage-regression32-behavior-20261003.json -text
+docs/verified-runs/coverage-regression32-nli-proxy-20261003.json -text
