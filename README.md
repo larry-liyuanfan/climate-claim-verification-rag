@@ -25,8 +25,10 @@ combined-premise NLI proxy pass counts are3/32,2/32,5/32 with crossing-zero pair
 intervals, not a proven Agent gain. A relation-coverage gate is implemented in
 the actual three-arm worker, with shared tools/initial information/verifier and
 explicit consumed-cohort binding; CPU fixtures do not prove model behavior.
-Public learned-index reconstruction and exact public4B checkpoint acquisition
-are separate from unavailable historical LoRA/LTR originals.
+The public5,240-document learned index and a real BM25/HNSW/RRF/4B manual query
+are complete, separately from unavailable historical LoRA/LTR originals. Local
+CPU BF16 reranking20 pairs took684s: live retrieval plus explicitly saved real
+rerank replay is the recruitment demo, not an online SLA or quality benchmark.
 [Results, implementation decision and remaining boundaries](docs/AUTOMATED_GROUNDING_AND_COVERAGE_20261003.md).
 
 [Two-minute demo, architecture, real cases, STAR and resume candidates](docs/RECRUITMENT_DEMO_20261003.md)

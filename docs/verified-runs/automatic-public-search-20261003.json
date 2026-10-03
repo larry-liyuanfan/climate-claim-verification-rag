@@ -1,0 +1,69 @@
+{
+  "scope": "new_public_reconstruction_manual_demo_and_saved_output_nli_proxy",
+  "gold_or_frozen_test_read": false,
+  "new_agent_model_run": false,
+  "human_annotation_required": false,
+  "reviewed_functional_head": "f792b9e0c09f95ddc46c7e613541b90eeded3edc",
+  "public_reconstruction": {
+    "documents": 5240,
+    "vectors": 5240,
+    "dimension": 1024,
+    "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+    "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+    "embedding_revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+    "cpu_threads": 4,
+    "embedding_seconds": 2173.478073199978,
+    "index_build_seconds": 0.3539477998856455,
+    "index_bytes": 22886274,
+    "reconstruction_sha256": "cba4cb265f516d27943673069317622fdd41d8e5910ab4d1b96bebbca7588183",
+    "index_sha256": "c921ceb0b95afa0e743cc9848e8a2c4211394e5c8dcb534066863668ea92d241",
+    "historical_lora_or_ltr_restored": false
+  },
+  "manual_query_stages": {
+    "queries": 1,
+    "candidate_width": 20,
+    "bm25_ms": 0.6913000252097845,
+    "query_forward_ms": 422.1213001292199,
+    "hnsw_ms": 5.103799980133772,
+    "rrf_ms": 0.07650000043213367,
+    "query_model_load_ms": 7186.279200017452,
+    "encoder_process_including_load_ms": 10195.892499992624,
+    "search_sha256": "d0ddee2c4a87ce219f69362ceeb6dfe76ccc4391511fb2963a1afbe34a8aa3c6",
+    "reranker": "Qwen/Qwen3-Reranker-4B",
+    "reranker_revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+    "reranker_manifest_sha256": "e1f56457935dd69b67e3249cbd81fd7aabaf5e2f0b870aa173b6fcb573b564ed",
+    "reranker_identity_sha256": "de1d4ac39101816774439e68881e2308c5e5f1bd94d0b0dc4c492a56c2681052",
+    "reranker_dtype": "bfloat16",
+    "reranker_batch_size": 1,
+    "max_pair_tokens": 142,
+    "reranker_load_ms": 7281.832000007853,
+    "rerank_ms": 684026.9993999973,
+    "rerank_output_sha256": "f6c174f02075ef3a3791f6b81785dec87155daa0b61df6cbdc7b269f449ee5c7",
+    "scope": "one local CPU query, no gold scoring, no E2E/SLA/quality gain; model loads separately, not double counted"
+  },
+  "saved_nli_proxy": {
+    "tasks_per_arm": 32,
+    "slots": 96,
+    "combined_premise_pass_counts": {
+      "fixed_multiquery": 3,
+      "deterministic_workflow": 2,
+      "autonomous": 5
+    },
+    "model": "cross-encoder/nli-deberta-v3-small",
+    "revision": "fa2804872c3b4bd748f38c0185cc85775361e735",
+    "threshold": 0.8,
+    "bootstrap_samples": 5000,
+    "autonomous_minus_fixed_ci95": [-0.0625, 0.1875],
+    "autonomous_minus_deterministic_ci95": [-0.03125, 0.25],
+    "task_accuracy_or_human_truth": false,
+    "quality_gain_proven": false,
+    "compact_sha256": "9541a6e16ece354d594a2f4f3e32bed38d340710287aeef4fc46b5c5d0c4e8e4"
+  },
+  "runtime_versions": {
+    "torch": "2.7.1+cpu",
+    "transformers": "4.51.3",
+    "sentence_transformers": "4.1.0",
+    "faiss_cpu": "1.10.0",
+    "numpy": "1.26.4"
+  }
+}

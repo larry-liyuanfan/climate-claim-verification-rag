@@ -108,6 +108,25 @@ query模型冷加载7186.279ms；encoder子进程总10195.892ms含加载，不�
 Windows原生Torch与FAISS的OpenMP冲突通过独立进程隔离解决，没有开启duplicate-runtime绕过。
 查询编码与检索索引相互核对模型文件、语料、向量维度、文档ID/文本映射，产物拒绝覆盖。
 
+4B同一20条RRF候选实际精排已完成：4线程CPU、BF16、batch1，最长pair142tokens，
+forward684.027s（11.4分钟），加载7.282s另列；Top1变为
+`Carbon dioxide in Earth's atmosphere:4`（relevance score0.9921875），
+并列分数按ID确定排序。分数是相关性yes/no概率，不是声明正确率。
+实际输出`E:/Project/_climate_transfer/public-learned-demo-hnsw-20261003/live-4b-co2.json`，
+SHA `f6c174f02075ef3a3791f6b81785dec87155daa0b61df6cbdc7b269f449ee5c7`；
+执行脚本SHA `338bc50b35cc3403bdafb49b0a4926b273ccf8517afa4fbb5febdbd083db3773`。
+本机该配置不适合现场实时等待。秋招演示用10秒量级的真实冷查询链，
+随后展示本次保存的**真实4B精排轨迹**，明确标为历史回放而非现场调用或fixture。
+不将此CPU单次结果与旧GPU validation P95相减，不声称“4B普遍要11分钟”。
+
+重新实跑4B（会慢，不需要每次演示重复）：
+
+```powershell
+.venv-validation/Scripts/python.exe -X utf8 scripts/rerank_public_demo.py --search E:/Project/_climate_transfer/public-learned-demo-hnsw-20261003/live-learned-co2.json --search-sha d0ddee2c4a87ce219f69362ceeb6dfe76ccc4391511fb2963a1afbe34a8aa3c6 --evidence E:/Project/_climate_transfer/fair-three-arm-20261003/cpu-input/evidence.jsonl --role-dir E:/Project/_climate_transfer/public-search-model-recovery-20261003/reranker --output E:/Project/_climate_transfer/public-learned-demo-hnsw-20261003/live-4b-co2-repeat.json
+```
+
+安全汇总见[compact](verified-runs/automatic-public-search-20261003.json)，不含逐题原文或gold。
+
 ## 完成口径与求职转译
 
 可交付：真实训练案例、错误诊断、自动代理测量、真实搜索路径和有明确失败条件的新获取实现。
@@ -117,12 +136,38 @@ Windows原生Torch与FAISS的OpenMP冲突通过独立进程隔离解决，没有
 建议项目定位：**气候证据检索与排序**，不是已经证明收益的自主事实核查Agent。
 可用表述：
 
-- 面向120.9万条气候证据，构建hard-negative→InfoNCE/LoRA→ANN→融合/排序训练链；
-  在154条offline-dev上Recall@5由27.93%提升到29.70%，保留5,000次配对bootstrap与泄漏边界。
-- 在独立于上述受限轨的公开validation上比较低延迟LTR与4B精排，报告召回—时延取舍；
-  对真实三路获取轨迹增加引用语义代理和送达审计，发现自主路线提前停止，未宣称Agent质量收益。
+- 针对气候声明词汇错配与难证据召回，联合BM25/dense挖掘难负例，采用InfoNCE/LoRA适配检索表示；
+  在154条offline-dev上将Recall@5从27.93%提升至29.70%，以配对bootstrap验证组合效果。
+- 构建BM25＋dense/HNSW＋RRF＋4B的可追溯搜索演示，并在单独公开validation比较召回—时延取舍；
+  LTR达到60.54% Recall@5与77.8ms离线P95，明确历史选型、实时召回和已存精排轨迹的边界。
 
 不要把负结论伪装成收益，也不用声称节省时间、线上生产采用或人工盲标完成。
+
+## 精确源码、验证与下一模型包
+
+功能源码与独立差量reviewed HEAD：`f792b9e0c09f95ddc46c7e613541b90eeded3edc`。
+分别复核NLI支持评分、coverage worker/audit/score/合同接线、公开检索身份与索引覆盖保护；
+已指出的阻断闭合，不扩大为完整历史仓库或模型结果背书。
+本机受影响验证33passed、Ruff全src/scripts/tests通过、受影响src及脚本mypy通过。
+另从精确source.tar解包、强制导入解包src，30条新模块测试通过；复用依赖环境，
+不是宣称重装了干净系统。Linux同源CI独立运行，未完成前不写成功。
+
+CPU冻结包（默认禁止执行模型）：
+`E:/Project/_climate_transfer/coverage-v2-f792b9e-20261003/`。
+run ID `coverage-regression32-20261003`；source archive SHA
+`f8bffda39fbb2b60d7ab90a42affa89fa21babbe023e1761bb4fe0225c1fccc8`；
+`release.unauthorized.json` SHA `f7fab93d8d37015c488c17adce81fea019c28c812ed0c9e7ac4ac262b4153c24`。
+新binding SHA `2a03539d19fb444eca35b89be9808e8ef2a13157eee138ce6722a8f5077647c8`。
+旧provider元数据仅作未执行模板，不证明当前卷/模型可访问。
+尚缺本轮实际asset/runtime/private-storage回执；未把旧release授权复用，也未启动GPU等待修复。
+新coverage没有真实模型结果，NLI脚本当前只接受已验收的原96槽；新结果须先完成自身
+送达审计和精确raw绑定才能复用该代理，不能把旧hash换名直接算。
+
+若后续运行：单张A10040GB级、按旧96槽真实成本加余量准备，现模板计算硬退出2h、
+原US$20整轮预算不变，不平行重试。两小时和旧US$1.59/h报价仅是条件性US$3.18计算上界，
+不含新报价、账单滞后和全部卷费，不是精确剩余预算或新一次已执行实验。
+新32题仍是consumed回归，不称独立提升；再all-stop或只有调用数变化则停止该假设，
+不继续同批调整到正数。没有人工前置步骤。
 
 ## 无需人工参与的验收与仍不可认领的成果
 
