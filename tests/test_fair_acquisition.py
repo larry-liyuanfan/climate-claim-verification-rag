@@ -264,6 +264,24 @@ def test_fair_package_binds_cohort_and_refuses_missing_scorer_hash(tmp_path, mon
     assert value["policy"]["planned_slots"] == 3 and not value["model_execution_authorized"]
 
 
+def test_asset_inventory_preserves_legacy_hash_and_explicit_fair_override(tmp_path, monkeypatch):
+    import preflight_cloud_assets as assets
+    archive, gold = tmp_path / "input.tar", tmp_path / "scorer.json"
+    archive.write_bytes(b"SYNTHETIC input")
+    gold.write_bytes(b"SYNTHETIC scorer hash only")
+    fingerprint = assets.digest(gold)
+    monkeypatch.setattr(assets, "GOLD_SHA", fingerprint)
+    monkeypatch.setattr(assets, "SELECTION", "selection.json")
+    selection = tmp_path / "selection.json"
+    selection.write_bytes(b"SYNTHETIC receipt")
+    monkeypatch.setattr(assets, "SELECTION_SHA", assets.digest(selection))
+    monkeypatch.setattr(assets, "inspect_input", lambda *a, **kw: {"status": "verified"})
+    assert assets.inventory(archive, gold, tmp_path)["asset_status"] == "verified_local_assets"
+    monkeypatch.setattr(assets, "GOLD_SHA", "0" * 64)
+    assert assets.inventory(archive, gold, tmp_path)["asset_status"] == "needs_assets"
+    assert assets.inventory(archive, gold, tmp_path, gold_sha=fingerprint)["asset_status"] == "verified_local_assets"
+
+
 def test_final_renderer_instructions_are_route_independent():
     class Tokenizer:
         def apply_chat_template(self, messages, **kwargs):

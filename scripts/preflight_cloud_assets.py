@@ -11,13 +11,14 @@ from climate_rag.targeted_replay import GOLD_SHA, INPUT_SHA, SELECTION_SHA
 
 
 def inventory(archive: Path, gold: Path, source: Path, *, full: bool = False,
-              input_sha: str = INPUT_SHA, gold_sha: str = GOLD_SHA) -> dict[str, Any]:
+              input_sha: str = INPUT_SHA, gold_sha: str | None = None) -> dict[str, Any]:
     result: dict[str, Any] = {"scope": "local_cpu_asset_inventory_not_cloud_readiness",
                               "model_execution_authorized": False,
                               "runtime": {"linux": "unobserved", "gpu": "unobserved",
                                           "driver": "unobserved", "instance": "unobserved"},
                               "assets": {}}
-    for name, path, expected in (("gold", gold, gold_sha), ("selection", source / SELECTION, SELECTION_SHA)):
+    expected_gold = GOLD_SHA if gold_sha is None else gold_sha
+    for name, path, expected in (("gold", gold, expected_gold), ("selection", source / SELECTION, SELECTION_SHA)):
         result["assets"][name] = ({"status": "verified", "sha256": expected, "bytes": path.stat().st_size}
                                   if path.is_file() and digest(path) == expected else {"status": "needs_assets"})
     if archive.is_file():
