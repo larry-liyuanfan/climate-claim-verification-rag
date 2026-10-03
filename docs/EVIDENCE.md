@@ -1,5 +1,24 @@
 # Evidence and claim boundaries
 
+## 2026-10-03 fair acquisition: complete real run, autonomous not promoted
+
+[Result, business decision and complete cost](FAIR_THREE_ARM_RESULT_20261003.md),
+[safe score projection](verified-runs/fair-three-arm-runpod-20261003.json) and
+[gold-free CPU behavior replay](verified-runs/fair-three-arm-behavior-20261003.json):
+actual model source `e826a4d2178983365c87184e259f7ad43ba7b17a`,96/96 slots,
+worker0/reaped/operator+deadline completed, private archive hash-verified before
+GPU Stop. Fixed/deterministic official task correct14/32 vs autonomous12/32;
+task+nonempty official-ID proxy2/32,2/32,1/32. Autonomous has32 available
+read/query/rerank gates but32 stops/0 acquisition/0 new-text receipts, two
+validation-repair failures. The candidate-ranking denominator is13, not32.
+165 generation calls/367537 input/7105 output tokens;64 rerank requests/1280
+pairs/169156 tokens; unknown usage0. Semantic support and feedback causal benefit
+remain unmeasured. Retrieval-exposed dev is not an independent test, slot time
+is not online SLA, and lower resource point estimates are not measured dollars.
+Keep deterministic as a provisional dev/demo baseline, not a proven non-inferior
+or production system. Old54031fa/160-slot results remain separate and unchanged;
+no source/policy/cohort/model change or automatic rerun occurred in this run.
+
 ## 2026-10-02 targeted retrieval feedback: completed, not promoted
 
 [Full result and five redacted cases](TARGETED_RETRIEVAL_FEEDBACK_RESULT_20261002.md)

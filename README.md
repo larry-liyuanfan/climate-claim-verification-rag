@@ -1,5 +1,18 @@
 # Climate Evidence Retrieval and Grounded Verification
 
+**Latest real result (2026-10-03):** the [equal-capability three-arm run](docs/FAIR_THREE_ARM_RESULT_20261003.md)
+completed and privately recovered **96/96 slots**. Fixed multiquery and
+deterministic workflow each achieve **14/32** official task correctness;
+autonomous achieves **12/32**, selecting **stop32/32** with no extra evidence
+acquisition even though read/query/rerank are available. No autonomous quality
+or semantic-grounding gain is claimed. The provisional **development demo**
+keeps the deterministic workflow: equal point task score to fixed multiquery,
+33 vs64 generator calls, not proven non-inferiority or dollar savings.
+The [score/cost projection](docs/verified-runs/fair-three-arm-runpod-20261003.json)
+and [gold-free receipt replay](docs/verified-runs/fair-three-arm-behavior-20261003.json)
+keep all failures, separate denominators and full physical costs. GPU compute
+was stopped after private hash-verified recovery; retained storage still costs.
+
 **CPU implementation update (2026-10-03, not a new model result):** the
 [fair three-arm package](docs/FAIR_THREE_ARM_CPU_20261003.md) connects strong
 upfront multiquery, deterministic workflow and optional autonomous acquisition
@@ -10,17 +23,19 @@ delivery and later physical prompts are audited, not inferred from tool counts.
 The scorer keeps official task labels separate from the explicitly limited
 official-evidence-ID citation proxy. The package is **unauthorized by default**;
 fresh exact release, cloud asset/runtime receipts and private recovery are
-required before any real model run. No independent-test or Agent gain is claimed.
+required before any real model run. The exact run above passed those gates;
+this does not authorize automatic repeats. No independent-test or Agent gain is claimed.
 
-**Latest verified result (2026-10-03):** the Runpod replay completed and all
+**Historical54031fa result retained (2026-10-03):** the Runpod replay completed and all
 **160 slots** were privately recovered. Autonomous acquisition selected stop in
 **32/32** tasks, with binary correctness **8/23 vs fixed multiquery14/23**; no
 Agent quality/cost benefit is claimed. [Recovery and complete comparison](docs/RUNPOD_RECOVERY_AND_NEXT_DECISION_20261003.md)
 records source identities, availability, behavior and full physical cost.
 [Application case, architecture and STAR](docs/CLIMATE_APPLICATION_CASE_20261003.md)
 connects the defensible training/search results to the claim-checking problem.
-The new gold-free CPU replay and equal-capability comparison check are preparation,
-not model execution. Current work uses local materials and Runpod; unavailable
+The earlier gold-free CPU replay and equal-capability comparison check were preparation,
+not model execution. Their later real comparison is separately reported above.
+Current work uses local materials and Runpod; unavailable
 Spartan originals are marked unrecovered, not lost. Historical runbooks below
 describe their own completed/preparation packages and are not current launch steps.
 
