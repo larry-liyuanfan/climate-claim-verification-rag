@@ -1,4 +1,44 @@
-# Climate Evidence Retrieval and Grounded Verification
+# Climate Evidence Retrieval — Model Training and Evidence Search
+
+## Recruitment case: training, search quality and technical decisions
+
+The business task is to find evidence covering a claim's entity, time and
+comparison, then choose a defensible quality/latency profile. This is an
+extension of the COMP90042 Group 045 team system, not a claim that the entire
+team deliverable is my individual work.
+
+- **Representation training:** grouped hard negatives + 20-step InfoNCE/LoRA
+  adaptation improves Recall@5 **27.93% →29.70%** on 154 restricted offline-dev
+  queries over 1,208,827 documents. Not pretraining, independent test or A/B.
+- **Search-model choice:** on a separate 126-query public validation profile,
+  LTR reaches **60.54% R@5 /77.8ms offline P95**. 4B Top100 has higher Top5 point
+  estimates but 9.30s P95 and crossing-zero paired quality intervals. LTR is an
+  offline candidate, not a deployed default or CPU-only complete route.
+- **Grounding boundary:** the 96-slot fair development experiment is complete,
+  with **32 stop /0 acquire** on the autonomous arm. It is not promoted. The
+  subsequent fixed 12-task author-assisted diagnosis finds relation/quantity/
+  time coverage gaps; it is not new accuracy or independent semantic evaluation.
+
+[Two-minute demo, architecture, real cases, STAR and resume candidates](docs/RECRUITMENT_DEMO_20261003.md)
+are the current recruitment entry. [Bounded self-execution prompt](docs/CLIMATE_RECRUITMENT_CLOSEOUT_20261003.md)
+closes this package without more training, model runs or infrastructure.
+
+```sh
+# Saved aggregates + redacted public search metadata; no model, corpus or network.
+python scripts/demo_recruitment_case.py
+# Optional actual BM25 on the registered local public corpus; NOT live dense/LTR/LLM.
+python scripts/demo_recruitment_case.py --evidence /path/to/registered-public-evidence.jsonl
+```
+
+Historical LTR weights/per-query traces are not recovered locally. The demo
+does not replace them with fixture scores or pretend to execute the selected
+historical profile. Public passage text stays local; neither private run text
+nor gold is included in the display export. Manual OOV handling is not a real
+model recovery case. No current resume/shared career files or other projects
+are changed.
+
+<details>
+<summary>Historical execution and recovery records (not the current demo workflow)</summary>
 
 **Latest real result (2026-10-03):** the [equal-capability three-arm run](docs/FAIR_THREE_ARM_RESULT_20261003.md)
 completed and privately recovered **96/96 slots**. Fixed multiquery and
@@ -624,6 +664,8 @@ claim normalisation + entity/year constraints
 ```
 
 The repository does **not** claim an official leaderboard rank. Restricted course data, raw predictions, and private checkpoints are not redistributed.
+
+</details>
 
 ## What is implemented
 

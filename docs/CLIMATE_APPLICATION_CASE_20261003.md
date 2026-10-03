@@ -1,5 +1,11 @@
 # Climate Evidence Retrieval: application case and interview handoff
 
+**Latest recruitment closeout:** [CPU demo, fixed saved-sample diagnosis and
+concise interview/resume package](RECRUITMENT_DEMO_20261003.md). That document
+is the application-facing entry; the historical result/source boundaries below
+remain intact. The original full-run semantic score is still unmeasured; the
+new 12-task diagnosis is author-assisted only, not a new benchmark.
+
 Current outcome: [fair three-arm real comparison](FAIR_THREE_ARM_RESULT_20261003.md)
 is completed, not promoted. The recovery/preparation package is complete; a
 real autonomous acquisition→feedback→later-decision case is still absent. No

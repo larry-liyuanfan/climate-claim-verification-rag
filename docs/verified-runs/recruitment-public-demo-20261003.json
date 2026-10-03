@@ -1,0 +1,20 @@
+{
+  "mode": "saved_redacted_public_BM25_metadata_not_live_search",
+  "document_count": 5240,
+  "corpus_sha256": "c14315aee9feecbbbbc3b0c7101d978b52b47cee9a613336304bcaa736460c71",
+  "live_output_sha256": "7ea28dd53df21e3bc6b516e295039f897f02de184ee9296e2d56acd3dd30ca46",
+  "scope": "three authored manual queries; not split evaluation, no LLM/verdict; full text omitted",
+  "cases": [
+    {"claim_text": "Arctic sea ice decline", "status": "evidence_found", "answer": null, "items": [
+      {"evidence_id": "Arctic sea ice decline:271", "retrieval": {"rank": 1, "score": 19.624982915023864, "route": "bm25"}, "original_text_sha256": "bee4ed3c57b5a5e2ade148df22dd340ace36c077ecfb02d440fdc82dc2791325"},
+      {"evidence_id": "Arctic sea ice decline:17", "retrieval": {"rank": 2, "score": 15.609941002119733, "route": "bm25"}, "original_text_sha256": "56329eb53284e7bd3e2a605ffaf97b4e81f7262074d42cf567007cf578cb7ecd"},
+      {"evidence_id": "Climate change in the Arctic:34", "retrieval": {"rank": 3, "score": 14.733107166068516, "route": "bm25"}, "original_text_sha256": "1f26bb2e6b3d40890d328644bf533556ae8ada64a00fb77cc4d0d60fd247c193"}
+    ]},
+    {"claim_text": "carbon dioxide greenhouse effect", "status": "evidence_found", "answer": null, "items": [
+      {"evidence_id": "Greenhouse effect:54", "retrieval": {"rank": 1, "score": 10.815068894876145, "route": "bm25"}, "original_text_sha256": "048df2597c0bf0f4b4e909c2bcab5c1144b9e11811758c202965615782187ef6"},
+      {"evidence_id": "Paleoclimatology:145", "retrieval": {"rank": 2, "score": 10.389608978236803, "route": "bm25"}, "original_text_sha256": "a81316e14d46f2ce24f66bd25f5675fa70586825d3477dd50dcda6756d9c35c6"},
+      {"evidence_id": "Christopher Monckton, 3rd Viscount Monckton of Brenchley:72", "retrieval": {"rank": 3, "score": 9.620105061360132, "route": "bm25"}, "original_text_sha256": "0090d0b9bbe2007a1ba8abaa74473e805f17a2c5faf1775c107180499b2a3d83"}
+    ]},
+    {"claim_text": "zxqv_nonexistent_term_20260927", "status": "empty_result", "answer": null, "items": []}
+  ]
+}
