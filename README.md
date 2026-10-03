@@ -19,9 +19,19 @@ team deliverable is my individual work.
   subsequent fixed 12-task author-assisted diagnosis finds relation/quantity/
   time coverage gaps; it is not new accuracy or independent semantic evaluation.
 
+**Latest bounded extension (2026-10-03):** human blind labeling is no longer a
+delivery prerequisite. A pinned local NLI sidecar has scored all96 saved outputs;
+combined-premise NLI proxy pass counts are3/32,2/32,5/32 with crossing-zero paired
+intervals, not a proven Agent gain. A relation-coverage gate is implemented in
+the actual three-arm worker, with shared tools/initial information/verifier and
+explicit consumed-cohort binding; CPU fixtures do not prove model behavior.
+Public learned-index reconstruction and exact public4B checkpoint acquisition
+are separate from unavailable historical LoRA/LTR originals.
+[Results, implementation decision and remaining boundaries](docs/AUTOMATED_GROUNDING_AND_COVERAGE_20261003.md).
+
 [Two-minute demo, architecture, real cases, STAR and resume candidates](docs/RECRUITMENT_DEMO_20261003.md)
-are the current recruitment entry. [Bounded self-execution prompt](docs/CLIMATE_RECRUITMENT_CLOSEOUT_20261003.md)
-closes this package without more training, model runs or infrastructure.
+document the earlier BM25-only presentation. [Bounded self-execution prompt](docs/CLIMATE_RECRUITMENT_CLOSEOUT_20261003.md)
+closed that earlier package; the latest authorized local extension above is separate.
 [Interview readiness: completed work, training whiteboard, error taxonomy and personal practice](docs/CLIMATE_INTERVIEW_READINESS_20261003.md)
 separates prepared materials from the candidate's still-unverified independent code defence.
 

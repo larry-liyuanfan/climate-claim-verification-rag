@@ -18,6 +18,7 @@ import numpy as np
 from .agent_v3 import Source, parse_action, action_schema
 from . import stop_acquire
 from . import fair_acquisition
+from . import coverage_acquisition
 from .metrics import paired_bootstrap, per_claim_retrieval_metrics
 from .models import Claim, Prediction
 from .scifact_utility_runtime import ledger_cost, reranker_cost
@@ -167,17 +168,19 @@ def audit(
     generation_contract: Any = None,
     reranker_directory: Path | None = None,
 ) -> None:
-    fair = run.get("protocol") == fair_acquisition.PROTOCOL
+    fair = fair_acquisition.is_fair(run.get("protocol"))
     routes = fair_acquisition.ROUTES if fair else ROUTES
     study = STUDY
     if fair:
-        from .fair_replay import validate_binding, validate_tasks, audit_state, STUDY as fair_study
+        from .fair_replay import validate_binding, validate_tasks, audit_state
         validate_binding(run.get("fair_binding"))
+        if run["fair_binding"]["protocol"] != run["protocol"]:
+            raise ValueError("fair_binding_execution_protocol_mismatch")
         validate_tasks(tasks, run["fair_binding"])
-        study = fair_study
+        study = run["fair_binding"]["study_kind"]
     expected = [(t["id"], route) for t in tasks for route in routes]
     if (
-        run["protocol"] not in {PROTOCOL, stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL}
+        run["protocol"] not in {PROTOCOL, stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL, fair_acquisition.COVERAGE_PROTOCOL}
         or run["study_kind"] != study
         or run["budget"] != BUDGET
         or [(r["task_id"], r["route"]) for r in run["runs"]] != expected
@@ -208,7 +211,7 @@ def audit(
             or (not synthetic and row["provider_kind"] != "local_model")
         ):
             raise ValueError("row_identity_or_unconfigured_provider")
-        gated = row["protocol"] in {stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL}
+        gated = row["protocol"] in {stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL, fair_acquisition.COVERAGE_PROTOCOL}
         if fair:
             audit_state(row, sources)
         elif gated:
@@ -320,7 +323,8 @@ def audit(
                     if fair and a["stage"] == "plan":
                         actual = fair_acquisition.validate_plan(payload, observation)
                     elif fair and a["stage"] == "gate":
-                        actual = fair_acquisition.parse_gate(payload, observation, fully_shown=[
+                        gate = coverage_acquisition.parse if run["protocol"] == coverage_acquisition.PROTOCOL else fair_acquisition.parse_gate
+                        actual = gate(payload, observation, fully_shown=[
                             alias for alias, real in aliases.items()
                             if all(f"{alias}:{i}" in now for i in range(len(sources[real].sentences)))])
                     else:

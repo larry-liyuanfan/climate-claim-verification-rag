@@ -12,6 +12,7 @@ import re
 from typing import Any
 
 from . import fair_acquisition, targeted_query
+from . import coverage_acquisition
 from .agent_v3 import action_schema
 from .metrics import paired_bootstrap, per_claim_retrieval_metrics
 from .models import Claim, Prediction
@@ -19,6 +20,7 @@ from .targeted_replay import BUDGET, CORPUS_SHA, MODEL_SHA, RERANKER_SHA
 from .verification import normalise_claim
 
 STUDY = "public_v2_retrieval_exposed_development_policy_comparison_not_independent_test"
+REGRESSION_STUDY = "consumed_fair32_coverage_regression_not_independent_quality_validation"
 BINDING_KEYS = {"protocol", "study_kind", "task_count", "cohort_sha256", "tasks_sha256",
                 "exposure_audit_sha256", "scoring_contract_sha256", "initial_contract_sha256",
                 "corpus_sha256", "model_sha256", "reranker_sha256", "eligible", "selection_rule"}
@@ -32,7 +34,8 @@ def identity(value: Any) -> str:
 def validate_binding(binding: Any, *, execution: bool = True) -> None:
     if not isinstance(binding, dict) or set(binding) != BINDING_KEYS:
         raise ValueError("unbound_fair_identity")
-    if (binding["protocol"] != fair_acquisition.PROTOCOL or binding["study_kind"] != STUDY
+    expected_study = REGRESSION_STUDY if binding["protocol"] == coverage_acquisition.PROTOCOL else STUDY
+    if (not fair_acquisition.is_fair(binding["protocol"]) or binding["study_kind"] != expected_study
             or type(binding["task_count"]) is not int or not 1 <= binding["task_count"] <= 32
             or type(binding["eligible"]) is not bool or not binding["selection_rule"]):
         raise ValueError("fair_study_or_cohort")
@@ -60,7 +63,7 @@ def validate_tasks(tasks: Any, binding: Any) -> None:
 def policy(binding: dict[str, Any]) -> dict[str, Any]:
     validate_binding(binding, execution=False)
     slots = 3 * binding["task_count"]
-    return {"protocol": fair_acquisition.PROTOCOL, "routes": list(fair_acquisition.ROUTES),
+    return {"protocol": binding["protocol"], "routes": list(fair_acquisition.ROUTES),
             "planned_slots": slots, "max_generator_calls": slots * BUDGET["max_calls"],
             "max_rerank_requests": slots * (BUDGET["max_tools"] - 1),
             "budget": BUDGET, "binding": binding, "same_caps_not_equal_actual_cost": True,
@@ -189,7 +192,8 @@ def audit_state(row: dict[str, Any], sources: dict[str, Any]) -> None:
                     or set(readable) & fully or not set(readable) <= set(pool)
                     or obs["allowed_actions"] != ["stop"] + (["acquire"] if acquire and (query or readable or rank) else [])):
                 raise ValueError("fair_availability_reconstruction")
-            schema = fair_acquisition.gate_schema(obs["readable_source_ids"],
+            gate = coverage_acquisition.schema if row["protocol"] == coverage_acquisition.PROTOCOL else fair_acquisition.gate_schema
+            schema = gate(obs["readable_source_ids"],
                 can_acquire=obs["acquisition_available"], can_query=obs["query_available"],
                 can_rerank=obs["rerank_available"])
         if a["schema"] != schema:
@@ -210,6 +214,10 @@ def audit_state(row: dict[str, Any], sources: dict[str, Any]) -> None:
                     raise ValueError("fair_delivery_not_actual_prompt")
         if a["status"] == "valid_decision":
             d = a["decision"]
+            if phase == "gate" and row["protocol"] == coverage_acquisition.PROTOCOL:
+                full = [alias for alias, real in aliases.items() if all(f"{alias}:{i}" in visible for i in range(len(sources[real].sentences)))]
+                if coverage_acquisition.parse(a["proposed_decision"], obs, fully_shown=full) != d:
+                    raise ValueError("coverage_validated_decision_drift")
             triggered = [e for e in tools if e["trigger_attempt"] == ordinal]
             if phase == "verdict" and ordinal != len(row["generation_attempts"]) - 1:
                 raise ValueError("fair_verdict_must_terminate")
@@ -262,11 +270,13 @@ def score(run: dict[str, Any], gold: dict[str, Any]) -> dict[str, Any]:
     """Post-audit only. All N retained; semantic support remains unmeasured."""
     binding = run["fair_binding"]
     validate_binding(binding)
+    if binding["protocol"] != run["protocol"]:
+        raise ValueError("fair_binding_execution_protocol_mismatch")
     task_ids = [r["task_id"] for r in run["runs"] if r["route"] == fair_acquisition.ROUTES[0]]
     if (gold.get("tasks_sha256") != binding["tasks_sha256"] or set(gold["claims"]) != set(task_ids)
             or len(run["runs"]) != 3 * binding["task_count"]):
         raise ValueError("fair_gold_or_matrix_identity")
-    result: dict[str, Any] = {"protocol": fair_acquisition.PROTOCOL, "study_kind": STUDY,
+    result: dict[str, Any] = {"protocol": binding["protocol"], "study_kind": binding["study_kind"],
         "semantic_citation_support": "unmeasured; no human blind labels or model judge",
         "citation_proxy": "official decisive evidence-ID concordance, NOT semantic support",
         "feedback_causality": "whole_policy_comparison_only", "routes": {}, "paired_bootstrap": {}}

@@ -65,11 +65,14 @@ class TargetedRerank(SerialRerank):
 def load_inputs(
     input_dir: Path, release: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, str]], list[Any], dict[str, Source]]:
-    fair = release is not None and release.get("purpose") == fair_acquisition.PROTOCOL
+    fair = release is not None and fair_acquisition.is_fair(release.get("purpose"))
     if fair:
         assert release is not None
         binding = release["fair_binding"]
         validate_binding(binding)
+        if release["purpose"] == fair_acquisition.COVERAGE_PROTOCOL:
+            from climate_rag.coverage_acquisition import validate_frozen_cohort
+            validate_frozen_cohort(binding)
         cohort = Path(release["cohort_path"])
         exposure = Path(release["exposure_audit_path"])
         if cohort.resolve() != cohort or exposure.resolve() != exposure:
@@ -120,13 +123,13 @@ def worker(release: dict[str, Any], input_dir: Path) -> None:
 
 def worker_body(release: dict[str, Any], input_dir: Path) -> None:
     """Shared implementation; entrypoints must validate their own backend first."""
-    if release.get("purpose") == fair_acquisition.PROTOCOL:
+    if fair_acquisition.is_fair(release.get("purpose")):
         if (release.get("authorization") != "validated_worker_projection"
                 or not re.fullmatch(r"[0-9a-f]{40}", str(release.get("source_git")))
                 or not re.fullmatch(r"[0-9a-f]{64}", str(release.get("source_archive_sha256")))
                 or not re.fullmatch(r"[a-z0-9][a-z0-9-]{5,79}", str(release.get("run_id")))):
             raise ValueError("fair_worker_unbound_run_identity")
-    tasks, documents, sources = (load_inputs(input_dir, release) if release["purpose"] == fair_acquisition.PROTOCOL else load_inputs(input_dir))
+    tasks, documents, sources = (load_inputs(input_dir, release) if fair_acquisition.is_fair(release["purpose"]) else load_inputs(input_dir))
     manifests = {}
     for key, identity in (("generator", MODEL_SHA), ("reranker", RERANKER_SHA)):
         root = input_dir / "models" / key
@@ -157,7 +160,7 @@ def worker_body(release: dict[str, Any], input_dir: Path) -> None:
         batch_size=1,
     )
     rerank = TargetedRerank(
-        backend, ranker, output / "reranker-ledger", max_requests=(len(tasks) * 12 if release["purpose"] == fair_acquisition.PROTOCOL else 128)
+        backend, ranker, output / "reranker-ledger", max_requests=(len(tasks) * 12 if fair_acquisition.is_fair(release["purpose"]) else 128)
     )
     index = BM25Index().fit(documents)
 
@@ -198,11 +201,11 @@ def score_after_exit(release: dict[str, Any], input_dir: Path, *, gold_path: Pat
         raise ValueError("worker_not_cleanly_reaped")
     if not (output / "cost-before-quality.json").is_file():
         raise ValueError("missing_cost_before_gold")
-    tasks, _, sources = (load_inputs(input_dir, release) if release["purpose"] == fair_acquisition.PROTOCOL else load_inputs(input_dir))
+    tasks, _, sources = (load_inputs(input_dir, release) if fair_acquisition.is_fair(release["purpose"]) else load_inputs(input_dir))
     run = json.loads((output / "inference/run.json").read_bytes())
     if run.get("protocol") != release["purpose"]:
         raise ValueError("run_release_protocol_mismatch")
-    if release["purpose"] == fair_acquisition.PROTOCOL and run.get("fair_binding") != release["fair_binding"]:
+    if fair_acquisition.is_fair(release["purpose"]) and run.get("fair_binding") != release["fair_binding"]:
         raise ValueError("fair_run_release_binding_mismatch")
     # Tokenizer-only, not weights: bind physical prompt IDs and decoding receipts.
     from transformers.models.auto.tokenization_auto import AutoTokenizer
@@ -227,7 +230,7 @@ def score_after_exit(release: dict[str, Any], input_dir: Path, *, gold_path: Pat
         or cost["completed_slots"] != release.get("policy", {}).get("planned_slots", 160)
     ):
         raise ValueError("cost_before_quality_drift")
-    if release["purpose"] == fair_acquisition.PROTOCOL:
+    if fair_acquisition.is_fair(release["purpose"]):
         from climate_rag.fair_replay import score as fair_score
         if gold_path is None or digest(gold_path) != release["gold_sha256"]:
             raise ValueError("fair_gold_hash_after_exit")

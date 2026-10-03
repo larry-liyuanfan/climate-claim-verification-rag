@@ -23,6 +23,7 @@ from .verification import decompose_claim, extract_constraints, normalise_claim
 from . import targeted_query
 from . import stop_acquire
 from . import fair_acquisition
+from . import coverage_acquisition
 
 
 class _Strict(BaseModel):
@@ -279,14 +280,16 @@ class SentenceAgentV3:
         protocol: str = "sentence-id-v3",
     ):
         if protocol not in {"sentence-id-v3", targeted_query.PROTOCOL, stop_acquire.PROTOCOL,
-                            fair_acquisition.PROTOCOL}:
+                            fair_acquisition.PROTOCOL, coverage_acquisition.PROTOCOL}:
             raise ValueError("unknown controller protocol")
         self.provider, self.retrieve, self.rerank = provider, retrieve, rerank
         self.budget, self.clock = budget or V3Budget(), clock
         self.protocol = protocol
 
     def run(self, claim: str, route: str = "adaptive") -> dict[str, Any]:
-        fair = self.protocol == fair_acquisition.PROTOCOL
+        fair = fair_acquisition.is_fair(self.protocol)
+        coverage = self.protocol == coverage_acquisition.PROTOCOL
+        gate_schema = coverage_acquisition.schema if coverage else fair_acquisition.gate_schema
         original_route = route
         if fair:
             if route not in fair_acquisition.ROUTES or self.rerank is None:
@@ -296,7 +299,7 @@ class SentenceAgentV3:
         if gated and not fair and route != "adaptive":
             raise ValueError("stop_acquire_only_replaces_adaptive")
         targeted = self.protocol in {targeted_query.PROTOCOL, stop_acquire.PROTOCOL,
-                                     fair_acquisition.PROTOCOL}
+                                     fair_acquisition.PROTOCOL, coverage_acquisition.PROTOCOL}
         if route not in ({
             "fixed_retrieval",
             "fixed_rerank",
@@ -506,7 +509,7 @@ class SentenceAgentV3:
                 gate = {**view, "phase": "gate", "allowed_actions": ["stop", "acquire"]}
                 plan = {**view, "phase": "plan", "allowed_actions": ["plan_queries"]}
                 return 64 + max(self.provider.count_prompt(view, schema_value),
-                    self.provider.count_prompt(gate, fair_acquisition.gate_schema(readable,
+                    self.provider.count_prompt(gate, gate_schema(readable,
                         can_acquire=b.max_calls >= 3, can_query=True, can_rerank=bool(candidates), max_read=b.context_k)),
                     self.provider.count_prompt(plan, fair_acquisition.planning_schema(readable)))
             if targeted:
@@ -551,7 +554,7 @@ class SentenceAgentV3:
                         observation["phase"] = "plan"
                         observation["allowed_actions"] = ["plan_queries"]
                         return fair_acquisition.planning_schema(readable)
-                    return fair_acquisition.gate_schema(readable, can_acquire=can_acquire,
+                    return gate_schema(readable, can_acquire=can_acquire,
                         can_query=can_query, can_rerank=observation["rerank_available"], max_read=b.context_k)
                 return stop_acquire.gate_schema(readable, can_acquire=can_acquire, can_query=can_query, max_read=b.context_k)
             if planning and not fair:
@@ -787,7 +790,7 @@ class SentenceAgentV3:
                         decision = (fair_acquisition.validate_plan(payload, observation) if fair
                                     else targeted_query.validate_plan(payload, seen_queries))
                     elif gated and phase == "gate":
-                        decision = (fair_acquisition.parse_gate if fair else stop_acquire.parse_gate)(
+                        decision = (coverage_acquisition.parse if coverage else fair_acquisition.parse_gate if fair else stop_acquire.parse_gate)(
                             payload, observation, fully_shown=[s for s in candidates if fully_shown(s, visible)])
                     else:
                         decision = parse_action(payload, allowed, visible, candidates, b.context_k,

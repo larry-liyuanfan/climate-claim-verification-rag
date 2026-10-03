@@ -109,7 +109,7 @@ def policy(protocol: str = PROTOCOL) -> dict[str, Any]:
 
 
 def route_protocol(protocol: str, route: str) -> str:
-    if protocol == fair_acquisition.PROTOCOL and route in fair_acquisition.ROUTES:
+    if fair_acquisition.is_fair(protocol) and route in fair_acquisition.ROUTES:
         return protocol
     if protocol not in {PROTOCOL, stop_acquire.PROTOCOL} or route not in ROUTES:
         raise ValueError("unknown_matrix_protocol_or_route")
@@ -159,13 +159,15 @@ def run_matrix(
     protocol: str = PROTOCOL,
     binding: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    fair = protocol == fair_acquisition.PROTOCOL
+    fair = fair_acquisition.is_fair(protocol)
     routes = fair_acquisition.ROUTES if fair else ROUTES
     if fair:
         from .fair_replay import validate_binding, validate_tasks
         validate_binding(binding)
         assert binding is not None
         validate_tasks(tasks, binding)
+        if binding["protocol"] != protocol:
+            raise ValueError("fair_binding_execution_protocol_mismatch")
         study_kind = binding["study_kind"]
     else:
         route_protocol(protocol, "adaptive")

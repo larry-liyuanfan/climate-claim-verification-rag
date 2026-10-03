@@ -29,7 +29,7 @@ class LocalTargetedProvider(LocalQwenSciFactProvider):
         self.name = self.base.name + ":" + protocol
 
     def render(self, observation: Mapping[str, Any], schema: Mapping[str, Any]) -> str:
-        if observation.get("protocol") not in {PROTOCOL, stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL}:
+        if observation.get("protocol") not in {PROTOCOL, stop_acquire.PROTOCOL, fair_acquisition.PROTOCOL, fair_acquisition.COVERAGE_PROTOCOL}:
             raise ValueError("targeted_prompt_protocol")
         return render_v3_prompt(self.base.tokenizer, observation, schema)
 

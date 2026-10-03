@@ -10,7 +10,7 @@ from typing import Any, IO
 from cloud_capacity import COMPLETE_HOST, RUNPOD_VISIBLE
 from cloud_private_storage import SINGLE_ROOT, PRIVATE_POSIX, is_split
 
-from climate_rag import stop_acquire, fair_acquisition
+from climate_rag import stop_acquire
 from climate_rag.scifact_generation import frozen_contract
 from climate_rag.targeted_replay import (
     CORPUS_SHA, GOLD_SHA, INPUT_SHA, MANIFEST_BYTES, OLD_PROTOCOL_SHA,
@@ -123,7 +123,7 @@ def draft(source_git: str, source_sha: str, entry_sha: str, *, root: str,
         if fair_gold_sha256 is None:
             raise ValueError("fair_scorer_hash_required")
         hex_id(fair_gold_sha256)
-        result.update(purpose=fair_acquisition.PROTOCOL, policy=fair_policy(fair_binding),
+        result.update(purpose=fair_binding["protocol"], policy=fair_policy(fair_binding),
             fair_binding=fair_binding, cohort_path=str(private / "assets" / "fair-cohort.json"),
             exposure_audit_path=str(private / "assets" / "fair-exposure-audit.json"),
             gold_path=str(private / "scoring" / "fair-gold.json"), gold_sha256=fair_gold_sha256)
@@ -226,7 +226,10 @@ def verify_source(value: dict[str, Any], source: Path) -> None:
     if digest(source / ENTRY) != value["entry_sha256"] or digest(source / SELECTION) != SELECTION_SHA:
         raise ValueError("source_entry_or_selection_hash")
     if "fair_binding" in value:
-        contract_sha = digest(source / "docs/protocols/fair-three-arm-20261003.json")
+        from climate_rag.fair_acquisition import COVERAGE_PROTOCOL
+        contract_name = ("coverage-three-arm-20261003.json" if value["purpose"] == COVERAGE_PROTOCOL
+                         else "fair-three-arm-20261003.json")
+        contract_sha = digest(source / "docs/protocols" / contract_name)
         if any(value["fair_binding"][key] != contract_sha for key in ("scoring_contract_sha256", "initial_contract_sha256")):
             raise ValueError("fair_contract_source_drift")
 

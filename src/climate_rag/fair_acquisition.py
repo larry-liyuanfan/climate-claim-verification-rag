@@ -7,7 +7,12 @@ from typing import Any
 from . import stop_acquire, targeted_query
 
 PROTOCOL = "fair-acquisition-three-arm-v1-20261003"
+COVERAGE_PROTOCOL = "fair-acquisition-coverage-v2-20261003"
 ROUTES = ("fixed_multiquery", "deterministic_workflow", "autonomous")
+
+
+def is_fair(protocol: Any) -> bool:
+    return protocol in (PROTOCOL, COVERAGE_PROTOCOL)
 
 
 def gate_schema(readable: Sequence[str], *, can_acquire: bool, can_query: bool,

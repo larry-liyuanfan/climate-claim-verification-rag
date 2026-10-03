@@ -87,7 +87,7 @@ def test_isolated_bootstrap_rejects_alternate_bytes_before_import(tmp_path, exte
         py_compile.compile(str(source), cfile=str(scripts / "argparse.pyc"), doraise=True)
     else:
         (scripts / ("argparse" + extension)).write_bytes(b"not a native extension")
-    result = subprocess.run([sys.executable, "-IB", str(copied), "--help"], capture_output=True, text=True)
+    result = subprocess.run([sys.executable, "-X", "utf8", "-IB", str(copied), "--help"], capture_output=True, text=True, encoding="utf-8")
     assert result.returncode != 0 and "unbound_project_bytecode_or_extension" in result.stderr
     assert not marker.exists()
     assert "No module named" not in result.stderr

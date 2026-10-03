@@ -1,7 +1,9 @@
 # Climate：已完成、未完成与本人练习清单
 
-本轮起点：`74b1cdb`，同一 managed worktree / `codex/climate-bounded-gap-repair-20260930`。
-只补秋招展示与讲解；不训练、不运行模型、不读取 gold/test、不修改主简历。
+原展示包起点：`74b1cdb`，同一 managed worktree / `codex/climate-bounded-gap-repair-20260930`。
+该包原先只补秋招展示与讲解；其历史回执不改。用户随后授权去掉人工部分、补齐其他。
+新增自动NLI测量与真实公开搜索重建单独登记于
+[补齐包](AUTOMATED_GROUNDING_AND_COVERAGE_20261003.md)，不读取sealed test、不修改主简历。
 业务问题是：**帮助查证人员找到相关、充分、可追溯的证据**。
 检索命中只是提供候选，当前演示不自动认定证据充分，也不生成事实判定。
 
@@ -11,7 +13,7 @@
 |---|---|---|
 | 明确问题 | 查证任务、个人模块、交付物与事实边界已写清 | 你用自己的话在 30 秒内解释，而非背模型名 |
 | 真实训练案例 | 负样本、数据分组、损失、LoRA、指标与边界的源码讲解见下文 | 你独立写损失、回答追问；未做单因素因果消融 |
-| 可重复真实路径 | `--claim` 输入任意声明，真实公开 BM25 → Top 候选 → 分数排序 → 证据/来源/哈希 → 当次耗时 | 不是实时 dense/LTR/4B/verifier；相关不等于支持判断 |
+| 可重复真实路径 | 新公开5,240条语料的 BM25＋真实Qwen dense/HNSW＋RRF：候选、证据/来源/哈希、各阶段实际耗时 | 历史LoRA/LTR原件仍未恢复；相关不等于支持判断，未配置verdict |
 | 错误分析 | 固定 12 题 × 3 路保存输出，原诊断不改分；六类讲解与缺失类别见下文 | 不是人工盲标；没有确证极性翻转或获取后成功的案例 |
 | 独立防守核心代码 | 白板提纲、源码入口、现场改代码任务与验收标准已提供 | 必须由你本人完成，不能由测试数或 AI 写好文档替代 |
 
@@ -53,6 +55,18 @@
   空结果输出 SHA：`9eba81f863c5ae8ed567b7d4b62f55929add8e748283220ed286806ad7c03ed3`。
 - 此次有结果的初始化147.14ms，请求0.914ms（搜索/排序0.882ms、打包0.032ms）；
   空结果初始化143.71ms，请求0.031ms。只是两个本地单次回执，不与历史 LTR 时延相减认领收益。
+
+### 2.1 后续真实 learned search（新公开重建，不是历史恢复）
+
+```powershell
+.venv-validation/Scripts/python.exe -X utf8 scripts/demo_learned_public_search.py --evidence E:/Project/_climate_transfer/fair-three-arm-20261003/cpu-input/evidence.jsonl --dense-dir E:/Project/_climate_transfer/public-learned-demo-hnsw-20261003 --claim "Atmospheric carbon dioxide absorbs infrared radiation."
+```
+
+该命令实际编码新查询、查HNSW并融合，不是读fixture；检索每路Top20、RRF k60。
+返回阶段候选排名、Top3完整证据与来源、model/index身份和冷加载/forward区分后的耗时。
+默认仅输出到本地终端；需要保存时，`--output`必须是Git/OneDrive之外的全新绝对路径。
+基础embedding资产与公开4B checkpoint已回收，具体身份、真实运行及耗时见[补齐包](AUTOMATED_GROUNDING_AND_COVERAGE_20261003.md)。
+旧BM25命令和历史回执继续保留，不把它们改写成新模型运行。
 
 ## 3. 训练白板：要讲清什么
 
@@ -169,8 +183,10 @@ OOV/合成练习只能讲接口或实现，不能补成实测故事。
   远端不可访问不等于丢失。本轮没有恢复，不拿 BM25/fixture 替代其指标。
 - 自主获取—反馈—后续决策的真实成功与质量收益：现有32 stop / 0 acquire，仍未证明。
   不作为本次秋招投递前置条件，不承诺强制调用就能改善。
-- 全量人工语义盲标、独立 test 新提升、生产 SLA/采用/ROI：没有，不写进简历。
+- 人工语义盲标：已从完成条件移除，不再要求你参加新标注。自动NLI代理已测完96槽，
+  但不冒充人工/官方真值；两组差值区间都跨零，不据此写效果提升。
+- 独立 test 新提升、生产 SLA/采用/ROI：没有，不写进简历；不是追加工程的必需门槛。
 - HTML 浏览器视觉验收：未做；本次可验收交付为实际 CLI，不为浏览器限制新建服务。
 
-**停止线：**本包完成后不追加模型运行或工程规模。你完成脱稿演示、白板、两个真实错误故事
+**原展示包停止线已被用户后续补齐授权替代；不无限追加工程规模。**你完成脱稿演示、白板、两个真实错误故事
 和一次核心模块修改，即进入投递/面试；不是要求所有缺失研究结果都补齐。
