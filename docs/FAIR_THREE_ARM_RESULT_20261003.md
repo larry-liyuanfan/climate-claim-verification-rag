@@ -193,8 +193,10 @@ The new10 synthetic tests cover privacy, unique receipt counts, bad hash/schema/
 delivery/future/post-stop/initial/roster rejection, route-specific case ordering
 and error-detail redaction; they are implementation tests,
 not new model effects. Accepted e826 runtime tests/clean checkout/Linux CI are
-reused; only closeout/replay deltas are checked anew. Result review is recorded
-separately with its precise source identity.
+reused; only closeout/replay deltas are checked anew. The
+[independent review and clean reproduction receipt](verified-runs/fair-three-arm-closeout-20261003.json)
+binds reviewed HEAD `7e3e6bc42f8935b6455ed13a432128c4215c4a52`; no remaining
+blocker. The route-specific first-case correction does not change model scores.
 
 My contribution is grouped negative sampling/representation adaptation and
 retrieval/latency selection, then shared typed acquisition, immutable evidence

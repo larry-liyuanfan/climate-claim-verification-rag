@@ -1,0 +1,83 @@
+{
+  "schema": "fair-three-arm-result-closeout-v1",
+  "run_id": "fair-three-arm-20261003",
+  "actual_model_source_commit": "e826a4d2178983365c87184e259f7ad43ba7b17a",
+  "closeout_reviewed_head": "7e3e6bc42f8935b6455ed13a432128c4215c4a52",
+  "review": {
+    "reviewer": "independent read-only fair_runtime_scout_readonly",
+    "status": "accepted",
+    "remaining_blockers": 0,
+    "scope": "new saved-receipt census, tests, result projections, report and application wording; not a repeat of prior runtime review",
+    "fixed_issue": "global first-error wording conflicted with route-first traversal; case keys now route:behavior and selection is first within that route in frozen task order",
+    "reviewer_performed_model_run_or_rescore": false,
+    "limitations": [
+      "Official evidence ID concordance is not semantic support.",
+      "Prompt delivery does not establish semantic use or feedback causality.",
+      "Task denominators are 32 per route; candidate-ranking secondary denominator is 13.",
+      "Same point task scores do not establish statistical non-inferiority.",
+      "Recorded resources and slot timings are not per-route measured USD or online SLA.",
+      "Autonomous stop32/acquire0 does not prove architectural impossibility or reasonable stopping.",
+      "No autonomous acquisition, real empty-query or failed-tool recovery case was observed."
+    ]
+  },
+  "affected_validation": {
+    "worktree_tests": {"passed": 10, "failed": 0, "elapsed_seconds": 0.18},
+    "clean_export_tests": {"passed": 10, "failed": 0, "elapsed_seconds": 0.31},
+    "ruff": "passed for new script and test",
+    "mypy": "passed for new script with existing py310 strict configuration",
+    "tracked_secret_pii_scan": "passed",
+    "git_diff_check": "passed",
+    "clean_import_module": "closeout-clean-7e3e6bc/scripts/replay_fair_acquisition_result.py",
+    "clean_source_export_sha256": "0f45c61383873a260c7eb829a2855df11a086c383a6b22578dfb03dd08942931",
+    "clean_test_xml_sha256": "b75bd0b9ac0a0bd01ee5d6f1dcd4b34bce1ce9eafb5e94179282502a2fa931f5",
+    "clean_actual_receipt_census_slots": 96,
+    "clean_actual_receipt_census_sha256": "1a483ce79857a65a7e94e4b616b28fc14d2736635120dd929af8bfa653d80fb1",
+    "clean_actual_receipt_census_model_calls": 0,
+    "clean_actual_receipt_census_gold_read": false,
+    "clean_actual_receipt_census_scores_recomputed": false,
+    "prior_runtime_acceptance_reused": "e826a4d same-source Linux quality CI 37080557877; unchanged model/runtime/data/score identities"
+  },
+  "safe_artifact_hashes": {
+    "scripts/replay_fair_acquisition_result.py": {
+      "worktree_bytes_sha256": "ed60d267b46f0ceb465dfded8e02575e7db41b222b671c9653fdcbccdf110c09",
+      "git_export_lf_sha256": "d06adec8d7e5eb03c34f30acb3e671ae5b0d8078b2b3da66017dca28123693d3"
+    },
+    "tests/test_fair_saved_replay.py": {
+      "worktree_bytes_sha256": "54eab6ff3adc4411e2bdec77fa09bee7050086a32864fcbeafa33126fb714604",
+      "git_export_lf_sha256": "4c81772b33b6bee0bbdcfb869de51b62f110f0c53f0ad097ccc00e9a0fdc9be1"
+    },
+    "docs/verified-runs/fair-three-arm-runpod-20261003.json": {
+      "worktree_bytes_sha256": "a51fe20b5fb2008cf2053ec813b73bd15356e2628bb83e092a038fd2077bac95",
+      "git_export_lf_sha256": "f8199bd635b0a7ee12f97c7562c816454dbdb37544f4102826dc142054517314"
+    },
+    "docs/verified-runs/fair-three-arm-behavior-20261003.json": {
+      "worktree_bytes_sha256": "1a483ce79857a65a7e94e4b616b28fc14d2736635120dd929af8bfa653d80fb1",
+      "git_export_lf_sha256": "0f66fc10ec5c1aea4f0b627a260a6bccf4d09cee8ae6899681b92540ecd928dc"
+    },
+    "line_endings_note": "Worktree and clean Git export content was verified equal after CRLF normalization; byte hashes intentionally remain separate."
+  },
+  "private_recovery_and_stop": {
+    "archive_sha256": "b83f2d1f901a747d2fc5af107f8b0cf798c425cd7cb867cc8f6bd6309d271d5f",
+    "archive_files": 3557,
+    "archive_bytes": 2072612,
+    "archive_retained_outside_git_and_onedrive": true,
+    "recovery_receipt_sha256": "824bc6d391ac20bcb4e8bb5b3e49a5fb9cd0142c4a8de916cd4b93c0e3675e82",
+    "stop_budget_receipt_sha256": "03344348bb79668c001722d7e015d83b39fa7f9a112219b1bd8703d43df7a682",
+    "compute_stop_observed_before_utc": "2026-10-03T01:32:43Z",
+    "compute_running": false,
+    "permanent_deletion": false,
+    "ongoing_retained_volume_quote_usd_hour": 0.132,
+    "original_whole_round_cap_usd": 20,
+    "per_package_cap_usd": null,
+    "estimated_cumulative_upper_at_stop_usd": 4.6,
+    "billing_not_final": true,
+    "auto_pay": "Disabled"
+  },
+  "package_complete": true,
+  "overall_autonomous_agent_goal_complete": false,
+  "model_policy_promoted": false,
+  "provisional_dev_demo_baseline": "deterministic_workflow",
+  "coordination_message": "not sent; latest user revoked further coordination",
+  "other_projects_or_career_workspace_modified": false,
+  "sealed_test_consumed_by_this_package": false
+}
