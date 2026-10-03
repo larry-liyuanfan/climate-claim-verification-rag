@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from replay_fair_acquisition_result import PROTOCOL, ROUTES, census, digest
+from replay_fair_acquisition_result import PROTOCOL, ROUTES, census, coverage_failure_causes, digest
 
 
 def saved(tmp_path):
@@ -59,6 +59,21 @@ def test_saved_fair_replay_counts_unique_deliveries_and_redacts(tmp_path):
     assert result["gold_read"] is False and result["scores_recomputed"] is False
     assert result["model_calls_made"] == 0
     assert result["feedback_causality"].startswith("whole_policy_only")
+    assert result["routes"]["autonomous"]["acquisition_outcomes"] == [{
+        "frozen_task_position": 0, "delivered_new_sentences": 1,
+        "final_answer_present": True, "new_sentences_in_validated_final_selection": 0,
+        "validation_repair_exhausted": False}]
+
+
+def test_coverage_diagnosis_overlaps_and_never_exports_values():
+    attempt = {"error_code": "coverage_not_claim_or_current_evidence",
+        "observation": {"immutable_claim": "PRIVATE_CLAIM", "current_citable": []},
+        "proposed_decision": {"coverage": [{"claim_span": "PRIVATE_PARAPHRASE",
+            "kind": "relation", "status": "partial", "sentence_ids": ["PRIVATE_ID"]}]}}
+    assert coverage_failure_causes(attempt) == {"span_not_verbatim_claim", "ids_not_current_visible"}
+    assert "PRIVATE" not in json.dumps(sorted(coverage_failure_causes(attempt)))
+    attempt["error_code"] = "different_error"
+    assert coverage_failure_causes(attempt) == set()
 
 
 def test_wrong_hash_rejected_before_private_record_parsing(tmp_path):

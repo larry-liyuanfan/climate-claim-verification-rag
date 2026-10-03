@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from climate_rag.fair_acquisition import COVERAGE_PROTOCOL
+from climate_rag.coverage_acquisition import KINDS, STATES
 
 PROTOCOL = "fair-acquisition-three-arm-v1-20261003"
 ROUTES = ("fixed_multiquery", "deterministic_workflow", "autonomous")
@@ -30,6 +31,41 @@ def digest(path: Path) -> str:
 def require(value: bool, error: str) -> None:
     if not value:
         raise ValueError(error)
+
+
+def coverage_failure_causes(attempt: dict[str, Any]) -> set[str]:
+    """Diagnose saved validation failures, without exporting text or references.
+
+    Counts overlap within an attempt. This does not repair/reinterpret decisions.
+    Only the specific frozen parser error is eligible for this diagnosis.
+    """
+    if attempt.get("error_code") != "coverage_not_claim_or_current_evidence":
+        return set()
+    observation = attempt["observation"]
+    visible = {s["sentence_id"] for s in observation["current_citable"]}
+    result: set[str] = set()
+    for item in attempt["proposed_decision"]["coverage"]:
+        span, ids = item["claim_span"], item["sentence_ids"]
+        if not isinstance(span, str) or not 1 <= len(span) <= 160:
+            result.add("span_shape")
+        elif span not in observation["immutable_claim"]:
+            result.add("span_not_verbatim_claim")
+        if item["kind"] not in KINDS:
+            result.add("kind")
+        if item["status"] not in STATES:
+            result.add("status")
+        if not isinstance(ids, list) or len(ids) > 3:
+            result.add("ids_shape")
+        elif any(not isinstance(s, str) for s in ids):
+            result.add("ids_not_string")
+        else:
+            if len(set(ids)) != len(ids):
+                result.add("ids_duplicate")
+            if not set(ids) <= visible:
+                result.add("ids_not_current_visible")
+        if item["status"] == "covered" and not ids:
+            result.add("covered_without_ids")
+    return result
 
 
 def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32,
@@ -50,7 +86,10 @@ def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32,
         require([r["task_id"] for r in selected] == task_ids, "route_roster_drift")
         counts: Counter[str] = Counter()
         errors: Counter[str] = Counter()
+        coverage_causes: Counter[str] = Counter()
+        coverage_attempts = coverage_truncated = 0
         actions: Counter[str] = Counter()
+        acquisition_outcomes = []
         for position, row in enumerate(selected):
             fingerprint = row["initial_frame_sha256"]
             require(initial.setdefault(row["task_id"], fingerprint) == fingerprint,
@@ -83,6 +122,10 @@ def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32,
                         counts["acquire_" + decision["tool"]] += 1
                 if "error_code" in attempt:
                     code = attempt["error_code"]
+                    if code == "coverage_not_claim_or_current_evidence":
+                        coverage_attempts += 1
+                        coverage_truncated += bool(attempt["diagnostics"].get("reached_max_new_tokens"))
+                        coverage_causes.update(coverage_failure_causes(attempt))
                     errors[code if code in {"duplicate_sentence_reference", "invalid_schema", "invalid_json",
                         "invalid_fixed_read_plan", "read_loop", "read_not_unseen_preview"} else "other_validation_error"] += 1
                     cases.setdefault(route + ":validation_error", {"route": route,
@@ -122,6 +165,14 @@ def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32,
                     counts["additional_full_text_delivery_events"] += 1
                     counts["additional_sentences_delivered"] += len(delivery["new_sentence_sha256"])
             counts["additional_delivery_events_in_later_model_prompt"] += len(received)
+            if route == "autonomous" and received:
+                new_ids = {k for i in received for k in events[i]["delivery"]["new_sentence_sha256"]}
+                final_ids = {k for a in attempts if a["stage"] == "verdict"
+                    for k in (a.get("decision") or {}).get("sentence_ids", [])}
+                acquisition_outcomes.append({"frozen_task_position": position,
+                    "delivered_new_sentences": len(new_ids), "final_answer_present": bool(row["answer"]),
+                    "new_sentences_in_validated_final_selection": len(new_ids & final_ids),
+                    "validation_repair_exhausted": row.get("outcome") == "validation_repair_exhausted"})
             if route == "autonomous" and stop_at is not None:
                 cases.setdefault(route + ":stop_then_verdict", {"route": route,
                     "frozen_task_position": position, "stop_attempt": stop_at,
@@ -132,7 +183,11 @@ def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32,
             counts["slots_with_additional_text_received"] += bool(received)
             counts["recorded_model_calls"] += len(attempts)
         summary[route] = {"slots": len(selected), "counts": dict(counts),
-                          "validated_actions": dict(actions), "validation_errors": dict(errors)}
+                          "validated_actions": dict(actions), "validation_errors": dict(errors),
+                          "coverage_validation_diagnosis": {"failed_attempts": coverage_attempts,
+                              "overlapping_attempt_causes": dict(coverage_causes),
+                              "reached_output_limit": coverage_truncated},
+                          "acquisition_outcomes": acquisition_outcomes}
     return {"schema": "fair-acquisition-saved-receipt-census-v1", "protocol": expected_protocol,
         "run_sha256": expected_sha, "total_slots": len(rows), "routes": summary,
         "first_cases_by_behavior_only": cases,
