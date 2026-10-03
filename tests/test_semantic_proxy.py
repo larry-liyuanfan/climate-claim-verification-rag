@@ -3,6 +3,8 @@ import copy
 
 import pytest
 
+from climate_rag.fair_acquisition import COVERAGE_PROTOCOL
+
 from climate_rag.semantic_proxy import (
     PROTOCOL, ROUTES, aggregate, cited_pair, classify, matrix, text_sha,
 )
@@ -90,3 +92,20 @@ def test_invalid_probabilities_and_roster_refused():
         classify([0.1, float("nan"), 0.2], "entailment")
     with pytest.raises(ValueError, match="roster"):
         aggregate([{"route": r, "slot_position": 1, "status": "overlength"} for r in ROUTES], tasks=1)
+
+
+def test_coverage_protocol_requires_explicit_binding_and_reaches_scoring():
+    run = {"protocol": COVERAGE_PROTOCOL, "runs": [row(a) for a in ROUTES]}
+    with pytest.raises(ValueError, match="protocol"):
+        matrix(run)
+    with pytest.raises(ValueError, match="protocol"):
+        matrix(run, expected_protocol="arbitrary")
+
+    class Judge:
+        def score(self, premise, hypothesis):
+            assert premise == hypothesis
+            return [0.1, 0.85, 0.05], 8
+
+    report, records = score_saved(run, Judge(), expected_protocol=COVERAGE_PROTOCOL)
+    assert len(records) == 3
+    assert report["measurement_cost"]["nli_calls"] == 3

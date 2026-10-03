@@ -13,6 +13,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from climate_rag.fair_acquisition import COVERAGE_PROTOCOL
+
 PROTOCOL = "fair-acquisition-three-arm-v1-20261003"
 ROUTES = ("fixed_multiquery", "deterministic_workflow", "autonomous")
 
@@ -30,10 +32,12 @@ def require(value: bool, error: str) -> None:
         raise ValueError(error)
 
 
-def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32) -> dict[str, Any]:
+def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32,
+           expected_protocol: str = PROTOCOL) -> dict[str, Any]:
     require(digest(run_path) == expected_sha, "run_hash_mismatch")
     run = json.loads(run_path.read_bytes())
-    require(run["protocol"] == PROTOCOL, "unsupported_protocol")
+    require(expected_protocol in {PROTOCOL, COVERAGE_PROTOCOL}
+            and run["protocol"] == expected_protocol, "unsupported_protocol")
     rows = run["runs"]
     task_ids = [r["task_id"] for r in rows if r["route"] == ROUTES[0]]
     require(len(task_ids) == expected_tasks and len(set(task_ids)) == expected_tasks
@@ -129,7 +133,7 @@ def census(run_path: Path, expected_sha: str, *, expected_tasks: int = 32) -> di
             counts["recorded_model_calls"] += len(attempts)
         summary[route] = {"slots": len(selected), "counts": dict(counts),
                           "validated_actions": dict(actions), "validation_errors": dict(errors)}
-    return {"schema": "fair-acquisition-saved-receipt-census-v1", "protocol": PROTOCOL,
+    return {"schema": "fair-acquisition-saved-receipt-census-v1", "protocol": expected_protocol,
         "run_sha256": expected_sha, "total_slots": len(rows), "routes": summary,
         "first_cases_by_behavior_only": cases,
         "case_selection": "first occurrence within each route/behavior in frozen task order; no score/gold filter",
@@ -143,8 +147,9 @@ def main() -> None:
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--run-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--protocol", choices=(PROTOCOL, COVERAGE_PROTOCOL), default=PROTOCOL)
     args = parser.parse_args()
-    result = census(args.run, args.run_sha256)
+    result = census(args.run, args.run_sha256, expected_protocol=args.protocol)
     with args.output.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(result, stream, indent=2)
         stream.write("\n")

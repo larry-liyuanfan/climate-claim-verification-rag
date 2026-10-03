@@ -13,7 +13,7 @@ from typing import Any
 
 import numpy as np
 
-from .fair_acquisition import PROTOCOL, ROUTES
+from .fair_acquisition import COVERAGE_PROTOCOL, PROTOCOL, ROUTES
 from .metrics import paired_bootstrap
 
 MODEL = "cross-encoder/nli-deberta-v3-small"
@@ -27,8 +27,9 @@ def text_sha(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
 
-def matrix(run: Mapping[str, Any], *, expected_tasks: int | None = None) -> list[dict[str, Any]]:
-    if run.get("protocol") != PROTOCOL:
+def matrix(run: Mapping[str, Any], *, expected_tasks: int | None = None,
+           expected_protocol: str = PROTOCOL) -> list[dict[str, Any]]:
+    if expected_protocol not in {PROTOCOL, COVERAGE_PROTOCOL} or run.get("protocol") != expected_protocol:
         raise ValueError("unsupported_saved_protocol")
     rows = run["runs"]
     ids = [r["task_id"] for r in rows if r["route"] == ROUTES[0]]
